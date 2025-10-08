@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leo Web Editor</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: #2d2d30;
+            padding: 10px 20px;
+            border-bottom: 1px solid #3e3e42;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+        }
+        .tree-pane {
+            width: 300px;
+            background-color: #252526;
+            border-right: 1px solid #3e3e42;
+            padding: 10px;
+        }
+        .editor-pane {
+            flex: 1;
+            background-color: #1e1e1e;
+            padding: 20px;
+        }
+        h1 {
+            margin: 0;
+            color: #569cd6;
+        }
+        .welcome-message {
+            color: #9cdcfe;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Leo Web Editor</h1>
+        </div>
+        <div class="main-content">
+            <div class="tree-pane">
+                <h3>Leo Outline</h3>
+                <div id="tree-container">
+                    <!-- Tree structure will be rendered here -->
+                </div>
+            </div>
+            <div class="editor-pane">
+                <div class="welcome-message">
+                    <h2>Welcome to Leo Web Editor</h2>
+                    <p>A web-based version of the Leo Editor - a structured document editor.</p>
+                    <p id="status">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
