@@ -16,7 +16,7 @@ class LeoWebApp {
 
     private init(): void {
         console.log('Leo Web Editor initializing...');
-        
+
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.setupApp());
@@ -27,7 +27,7 @@ class LeoWebApp {
 
     private setupApp(): void {
         console.log('Setting up Leo Web Editor application...');
-        
+
         // Update status
         const statusElement = document.getElementById('status');
         if (statusElement) {
@@ -36,7 +36,7 @@ class LeoWebApp {
 
         // Initialize the Leo editor
         this.editor.initialize();
-        
+
         console.log('Leo Web Editor ready!');
     }
 }

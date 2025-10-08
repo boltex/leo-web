@@ -10,7 +10,13 @@
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["leo", "editor", "typescript", "web", "spa"],
+  "keywords": [
+    "leo",
+    "editor",
+    "typescript",
+    "web",
+    "spa"
+  ],
   "author": "Leo Editor Developer",
   "license": "MIT",
   "devDependencies": {

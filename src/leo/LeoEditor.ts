@@ -63,7 +63,7 @@ export class LeoEditor {
 
     public initialize(): void {
         console.log('Initializing Leo Editor...');
-        
+
         this.treeContainer = document.getElementById('tree-container');
         if (this.treeContainer) {
             this.renderTree();
@@ -86,10 +86,10 @@ export class LeoEditor {
         const nodeElement = document.createElement('div');
         nodeElement.className = 'tree-node';
         nodeElement.style.marginLeft = `${depth * 20}px`;
-        
+
         const nodeHeader = document.createElement('div');
         nodeHeader.className = 'node-header';
-        
+
         // Expand/collapse icon
         const expandIcon = document.createElement('span');
         expandIcon.className = 'expand-icon';
@@ -97,7 +97,7 @@ export class LeoEditor {
         expandIcon.style.cursor = node.children.length > 0 ? 'pointer' : 'default';
         expandIcon.style.marginRight = '5px';
         expandIcon.style.color = '#569cd6';
-        
+
         if (node.children.length > 0) {
             expandIcon.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -114,7 +114,7 @@ export class LeoEditor {
         headline.style.backgroundColor = node === this.currentNode ? '#264f78' : 'transparent';
         headline.style.padding = '2px 5px';
         headline.style.borderRadius = '3px';
-        
+
         headline.addEventListener('click', () => {
             this.selectNode(node);
         });

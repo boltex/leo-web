@@ -32,10 +32,13 @@ This project is a TypeScript single-page application that brings the Leo Editor 
 ### Development
 
 Start the development server:
+
 ```bash
 npm run dev
 ```
+
 or
+
 ```bash
 npm start
 ```
@@ -45,6 +48,7 @@ This will start the webpack dev server and automatically open the application in
 ### Building for Production
 
 Build the application for production:
+
 ```bash
 npm run build
 ```
