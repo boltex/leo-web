@@ -6,22 +6,14 @@ A web-based version of the Leo Editor - a structured document editor that allows
 
 This project is a TypeScript single-page application that brings the Leo Editor experience to the web. Leo Editor is known for its unique approach to organizing documents through an outline-based structure, making it perfect for complex documentation, note-taking, and content organization.
 
-## Features
-
-- **Hierarchical Document Structure**: Organize your content in a tree-like outline
-- **Interactive Outline Navigation**: Click to expand/collapse nodes and navigate the structure
-- **TypeScript Implementation**: Built with modern TypeScript for type safety and better development experience
-- **Responsive Design**: Works well on different screen sizes
-- **Hot Reload Development**: Fast development with webpack dev server
-
-## Getting Started
+## Contributing
 
 ### Prerequisites
 
 - Node.js (version 14 or higher)
 - npm or yarn
 
-### Installation
+### Build
 
 1. Clone the repository
 2. Install dependencies:
@@ -60,29 +52,11 @@ The built files will be in the `dist/` directory.
 - `npm run type-check` - Run TypeScript type checking without building
 - `npm run clean` - Clean the dist directory
 
-## Project Structure
-
-```
-leo-web/
-├── src/
-│   ├── leo/
-│   │   └── LeoEditor.ts      # Core Leo Editor functionality
-│   ├── index.html            # Main HTML template
-│   ├── index.ts              # Application entry point
-│   └── styles.css            # Global styles
-├── dist/                     # Build output (generated)
-├── webpack.config.js         # Webpack configuration
-├── tsconfig.json            # TypeScript configuration
-├── package.json             # Project dependencies and scripts
-└── README.md               # This file
-```
-
 ## Technologies Used
 
 - **TypeScript** - Type-safe JavaScript
 - **Webpack** - Module bundling and development server
 - **HTML5 & CSS3** - Modern web standards
-- **VS Code inspired styling** - Familiar dark theme
 
 ## Contributing
 
