@@ -5,79 +5,233 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leo Web Editor</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-        }
-
-        .container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background-color: #2d2d30;
-            padding: 10px 20px;
-            border-bottom: 1px solid #3e3e42;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-        }
-
-        .tree-pane {
-            width: 300px;
-            background-color: #252526;
-            border-right: 1px solid #3e3e42;
-            padding: 10px;
-        }
-
-        .editor-pane {
-            flex: 1;
-            background-color: #1e1e1e;
-            padding: 20px;
-        }
-
-        h1 {
-            margin: 0;
-            color: #569cd6;
-        }
-
-        .welcome-message {
-            color: #9cdcfe;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-    </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Leo Web Editor</h1>
+    <!--
+    * Layout *
+    The body element is split in two (outline-find-container and body-pane) by the main-resizer.
+    The outline-find-container is split in two (outline-pane and find-pane) by the secondary-resizer.
+    So in total, there are three panes and two resizers. The rest are just floating buttons which are not part of the layout.
+-->
+    <div id="outline-find-container">
+        <div id="outline-pane" tabindex="0">
+            <div id="spacer"></div>
+            <div id="collapse-all-btn" class="outline-icon" title="Collapse All" role="button"
+                aria-label="Collapse All">
+                <svg width="16" height="16" fill="currentColor">
+                    <path
+                        d="M 6 2 L 5 3 L 5 5 L 3 5 L 2 6 L 2 13 L 3 14 L 10 14 L 11 13 L 11 11 L 13 11 L 14 10 L 14 3 L 13 2 L 6 2 z M 6 3 L 13 3 L 13 10 L 11 10 L 11 6 L 10 5 L 6 5 L 6 3 z M 3 6 L 10 6 L 10 13 L 3 13 L 3 6 z M 4 9 L 4 10 L 9 10 L 9 9 L 4 9 z "
+                        style="fill:var(--find-border-color);" />
+                </svg>
+            </div>
         </div>
-        <div class="main-content">
-            <div class="tree-pane">
-                <h3>Leo Outline</h3>
-                <div id="tree-container">
-                    <!-- Tree structure will be rendered here -->
+        <div id="secondary-resizer"></div>
+        <div id="find-pane">
+            <input id="find-input" type="text" autocomplete="off" placeholder="&lt;find pattern here&gt;"
+                title="Ctrl+F: Search | F3/F2: Next/Prev" aria-label="Find pattern">
+            <div id="find-controls" role="region" aria-label="Find options">
+                <div class="find-col" aria-label="Search options">
+                    <label for="opt-whole">
+                        <input id="opt-whole" type="checkbox" name="find-option" />
+                        Whole Word
+                    </label>
+                    <label for="opt-ignorecase">
+                        <input id="opt-ignorecase" type="checkbox" name="find-option" checked />
+                        Ignore Case
+                    </label>
+                    <label for="opt-regexp">
+                        <input id="opt-regexp" type="checkbox" name="find-option" />
+                        Regexp
+                    </label>
+                    <label for="opt-mark">
+                        <input id="opt-mark" type="checkbox" name="find-option" />
+                        Mark Finds
+                    </label>
+                </div>
+                <div class="find-col" role="radiogroup" aria-label="Search scope">
+                    <label for="scope-entire">
+                        <input id="scope-entire" type="radio" name="find-scope" value="entire" checked />
+                        Entire Outline
+                    </label>
+                    <label for="scope-suboutline">
+                        <input id="scope-suboutline" type="radio" name="find-scope" value="suboutline" />
+                        Suboutline Only
+                    </label>
+                    <label for="scope-node">
+                        <input id="scope-node" type="radio" name="find-scope" value="node" />
+                        Node Only
+                    </label>
+                    <label for="opt-headline">
+                        <input id="opt-headline" type="checkbox" name="find-target" checked />
+                        Search Headline
+                    </label>
+                    <label for="opt-body">
+                        <input id="opt-body" type="checkbox" name="find-target" checked />
+                        Search Body
+                    </label>
                 </div>
             </div>
-            <div class="editor-pane">
-                <div class="welcome-message">
-                    <h2>Welcome to Leo Web Editor</h2>
-                    <p>A web-based version of the Leo Editor - a structured document editor.</p>
-                    <p id="status">Loading...</p>
+            <span id="config-btn" aria-label="Configuration" title="Configuration">⚙️</span>
+            <div id="config-controls" role="region" aria-label="Configuration settings">
+                <span class="config-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" height="32" width="32" viewBox="0 0 16 16">
+                        <path d="M2.875 1.21h10.566v8.482H2.875z" fill="#7c2504" />
+                        <path
+                            d="M11.093 1.21c-1.14.782-1.827 2.105-1.828 3.523 0 1.747 1.023 3.246 2.482 3.89v6.021h1.694V1.21zm-8.218 0V14.88h1.713V9.009a4.073 4.225 0 003.167-4.115A4.073 4.225 0 005.673 1.21z"
+                            fill="#b04620" />
+                        <path
+                            d="M6.35 6.339c.12.188.21.425.174.645-.245.565-.76 1.076-1.191 1.44-.73.668-1.442.894-2.433.993V4.002C4 4.79 5.58 5.269 6.35 6.339z"
+                            fill="#c96b4b" />
+                        <path
+                            d="M4.332 8.389c-.158 0-.79.316-.79.316l-.65.561h-.07l-.034 3.3.333.28.562-.105c.37-.073.72-.394 1.106-.368 0 0-.368.375-.457.614-.177.595-.124 1.405.334 1.79.25.201.612.202.93.246 1.464-.037 4.222.01 5.74.035.626-.22.74-.879.841-1.422.07-.409.049-.903-.193-1.21-.215-.265-.877-.527-.877-.527s1.117.332 1.68.482c.2.054.601.15.601.15l.123-3.844-1.035-.298-1.176.07c-1.934.446-3.108.225-4.914.245l-1.053-.28s-.843-.035-1-.035z"
+                            fill="#e4dcc8" />
+                        <path
+                            d="M4.708 2.514c-.947.022-1.475.03-1.808 1.194-.061.43.13.923.439 1.228.415.386 1.612.462 2.264.738.249.037.546.14.755 0 .277-.202.345-.987.473-1.37.003-.511-.243-1.192-.649-1.597-.477-.294-.98-.212-1.474-.193zm7.065.1c-.2.002-.405.024-.613.036-.518-.066-.748.086-.983.526-.343.738-.604 2.514.21 2.878.915.34 1.406-.481 2.001-.824.271-.149.585-.198.878-.299.049-1.108.161-1.483-.51-2.018-.322-.249-.648-.301-.983-.298z"
+                            fill="#f9f2b3" />
+                        <path
+                            d="M2.49.713V10l-1.516.143a.334.334 0 10.063.666l1.453-.138v.59l-1.483.288a.334.334 0 10.127.656l1.356-.263v3.349H13.88v-4.025h1.032a.334.334 0 100-.67h-1.032v-.64l1.054-.108a.334.334 0 10-.067-.665l-.987.101V.713H2.49zm.905.905h9.579v2.411a1.607 1.607 0 00-.088-.224c-.315-.63-.738-.878-1.277-.857-.636.001-1.105.415-1.342 1.009-.152.398-.113.704-.09 1.082.016.24.4.593.692.537.453-.088 1.18-.482 1.757-.765.18-.088.289-.19.348-.303v4.869l-2.427.246a.334.334 0 10.067.665l2.36-.24v.549h-2.405a.334.334 0 100 .669h2.405v3.12H3.395v-.677c.117.087.348.15.436.11.33-.153.357-.46.749-.83.182-.171.323-.42.599-.562.246-.126.727-.052 1.452-.207 1.346-.232 2.858-.122 3.97.085.707.134.891.457 1.033.776.11.248.07.353.247.558.137.16.505.353.716.169.168-.147 0-.502.182-.682.204-.204.28-.442.007-.745-.902-.485-1.542-.586-2.66-.737-.199-.02-.316-.245-.461-.38-.345-.32-.675-.483-1.103-.532.016-.055.037-.204.068-.244.695-.897 1.659-1.467 2.392-1.634.273-.062.157-.392.093-.431-.145-.088-.331-.093-.5-.093-.319.001-.633.08-.95.098-.952.054-1.783.082-2.651.006-.287-.025-.576-.058-.864-.046-.463.02-.554.254-.43.598.045.128.579.135.84.272.423.22.632.51 1.103 1.097.058.071.126.137.167.218.023.046.023.1.03.15-.514.002-.712.127-1.025.46-.363.38-.283.403-1.243.553-.22.034-.458.033-.678.069-.413.067-1.056.097-1.375.472-.062.073-.1.14-.143.208v-.719l2.476-.48a.334.334 0 10-.128-.657l-2.348.456v-.5l2.445-.231a.334.334 0 10-.063-.666l-2.382.225v-5.62c.2.094.516.16.657.221.442.194.737.484 1.025.634.18.094.866.282 1.016.147.222-.2.262-1.117.074-1.538a2.12 2.12 0 00-.651-.854c-.09-.072-.43-.153-.68-.148-.25.004-.556.053-.711.091-.315.079-.473.259-.683.505-.012.012-.031.05-.047.076z"
+                            fill="#1c0e01" />
+                        <path
+                            d="M4.487 3.186c-.11.182-.05.382.062.533.094.125.222.226.36.298.222.11.36.162.484-.062.151-.264.091-.52-.112-.72-.23-.204-.581-.277-.794-.05zm7 .26c-.326.03-.478.33-.472.633a.91.91 0 00.162.385c.247-.037.604-.197.769-.36.093-.133.21-.369.149-.509-.152-.191-.403-.18-.608-.149z"
+                            fill="#fff" />
+                    </svg>
+                    Leo Outline Viewer </span>
+                <span class="sub-title">Visible Controls</span>
+                <div class="config-col" aria-label="Config options">
+                    <label for="show-prev-next-mark">
+                        <input id="show-prev-next-mark" type="checkbox" name="config-option" checked />
+                        Previous/Next Marked
+                    </label>
+                    <label for="show-toggle-mark">
+                        <input id="show-toggle-mark" type="checkbox" name="config-option" />
+                        Mark/Unmark
+                    </label>
+                    <label for="show-prev-next-history">
+                        <input id="show-prev-next-history" type="checkbox" name="config-option" checked />
+                        Previous/Next History
+                    </label>
+                    <label for="show-hoist-dehoist">
+                        <input id="show-hoist-dehoist" type="checkbox" name="config-option" />
+                        Hoist/De-hoist
+                    </label>
                 </div>
+                <div class="config-col" aria-label="Config options">
+                    <label for="show-layout-orientation">
+                        <input id="show-layout-orientation" type="checkbox" name="config-option" checked />
+                        Layout Orientation
+                    </label>
+                    <label for="show-theme-toggle">
+                        <input id="show-theme-toggle" type="checkbox" name="config-option" checked />
+                        Dark/Light Theme
+                    </label>
+                    <label for="show-node-icons">
+                        <input id="show-node-icons" type="checkbox" name="config-option" checked />
+                        Node Icons
+                    </label>
+                    <label for="show-collapse-all">
+                        <input id="show-collapse-all" type="checkbox" name="config-option" checked />
+                        Collapse All
+                    </label>
+                    <!-- Future possible options: -->
+                    <!-- <label for="show-chapters">
+                    <input id="show-chapters" type="checkbox" name="config-option" />
+                    Chapters
+                </label> -->
+                </div>
+                <span class="sub-title">Keyboard Shortcuts</span>
+                <ul class="config-col shortcuts">
+                    <li><span class="kbd-spacer"><kbd>Arrows</kbd></span> — Navigate Outline</li>
+                    <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>Arrows</kbd></span> — Navigate from Body Pane</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>F</kbd></span> — Find…</li>
+                    <li><span class="kbd-spacer"><kbd>F2</kbd>/<kbd>F3</kbd></span> — Previous/Next Match</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>M</kbd></span> — Mark Node</li>
+                    <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>-</kbd></span> — Collapse All</li>
+                </ul>
+                <span class="sub-title footer">
+                    <a href="https://leo-editor.github.io/leo-editor/" target="_blank">Leo Editor</a>
+                    <span>Outline Viewer - 1.0.2 - Made by</span>
+                    <a href="https://github.com/boltex" target="_blank">Félix</a>
+                </span>
             </div>
         </div>
     </div>
+    <div id="main-resizer"></div>
+    <div id="body-pane" tabindex="0" contenteditable="plaintext-only" spellcheck="false"></div>
+    <div id="button-trigger-area"></div>
+    <div id="button-container">
+        <button tabindex="-1" id="theme-toggle" class="action-button" aria-label="Toggle dark/light mode"><span
+                id="toggle-icon">🌓</span></button>
+        <button tabindex="-1" id="layout-toggle" class="action-button" aria-label="Toggle layout orientation"><span
+                id="layout-icon">📐</span></button>
+        <button tabindex="-1" id="dehoist-btn" class="action-button" aria-label="De-hoist" title="De-hoist" disabled>
+            <span class="svg-icon" id="dehoist-icon">
+                <svg width="20" height="20" viewBox="0 0 17 17">
+                    <path
+                        d="m 9.717,5.896 0.701,1.249 h 3.238 v 6.494 H 2.344 V 9.3649687 L 1.096,10.038969 V 14.896 h 13.808 v -9 z M 3.198,0.844 1.733,8.267 4.326,6.865 6.23,10.258 9.687,8.388 7.78,4.997 10.374,3.596 Z"
+                        style="fill:var(--find-text-color);" />
+                </svg>
+            </span>
+        </button>
+        <button tabindex="-1" id="hoist-btn" class="action-button" aria-label="Hoist" title="Hoist">
+            <span class="svg-icon" id="hoist-icon">
+                <svg width="20" height="20" viewBox="0 0 17 17">
+                    <path
+                        d="M 7.907,10.33 3.089,4.496 h 2.947 l 0.062,-3.89 3.93,0.002 -0.065,3.89 2.948,-0.001 z M 1.096,5.896 v 9 h 13.808 v -9 h -0.596094 l -1.07,1.249 H 13.656 v 6.494 H 2.344 V 7.145 h 0.4117139 l -1.031,-1.249 z"
+                        style="fill:var(--find-text-color);" />
+                </svg>
+            </span>
+        </button>
+        <button tabindex="-1" id="next-btn" class="action-button" aria-label="Goto Next" title="Goto Next" disabled>
+            <span class="svg-icon" id="next-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <polygon points="14,10 6,3 6,17" fill="#494" />
+                </svg>
+            </span>
+        </button>
+        <button tabindex="-1" id="prev-btn" class="action-button" aria-label="Goto Previous" title="Goto Previous"
+            disabled>
+            <span class="svg-icon" id="prev-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <polygon points="6,10 14,3 14,17" fill="#494" />
+                </svg>
+            </span>
+        </button>
+        <button tabindex="-1" id="next-marked-btn" class="action-button" aria-label="Go to Next Marked Node"
+            title="Go to Next Marked Node" disabled>
+            <span class="svg-icon" id="next-marked-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <polygon points="14,10 6,3 6,17" fill="#cb1919" />
+                </svg>
+            </span>
+        </button>
+        <button tabindex="-1" id="toggle-mark-btn" class="action-button" aria-label="Toggle Mark" title="Toggle Mark">
+            <span class="svg-icon" id="toggle-mark-icon">
+                <svg width="20" height="20" viewBox="1.5 1 13 13">
+                    <path
+                        d="m 5.0855,2.17 c -0.532,0 -0.73,0.196 -0.73,0.728 v 10.933 l 3.645,-2.253 3.644,2.253 V 2.898 c 0,-0.532 -0.197,-0.729 -0.463,-0.7285 z m 3.906,4.088 0.525,1.574 -0.146,0.124 -1.37,-0.976 -1.37,0.976 -0.146,-0.124 0.525,-1.574 -1.356,-0.991 0.066,-0.168 1.676,-0.022 0.51,-1.574 h 0.182 l 0.51,1.574 1.677,0.022 0.08813,0.129125 z"
+                        style="fill:#cb1919;" />
+                </svg>
+            </span>
+        </button>
+        <button tabindex="-1" id="prev-marked-btn" class="action-button" aria-label="Go to Previous Marked Node"
+            title="Go to Previous Marked Node" disabled>
+            <span class="svg-icon" id="prev-marked-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <polygon points="6,10 14,3 14,17" fill="#cb1919" />
+                </svg>
+            </span>
+        </button>
+    </div>
+    <div id="menu" class="context-menu">
+        <ul>
+            <li id="action-mark">Mark</li>
+            <li id="action-unmark">Unmark</li>
+            <li id="action-hoist">Hoist</li>
+            <li id="action-dehoist">De-Hoist</li>
+        </ul>
+    </div>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
 </body>
 
 </html>

@@ -3,7 +3,7 @@
  * A web-based version of the Leo Editor, a structured document editor
  */
 
-import './styles.css';
+import './style.css';
 import { LeoEditor } from './leo/LeoEditor';
 
 class LeoWebApp {
@@ -26,16 +26,9 @@ class LeoWebApp {
     }
 
     private setupApp(): void {
-        console.log('Setting up Leo Web Editor application...');
-
-        // Update status
-        const statusElement = document.getElementById('status');
-        if (statusElement) {
-            statusElement.textContent = 'Leo Web Editor initialized successfully!';
-        }
 
         // Initialize the Leo editor
-        this.editor.initialize();
+        this.editor.handleDOMContentLoaded();
 
         console.log('Leo Web Editor ready!');
     }

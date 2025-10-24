@@ -57,6 +57,7 @@ The built files will be in the `dist/` directory.
 - **TypeScript** - Type-safe JavaScript
 - **Webpack** - Module bundling and development server
 - **HTML5 & CSS3** - Modern web standards
+- **idb** - A small wrapper that makes IndexedDB usable.
 
 ## Contributing
 
