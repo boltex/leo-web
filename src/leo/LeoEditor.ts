@@ -2041,6 +2041,7 @@ export class LeoEditor {
             this.selectAndOrToggleAndRedraw(initialSelectedNode); // sets selectedNode amd flatRows
         }
         this.setupButtonContainerAutoHide();
+        this.updateMarkedButtonStates();
     }
 
     private handleThemeToggleClick = () => {
