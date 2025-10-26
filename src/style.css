@@ -125,6 +125,64 @@
   background-color: var(--hover-bg);
 }
 
+/* Top Menu */
+.menu {
+  display: flex;
+  background: #eee;
+  border-bottom: 1px solid #ccc;
+  position: relative;
+  z-index: 10;
+  user-select: none;
+}
+
+.submenu {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  min-width: 160px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.submenu.visible {
+  display: flex;
+}
+
+.menu-item {
+  position: relative;
+  padding: 5px 14px;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.menu-item:hover {
+  background: #cce;
+}
+
+.menu-item.active,
+.menu-item.sub-active {
+  background: #bbd;
+}
+
+.menu-item.focused {
+  outline: 1px dotted #444;
+  background: #dde;
+}
+
+.menu-item.has-sub::after {
+  content: "▶";
+  font-size: 10px;
+  float: right;
+  margin-left: 8px;
+  color: #666;
+}
+
+.menu:not(.submenu) > .menu-item {
+  padding: 5px 16px;
+}
+
 .icon0 {
   background-image: url('data:image/svg+xml;utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path d="M0 4v9h15.15V4zm1 1h13.15v7H1z" fill="%234d4d4d"/></svg>');
 }

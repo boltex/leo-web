@@ -7,6 +7,7 @@ import './style.css';
 import { LeoEditor } from './leo/LeoEditor';
 
 class LeoWebApp {
+
     private editor: LeoEditor;
 
     constructor() {
@@ -15,8 +16,6 @@ class LeoWebApp {
     }
 
     private init(): void {
-        console.log('Leo Web Editor initializing...');
-
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.setupApp());
@@ -26,12 +25,10 @@ class LeoWebApp {
     }
 
     private setupApp(): void {
-
         // Initialize the Leo editor
         this.editor.handleDOMContentLoaded();
-
-        console.log('Leo Web Editor ready!');
     }
+
 }
 
 // Initialize the application

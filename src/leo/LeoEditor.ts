@@ -20,8 +20,14 @@ export interface FlatRow {
     node: TreeNode;
 }
 
+export interface MenuEntry {
+    label: string;
+    action?: string;
+    entries?: MenuEntry[];
+}
+
 export class LeoEditor {
-    /* Start of data */
+
     private title = "Virtual Tree View Demo 2"; // Also used as key for localstorage save/restore of expanded and marked sets.
     private genTimestamp = "1234567890"; // Change this to force reload of saved localstorage data.
     private tree: TreeNode = {
@@ -119,7 +125,56 @@ export class LeoEditor {
             "bodyString": "Last node of the tree's natural tree order.\n"
         }
     };
-    /* End of data */
+
+    private menuData: MenuEntry[] = [
+        {
+            label: "File",
+            entries: [
+                { label: "Open...", action: "open" },
+                {
+                    label: "Export",
+                    entries: [
+                        { label: "As PDF...", action: "export_pdf" },
+                        { label: "As Image...", action: "export_img" },
+                    ],
+                },
+                { label: "Exit", action: "exit" },
+            ],
+        },
+        {
+            label: "Edit",
+            entries: [
+                { label: "Undo", action: "undo" },
+                { label: "Redo", action: "redo" },
+                { label: "Cut", action: "cut" },
+                { label: "Copy", action: "copy" },
+                { label: "Paste", action: "paste" },
+            ],
+        },
+        {
+            label: "View",
+            entries: [
+                { label: "Zoom In", action: "zoom_in" },
+                { label: "Zoom Out", action: "zoom_out" },
+                {
+                    label: "Orientation",
+                    entries: [
+                        { label: "Portrait", action: "orient_portrait" },
+                        { label: "Landscape", action: "orient_landscape" },
+                    ],
+                },
+                { label: "Fullscreen", action: "fullscreen" },
+            ],
+        },
+        {
+            label: "Help",
+            entries: [
+                { label: "Documentation", action: "docs" },
+                { label: "About", action: "about" },
+            ],
+        },
+    ];
+
 
     // Note: Also use buildClones and buildParentRefs
     // to add icon member to data entries as needed:
@@ -219,6 +274,11 @@ export class LeoEditor {
     private TOAST: HTMLElement;
     private HTML_ELEMENT: HTMLElement;
 
+    private activeTopMenu: HTMLDivElement | null = null;
+    private focusedItem: HTMLDivElement | null = null;
+    private topLevelItems: HTMLDivElement[] = [];
+    private topLevelSubmenus = new Map();
+
     constructor() {
         this.buildClones(this.tree);
         this.buildParentRefs(this.tree);
@@ -289,9 +349,85 @@ export class LeoEditor {
             'Home': () => this.gotoFirstVisibleNode(),
             'End': () => this.gotoLastVisibleNode()
         };
-
+        // Build the menu
+        this.topLevelItems.length = 0;
+        this.topLevelSubmenus.clear();
+        this.buildMenu(this.menuData);
         // Apply theme & layout before anything else to avoid flash of unstyled content
         this.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
+    }
+
+    private buildMenu(entries: MenuEntry[], level = 0) {
+        const menu = level === 0 ? document.getElementById("top-menu")! : document.createElement("div");
+
+        menu.className = "menu" + (level > 0 ? " submenu" : "");
+
+        for (const entry of entries) {
+            const item = document.createElement("div");
+            item.className = "menu-item";
+            item.textContent = entry.label;
+
+            item.addEventListener("mouseenter", () => {
+                if (this.focusedItem && this.focusedItem !== item) {
+                    this.focusedItem.classList.remove("focused");
+                    this.focusedItem = null;
+                }
+            });
+
+            if (entry.entries) {
+                if (level > 0) item.classList.add("has-sub");
+                const sub = this.buildMenu(entry.entries, level + 1);
+                if (level === 0) {
+                    document.body.appendChild(sub);
+                    this.topLevelSubmenus.set(item, sub);
+                } else {
+                    item.appendChild(sub);
+                }
+
+                if (level === 0) {
+                    item.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        if (this.activeTopMenu === item) {
+                            this.closeAllSubmenus();
+                            this.activeTopMenu = null;
+                        } else {
+                            this.openTopMenu(item, sub, level);
+                        }
+                    });
+
+                    item.addEventListener("mouseenter", () => {
+                        if (this.activeTopMenu && this.activeTopMenu !== item) {
+                            this.openTopMenu(item, sub, level);
+                        }
+                    });
+                } else {
+                    item.addEventListener("mouseenter", () => {
+                        this.positionSubmenu(item, sub, level);
+                        sub.classList.add("visible");
+                    });
+                    item.addEventListener("mouseleave", (e) => {
+                        const related = e.relatedTarget as Node | null;
+                        if (!related || (!item.contains(related) && !sub.contains(related))) {
+                            sub.classList.remove("visible");
+                        }
+                    });
+                }
+            } else if (entry.action) {
+                item.addEventListener("click", () => {
+                    console.log("Action triggered:", entry.action);
+                    this.closeAllSubmenus();
+                    this.activeTopMenu = null;
+                });
+            }
+
+            if (level === 0) {
+                this.topLevelItems.push(item);
+            }
+
+            menu.appendChild(item);
+        }
+
+        return menu;
     }
 
 
@@ -599,7 +735,7 @@ export class LeoEditor {
     };
 
     // * Navigation actions
-    private hoistNode() {
+    private hoistNode = () => {
         if (!this.selectedNode) return;
 
         // If selected node is already hoisted: no-op (Even if button should be disabled in that case)
@@ -620,7 +756,7 @@ export class LeoEditor {
         this.renderTree();
     }
 
-    private dehoistNode() {
+    private dehoistNode = () => {
         if (this.hoistStack.length === 0) {
             return;
         }
@@ -767,7 +903,7 @@ export class LeoEditor {
         }
     };
 
-    private collapseAll() {
+    private collapseAll = () => {
         // Collapse all nodes in visible outline and select the proper top-level node
         const currentRoot = this.getCurrentRoot()!;
         if (currentRoot === this.tree) {
@@ -818,13 +954,13 @@ export class LeoEditor {
         }
     }
 
-    private toggleMarkCurrentNode() {
+    private toggleMarkCurrentNode = () => {
         if (this.selectedNode) {
             this.toggleMark(this.selectedNode);
         }
     }
 
-    private gotoNextMarkedNode() {
+    private gotoNextMarkedNode = () => {
         if (!this.selectedNode || this.marked.size === 0) {
             return;
         }
@@ -859,7 +995,7 @@ export class LeoEditor {
         }
     }
 
-    private gotoPrevMarkedNode() {
+    private gotoPrevMarkedNode = () => {
         if (!this.selectedNode || this.marked.size === 0) {
             return;
         }
@@ -921,7 +1057,7 @@ export class LeoEditor {
         this.toggleButtonVisibility(this.ACTION_DEHOIST, null, this.hoistStack.length > 0); // only check hoist stack length
     }
 
-    private toggleConfiguration() {
+    private toggleConfiguration = () => {
         if (this.HTML_ELEMENT.getAttribute('data-show-config') === 'true') {
             this.HTML_ELEMENT.setAttribute('data-show-config', 'false');
             this.CONFIG_BTN.innerHTML = '⚙️';
@@ -950,7 +1086,7 @@ export class LeoEditor {
         this.updateHistoryButtonStates();
     }
 
-    private previousHistory() {
+    private previousHistory = () => {
         if (this.currentHistoryIndex > 0) {
             this.currentHistoryIndex--;
             const node = this.navigationHistory[this.currentHistoryIndex];
@@ -959,7 +1095,7 @@ export class LeoEditor {
         }
     }
 
-    private nextHistory() {
+    private nextHistory = () => {
         if (this.currentHistoryIndex < this.navigationHistory.length - 1) {
             this.currentHistoryIndex++;
             const node = this.navigationHistory[this.currentHistoryIndex];
@@ -1116,7 +1252,7 @@ export class LeoEditor {
         }
     }
 
-    private renderTree() {
+    private renderTree = () => {
         if (!this.flatRows) {
             return; // Not initialized yet
         }
@@ -1262,7 +1398,7 @@ export class LeoEditor {
         }
     }
 
-    private preventDefault(e: Event) {
+    private preventDefault = (e: Event) => {
         e.preventDefault(); // Utility function used in setupBodyPaneHandlers
     }
 
@@ -1294,7 +1430,6 @@ export class LeoEditor {
         }
     }
 
-    // TODO : SET IN CONSTRUCTOR ??
     private handleDrag = this.throttle((e) => {
         if (this.currentLayout === 'vertical') {
             let clientX = e.clientX;
@@ -1325,7 +1460,7 @@ export class LeoEditor {
         this.updateCollapseAllPosition();
     }, 33);
 
-    private startDrag(e: Event) {
+    private startDrag = (e: Event) => {
         this.isDragging = true;
         document.body.classList.add('dragging-main');
         e.preventDefault();
@@ -1335,7 +1470,7 @@ export class LeoEditor {
         document.addEventListener('touchend', this.stopDrag);
     }
 
-    private stopDrag() {
+    private stopDrag = () => {
         if (this.isDragging) {
             this.isDragging = false;
             document.body.classList.remove('dragging-main');
@@ -1414,7 +1549,7 @@ export class LeoEditor {
         this.updateCollapseAllPosition();
     }, 33);
 
-    private startSecondaryDrag(e: Event) {
+    private startSecondaryDrag = (e: Event) => {
         this.secondaryIsDragging = true;
         document.body.classList.add('dragging-secondary');
         e.preventDefault();
@@ -1424,7 +1559,7 @@ export class LeoEditor {
         document.addEventListener('touchend', this.stopSecondaryDrag);
     }
 
-    private stopSecondaryDrag() {
+    private stopSecondaryDrag = () => {
         if (this.secondaryIsDragging) {
             this.secondaryIsDragging = false;
             document.body.classList.remove('dragging-secondary');
@@ -1440,6 +1575,15 @@ export class LeoEditor {
     private updatePanelSizes() {
         this.updateOutlineContainerSize();
         this.updateOutlinePaneSize();
+    }
+
+    private closeMenusEvent(e: MouseEvent) {
+        this.MENU.style.display = "none";
+        const target = e.target as Element;
+        if (!target.closest('.menu')) {
+            this.closeAllSubmenus();
+            this.activeTopMenu = null;
+        }
     }
 
     private applyTheme(theme: string) {
@@ -1472,6 +1616,7 @@ export class LeoEditor {
         this.setupButtonHandlers();
         this.setupFindPaneHandlers();
         this.setupConfigCheckboxes();
+        this.setupTopMenuHandlers();
     }
 
     private setupOutlinePaneHandlers() {
@@ -1481,8 +1626,8 @@ export class LeoEditor {
         this.OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
         this.OUTLINE_PANE.addEventListener("scroll", this.throttle(this.renderTree, 33));
         this.OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
-        document.addEventListener("click", () => {
-            this.MENU.style.display = "none";
+        document.addEventListener("click", (e) => {
+            this.closeMenusEvent(e);
         });
     }
 
@@ -1570,6 +1715,138 @@ export class LeoEditor {
         this.SHOW_COLLAPSE_ALL.addEventListener('change', this.updateButtonVisibility);
     }
 
+    private setupTopMenuHandlers() {
+        document.addEventListener("keydown", (e) => {
+            if (!this.activeTopMenu) return;
+
+            const topItems = this.topLevelItems;
+            const topIndex = topItems.indexOf(this.activeTopMenu);
+            if (topIndex === -1) return;
+
+            let openSubmenu = this.focusedItem
+                ? this.focusedItem.closest(".submenu")
+                : this.topLevelSubmenus.get(this.activeTopMenu);
+
+            if (!openSubmenu) return;
+
+            // Handle top-level navigation
+            if (!this.focusedItem || !openSubmenu.contains(this.focusedItem)) {
+                switch (e.key) {
+                    case "ArrowRight":
+                        e.preventDefault();
+                        const nextTop = topItems[(topIndex + 1) % topItems.length];
+                        const nextSub = this.topLevelSubmenus.get(nextTop);
+                        if (nextTop && nextSub) {
+                            this.openTopMenu(nextTop, nextSub, 0);
+                            this.focusItem(nextSub.querySelector(".menu-item"));
+                        }
+                        return;
+                    case "ArrowLeft":
+                        e.preventDefault();
+                        const prevTop = topItems[(topIndex - 1 + topItems.length) % topItems.length];
+                        const prevSub = this.topLevelSubmenus.get(prevTop);
+                        if (prevTop && prevSub) {
+                            this.openTopMenu(prevTop, prevSub, 0);
+                            this.focusItem(prevSub.querySelector(".menu-item"));
+                        }
+                        return;
+                    case "ArrowDown":
+                        e.preventDefault();
+                        const currentSub = this.topLevelSubmenus.get(this.activeTopMenu);
+                        if (currentSub) {
+                            const firstItem = currentSub.querySelector(".menu-item");
+                            if (firstItem) this.focusItem(firstItem);
+                        }
+                        return;
+                    case "Escape":
+                        e.preventDefault();
+                        this.closeAllSubmenus();
+                        this.activeTopMenu = null;
+                        return;
+                }
+                return; // stop here if we just handled top-level
+            }
+
+            // Handle submenu navigation
+            const items: HTMLDivElement[] = Array.from(openSubmenu.querySelectorAll(":scope > .menu-item"));
+            const index = this.focusedItem ? items.indexOf(this.focusedItem) : -1;
+
+            switch (e.key) {
+                case "ArrowDown":
+                    e.preventDefault();
+                    if (index < items.length - 1) {
+                        this.focusItem(items[index + 1]!);
+                    } else {
+                        this.focusItem(items[0]!); // Wrap to first item
+                    }
+                    break;
+                case "ArrowUp":
+                    e.preventDefault();
+                    if (index > 0) {
+                        this.focusItem(items[index - 1]!);
+                    } else {
+                        this.focusItem(items[items.length - 1]!); // Wrap to last item
+                    }
+                    break;
+                case "ArrowRight":
+                    e.preventDefault();
+                    if (this.focusedItem?.classList.contains("has-sub")) {
+                        const sub: HTMLElement | null = this.focusedItem.querySelector(":scope > .submenu");
+                        if (sub) {
+                            this.positionSubmenu(this.focusedItem, sub, 1);
+                            sub.classList.add("visible");
+                            this.focusItem(sub.querySelector(".menu-item"));
+                        }
+                    } else {
+                        const nextTop = topItems[(topIndex + 1) % topItems.length];
+                        const nextSub = this.topLevelSubmenus.get(nextTop);
+                        if (nextTop && nextSub) {
+                            this.openTopMenu(nextTop, nextSub, 0);
+                            this.focusItem(nextSub.querySelector(".menu-item"));
+                        }
+                    }
+                    break;
+                case "ArrowLeft":
+                    e.preventDefault();
+                    const parentMenu: HTMLElement | null = this.focusedItem.closest(".submenu")!;
+                    const parentItem: HTMLDivElement | null = parentMenu?.parentElement?.closest(".menu-item")!;
+
+                    if (parentItem) {
+                        parentMenu.classList.remove("visible");
+                        this.focusItem(parentItem);
+                    } else {
+                        const prevTop = topItems[(topIndex - 1 + topItems.length) % topItems.length];
+                        const prevSub = this.topLevelSubmenus.get(prevTop);
+                        if (prevTop && prevSub) {
+                            this.openTopMenu(prevTop, prevSub, 0);
+                            this.focusItem(prevSub.querySelector(".menu-item"));
+                        }
+                    }
+                    break;
+                case "Enter":
+                case " ":
+                    e.preventDefault();
+                    if (this.focusedItem?.classList.contains("has-sub")) {
+                        const sub: HTMLElement | null = this.focusedItem.querySelector(":scope > .submenu");
+                        if (sub) {
+                            this.positionSubmenu(this.focusedItem, sub, 1);
+                            sub.classList.add("visible");
+                            this.focusItem(sub.querySelector(".menu-item"));
+                            return;
+                        }
+                    }
+                    this.focusedItem?.click();
+                    break;
+                case "Escape":
+                    e.preventDefault();
+                    this.closeAllSubmenus();
+                    this.activeTopMenu = null;
+                    break;
+            }
+        });
+
+    }
+
     private setupButtonContainerAutoHide() {
         let hideTimeout: ReturnType<typeof setTimeout>;
         const showButtons = () => {
@@ -1600,11 +1877,13 @@ export class LeoEditor {
         }, 2000);
     }
 
-    private handleOutlinePaneMouseDown(e: MouseEvent) {
-        if (e.detail === 2) e.preventDefault(); // Prevent text selection on double-click
+    private handleOutlinePaneMouseDown = (e: MouseEvent) => {
+        if (e.detail === 2) {
+            e.preventDefault(); // Prevent text selection on double-click
+        }
     }
 
-    private handleOutlinePaneClick(event: MouseEvent) {
+    private handleOutlinePaneClick = (event: MouseEvent) => {
         const target = event.target as Element;
         const nodeEl = target.closest('.node') as HTMLElement | null;
         if (!nodeEl) {
@@ -1619,6 +1898,7 @@ export class LeoEditor {
         // Handle different click targets
         if (target.classList.contains('caret') && row.hasChildren) {
             event.stopPropagation();
+            this.closeMenusEvent(event);
             // Both toggle and select in one operation
             this.selectAndOrToggleAndRedraw(
                 row.node !== this.selectedNode ? row.node : null,
@@ -1627,13 +1907,14 @@ export class LeoEditor {
         } else {
             // Rest of the node (including icon and text)
             event.stopPropagation();
+            this.closeMenusEvent(event);
             if (row.node !== this.selectedNode) {
                 this.selectAndOrToggleAndRedraw(row.node); // Just selection
             }
         }
     }
 
-    private handleOutlinePaneDblClick(event: MouseEvent) {
+    private handleOutlinePaneDblClick = (event: MouseEvent) => {
         const target = event.target as Element;
 
         if (target.classList.contains('node-text')) {
@@ -1657,7 +1938,7 @@ export class LeoEditor {
         }
     }
 
-    private handleContextMenu(e: MouseEvent) {
+    private handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
         const target = e.target as Element;
 
@@ -1685,7 +1966,7 @@ export class LeoEditor {
         this.MENU.style.display = 'block';
     }
 
-    private handleOutlinePaneKeyDown(e: KeyboardEvent) {
+    private handleOutlinePaneKeyDown = (e: KeyboardEvent) => {
         const handler: (() => void) | undefined = this.outlinePaneKeyMap[e.key as keyof typeof this.outlinePaneKeyMap];
         if (handler && !e.ctrlKey && !e.altKey && !e.metaKey) {
             e.preventDefault();
@@ -1693,7 +1974,7 @@ export class LeoEditor {
         }
     }
 
-    private handleBodyPaneKeyDown(e: KeyboardEvent) {
+    private handleBodyPaneKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Tab') {
             e.preventDefault();
             this.OUTLINE_PANE.focus();
@@ -1701,7 +1982,7 @@ export class LeoEditor {
     }
 
     // Global key handlers (work anywhere)
-    private handleGlobalKeyDown(e: KeyboardEvent) {
+    private handleGlobalKeyDown = (e: KeyboardEvent) => {
         if (e.key.toLowerCase() === 'f' && e.ctrlKey && !e.altKey && !e.metaKey) {
             e.preventDefault();
             this.startFind();
@@ -1744,12 +2025,13 @@ export class LeoEditor {
         }
     }
 
-    private handleWindowResize() {
+    private handleWindowResize = () => {
         this.updatePanelSizes();
         this.renderTree();
     }
 
     public handleDOMContentLoaded() {
+        this.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
 
         const initialSelectedNode = this.loadDocumentStateFromLocalStorage();
@@ -1761,7 +2043,7 @@ export class LeoEditor {
         this.setupButtonContainerAutoHide();
     }
 
-    private handleThemeToggleClick() {
+    private handleThemeToggleClick = () => {
         // Only animate once button pressed, so page-load wont animate color changes.
         this.HTML_ELEMENT.setAttribute('data-transition', 'true');
         const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
@@ -1769,13 +2051,13 @@ export class LeoEditor {
         this.renderTree(); // Re-render to update icon colors
     }
 
-    private handleLayoutToggleClick() {
+    private handleLayoutToggleClick = () => {
         this.HTML_ELEMENT.setAttribute('data-transition', 'true');
         const newLayout = this.currentLayout === 'vertical' ? 'horizontal' : 'vertical';
         this.applyLayout(newLayout);
     }
 
-    private updateButtonVisibility() {
+    private updateButtonVisibility = () => {
         this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && this.marked.size > 0);
         this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked);
         this.toggleButtonVisibility(this.NEXT_BTN, this.PREV_BTN, this.SHOW_PREV_NEXT_HISTORY.checked && this.navigationHistory.length > 1);
@@ -1805,7 +2087,7 @@ export class LeoEditor {
         this.TRIGGER_AREA.style.width = ((visibleButtonCount * 40) + 10) + 'px';
     }
 
-    private updateNodeIcons() {
+    private updateNodeIcons = () => {
         this.HTML_ELEMENT.setAttribute('data-show-icons', this.SHOW_NODE_ICONS.checked ? 'true' : 'false');
         this.renderTree(); // Re-render to apply icon changes
     }
@@ -1819,7 +2101,71 @@ export class LeoEditor {
         }
     }
 
-    private saveAll() {
+    private openTopMenu(item: HTMLDivElement, sub: HTMLElement | null, level: number) {
+        this.closeAllSubmenus();
+        this.activeTopMenu = item;
+        const targetSubmenu = sub || this.topLevelSubmenus.get(item);
+        if (!targetSubmenu) return;
+        this.positionSubmenu(item, targetSubmenu, level);
+        targetSubmenu.classList.add("visible");
+        item.classList.add("active");
+        this.focusedItem = null;
+    }
+
+    private positionSubmenu(parentItem: HTMLDivElement, submenu: HTMLElement, level: number) {
+        submenu.style.display = "flex";
+        const rect = parentItem.getBoundingClientRect();
+        const subRect = submenu.getBoundingClientRect();
+
+        if (level === 0) {
+            submenu.style.left = rect.left + "px";
+            submenu.style.top = rect.bottom + "px";
+        } else {
+            const spaceRight = window.innerWidth - rect.right;
+            const spaceLeft = rect.left;
+            if (spaceRight < subRect.width && spaceLeft > subRect.width) {
+                submenu.style.left = -subRect.width + "px";
+            } else {
+                submenu.style.left = rect.width + "px";
+            }
+            submenu.style.top = "0px";
+        }
+        submenu.style.display = "";
+    }
+
+    private closeAllSubmenus() {
+        document.querySelectorAll(".submenu.visible").forEach(sub =>
+            sub.classList.remove("visible")
+        );
+        document.querySelectorAll(".menu-item.active").forEach(item =>
+            item.classList.remove("active")
+        );
+        document.querySelectorAll(".menu-item.focused").forEach(item =>
+            item.classList.remove("focused")
+        );
+        document.querySelectorAll(".menu-item.sub-active").forEach(item =>
+            item.classList.remove("sub-active")
+        );
+        this.focusedItem = null;
+    }
+
+    private focusItem(item: HTMLDivElement | null) {
+        if (!item) return; // Safety check
+        if (this.focusedItem) this.focusedItem.classList.remove("focused");
+        item.classList.add("focused");
+        this.focusedItem = item;
+        item.scrollIntoView({ block: "nearest" });
+        document.querySelectorAll(".menu-item.sub-active").forEach(el =>
+            el.classList.remove("sub-active")
+        );
+        let ancestor = item.parentElement?.closest(".menu-item");
+        while (ancestor) {
+            ancestor.classList.add("sub-active");
+            ancestor = ancestor.parentElement?.closest(".submenu")?.parentElement?.closest(".menu-item");
+        }
+    }
+
+    private saveAll = () => {
         this.saveLayoutPreferences();
         this.saveConfigPreferences();
         this.saveDocumentStateToLocalStorage();
