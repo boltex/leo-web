@@ -190,6 +190,7 @@ export class LeoEditor {
     private currentLayout = 'vertical'; // Default layout
     private isDragging = false;
     private isMenuShown = false;
+    private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
     private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
     private secondaryIsDragging = false;
     private secondaryRatio = 0.75; // Default proportion between the outline-pane and the find-pane (defaults to 3/4)
@@ -394,6 +395,9 @@ export class LeoEditor {
                         if (this.activeTopMenu === item) {
                             this.closeAllSubmenus();
                             this.activeTopMenu = null;
+                            if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+                                this.lastFocusedElement.focus();
+                            }
                         } else {
                             this.openTopMenu(item, sub, level);
                         }
@@ -420,6 +424,9 @@ export class LeoEditor {
                 item.addEventListener("click", () => {
                     console.log("Action triggered:", entry.action);
                     this.closeAllSubmenus();
+                    if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+                        this.lastFocusedElement.focus();
+                    }
                     this.activeTopMenu = null;
                 });
             }
@@ -1633,6 +1640,9 @@ export class LeoEditor {
         this.OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
         this.OUTLINE_PANE.addEventListener("scroll", this.throttle(this.renderTree, 33));
         this.OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
+        this.OUTLINE_PANE.addEventListener('focus', () => {
+            this.lastFocusedElement = this.OUTLINE_PANE;
+        });
         document.addEventListener("click", (e) => {
             this.closeMenusEvent(e);
         });
@@ -1642,6 +1652,9 @@ export class LeoEditor {
         this.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
         this.BODY_PANE.addEventListener("beforeinput", this.preventDefault); // Block text changes
         this.BODY_PANE.addEventListener("paste", this.preventDefault); // Block text changes
+        this.BODY_PANE.addEventListener('focus', () => {
+            this.lastFocusedElement = this.BODY_PANE;
+        });
     }
 
     private setupResizerHandlers() {
@@ -1771,6 +1784,9 @@ export class LeoEditor {
                         e.preventDefault();
                         this.closeAllSubmenus();
                         this.activeTopMenu = null;
+                        if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+                            this.lastFocusedElement.focus();
+                        }
                         return;
                 }
                 return; // stop here if we just handled top-level
@@ -1850,6 +1866,9 @@ export class LeoEditor {
                     e.preventDefault();
                     this.closeAllSubmenus();
                     this.activeTopMenu = null;
+                    if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+                        this.lastFocusedElement.focus();
+                    }
                     break;
             }
         });
