@@ -16,6 +16,9 @@
   --find-border-color: #a0a0a0;
   --find-selection: #0078d7;
   --menu-bg-color: #eee;
+  --menu-color: #000;
+  --menu-caret-color: #666;
+  --menu-border-color: #ccc;
   /* vertical layout (default) */
   --main-direction: row;
   --main-resizer-width: 5px;
@@ -46,6 +49,7 @@
   --config-display: none;
   --find-display: flex;
   /* Top Menu */
+  --menu-font-family: sans-serif;
   --menu-display: none;
   --buttons-display: flex;
 }
@@ -82,6 +86,10 @@
   --find-placeholder-color: #5a699e;
   --find-border-color: #81889e;
   --find-selection: #3c54ce;
+  --menu-bg-color: #2a2536;
+  --menu-color: #cdd6f4;
+  --menu-caret-color: #999;
+  --menu-border-color: #454a6e;
 }
 
 [data-layout="horizontal"] {
@@ -137,7 +145,7 @@
 /* Top Menu */
 #top-menu {
   display: var(--menu-display);
-  font-family: sans-serif;
+  font-family: var(--menu-font-family);
   height: 27px;
   flex-shrink: 0;
   overflow: hidden;
@@ -150,23 +158,26 @@
 }
 
 #top-menu-toggle:hover {
-  background: #cce;
+  background: var(--ancestor-bg);
 }
 
 .menu {
   background: var(--menu-bg-color);
-  border-bottom: 1px solid #ccc;
+  color: var(--menu-color);
+  border-bottom: 1px solid var(--menu-border-color);
   position: relative;
   z-index: 10;
   user-select: none;
 }
 
 .submenu {
+  font-family: var(--menu-font-family);
   display: none;
   flex-direction: column;
   position: absolute;
-  background: #fff;
-  border: 1px solid #ccc;
+  background: var(--menu-bg-color);
+  color: var(--menu-color);
+  border: 1px solid var(--menu-border-color);
   min-width: 160px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 1000;
@@ -184,17 +195,24 @@
 }
 
 .menu-item:hover {
-  background: #cce;
+  background: var(--ancestor-bg);
 }
 
-.menu-item.active,
+.submenu .menu-item:hover {
+  background: var(--selected-bg);
+}
+
+.menu-item.active {
+  background: var(--hover-bg);
+}
+
 .menu-item.sub-active {
-  background: #bbd;
+  background: var(--selected-bg);
 }
 
 .menu-item.focused {
-  outline: 1px dotted #444;
-  background: #dde;
+  outline: 1px dotted var(--find-border-color);
+  background: var(--selected-bg);
 }
 
 .menu-item.has-sub::after {
@@ -202,7 +220,7 @@
   font-size: 10px;
   float: right;
   margin-left: 8px;
-  color: #666;
+  color: var(--menu-caret-color);
 }
 
 .menu:not(.submenu) > .menu-item {
@@ -434,9 +452,9 @@ body.dragging-secondary {
 #outline-pane:focus-visible,
 #body-pane:focus-visible {
   /* 
-        Note: Outline will appear under the items positioned absolutely.
-        See pseudo-elements with "z-index: -1" that appear below this outline.
-      */
+    Note: Outline will appear under the items positioned absolutely.
+    See pseudo-elements with "z-index: -1" that appear below this outline.
+  */
   outline: 3px solid var(--focus-outline);
   outline-offset: -3px;
 }

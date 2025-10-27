@@ -15,7 +15,7 @@
     So in total, there are three panes and two resizers. The rest are just floating buttons which are not part of the layout.
     -->
     <div id="top-menu">
-        <div id="top-menu-toggle">&#8801;</div>
+        <div id="top-menu-toggle" aria-label="Hide menu" title="Hide menu">&#8801;</div>
     </div>
     <div id="main-container">
         <div id="outline-find-container" style="visibility: hidden;">
@@ -103,6 +103,10 @@
                         Leo Outline Viewer </span>
                     <span class="sub-title">Visible Controls</span>
                     <div class="config-col" aria-label="Config options">
+                        <label for="show-prev-next-history">
+                            <input id="show-prev-next-history" type="checkbox" name="config-option" checked />
+                            Previous/Next History
+                        </label>
                         <label for="show-prev-next-mark">
                             <input id="show-prev-next-mark" type="checkbox" name="config-option" checked />
                             Previous/Next Marked
@@ -110,10 +114,6 @@
                         <label for="show-toggle-mark">
                             <input id="show-toggle-mark" type="checkbox" name="config-option" />
                             Mark/Unmark
-                        </label>
-                        <label for="show-prev-next-history">
-                            <input id="show-prev-next-history" type="checkbox" name="config-option" checked />
-                            Previous/Next History
                         </label>
                         <label for="show-hoist-dehoist">
                             <input id="show-hoist-dehoist" type="checkbox" name="config-option" />
@@ -166,7 +166,7 @@
     </div>
     <div id="button-trigger-area"></div>
     <div id="button-container">
-        <button tabindex="-1" id="menu-toggle" class="action-button" aria-label="Toggle top menu"><span
+        <button tabindex="-1" id="menu-toggle" class="action-button" aria-label="Show menu" title="Show menu"><span
                 id="menu-icon">&#8801;</span></button>
         <button tabindex="-1" id="theme-toggle" class="action-button" aria-label="Toggle dark/light mode"><span
                 id="theme-icon">🌓</span></button>
