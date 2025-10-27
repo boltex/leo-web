@@ -278,7 +278,7 @@ export class LeoEditor {
     private HTML_ELEMENT: HTMLElement;
 
     private activeTopMenu: HTMLDivElement | null = null;
-    private focusedItem: HTMLDivElement | null = null;
+    private focusedMenuItem: HTMLDivElement | null = null;
     private topLevelItems: HTMLDivElement[] = [];
     private topLevelSubmenus = new Map();
 
@@ -372,9 +372,9 @@ export class LeoEditor {
             item.textContent = entry.label;
 
             item.addEventListener("mouseenter", () => {
-                if (this.focusedItem && this.focusedItem !== item) {
-                    this.focusedItem.classList.remove("focused");
-                    this.focusedItem = null;
+                if (this.focusedMenuItem && this.focusedMenuItem !== item) {
+                    this.focusedMenuItem.classList.remove("focused");
+                    this.focusedMenuItem = null;
                 }
             });
 
@@ -1732,14 +1732,14 @@ export class LeoEditor {
             const topIndex = topItems.indexOf(this.activeTopMenu);
             if (topIndex === -1) return;
 
-            let openSubmenu = this.focusedItem
-                ? this.focusedItem.closest(".submenu")
+            let openSubmenu = this.focusedMenuItem
+                ? this.focusedMenuItem.closest(".submenu")
                 : this.topLevelSubmenus.get(this.activeTopMenu);
 
             if (!openSubmenu) return;
 
             // Handle top-level navigation
-            if (!this.focusedItem || !openSubmenu.contains(this.focusedItem)) {
+            if (!this.focusedMenuItem || !openSubmenu.contains(this.focusedMenuItem)) {
                 switch (e.key) {
                     case "ArrowRight":
                         e.preventDefault();
@@ -1747,7 +1747,7 @@ export class LeoEditor {
                         const nextSub = this.topLevelSubmenus.get(nextTop);
                         if (nextTop && nextSub) {
                             this.openTopMenu(nextTop, nextSub, 0);
-                            this.focusItem(nextSub.querySelector(".menu-item"));
+                            this.focusMenuItem(nextSub.querySelector(".menu-item"));
                         }
                         return;
                     case "ArrowLeft":
@@ -1756,7 +1756,7 @@ export class LeoEditor {
                         const prevSub = this.topLevelSubmenus.get(prevTop);
                         if (prevTop && prevSub) {
                             this.openTopMenu(prevTop, prevSub, 0);
-                            this.focusItem(prevSub.querySelector(".menu-item"));
+                            this.focusMenuItem(prevSub.querySelector(".menu-item"));
                         }
                         return;
                     case "ArrowDown":
@@ -1764,7 +1764,7 @@ export class LeoEditor {
                         const currentSub = this.topLevelSubmenus.get(this.activeTopMenu);
                         if (currentSub) {
                             const firstItem = currentSub.querySelector(".menu-item");
-                            if (firstItem) this.focusItem(firstItem);
+                            if (firstItem) this.focusMenuItem(firstItem);
                         }
                         return;
                     case "Escape":
@@ -1778,73 +1778,73 @@ export class LeoEditor {
 
             // Handle submenu navigation
             const items: HTMLDivElement[] = Array.from(openSubmenu.querySelectorAll(":scope > .menu-item"));
-            const index = this.focusedItem ? items.indexOf(this.focusedItem) : -1;
+            const index = this.focusedMenuItem ? items.indexOf(this.focusedMenuItem) : -1;
 
             switch (e.key) {
                 case "ArrowDown":
                     e.preventDefault();
                     if (index < items.length - 1) {
-                        this.focusItem(items[index + 1]!);
+                        this.focusMenuItem(items[index + 1]!);
                     } else {
-                        this.focusItem(items[0]!); // Wrap to first item
+                        this.focusMenuItem(items[0]!); // Wrap to first item
                     }
                     break;
                 case "ArrowUp":
                     e.preventDefault();
                     if (index > 0) {
-                        this.focusItem(items[index - 1]!);
+                        this.focusMenuItem(items[index - 1]!);
                     } else {
-                        this.focusItem(items[items.length - 1]!); // Wrap to last item
+                        this.focusMenuItem(items[items.length - 1]!); // Wrap to last item
                     }
                     break;
                 case "ArrowRight":
                     e.preventDefault();
-                    if (this.focusedItem?.classList.contains("has-sub")) {
-                        const sub: HTMLElement | null = this.focusedItem.querySelector(":scope > .submenu");
+                    if (this.focusedMenuItem?.classList.contains("has-sub")) {
+                        const sub: HTMLElement | null = this.focusedMenuItem.querySelector(":scope > .submenu");
                         if (sub) {
-                            this.positionSubmenu(this.focusedItem, sub, 1);
+                            this.positionSubmenu(this.focusedMenuItem, sub, 1);
                             sub.classList.add("visible");
-                            this.focusItem(sub.querySelector(".menu-item"));
+                            this.focusMenuItem(sub.querySelector(".menu-item"));
                         }
                     } else {
                         const nextTop = topItems[(topIndex + 1) % topItems.length];
                         const nextSub = this.topLevelSubmenus.get(nextTop);
                         if (nextTop && nextSub) {
                             this.openTopMenu(nextTop, nextSub, 0);
-                            this.focusItem(nextSub.querySelector(".menu-item"));
+                            this.focusMenuItem(nextSub.querySelector(".menu-item"));
                         }
                     }
                     break;
                 case "ArrowLeft":
                     e.preventDefault();
-                    const parentMenu: HTMLElement | null = this.focusedItem.closest(".submenu")!;
+                    const parentMenu: HTMLElement | null = this.focusedMenuItem.closest(".submenu")!;
                     const parentItem: HTMLDivElement | null = parentMenu?.parentElement?.closest(".menu-item")!;
 
                     if (parentItem) {
                         parentMenu.classList.remove("visible");
-                        this.focusItem(parentItem);
+                        this.focusMenuItem(parentItem);
                     } else {
                         const prevTop = topItems[(topIndex - 1 + topItems.length) % topItems.length];
                         const prevSub = this.topLevelSubmenus.get(prevTop);
                         if (prevTop && prevSub) {
                             this.openTopMenu(prevTop, prevSub, 0);
-                            this.focusItem(prevSub.querySelector(".menu-item"));
+                            this.focusMenuItem(prevSub.querySelector(".menu-item"));
                         }
                     }
                     break;
                 case "Enter":
                 case " ":
                     e.preventDefault();
-                    if (this.focusedItem?.classList.contains("has-sub")) {
-                        const sub: HTMLElement | null = this.focusedItem.querySelector(":scope > .submenu");
+                    if (this.focusedMenuItem?.classList.contains("has-sub")) {
+                        const sub: HTMLElement | null = this.focusedMenuItem.querySelector(":scope > .submenu");
                         if (sub) {
-                            this.positionSubmenu(this.focusedItem, sub, 1);
+                            this.positionSubmenu(this.focusedMenuItem, sub, 1);
                             sub.classList.add("visible");
-                            this.focusItem(sub.querySelector(".menu-item"));
+                            this.focusMenuItem(sub.querySelector(".menu-item"));
                             return;
                         }
                     }
-                    this.focusedItem?.click();
+                    this.focusedMenuItem?.click();
                     break;
                 case "Escape":
                     e.preventDefault();
@@ -2134,7 +2134,7 @@ export class LeoEditor {
         this.positionSubmenu(item, targetSubmenu, level);
         targetSubmenu.classList.add("visible");
         item.classList.add("active");
-        this.focusedItem = null;
+        this.focusedMenuItem = null;
     }
 
     private positionSubmenu(parentItem: HTMLDivElement, submenu: HTMLElement, level: number) {
@@ -2171,14 +2171,14 @@ export class LeoEditor {
         document.querySelectorAll(".menu-item.sub-active").forEach(item =>
             item.classList.remove("sub-active")
         );
-        this.focusedItem = null;
+        this.focusedMenuItem = null;
     }
 
-    private focusItem(item: HTMLDivElement | null) {
+    private focusMenuItem(item: HTMLDivElement | null) {
         if (!item) return; // Safety check
-        if (this.focusedItem) this.focusedItem.classList.remove("focused");
+        if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
         item.classList.add("focused");
-        this.focusedItem = item;
+        this.focusedMenuItem = item;
         item.scrollIntoView({ block: "nearest" });
         document.querySelectorAll(".menu-item.sub-active").forEach(el =>
             el.classList.remove("sub-active")
