@@ -15,6 +15,7 @@
   --find-placeholder-color: #888;
   --find-border-color: #a0a0a0;
   --find-selection: #0078d7;
+  --menu-bg-color: #eee;
   /* vertical layout (default) */
   --main-direction: row;
   --main-resizer-width: 5px;
@@ -44,11 +45,19 @@
   /* configuration/find pane visibility */
   --config-display: none;
   --find-display: flex;
+  /* Top Menu */
+  --menu-display: none;
+  --buttons-display: flex;
 }
 
 [data-show-config="true"] {
   --config-display: flex;
   --find-display: none;
+}
+
+[data-show-menu="true"] {
+  --menu-display: flex;
+  --buttons-display: none;
 }
 
 [data-transition="true"] {
@@ -126,9 +135,26 @@
 }
 
 /* Top Menu */
+#top-menu {
+  display: var(--menu-display);
+  font-family: sans-serif;
+  height: 27px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+#top-menu-toggle {
+  margin-left: auto;
+  font-size: 27px;
+  padding: 0px 6px;
+}
+
+#top-menu-toggle:hover {
+  background: #cce;
+}
+
 .menu {
-  display: flex;
-  background: #eee;
+  background: var(--menu-bg-color);
   border-bottom: 1px solid #ccc;
   position: relative;
   z-index: 10;
@@ -258,7 +284,9 @@ body {
   z-index: 0;
   margin: 0;
   display: flex;
+  min-height: 0;
   flex-grow: 1;
+  overflow: hidden;
   flex-direction: var(--main-direction);
   background-color: var(--background-color);
   color: var(--text-color);
@@ -297,6 +325,10 @@ body.dragging-secondary {
 #outline-pane:hover #collapse-all-btn {
   opacity: 1;
   pointer-events: auto;
+}
+
+#menu-icon {
+  font-size: 27px;
 }
 
 .outline-icon {
@@ -385,6 +417,7 @@ body.dragging-secondary {
 #body-pane {
   flex: 1;
   padding: 1rem 0 0 1rem;
+  min-height: 0;
   background-color: var(--body-pane-color);
   overflow-y: auto;
   font-family: "Consolas", "Monaco", "Courier New", monospace;
@@ -545,6 +578,7 @@ body.dragging-secondary .node {
 
 /* buttons */
 #button-container {
+  display: var(--buttons-display);
   position: fixed;
   top: 0px;
   right: 12px;
@@ -559,11 +593,13 @@ body.dragging-secondary .node {
 }
 
 #button-container.hidden {
+  display: var(--buttons-display);
   opacity: 0;
   pointer-events: none;
 }
 
 #button-trigger-area {
+  display: var(--buttons-display);
   position: fixed;
   top: 0;
   right: 0;
@@ -630,13 +666,13 @@ body.dragging-secondary .node {
   left: 10px;
 }
 
-#toggle-icon {
+#theme-icon {
   position: relative;
   top: 0;
   transition: top 0.3s ease;
 }
 
-#theme-toggle:active #toggle-icon {
+#theme-toggle:active #theme-icon {
   top: 25px;
 }
 
@@ -659,7 +695,7 @@ body.dragging-secondary .node {
   height: 20px;
 }
 
-.action-button:disabled:active #toggle-icon,
+.action-button:disabled:active #theme-icon,
 .action-button:disabled:active #dehoist-icon,
 .action-button:disabled:active #hoist-icon {
   top: 0 !important;
@@ -692,6 +728,7 @@ body.dragging-secondary .node {
   font-family: sans-serif;
   padding: 0.5rem 0 0 0.5rem;
   overflow-x: hidden;
+  min-height: 0;
   background-color: var(--find-pane-color);
   position: relative;
   transition: var(--find-pane-transition);

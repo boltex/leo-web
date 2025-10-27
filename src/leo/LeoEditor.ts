@@ -189,6 +189,7 @@ export class LeoEditor {
     private currentTheme = 'light'; // Default theme
     private currentLayout = 'vertical'; // Default layout
     private isDragging = false;
+    private isMenuShown = false;
     private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
     private secondaryIsDragging = false;
     private secondaryRatio = 0.75; // Default proportion between the outline-pane and the find-pane (defaults to 3/4)
@@ -196,6 +197,7 @@ export class LeoEditor {
     private navigationHistory: Array<TreeNode> = [];
     private currentHistoryIndex = -1; // -1 means no history yet
     private hoistStack: Array<TreeNode> = []; // Track hoisted nodes
+
     // Allow http(s)/ftp with '://', file with // or ///, and mailto: without '//'
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi;
 
@@ -232,7 +234,8 @@ export class LeoEditor {
     private THEME_TOGGLE: HTMLElement;
     private THEME_ICON: HTMLElement;
     private LAYOUT_TOGGLE: HTMLElement;
-    private LAYOUT_ICON: HTMLElement;
+    private MENU_TOGGLE: HTMLElement;
+    private TOP_MENU_TOGGLE: HTMLElement;
 
     private DEHOIST_BTN: HTMLButtonElement;
     private HOIST_BTN: HTMLButtonElement;
@@ -293,9 +296,10 @@ export class LeoEditor {
         this.FIND_PANE = document.getElementById("find-pane")!;
         this.HORIZONTAL_RESIZER = document.getElementById('secondary-resizer')!;
         this.THEME_TOGGLE = document.getElementById('theme-toggle')!;
-        this.THEME_ICON = document.getElementById('toggle-icon')!;
+        this.THEME_ICON = document.getElementById('theme-icon')!;
         this.LAYOUT_TOGGLE = document.getElementById('layout-toggle')!;
-        this.LAYOUT_ICON = document.getElementById('layout-icon')!;
+        this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
+        this.TOP_MENU_TOGGLE = document.getElementById("top-menu-toggle")!;
 
         this.DEHOIST_BTN = document.getElementById('dehoist-btn')! as HTMLButtonElement;
         this.HOIST_BTN = document.getElementById('hoist-btn')! as HTMLButtonElement;
@@ -422,9 +426,12 @@ export class LeoEditor {
 
             if (level === 0) {
                 this.topLevelItems.push(item);
+                menu.insertBefore(item, this.TOP_MENU_TOGGLE);
+            } else {
+
+                menu.appendChild(item);
             }
 
-            menu.appendChild(item);
         }
 
         return menu;
@@ -1654,6 +1661,8 @@ export class LeoEditor {
         this.COLLAPSE_ALL_BTN.addEventListener('click', this.collapseAll);
         this.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
         this.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
+        this.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        this.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         this.HOIST_BTN.addEventListener('click', this.hoistNode);
         this.DEHOIST_BTN.addEventListener('click', this.dehoistNode);
         this.PREV_BTN.addEventListener('click', this.previousHistory);
@@ -1850,8 +1859,11 @@ export class LeoEditor {
     private setupButtonContainerAutoHide() {
         let hideTimeout: ReturnType<typeof setTimeout>;
         const showButtons = () => {
-            this.BUTTON_CONTAINER.classList.remove('hidden');
             clearTimeout(hideTimeout);
+            if (this.isMenuShown) {
+                return;
+            }
+            this.BUTTON_CONTAINER.classList.remove('hidden');
         }
 
         const hideButtons = () => {
@@ -2056,6 +2068,16 @@ export class LeoEditor {
         this.HTML_ELEMENT.setAttribute('data-transition', 'true');
         const newLayout = this.currentLayout === 'vertical' ? 'horizontal' : 'vertical';
         this.applyLayout(newLayout);
+    }
+
+    private handleMenuToggleClick = () => {
+        this.isMenuShown = !this.isMenuShown;
+        this.HTML_ELEMENT.setAttribute('data-show-menu', this.isMenuShown ? 'true' : 'false');
+        if (this.isMenuShown) {
+            this.BUTTON_CONTAINER.classList.add('hidden');
+        } else {
+            this.BUTTON_CONTAINER.classList.remove('hidden');
+        }
     }
 
     private updateButtonVisibility = () => {

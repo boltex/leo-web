@@ -14,7 +14,9 @@
     The outline-find-container is split in two (outline-pane and find-pane) by the secondary-resizer.
     So in total, there are three panes and two resizers. The rest are just floating buttons which are not part of the layout.
     -->
-    <div id="top-menu"></div>
+    <div id="top-menu">
+        <div id="top-menu-toggle">&#8801;</div>
+    </div>
     <div id="main-container">
         <div id="outline-find-container" style="visibility: hidden;">
             <div id="outline-pane" tabindex="0">
@@ -153,7 +155,7 @@
                     </ul>
                     <span class="sub-title footer">
                         <a href="https://leo-editor.github.io/leo-editor/" target="_blank">Leo Editor</a>
-                        <span>Outline Viewer - 1.0.2 - Made by</span>
+                        <span>Outline Viewer - 1.0.3 - Made by</span>
                         <a href="https://github.com/boltex" target="_blank">Félix</a>
                     </span>
                 </div>
@@ -164,8 +166,10 @@
     </div>
     <div id="button-trigger-area"></div>
     <div id="button-container">
+        <button tabindex="-1" id="menu-toggle" class="action-button" aria-label="Toggle top menu"><span
+                id="menu-icon">&#8801;</span></button>
         <button tabindex="-1" id="theme-toggle" class="action-button" aria-label="Toggle dark/light mode"><span
-                id="toggle-icon">🌓</span></button>
+                id="theme-icon">🌓</span></button>
         <button tabindex="-1" id="layout-toggle" class="action-button" aria-label="Toggle layout orientation"><span
                 id="layout-icon">📐</span></button>
         <button tabindex="-1" id="dehoist-btn" class="action-button" aria-label="De-hoist" title="De-hoist" disabled>
