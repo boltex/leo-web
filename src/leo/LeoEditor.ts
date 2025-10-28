@@ -1440,7 +1440,7 @@ export class LeoEditor {
             }
             this.OUTLINE_FIND_CONTAINER.style.height = `${newHeight}px`;
             this.OUTLINE_FIND_CONTAINER.style.width = '100%';
-            this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 6 : 33)}px 7px auto auto`;
+            this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
         }
     }
 
@@ -1469,7 +1469,7 @@ export class LeoEditor {
                 this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
             }
             this.renderTree(); // Resizing vertically, so need to re-render tree
-            this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 6 : 33)}px 7px auto auto`;
+            this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
         }
         this.updateCollapseAllPosition();
     }, 33);
@@ -1530,7 +1530,7 @@ export class LeoEditor {
     }
 
     private updateCollapseAllPosition() {
-        this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 32 : 6}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
+        this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 32 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
 
     private handleSecondaryDrag = this.throttle((e) => {
@@ -1888,7 +1888,7 @@ export class LeoEditor {
         const hideButtons = () => {
             hideTimeout = setTimeout(() => {
                 this.BUTTON_CONTAINER.classList.add('hidden');
-            }, 1500);
+            }, 1000);
         };
         this.TRIGGER_AREA.addEventListener('mouseenter', showButtons);
         this.BUTTON_CONTAINER.addEventListener('mouseenter', showButtons);
@@ -1905,7 +1905,7 @@ export class LeoEditor {
         showButtons();
         hideTimeout = setTimeout(() => {
             this.BUTTON_CONTAINER.classList.add('hidden');
-        }, 2000);
+        }, 1500);
     }
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
