@@ -2073,6 +2073,8 @@ export class LeoEditor {
         }
         this.setupButtonContainerAutoHide();
         this.updateMarkedButtonStates();
+        // Finish startup by setting focus to outline pane
+        this.OUTLINE_PANE.focus();
     }
 
     private handleThemeToggleClick = () => {
@@ -2096,6 +2098,10 @@ export class LeoEditor {
             this.BUTTON_CONTAINER.classList.add('hidden');
         } else {
             this.BUTTON_CONTAINER.classList.remove('hidden');
+            // Set focus on last focused element
+            if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+                this.lastFocusedElement.focus();
+            }
         }
         this.updateCollapseAllPosition();
         this.updateOutlineContainerSize();
