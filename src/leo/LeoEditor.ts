@@ -395,9 +395,7 @@ export class LeoEditor {
                         if (this.activeTopMenu === item) {
                             this.closeAllSubmenus();
                             this.activeTopMenu = null;
-                            if (this.lastFocusedElement && this.lastFocusedElement.focus) {
-                                this.lastFocusedElement.focus();
-                            }
+                            this.restoreLastFocusedElement();
                         } else {
                             this.openTopMenu(item, sub, level);
                         }
@@ -424,9 +422,7 @@ export class LeoEditor {
                 item.addEventListener("click", () => {
                     console.log("Action triggered:", entry.action);
                     this.closeAllSubmenus();
-                    if (this.lastFocusedElement && this.lastFocusedElement.focus) {
-                        this.lastFocusedElement.focus();
-                    }
+                    this.restoreLastFocusedElement();
                     this.activeTopMenu = null;
                 });
             }
@@ -1621,6 +1617,16 @@ export class LeoEditor {
         }
     };
 
+    private restoreLastFocusedElement() {
+        if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+            // also check if visible by checking its size
+            const rect = this.lastFocusedElement.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                this.lastFocusedElement.focus();
+            }
+        }
+    }
+
     // Setup and organize all event handlers
     private setupEventHandlers() {
         this.setupOutlinePaneHandlers();
@@ -1640,9 +1646,6 @@ export class LeoEditor {
         this.OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
         this.OUTLINE_PANE.addEventListener("scroll", this.throttle(this.renderTree, 33));
         this.OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
-        this.OUTLINE_PANE.addEventListener('focus', () => {
-            this.lastFocusedElement = this.OUTLINE_PANE;
-        });
         document.addEventListener("click", (e) => {
             this.closeMenusEvent(e);
         });
@@ -1652,9 +1655,7 @@ export class LeoEditor {
         this.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
         this.BODY_PANE.addEventListener("beforeinput", this.preventDefault); // Block text changes
         this.BODY_PANE.addEventListener("paste", this.preventDefault); // Block text changes
-        this.BODY_PANE.addEventListener('focus', () => {
-            this.lastFocusedElement = this.BODY_PANE;
-        });
+
     }
 
     private setupResizerHandlers() {
@@ -1724,6 +1725,24 @@ export class LeoEditor {
                 e.preventDefault();
             });
         });
+        this.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+        });
+    }
+
+    private setupLastFocusedElementTracking() {
+        const focusableElements = [this.OUTLINE_PANE, this.BODY_PANE];
+        // All elements that also need to be tracked for focus are 'input' elements inside the outline/find container
+        const allInputs = this.OUTLINE_FIND_CONTAINER.querySelectorAll<HTMLElement>('input');
+        allInputs.forEach(input => {
+            focusableElements.push(input);
+        });
+
+        focusableElements.forEach(element => {
+            element.addEventListener('focus', () => {
+                this.lastFocusedElement = element;
+            });
+        });
     }
 
     private setupConfigCheckboxes() {
@@ -1784,9 +1803,7 @@ export class LeoEditor {
                         e.preventDefault();
                         this.closeAllSubmenus();
                         this.activeTopMenu = null;
-                        if (this.lastFocusedElement && this.lastFocusedElement.focus) {
-                            this.lastFocusedElement.focus();
-                        }
+                        this.restoreLastFocusedElement();
                         return;
                 }
                 return; // stop here if we just handled top-level
@@ -1866,9 +1883,7 @@ export class LeoEditor {
                     e.preventDefault();
                     this.closeAllSubmenus();
                     this.activeTopMenu = null;
-                    if (this.lastFocusedElement && this.lastFocusedElement.focus) {
-                        this.lastFocusedElement.focus();
-                    }
+                    this.restoreLastFocusedElement();
                     break;
             }
         });
@@ -2099,9 +2114,7 @@ export class LeoEditor {
         } else {
             this.BUTTON_CONTAINER.classList.remove('hidden');
             // Set focus on last focused element
-            if (this.lastFocusedElement && this.lastFocusedElement.focus) {
-                this.lastFocusedElement.focus();
-            }
+            this.restoreLastFocusedElement();
         }
         this.updateCollapseAllPosition();
         this.updateOutlineContainerSize();
@@ -2815,5 +2828,6 @@ export class LeoEditor {
         this.updateHoistButtonStates();
         this.setupEventHandlers();
         this.setupButtonFocusPrevention();
+        this.setupLastFocusedElementTracking();
     }
 }
