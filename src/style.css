@@ -148,9 +148,70 @@ html {
   background-color: var(--hover-bg);
 }
 
+/* Top Bar */
+#top-bar {
+  display: var(--menu-display);
+  justify-content: space-between;
+  align-items: center;
+  background: var(--menu-bg-color);
+  border-bottom: 1px solid var(--menu-border-color);
+  padding: 0;
+  height: 52px;
+  font-family: var(--menu-font-family);
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+/* Top container for document tabs and menu */
+#top-container {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Document Tabs */
+#document-tabs {
+  display: flex; /* line them up horizontally */
+  gap: 2px; /* small space between tabs */
+  height: 26px;
+  padding: 0;
+  border-bottom: 1px solid var(--menu-border-color);
+}
+
+.document-tab {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--menu-bg-color);
+  color: var(--menu-color);
+  border: 1px solid var(--menu-border-color);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+}
+
+.close-btn {
+  width: 12px;
+  height: 12px;
+  margin-left: 8px;
+  position: relative;
+}
+
+.close-btn::before {
+  content: "×";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: var(--menu-color);
+  cursor: pointer;
+}
+
 /* Top Menu */
 #top-menu {
-  display: var(--menu-display);
+  display: flex;
   font-family: var(--menu-font-family);
   font-size: 0.875rem;
   height: 26px;
@@ -171,7 +232,7 @@ html {
 .menu {
   background: var(--menu-bg-color);
   color: var(--menu-color);
-  border-bottom: 1px solid var(--menu-border-color);
+  /* border-bottom: 1px solid var(--menu-border-color); */
   position: relative;
   z-index: 10;
   user-select: none;
@@ -752,7 +813,7 @@ body.dragging-secondary .node {
 #find-pane {
   scrollbar-gutter: stable;
   font-family: sans-serif;
-  padding: 0.5rem 0 0.5rem 0.5rem;
+  padding: 0.1rem 0 0.5rem 0.5rem;
   overflow-x: hidden;
   min-height: 0;
   background-color: var(--find-pane-color);
@@ -773,6 +834,38 @@ body.dragging-secondary .node {
   #config-controls {
     justify-content: center;
   }
+}
+
+#find-pane-tabs {
+  display: flex; /* line them up horizontally */
+  gap: 2px; /* small space between tabs */
+  /* background: #222; */
+  padding: 0 0;
+  /* border-bottom: 1px solid #444; */
+}
+
+#find-pane-tabs .tab {
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.8rem;
+
+  padding: 4px 6px;
+  border-radius: 6px 6px 0 0; /* tab-like top rounding */
+  background: var(--menu-bg-color);
+  transition: background 0.2s, transform 0.1s;
+}
+
+#find-pane-tabs .tab:not(.active):hover {
+  background: var(--hover-bg);
+  transform: translateY(-1px); /* tiny lift effect on hover */
+}
+
+#find-pane-tabs .tab.active {
+  /* background: unset; */
+  background: var(--selected-bg);
+  /* color: white;
+  font-weight: bold; */
+  /* border-bottom: 2px solid #555;  */
 }
 
 #config-btn {

@@ -429,7 +429,8 @@ export class LeoEditor {
 
             if (level === 0) {
                 this.topLevelItems.push(item);
-                menu.insertBefore(item, this.TOP_MENU_TOGGLE);
+                // menu.insertBefore(item, this.TOP_MENU_TOGGLE);
+                menu.appendChild(item);
             } else {
 
                 menu.appendChild(item);

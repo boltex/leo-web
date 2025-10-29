@@ -14,7 +14,17 @@
     The outline-find-container is split in two (outline-pane and find-pane) by the secondary-resizer.
     So in total, there are three panes and two resizers. The rest are just floating buttons which are not part of the layout.
     -->
-    <div id="top-menu">
+    <div id="top-bar">
+        <div id="top-container">
+            <div id="document-tabs">
+                <div class="document-tab active">Untitled<div class="close-btn"></div>
+                </div>
+                <div class="document-tab">Untitled2<div class="close-btn"></div>
+                </div>
+            </div>
+            <div id="top-menu"></div>
+        </div>
+        <!-- Top menu toggle is at the right: -->
         <div id="top-menu-toggle" aria-label="Hide menu" title="Hide menu">&#8801;</div>
     </div>
     <div id="main-container">
@@ -32,6 +42,12 @@
             </div>
             <div id="secondary-resizer"></div>
             <div id="find-pane">
+                <div id="find-pane-tabs">
+                    <div class="tab active" id="log-tab" title="Log Pane">Log</div>
+                    <div class="tab" id="find-tab" title="Find Pane">Find</div>
+                    <div class="tab" id="undo-tab" title="Undo Pane">Undo</div>
+                    <div class="tab" id="settings-tab" title="Settings Pane">Settings</div>
+                </div>
                 <div id="find-controls" role="region" aria-label="Find options">
                     <input id="find-input" type="text" autocomplete="off" placeholder="&lt;find pattern here&gt;"
                         title="Ctrl+F: Search | F3/F2: Next/Prev" aria-label="Find pattern">
