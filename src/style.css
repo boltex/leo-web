@@ -752,7 +752,7 @@ body.dragging-secondary .node {
 #find-pane {
   scrollbar-gutter: stable;
   font-family: sans-serif;
-  padding: 0.5rem 0 0 0.5rem;
+  padding: 0.5rem 0 0.5rem 0.5rem;
   overflow-x: hidden;
   min-height: 0;
   background-color: var(--find-pane-color);
@@ -792,7 +792,7 @@ body.dragging-secondary .node {
 }
 
 #find-controls {
-  padding-top: 0.5rem;
+  padding-top: 0;
   display: var(--find-display);
 }
 
@@ -906,7 +906,6 @@ body.dragging-secondary .node {
   background: transparent;
   color: var(--find-text-color);
   font-family: sans-serif;
-  display: var(--find-display);
 }
 
 #find-input::placeholder {
