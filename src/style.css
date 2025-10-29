@@ -160,6 +160,7 @@ html {
   font-family: var(--menu-font-family);
   font-size: 0.875rem;
   user-select: none;
+  overflow: hidden;
 }
 
 /* Top container for document tabs and menu */
@@ -222,7 +223,10 @@ html {
 #top-menu-toggle {
   margin-left: auto;
   font-size: 24px;
-  padding: 0px 6px;
+  padding: 0px 16px;
+  height: 100%;
+  line-height: 54px;
+  border-left: 1px solid var(--menu-border-color);
 }
 
 #top-menu-toggle:hover {
