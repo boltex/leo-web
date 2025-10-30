@@ -1527,7 +1527,7 @@ export class LeoEditor {
     }
 
     private updateCollapseAllPosition() {
-        this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 32 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
+        this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 51 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
 
     private handleSecondaryDrag = this.throttle((e) => {

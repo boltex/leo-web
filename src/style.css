@@ -510,7 +510,7 @@ body.dragging-secondary {
 
 #outline-pane,
 #find-pane {
-  overflow-y: auto;
+  /* overflow-y: auto; */
   flex: 1 1 0;
 }
 
@@ -824,10 +824,11 @@ body.dragging-secondary .node {
 
 /* find pane */
 #find-pane {
+  display: flex;
+  flex-direction: column;
   scrollbar-gutter: stable;
   font-family: sans-serif;
-  padding: 0.1rem 0 0.5rem 0.5rem;
-  overflow-x: hidden;
+  padding: 0.1rem 0 0 0;
   min-height: 0;
   background-color: var(--find-pane-color);
   position: relative;
@@ -853,7 +854,7 @@ body.dragging-secondary .node {
   display: flex; /* line them up horizontally */
   gap: 2px; /* small space between tabs */
   /* background: #222; */
-  padding: 0 0;
+  padding: 0 0 0 0.2rem;
   /* border-bottom: 1px solid #444; */
 }
 
@@ -882,6 +883,7 @@ body.dragging-secondary .node {
 }
 
 #config-btn {
+  display: none;
   position: fixed;
   z-index: 2001;
   cursor: pointer;
@@ -898,13 +900,17 @@ body.dragging-secondary .node {
 }
 
 #find-controls {
-  padding-top: 0;
+  padding: 0 0.5rem 0.5rem 0.5rem;
   display: var(--find-display);
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #config-controls {
   padding-top: 0;
   display: var(--config-display);
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .config-title {
