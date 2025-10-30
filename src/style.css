@@ -49,7 +49,7 @@
   /* configuration/find pane visibility */
   --config-display: none;
   --find-display: flex;
-  /* Top Menu */
+  /* Top Bar Menu */
   --menu-font-family: sans-serif;
   --menu-display: none;
   --buttons-display: flex;
@@ -173,8 +173,8 @@ html {
 
 /* Document Tabs */
 #document-tabs {
-  display: flex; /* line them up horizontally */
-  gap: 2px; /* small space between tabs */
+  display: flex;
+  gap: 2px;
   height: 26px;
   padding: 0;
   border-bottom: 1px solid var(--menu-border-color);
@@ -190,6 +190,14 @@ html {
   border-bottom: none;
   border-radius: 4px 4px 0 0;
   cursor: pointer;
+}
+
+.document-tab.active {
+  background: var(--selected-bg);
+}
+
+.document-tab:hover {
+  background: var(--hover-bg);
 }
 
 .close-btn {
@@ -222,6 +230,7 @@ html {
 
 #top-menu-toggle {
   margin-left: auto;
+  color: var(--menu-color);
   font-size: 24px;
   padding: 0px 16px;
   height: 100%;
