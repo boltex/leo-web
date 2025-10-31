@@ -151,6 +151,7 @@ html {
 
 /* Top Bar */
 #top-bar {
+  flex-shrink: 0;
   display: var(--menu-display);
   justify-content: space-between;
   align-items: center;
@@ -166,6 +167,7 @@ html {
 
 /* Top container for document tabs and menu */
 #top-container {
+  /* flex-shrink: 0; */
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -174,6 +176,7 @@ html {
 
 /* Document Tabs */
 #document-tabs {
+  flex-shrink: 0;
   display: flex;
   gap: 2px;
   height: 26px;
@@ -520,7 +523,7 @@ body.dragging-cross {
   width: var(--cross-resizer-size);
   height: var(--cross-resizer-size);
   cursor: move;
-  background-color: var(--resizer-color);
+  background-color: transparent;
   flex-shrink: 0;
 }
 

@@ -193,6 +193,7 @@ export class LeoEditor {
     private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
     private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
     private secondaryIsDragging = false;
+    private crossIsDragging = false;
     private secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
     private navigationHistory: Array<TreeNode> = [];
@@ -224,6 +225,7 @@ export class LeoEditor {
     private ROW_HEIGHT = 26;
     private LEFT_OFFSET = 16; // Padding from left edge
 
+    private MAIN_CONTAINER: HTMLElement;
     private OUTLINE_FIND_CONTAINER: HTMLElement;
     private OUTLINE_PANE: HTMLElement;
     private COLLAPSE_ALL_BTN: HTMLElement;
@@ -232,6 +234,7 @@ export class LeoEditor {
     private VERTICAL_RESIZER: HTMLElement;
     private LOG_PANE: HTMLElement;
     private HORIZONTAL_RESIZER: HTMLElement;
+    private CROSS_RESIZER: HTMLElement;
     private THEME_TOGGLE: HTMLElement;
     private THEME_ICON: HTMLElement;
     private LAYOUT_TOGGLE: HTMLElement;
@@ -292,6 +295,7 @@ export class LeoEditor {
         this.buildParentRefs(this.tree);
         this.allNodesInOrder = this.getAllNodesInTreeOrder(this.tree); // Initialize the global array once
 
+        this.MAIN_CONTAINER = document.getElementById("main-container")!;
         this.OUTLINE_FIND_CONTAINER = document.getElementById("outline-find-container")!;
         this.OUTLINE_PANE = document.getElementById("outline-pane")!;
         this.COLLAPSE_ALL_BTN = document.getElementById("collapse-all-btn")!;
@@ -300,6 +304,7 @@ export class LeoEditor {
         this.VERTICAL_RESIZER = document.getElementById('main-resizer')!;
         this.LOG_PANE = document.getElementById("log-pane")!;
         this.HORIZONTAL_RESIZER = document.getElementById('secondary-resizer')!;
+        this.CROSS_RESIZER = document.getElementById('cross-resizer')!;
         this.THEME_TOGGLE = document.getElementById('theme-toggle')!;
         this.THEME_ICON = document.getElementById('theme-icon')!;
         this.LAYOUT_TOGGLE = document.getElementById('layout-toggle')!;
@@ -1425,7 +1430,7 @@ export class LeoEditor {
         if (this.currentLayout === 'vertical') {
             this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetWidth / window.innerWidth;
         } else {
-            this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetHeight / window.innerHeight;
+            this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetHeight / this.MAIN_CONTAINER.offsetHeight;
         }
     }
 
@@ -1437,15 +1442,13 @@ export class LeoEditor {
             }
             this.OUTLINE_FIND_CONTAINER.style.width = `${newWidth}px`;
             this.OUTLINE_FIND_CONTAINER.style.height = '100%';
-            // this.CONFIG_BTN.style.inset = `auto auto 7px ${newWidth - 33}px`;
         } else {
-            let newHeight = window.innerHeight * this.mainRatio;
+            let newHeight = this.MAIN_CONTAINER.offsetHeight * this.mainRatio;
             if (newHeight < this.minWidth) {
                 newHeight = this.minWidth;
             }
             this.OUTLINE_FIND_CONTAINER.style.height = `${newHeight}px`;
             this.OUTLINE_FIND_CONTAINER.style.width = '100%';
-            //this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
         }
     }
 
@@ -1461,21 +1464,20 @@ export class LeoEditor {
             } else {
                 this.OUTLINE_FIND_CONTAINER.style.width = (this.minWidth - 3) + 'px';
             }
-            // this.CONFIG_BTN.style.inset = `auto auto 7px ${newWidth - 33}px`;
         } else {
             let clientY = e.clientY;
             if (e.touches) {
                 clientY = e.touches[0].clientY;
             }
-            const newHeight = clientY;
+            const newHeight = clientY - this.TOP_MENU_TOGGLE.offsetHeight;
             if (newHeight >= this.minWidth) {
                 this.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
             } else {
                 this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
             }
             this.renderTree(); // Resizing vertically, so need to re-render tree
-            // this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
         }
+        this.positionCrossDragger();
         this.updateCollapseAllPosition();
     }, 33);
 
@@ -1535,7 +1537,7 @@ export class LeoEditor {
     }
 
     private updateCollapseAllPosition() {
-        this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 51 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
+        this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 58 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
 
     private handleSecondaryDrag = this.throttle((e) => {
@@ -1565,6 +1567,7 @@ export class LeoEditor {
                 this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
         }
+        this.positionCrossDragger();
         this.updateCollapseAllPosition();
     }, 33);
 
@@ -1591,9 +1594,103 @@ export class LeoEditor {
         }
     }
 
+    private handleCrossDrag = this.throttle((e) => {
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+
+        if (this.currentLayout === 'vertical') {
+            // Handle cross drag when in vertical layout
+
+            // do main first as per handleDrag
+            const newWidth = clientX;
+            if (newWidth >= this.minWidth) {
+                this.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
+            } else {
+                this.OUTLINE_FIND_CONTAINER.style.width = (this.minWidth - 3) + 'px';
+            }
+            // then secondary as per handleSecondaryDrag
+            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const relativeY = clientY - containerRect.top;
+            const containerHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight;
+            if (relativeY >= this.minHeight && relativeY <= containerHeight - this.minHeight) {
+                this.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            }
+        } else {
+            // Handle cross drag when in horizontal layout
+
+            // do main first as per handleDrag
+            const newHeight = clientY - this.TOP_MENU_TOGGLE.offsetHeight;
+            if (newHeight >= this.minWidth) {
+                this.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
+            } else {
+                this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
+            }
+            // then secondary as per handleSecondaryDrag
+            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const relativeX = clientX - containerRect.left;
+            const containerWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
+            if (relativeX >= this.minHeight && relativeX <= containerWidth - this.minHeight) {
+                this.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            }
+        }
+        this.positionCrossDragger();
+
+        this.renderTree(); // Render afterward as it would be in each branch of the if/else
+        this.updateCollapseAllPosition();
+    }, 33);
+
+    private startCrossDrag = (e: Event) => {
+        this.crossIsDragging = true;
+        document.body.classList.add('dragging-cross');
+        e.preventDefault();
+        document.addEventListener('mousemove', this.handleCrossDrag);
+        document.addEventListener('mouseup', this.stopCrossDrag);
+        document.addEventListener('touchmove', this.handleCrossDrag, { passive: false });
+        document.addEventListener('touchend', this.stopCrossDrag);
+
+    }
+
+    private stopCrossDrag = () => {
+        if (this.crossIsDragging) {
+            this.crossIsDragging = false;
+            document.body.classList.remove('dragging-cross');
+            document.removeEventListener('mousemove', this.handleCrossDrag);
+            document.removeEventListener('mouseup', this.stopCrossDrag);
+            document.removeEventListener('touchmove', this.handleCrossDrag);
+            document.removeEventListener('touchend', this.stopCrossDrag);
+
+            this.updateProportion();
+            this.updateSecondaryProportion();
+
+            this.renderTree();
+        }
+    }
+
+    private positionCrossDragger() {
+        if (this.currentLayout === 'vertical') {
+            const outlineWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
+            const paneHeight = this.OUTLINE_PANE.offsetHeight + this.TOP_MENU_TOGGLE.offsetHeight;
+            this.CROSS_RESIZER.style.top = (paneHeight) + 'px';
+            this.CROSS_RESIZER.style.left = (outlineWidth) + 'px';
+        } else {
+            const outlineHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight + this.TOP_MENU_TOGGLE.offsetHeight;
+            const paneWidth = this.OUTLINE_PANE.offsetWidth;
+            this.CROSS_RESIZER.style.left = (paneWidth) + 'px';
+            this.CROSS_RESIZER.style.top = (outlineHeight) + 'px';
+        }
+
+    }
+
     private updatePanelSizes() {
         this.updateOutlineContainerSize();
         this.updateOutlinePaneSize();
+        this.positionCrossDragger();
     }
 
     private closeMenusEvent(e: MouseEvent) {
@@ -1672,6 +1769,8 @@ export class LeoEditor {
         this.VERTICAL_RESIZER.addEventListener('touchstart', this.startDrag);
         this.HORIZONTAL_RESIZER.addEventListener('mousedown', this.startSecondaryDrag);
         this.HORIZONTAL_RESIZER.addEventListener('touchstart', this.startSecondaryDrag);
+        this.CROSS_RESIZER.addEventListener('mousedown', this.startCrossDrag);
+        this.CROSS_RESIZER.addEventListener('touchstart', this.startCrossDrag);
     }
 
     private setupWindowHandlers() {
@@ -2126,8 +2225,9 @@ export class LeoEditor {
             // Set focus on last focused element
             this.restoreLastFocusedElement();
         }
-        this.updateCollapseAllPosition();
+        this.updateOutlinePaneSize();
         this.updateOutlineContainerSize();
+        this.positionCrossDragger();
     }
 
     private updateButtonVisibility = () => {
