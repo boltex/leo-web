@@ -193,7 +193,7 @@ export class LeoEditor {
     private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
     private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
     private secondaryIsDragging = false;
-    private secondaryRatio = 0.75; // Default proportion between the outline-pane and the find-pane (defaults to 3/4)
+    private secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
     private navigationHistory: Array<TreeNode> = [];
     private currentHistoryIndex = -1; // -1 means no history yet
@@ -230,7 +230,7 @@ export class LeoEditor {
     private SPACER: HTMLElement;
     private BODY_PANE: HTMLElement;
     private VERTICAL_RESIZER: HTMLElement;
-    private FIND_PANE: HTMLElement;
+    private LOG_PANE: HTMLElement;
     private HORIZONTAL_RESIZER: HTMLElement;
     private THEME_TOGGLE: HTMLElement;
     private THEME_ICON: HTMLElement;
@@ -263,7 +263,11 @@ export class LeoEditor {
     private OPT_REGEXP: HTMLInputElement;
     private OPT_MARK: HTMLInputElement;
 
-    private CONFIG_BTN: HTMLButtonElement;
+    // private CONFIG_BTN: HTMLButtonElement;
+    private LOG_TAB: HTMLDivElement;
+    private FIND_TAB: HTMLDivElement;
+    private UNDO_TAB: HTMLDivElement;
+    private SETTINGS_TAB: HTMLDivElement;
 
     private SHOW_PREV_NEXT_MARK: HTMLInputElement;
     private SHOW_TOGGLE_MARK: HTMLInputElement;
@@ -294,7 +298,7 @@ export class LeoEditor {
         this.SPACER = document.getElementById("spacer")!;
         this.BODY_PANE = document.getElementById("body-pane")!;
         this.VERTICAL_RESIZER = document.getElementById('main-resizer')!;
-        this.FIND_PANE = document.getElementById("find-pane")!;
+        this.LOG_PANE = document.getElementById("log-pane")!;
         this.HORIZONTAL_RESIZER = document.getElementById('secondary-resizer')!;
         this.THEME_TOGGLE = document.getElementById('theme-toggle')!;
         this.THEME_ICON = document.getElementById('theme-icon')!;
@@ -327,7 +331,11 @@ export class LeoEditor {
         this.OPT_REGEXP = document.getElementById('opt-regexp')! as HTMLInputElement;
         this.OPT_MARK = document.getElementById('opt-mark')! as HTMLInputElement;
 
-        this.CONFIG_BTN = document.getElementById('config-btn')! as HTMLButtonElement;
+        // this.CONFIG_BTN = document.getElementById('config-btn')! as HTMLButtonElement;
+        this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
+        this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
+        this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
+        this.SETTINGS_TAB = document.getElementById('settings-tab')! as HTMLDivElement;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
         this.SHOW_TOGGLE_MARK = document.getElementById('show-toggle-mark')! as HTMLInputElement;
@@ -1068,19 +1076,19 @@ export class LeoEditor {
         this.toggleButtonVisibility(this.ACTION_DEHOIST, null, this.hoistStack.length > 0); // only check hoist stack length
     }
 
-    private toggleConfiguration = () => {
-        if (this.HTML_ELEMENT.getAttribute('data-show-config') === 'true') {
-            this.HTML_ELEMENT.setAttribute('data-show-config', 'false');
-            this.CONFIG_BTN.innerHTML = '⚙️';
-            this.CONFIG_BTN.setAttribute('title', 'Configuration');
-            this.CONFIG_BTN.setAttribute('aria-label', 'Configuration');
-        } else {
-            this.HTML_ELEMENT.setAttribute('data-show-config', 'true');
-            this.CONFIG_BTN.innerHTML = '✔️';
-            this.CONFIG_BTN.setAttribute('title', 'Back to Find');
-            this.CONFIG_BTN.setAttribute('aria-label', 'Back to Find');
-        }
-    }
+    // private toggleConfiguration = () => {
+    //     if (this.HTML_ELEMENT.getAttribute('data-show-config') === 'true') {
+    //         this.HTML_ELEMENT.setAttribute('data-show-config', 'false');
+    //         this.CONFIG_BTN.innerHTML = '⚙️';
+    //         this.CONFIG_BTN.setAttribute('title', 'Configuration');
+    //         this.CONFIG_BTN.setAttribute('aria-label', 'Configuration');
+    //     } else {
+    //         this.HTML_ELEMENT.setAttribute('data-show-config', 'true');
+    //         this.CONFIG_BTN.innerHTML = '✔️';
+    //         this.CONFIG_BTN.setAttribute('title', 'Back to Find');
+    //         this.CONFIG_BTN.setAttribute('aria-label', 'Back to Find');
+    //     }
+    // }
 
     // * History
     private addToHistory(node: TreeNode) {
@@ -1429,7 +1437,7 @@ export class LeoEditor {
             }
             this.OUTLINE_FIND_CONTAINER.style.width = `${newWidth}px`;
             this.OUTLINE_FIND_CONTAINER.style.height = '100%';
-            this.CONFIG_BTN.style.inset = `auto auto 7px ${newWidth - 33}px`;
+            // this.CONFIG_BTN.style.inset = `auto auto 7px ${newWidth - 33}px`;
         } else {
             let newHeight = window.innerHeight * this.mainRatio;
             if (newHeight < this.minWidth) {
@@ -1437,7 +1445,7 @@ export class LeoEditor {
             }
             this.OUTLINE_FIND_CONTAINER.style.height = `${newHeight}px`;
             this.OUTLINE_FIND_CONTAINER.style.width = '100%';
-            this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
+            //this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
         }
     }
 
@@ -1453,7 +1461,7 @@ export class LeoEditor {
             } else {
                 this.OUTLINE_FIND_CONTAINER.style.width = (this.minWidth - 3) + 'px';
             }
-            this.CONFIG_BTN.style.inset = `auto auto 7px ${newWidth - 33}px`;
+            // this.CONFIG_BTN.style.inset = `auto auto 7px ${newWidth - 33}px`;
         } else {
             let clientY = e.clientY;
             if (e.touches) {
@@ -1466,7 +1474,7 @@ export class LeoEditor {
                 this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
             }
             this.renderTree(); // Resizing vertically, so need to re-render tree
-            this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
+            // this.CONFIG_BTN.style.inset = `${newHeight - (this.isMenuShown ? 5 : 33)}px 7px auto auto`;
         }
         this.updateCollapseAllPosition();
     }, 33);
@@ -1522,7 +1530,7 @@ export class LeoEditor {
             }
             this.OUTLINE_PANE.style.flex = `0 0 ${newWidth}px`;
         }
-        this.FIND_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+        this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
         this.updateCollapseAllPosition();
     }
 
@@ -1541,7 +1549,7 @@ export class LeoEditor {
             const containerHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight;
             if (relativeY >= this.minHeight && relativeY <= containerHeight - this.minHeight) {
                 this.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
-                this.FIND_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
             this.renderTree(); // Resizing vertically, so need to re-render tree
         } else {
@@ -1554,7 +1562,7 @@ export class LeoEditor {
             const containerWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
             if (relativeX >= this.minHeight && relativeX <= containerWidth - this.minHeight) {
                 this.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
-                this.FIND_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
         }
         this.updateCollapseAllPosition();
@@ -1685,7 +1693,8 @@ export class LeoEditor {
         this.TOGGLE_MARK_BTN.addEventListener('click', this.toggleMarkCurrentNode);
         this.NEXT_MARKED_BTN.addEventListener('click', this.gotoNextMarkedNode);
         this.PREV_MARKED_BTN.addEventListener('click', this.gotoPrevMarkedNode);
-        this.CONFIG_BTN.addEventListener('click', this.toggleConfiguration);
+        // TODO : replace
+        // this.CONFIG_BTN.addEventListener('click', this.toggleConfiguration);
 
         this.ACTION_MARK.addEventListener('click', this.toggleMarkCurrentNode);
         this.ACTION_UNMARK.addEventListener('click', this.toggleMarkCurrentNode); // Same action
@@ -2410,9 +2419,10 @@ export class LeoEditor {
     // Find functionality
     private startFind() {
         this.initialFindNode = null; // If null, find next will set this, used with "Suboutline Only" find radio option (value: suboutline)
-        if (this.HTML_ELEMENT.getAttribute('data-show-config') === 'true') {
-            this.toggleConfiguration(); // // Make find input visible if in settings screen
-        }
+        // TODO
+        // if (this.HTML_ELEMENT.getAttribute('data-show-config') === 'true') {
+        //     this.toggleConfiguration(); // // Make find input visible if in settings screen
+        // }
         this.FIND_INPUT.focus();
         this.FIND_INPUT.select();
         this.renderTree(); // To show or remove initial-find highlight

@@ -509,7 +509,7 @@ body.dragging-secondary {
 }
 
 #outline-pane,
-#find-pane {
+#log-pane {
   /* overflow-y: auto; */
   flex: 1 1 0;
 }
@@ -822,8 +822,8 @@ body.dragging-secondary .node {
   display: none !important;
 }
 
-/* find pane */
-#find-pane {
+/* log pane */
+#log-pane {
   display: flex;
   flex-direction: column;
   scrollbar-gutter: stable;
@@ -844,13 +844,13 @@ body.dragging-secondary .node {
   flex-wrap: wrap;
 }
 
-@container find-pane (min-width: 450px) {
+@container log-pane (min-width: 450px) {
   #config-controls {
     justify-content: center;
   }
 }
 
-#find-pane-tabs {
+#log-pane-tabs {
   display: flex; /* line them up horizontally */
   gap: 2px; /* small space between tabs */
   /* background: #222; */
@@ -858,7 +858,7 @@ body.dragging-secondary .node {
   /* border-bottom: 1px solid #444; */
 }
 
-#find-pane-tabs .tab {
+#log-pane-tabs .tab {
   cursor: pointer;
   user-select: none;
   font-size: 0.8rem;
@@ -869,12 +869,12 @@ body.dragging-secondary .node {
   transition: background 0.2s, transform 0.1s;
 }
 
-#find-pane-tabs .tab:not(.active):hover {
+#log-pane-tabs .tab:not(.active):hover {
   background: var(--hover-bg);
   transform: translateY(-1px); /* tiny lift effect on hover */
 }
 
-#find-pane-tabs .tab.active {
+#log-pane-tabs .tab.active {
   /* background: unset; */
   background: var(--selected-bg);
   /* color: white;
@@ -882,21 +882,8 @@ body.dragging-secondary .node {
   /* border-bottom: 2px solid #555;  */
 }
 
-#config-btn {
-  display: none;
-  position: fixed;
-  z-index: 2001;
-  cursor: pointer;
-  font-size: 20px;
-  opacity: 0.6;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  text-shadow: 0 3px 3px rgba(0, 0, 0, 0.4);
-  user-select: none;
-}
-
-#config-btn:hover {
-  transform: scale(1.2);
-  opacity: 1;
+#log-controls {
+  /* TODO  */
 }
 
 #find-controls {
@@ -939,7 +926,7 @@ body.dragging-secondary .node {
   user-select: none;
 }
 
-#find-pane .config-col.shortcuts {
+#log-pane .config-col.shortcuts {
   list-style: none;
   padding: 0;
   margin: -5px 0 0 0;
@@ -951,13 +938,13 @@ body.dragging-secondary .node {
   user-select: none;
 }
 
-#find-pane .config-col.shortcuts li {
+#log-pane .config-col.shortcuts li {
   padding: 0.25rem 0.5rem;
   display: flex;
   align-items: center;
 }
 
-#find-pane .config-col.shortcuts kbd {
+#log-pane .config-col.shortcuts kbd {
   display: inline-block;
   padding: 0.1rem 0.4rem;
   margin: 0 0.2rem;
@@ -976,16 +963,16 @@ body.dragging-secondary .node {
   width: 100px;
 }
 
-#find-pane .find-col,
-#find-pane .config-col {
+#log-pane .find-col,
+#log-pane .config-col {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   min-width: 110px;
 }
 
-#find-pane .find-col label,
-#find-pane .config-col label {
+#log-pane .find-col label,
+#log-pane .config-col label {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -999,8 +986,8 @@ body.dragging-secondary .node {
   padding-left: 0.5rem;
 }
 
-#find-pane input[type="checkbox"],
-#find-pane input[type="radio"] {
+#log-pane input[type="checkbox"],
+#log-pane input[type="radio"] {
   flex-shrink: 0;
   width: 16px;
   height: 16px;

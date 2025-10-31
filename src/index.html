@@ -41,14 +41,20 @@
                 </div>
             </div>
             <div id="secondary-resizer"></div>
-            <div id="find-pane">
-                <div id="find-pane-tabs">
-                    <div class="tab active" id="log-tab" title="Log Pane">Log</div>
+            <div id="log-pane">
+                <div id="log-pane-tabs">
+                    <div class="tab" id="log-tab" title="Log Pane">Log</div>
                     <div class="tab" id="find-tab" title="Find Pane">Find</div>
                     <div class="tab" id="undo-tab" title="Undo Pane">Undo</div>
                     <div class="tab" id="settings-tab" title="Settings Pane">Settings</div>
                 </div>
-                <div id="find-controls" class="find-pane-container" role="region" aria-label="Find options">
+                <!-- Log Controls -->
+                <div id="log-controls" class="log-pane-container" role="region" aria-label="Log Pane">
+
+                </div>
+
+                <!-- Find controls -->
+                <div id="find-controls" class="log-pane-container" role="region" aria-label="Find options">
                     <input id="find-input" type="text" autocomplete="off" placeholder="&lt;find pattern here&gt;"
                         title="Ctrl+F: Search | F3/F2: Next/Prev" aria-label="Find pattern">
                     <div class="find-col" aria-label="Search options">
@@ -92,8 +98,8 @@
                         </label>
                     </div>
                 </div>
-                <span id="config-btn" aria-label="Configuration" title="Configuration">⚙️</span>
-                <div id="config-controls" class="find-pane-container" role="region" aria-label="Configuration settings">
+                <!-- Configuration controls -->
+                <div id="config-controls" class="log-pane-container" role="region" aria-label="Configuration settings">
                     <span class="config-title">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" height="32" width="32" viewBox="0 0 16 16">
                             <path d="M2.875 1.21h10.566v8.482H2.875z" fill="#7c2504" />
