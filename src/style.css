@@ -31,6 +31,7 @@
   --main-resizer-before-left: -5px;
   --main-resizer-after-right: -5px;
   --main-resizer-after-bottom: unset;
+  --cross-resizer-size: 5px;
   --secondary-direction: column;
   --secondary-height: 100%;
   --secondary-resizer-width: 100%;
@@ -401,6 +402,10 @@ body.dragging-secondary {
   cursor: var(--secondary-resizer-cursor) !important;
 }
 
+body.dragging-cross {
+  cursor: move !important;
+}
+
 #outline-pane {
   position: relative;
   white-space: nowrap;
@@ -506,6 +511,27 @@ body.dragging-secondary {
 #secondary-resizer::after {
   bottom: var(--secondary-resizer-after-bottom);
   right: var(--secondary-resizer-after-right);
+}
+
+#cross-resizer {
+  position: absolute;
+  top: 200px;
+  left: 200px;
+  width: var(--cross-resizer-size);
+  height: var(--cross-resizer-size);
+  cursor: move;
+  background-color: var(--resizer-color);
+  flex-shrink: 0;
+}
+
+#cross-resizer::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 15px;
+  height: 15px;
+  cursor: move;
 }
 
 #outline-pane,
