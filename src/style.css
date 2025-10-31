@@ -47,18 +47,54 @@
   --body-transition: unset;
   --body-pane-transition: unset;
   --find-pane-transition: unset;
-  /* configuration/find pane visibility */
-  --config-display: none;
-  --find-display: flex;
   /* Top Bar Menu */
   --menu-font-family: sans-serif;
   --menu-display: none;
   --buttons-display: flex;
 }
 
-[data-show-config="true"] {
-  --config-display: flex;
+[data-active-tab="log"] {
+  --log-display: flex;
+  --log-tab-bg-color: var(--selected-bg);
   --find-display: none;
+  --find-tab-bg-color: var(--menu-bg-color);
+  --undo-display: none;
+  --undo-tab-bg-color: var(--menu-bg-color);
+  --settings-display: none;
+  --settings-tab-bg-color: var(--menu-bg-color);
+}
+
+[data-active-tab="find"] {
+  --log-display: none;
+  --log-tab-bg-color: var(--menu-bg-color);
+  --find-display: flex;
+  --find-tab-bg-color: var(--selected-bg);
+  --undo-display: none;
+  --undo-tab-bg-color: var(--menu-bg-color);
+  --settings-display: none;
+  --settings-tab-bg-color: var(--menu-bg-color);
+}
+
+[data-active-tab="undo"] {
+  --log-display: none;
+  --log-tab-bg-color: var(--menu-bg-color);
+  --find-display: none;
+  --find-tab-bg-color: var(--menu-bg-color);
+  --undo-display: flex;
+  --undo-tab-bg-color: var(--selected-bg);
+  --settings-display: none;
+  --settings-tab-bg-color: var(--menu-bg-color);
+}
+
+[data-active-tab="settings"] {
+  --log-display: none;
+  --log-tab-bg-color: var(--menu-bg-color);
+  --find-display: none;
+  --find-tab-bg-color: var(--menu-bg-color);
+  --undo-display: none;
+  --undo-tab-bg-color: var(--menu-bg-color);
+  --settings-display: flex;
+  --settings-tab-bg-color: var(--selected-bg);
 }
 
 [data-show-menu="true"] {
@@ -894,7 +930,6 @@ body.dragging-secondary .node {
 
   padding: 4px 6px;
   border-radius: 6px 6px 0 0; /* tab-like top rounding */
-  background: var(--menu-bg-color);
   transition: background 0.2s, transform 0.1s;
 }
 
@@ -911,8 +946,19 @@ body.dragging-secondary .node {
   /* border-bottom: 2px solid #555;  */
 }
 
+#log-tab {
+  /* display: var(--log-display); */
+  background: var(--log-tab-bg-color);
+}
+
 #log-controls {
-  /* TODO  */
+  display: var(--log-display);
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
+
+#find-tab {
+  /* display: var(--find-display); */
+  background: var(--find-tab-bg-color);
 }
 
 #find-controls {
@@ -922,9 +968,26 @@ body.dragging-secondary .node {
   overflow-y: auto;
 }
 
+#undo-tab {
+  /* display: var(--undo-display); */
+  background: var(--undo-tab-bg-color);
+}
+
+#undo-controls {
+  padding: 0;
+  display: var(--undo-display);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#settings-tab {
+  /* display: var(--config-display); */
+  background: var(--settings-tab-bg-color);
+}
+
 #config-controls {
   padding-top: 0;
-  display: var(--config-display);
+  display: var(--settings-display);
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -1095,8 +1158,8 @@ input[type="checkbox"]:focus-visible:checked::after {
   border-width: 0 2px 2px 0;
 }
 
-#find-pane input:focus,
-#find-pane input:focus-visible {
+#find-controls input:focus,
+#find-controls input:focus-visible {
   border-color: var(--find-selection);
   outline: 2px solid var(--find-selection);
   outline-offset: -1px;

@@ -266,7 +266,6 @@ export class LeoEditor {
     private OPT_REGEXP: HTMLInputElement;
     private OPT_MARK: HTMLInputElement;
 
-    // private CONFIG_BTN: HTMLButtonElement;
     private LOG_TAB: HTMLDivElement;
     private FIND_TAB: HTMLDivElement;
     private UNDO_TAB: HTMLDivElement;
@@ -336,7 +335,6 @@ export class LeoEditor {
         this.OPT_REGEXP = document.getElementById('opt-regexp')! as HTMLInputElement;
         this.OPT_MARK = document.getElementById('opt-mark')! as HTMLInputElement;
 
-        // this.CONFIG_BTN = document.getElementById('config-btn')! as HTMLButtonElement;
         this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
         this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
         this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
@@ -1081,19 +1079,10 @@ export class LeoEditor {
         this.toggleButtonVisibility(this.ACTION_DEHOIST, null, this.hoistStack.length > 0); // only check hoist stack length
     }
 
-    // private toggleConfiguration = () => {
-    //     if (this.HTML_ELEMENT.getAttribute('data-show-config') === 'true') {
-    //         this.HTML_ELEMENT.setAttribute('data-show-config', 'false');
-    //         this.CONFIG_BTN.innerHTML = '⚙️';
-    //         this.CONFIG_BTN.setAttribute('title', 'Configuration');
-    //         this.CONFIG_BTN.setAttribute('aria-label', 'Configuration');
-    //     } else {
-    //         this.HTML_ELEMENT.setAttribute('data-show-config', 'true');
-    //         this.CONFIG_BTN.innerHTML = '✔️';
-    //         this.CONFIG_BTN.setAttribute('title', 'Back to Find');
-    //         this.CONFIG_BTN.setAttribute('aria-label', 'Back to Find');
-    //     }
-    // }
+    private showTab(tabName: string) {
+        // Set HTML_ELEMENT attributes. CSS rules will show/hide tabs based on these.
+        this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
+    }
 
     // * History
     private addToHistory(node: TreeNode) {
@@ -1254,7 +1243,7 @@ export class LeoEditor {
         }
         let text = this.data[node.gnx]?.bodyString || "";
         text = text.replace(this.urlRegex, url => {
-            return `<a href="${url}" target="_blank" contenteditable="false" rel="noopener noreferrer">${url}</a>`;
+            return `<a href="${url}" target="_blank" contenteditable="plaintext-only" rel="noopener noreferrer">${url}</a>`;
         });
         this.BODY_PANE.innerHTML = text;
     }
@@ -1792,8 +1781,11 @@ export class LeoEditor {
         this.TOGGLE_MARK_BTN.addEventListener('click', this.toggleMarkCurrentNode);
         this.NEXT_MARKED_BTN.addEventListener('click', this.gotoNextMarkedNode);
         this.PREV_MARKED_BTN.addEventListener('click', this.gotoPrevMarkedNode);
-        // TODO : replace
-        // this.CONFIG_BTN.addEventListener('click', this.toggleConfiguration);
+
+        this.LOG_TAB.addEventListener('click', () => { this.showTab("log") });
+        this.FIND_TAB.addEventListener('click', () => { this.showTab("find") });
+        this.UNDO_TAB.addEventListener('click', () => { this.showTab("undo") });
+        this.SETTINGS_TAB.addEventListener('click', () => { this.showTab("settings") });
 
         this.ACTION_MARK.addEventListener('click', this.toggleMarkCurrentNode);
         this.ACTION_UNMARK.addEventListener('click', this.toggleMarkCurrentNode); // Same action
@@ -2197,8 +2189,9 @@ export class LeoEditor {
         }
         this.setupButtonContainerAutoHide();
         this.updateMarkedButtonStates();
-        // Finish startup by setting focus to outline pane
+        // Finish startup by setting focus to outline pane and setting the log pane's active tab
         this.OUTLINE_PANE.focus();
+        this.showTab("log");
     }
 
     private handleThemeToggleClick = () => {
