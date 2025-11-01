@@ -986,7 +986,7 @@ body.dragging-secondary .node {
 }
 
 #config-controls {
-  padding-top: 0;
+  padding-top: 0.5rem;
   display: var(--settings-display);
   overflow-x: hidden;
   overflow-y: auto;
