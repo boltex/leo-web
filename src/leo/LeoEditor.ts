@@ -2635,8 +2635,8 @@ export class LeoEditor {
                         if (selection.rangeCount > 0) {
                             const range = selection.getRangeAt(0);
                             if (this.BODY_PANE.contains(range.commonAncestorContainer)) {
-                                // Selection is inside the body pane
-                                startOffset = range.endOffset;
+                                // Compute global offset across all text nodes in BODY_PANE
+                                startOffset = this.getGlobalOffset(this.BODY_PANE, range.endContainer, range.endOffset);
                                 body = body.substring(startOffset);
                             }
                         }
@@ -2740,9 +2740,6 @@ export class LeoEditor {
                 return lastMatchIndex !== -1 ? { index: lastMatchIndex, length: lastMatchLength } : null;
             }
 
-            // Flag to track if we found a match in the current node
-            let foundMatchInCurrentNode = false;
-
             // First, check the current node with respect to the current selection
             const node = this.selectedNode;
             let headString = this.data[node.gnx]?.headString || "";
@@ -2756,11 +2753,12 @@ export class LeoEditor {
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
                 if (this.selectedLabelElement && this.selectedLabelElement.contains(range.commonAncestorContainer)) {
-                    // Selection is in headline
+                    // Selection is in headline — safe, no <a> tags
                     headlineOffset = range.startOffset;
+
                 } else if (this.BODY_PANE.contains(range.commonAncestorContainer)) {
-                    // Selection is in body
-                    bodyOffset = range.startOffset;
+                    // Selection is in body — compute global offset across text nodes
+                    bodyOffset = this.getGlobalOffset(this.BODY_PANE, range.startContainer, range.startOffset);
                 }
             }
 
@@ -2901,18 +2899,57 @@ export class LeoEditor {
 
     private highlightMatchInBody(startIndex: number, endIndex: number) {
         // The body pane content is set directly as textContent, so it's a single text node
-        if (!this.BODY_PANE.firstChild || this.BODY_PANE.firstChild.nodeType !== Node.TEXT_NODE) return;
+        if (!this.BODY_PANE.firstChild) return;
         try {
             const range = document.createRange();
-            range.setStart(this.BODY_PANE.firstChild, startIndex);
-            range.setEnd(this.BODY_PANE.firstChild, endIndex);
+            const start = this.getTextNodeAtIndex(this.BODY_PANE, startIndex);
+            const end = this.getTextNodeAtIndex(this.BODY_PANE, endIndex);
 
-            const selection = window.getSelection()!;
-            selection.removeAllRanges();
-            selection.addRange(range);
+            if (!start || !end) {
+                console.warn("Invalid range: could not resolve text nodes");
+                return;
+            }
+
+            range.setStart(start.node, start.offset);
+            range.setEnd(end.node, end.offset);
+
+            const sel = window.getSelection()!;
+            sel.removeAllRanges();
+            sel.addRange(range);
         } catch (e) {
             console.error('Error setting body selection:', e);
         }
+    }
+
+    private getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        let currentNode = walker.nextNode();
+        let remaining = index;
+
+        while (currentNode) {
+            const len = currentNode!.nodeValue!.length;
+            if (remaining <= len) {
+                return { node: currentNode, offset: remaining };
+            }
+            remaining -= len;
+            currentNode = walker.nextNode();
+        }
+        return null;
+    }
+
+    private getGlobalOffset(root: Node, container: Node, offset: number): number {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        let total = 0;
+        let current: Node | null = walker.nextNode();
+
+        while (current) {
+            if (current === container) {
+                return total + offset;
+            }
+            total += current.nodeValue!.length;
+            current = walker.nextNode();
+        }
+        return total;
     }
 
     private findFocus() {
