@@ -933,21 +933,11 @@ body.dragging-secondary .node {
   transition: background 0.2s, transform 0.1s;
 }
 
-#log-pane-tabs .tab:not(.active):hover {
+#log-pane-tabs .tab:hover {
   background: var(--hover-bg);
-  transform: translateY(-1px); /* tiny lift effect on hover */
-}
-
-#log-pane-tabs .tab.active {
-  /* background: unset; */
-  background: var(--selected-bg);
-  /* color: white;
-  font-weight: bold; */
-  /* border-bottom: 2px solid #555;  */
 }
 
 #log-tab {
-  /* display: var(--log-display); */
   background: var(--log-tab-bg-color);
 }
 
@@ -957,19 +947,17 @@ body.dragging-secondary .node {
 }
 
 #find-tab {
-  /* display: var(--find-display); */
   background: var(--find-tab-bg-color);
 }
 
 #find-controls {
-  padding: 0 0.5rem 0.5rem 0.5rem;
+  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
   display: var(--find-display);
   overflow-x: hidden;
   overflow-y: auto;
 }
 
 #undo-tab {
-  /* display: var(--undo-display); */
   background: var(--undo-tab-bg-color);
 }
 
@@ -981,7 +969,6 @@ body.dragging-secondary .node {
 }
 
 #settings-tab {
-  /* display: var(--config-display); */
   background: var(--settings-tab-bg-color);
 }
 

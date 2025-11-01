@@ -2512,10 +2512,7 @@ export class LeoEditor {
     // Find functionality
     private startFind() {
         this.initialFindNode = null; // If null, find next will set this, used with "Suboutline Only" find radio option (value: suboutline)
-        // TODO
-        // if (this.HTML_ELEMENT.getAttribute('data-show-config') === 'true') {
-        //     this.toggleConfiguration(); // // Make find input visible if in settings screen
-        // }
+        this.showTab("find");
         this.FIND_INPUT.focus();
         this.FIND_INPUT.select();
         this.renderTree(); // To show or remove initial-find highlight
