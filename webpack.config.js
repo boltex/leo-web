@@ -1,4 +1,5 @@
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -28,8 +29,20 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
+            favicon: './public/favicon.ico',
             title: 'Leo Web Editor',
         }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'public',
+                    to: '',
+                    globOptions: {
+                        ignore: ['**/favicon.ico'] // Skip favicon.ico since HtmlWebpackPlugin handles it
+                    }
+                }
+            ]
+        })
     ],
     devServer: {
         static: './dist',
