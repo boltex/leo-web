@@ -1,6 +1,6 @@
 /**
  * Leo Web Editor - Main Entry Point
- * A web-based version of the Leo Editor, a structured document editor
+ * A web-based version of the Leo Editor
  */
 
 import './style.css';
