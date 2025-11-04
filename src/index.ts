@@ -4,7 +4,7 @@
  */
 
 import './style.css';
-import { LeoEditor } from './leo/LeoEditor';
+import { LeoEditor } from './LeoEditor';
 
 class LeoWebApp {
 
