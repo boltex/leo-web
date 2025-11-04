@@ -6,28 +6,14 @@
  */
 //@+<< imports >>
 //@+node:felix.20251103192334.997: ** << imports >>
-import * as vscodeObj from 'vscode';
-import {
-    ExtensionContext,
-    Uri,
-    env,
-    workspace,
-    window, commands,
-    FileStat, FileType
-} from 'vscode';
+
 import * as os from 'os';
-import * as child from 'child_process';
 import * as path from 'path';
-import * as GitAPI from '../git';
-import * as GitBaseAPI from '../git-base';
 import { LeoApp } from './leoApp';
 import { Commands } from './leoCommands';
 import { IdleTime as IdleTimeClass } from "./idle_time";
 import { Position, VNode } from './leoNodes';
 import { LeoGui } from './leoGui';
-import opn = require('open');
-import { RemoteHubApi } from '../remote-hub';
-import { SqlJsStatic } from 'sql.js';
 import * as showdownObj from "showdown";
 import * as pakoObj from 'pako';
 import * as JSZipObj from 'jszip';
@@ -41,18 +27,8 @@ dayjsObj.extend(localizedFormat);
 //@-<< imports >>
 //@+<< leoGlobals: global constants >>
 //@+node:felix.20251103192334.998: ** << leoGlobals: global constants >>
-export let isNewLeoJSVersion = false; // Used to show messages if first/new versions. Set by client-UI at startup.
-export const isBrowser: boolean = !!(process as any)?.browser; // coerced to boolean
 export const isMac: boolean = process.platform?.startsWith('darwin');
 export const isWindows: boolean = process.platform?.startsWith('win');
-/** the VS Code extensibility API */
-export let vscode: typeof vscodeObj = vscodeObj;
-/** The LeoJS 'Extension Context' */
-export let extensionContext: ExtensionContext;
-/** For accessing files in the LeoJS extension package */
-export let extensionUri: Uri;
-/** For accessing files in the current workspace */
-export let workspaceUri: Uri;
 
 export let SQL: SqlJsStatic;
 export let pako: typeof pakoObj = pakoObj;
@@ -61,10 +37,6 @@ export let JSZip: typeof JSZipObj = JSZipObj;
 export let dayjs: typeof dayjsObj = dayjsObj;
 export let md5: typeof md5Obj = md5Obj;
 
-// The singleton Git extension exposed API
-export let gitAPI: GitAPI.API;
-export let gitBaseAPI: GitBaseAPI.API;
-export let remoteHubAPI: RemoteHubApi;
 //@-<< leoGlobals: global constants >>
 //@+<< define g.globalDirectiveList >>
 //@+node:felix.20251103192334.999: ** << define g.globalDirectiveList >>
