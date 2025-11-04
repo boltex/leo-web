@@ -14,9 +14,7 @@ import { Commands } from './leoCommands';
 import { IdleTime as IdleTimeClass } from "./idle_time";
 import { Position, VNode } from './leoNodes';
 import { LeoGui } from './leoGui';
-import * as showdownObj from "showdown";
 import * as pakoObj from 'pako';
-import * as JSZipObj from 'jszip';
 import * as md5Obj from 'md5';
 const dayjsObj = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -30,10 +28,7 @@ dayjsObj.extend(localizedFormat);
 export const isMac: boolean = process.platform?.startsWith('darwin');
 export const isWindows: boolean = process.platform?.startsWith('win');
 
-export let SQL: SqlJsStatic;
 export let pako: typeof pakoObj = pakoObj;
-export let showdown: typeof showdownObj = showdownObj;
-export let JSZip: typeof JSZipObj = JSZipObj;
 export let dayjs: typeof dayjsObj = dayjsObj;
 export let md5: typeof md5Obj = md5Obj;
 
@@ -159,7 +154,7 @@ export function ivars2instance(c: Commands, g: any, ivars: string[]): any {
         return undefined;
     }
 
-    let ivar: string = ivars[0]; // first
+    let ivar: string = ivars[0]!; // first
 
     if (!['c', 'g'].includes(ivar)) {
         g.trace('can not happen: unknown base', ivar);
@@ -308,7 +303,7 @@ export class FileLikeObject {
      */
     public readline(): string {
         if (this.ptr < this._list.length) {
-            const line: string = this._list[this.ptr];
+            const line: string = this._list[this.ptr]!;
             this.ptr++;
             return line;
         }
