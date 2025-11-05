@@ -13,7 +13,8 @@ import { FileCommands } from './leoFileCommands';
 import { NullBody } from './leoFrame';
 import 'date-format-lite';
 import * as crypto from 'crypto';
-import KSUID = require('ksuid');
+// import KSUID = require('ksuid');
+import KSUID from 'ksuid';
 
 //@-<< imports >>
 //@+others
