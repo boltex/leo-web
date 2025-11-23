@@ -1,30 +1,5 @@
-export interface TreeNode {
-    gnx: number;
-    parent?: TreeNode;
-    children?: TreeNode[];
-    toggled?: boolean; // To track if node was toggled (expanded/collapsed) since last render
-}
-
-export interface NodeData {
-    headString: string;
-    bodyString: string;
-    icon?: number; // Bitmask for icons: hasBody: 1, isMarked: 2, isClone: 4, isDirty: 8
-}
-
-export interface FlatRow {
-    label: string;
-    depth: number;
-    toggled: boolean; // Will make it render with toggled class
-    hasChildren: boolean;
-    isExpanded: boolean;
-    node: TreeNode;
-}
-
-export interface MenuEntry {
-    label: string;
-    action?: string;
-    entries?: MenuEntry[];
-}
+import { TreeNode, NodeData, FlatRow, MenuEntry } from './types';
+import * as utils from './utils';
 
 export class LeoEditor {
 
@@ -774,8 +749,7 @@ export class LeoEditor {
         }
         this.updateHoistButtonStates();
         this.updateContextMenuState(); // Node was already selected so no need to reupdate based on hoist
-        this.flatRows = this.flattenTree(this.getCurrentRoot(), 0, false);
-        this.renderTree();
+        this.buildRowsRenderTree();
     }
 
     private dehoistNode = () => {
@@ -967,18 +941,18 @@ export class LeoEditor {
             this.marked.add(gnx);
             if (this.data[gnx]) this.data[gnx].icon = (this.data[gnx].icon || 0) | 2; // Set marked bit
         }
-        this.updateMarkedButtonStates();
-        this.updateButtonVisibility();
-
-        // Only need to redraw the affected node if visible, no need to re-flatten because structure didn't change
-        if (this.isVisible(node)) {
-            this.renderTree();
-        }
     }
 
     private toggleMarkCurrentNode = () => {
         if (this.selectedNode) {
             this.toggleMark(this.selectedNode);
+            this.updateMarkedButtonStates();
+            this.updateButtonVisibility();
+
+            // Only need to redraw the affected node if visible, no need to re-flatten because structure didn't change
+            if (this.isVisible(this.selectedNode)) {
+                this.renderTree();
+            }
         }
     }
 
@@ -1096,7 +1070,6 @@ export class LeoEditor {
         }
         this.navigationHistory.push(node); // Add the new node to history
         this.currentHistoryIndex = this.navigationHistory.length - 1;
-        this.updateHistoryButtonStates();
     }
 
     private previousHistory = () => {
@@ -1123,37 +1096,73 @@ export class LeoEditor {
         return this.hoistStack.length > 0 ? this.hoistStack[this.hoistStack.length - 1]! : this.tree;
     }
 
-    private flattenTree(node: TreeNode, depth = 0, isRoot = true): FlatRow[] {
-        // This only flattens the tree structure into an array of rows for rendering.
-        // It check for expansion state to include children as needed because only expanded nodes' children are visible.
-        // The isRoot parameter indicates if this node is the hidden root node (not visible).
+    private flattenTree(
+        node: TreeNode,
+        depth = 0,
+        isRoot = true,
+        selectedNode: TreeNode | null,
+        initialFindNode: TreeNode | null,
+    ): FlatRow[] {
+        const findScope = this.getFindScope();
+        const flatRows: FlatRow[] = [];
 
-        let rows: FlatRow[] = [];
+        if (!isRoot && !this.isVisible(node)) {
+            return flatRows; // Skip hidden nodes
+        }
 
-        // Only add non-root nodes to the rows
         if (!isRoot) {
-            rows.push({
-                label: this.data[node.gnx]!.headString,
-                depth,
-                toggled: node.toggled || false, // Will make it render with toggled class
-                hasChildren: !!node.children && node.children.length > 0,
+            flatRows.push({
+                label: this.data[node.gnx]!.headString || `Node ${node.gnx}`,
+                depth: depth,
+                toggled: false, // Reset each time
+                hasChildren: this.hasChildren(node),
                 isExpanded: this.isExpanded(node),
-                node
+                node: node,
+                // Computed display properties
+                isSelected: node === selectedNode,
+                isAncestor: selectedNode ? this.isAncestorOf(node, selectedNode) : false,
+                isInitialFind: this.computeIsInitialFind(node, initialFindNode, this.selectedNode),
+                icon: this.data[node.gnx]!.icon || 0
             });
         }
-        if (node.toggled) {
-            node.toggled = false; // Reset because it should not persist
-        }
 
-        if (this.isExpanded(node) && node.children) {
-            for (const child of node.children) {
-                // Root node's children appear at depth 0
-                const childDepth = isRoot ? 0 : depth + 1;
-                rows.push(...this.flattenTree(child, childDepth, false));
+        if (this.isExpanded(node) || isRoot) {
+            const children = this.children(node);
+            for (const child of children) {
+                flatRows.push(...this.flattenTree(child, depth + 1, false, selectedNode, initialFindNode));
             }
         }
 
-        return rows;
+        return flatRows;
+    }
+
+    private computeIsInitialFind(
+        node: TreeNode,
+        initialFindNode: TreeNode | null,
+        selectedNode: TreeNode | null
+    ): boolean {
+        const findScope = this.getFindScope();
+        if (findScope === 'node' && node === selectedNode) {
+            return true;
+        }
+        if (findScope === 'suboutline' && initialFindNode) {
+            return node === initialFindNode || this.isAncestorOf(initialFindNode, node);
+        }
+        return false;
+    }
+
+    private getFindScope(): string {
+        let selectedRadioValue = '';
+        const selectedRadio = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
+        if (selectedRadio) {
+            selectedRadioValue = selectedRadio.value;
+        }
+        return selectedRadioValue;
+    }
+
+    private buildRowsRenderTree(): void {
+        this.flatRows = this.flattenTree(this.getCurrentRoot(), 0, !this.hoistStack.length, this.selectedNode, this.initialFindNode);
+        this.renderTree();
     }
 
     private selectAndOrToggleAndRedraw(newSelectedNode: TreeNode | null = null, nodeToToggle: TreeNode | null = null) {
@@ -1191,33 +1200,29 @@ export class LeoEditor {
 
             this.selectedNode = newSelectedNode;
             this.addToHistory(newSelectedNode);
+            this.updateHistoryButtonStates();
             this.updateButtonVisibility();
             this.updateHoistButtonStates();
             this.updateContextMenuState();
         }
 
-        // Only rebuild and redraw once
-        const currentRoot = this.getCurrentRoot();
-        const isHoisted = this.hoistStack.length > 0;
-
-        // If hoisted, pass isRoot=false to make the hoisted node visible
-        // If not hoisted, use the hidden root with isRoot=true
-        this.flatRows = this.flattenTree(currentRoot, 0, !isHoisted);
-        this.renderTree();
+        this.buildRowsRenderTree();
 
         // Update body pane if selection changed (selectedNode cannot be null here because of isNew check)
         if (isNew) {
             if (newSelectedNode && this.data[newSelectedNode.gnx]) {
-                this.setBody(newSelectedNode);
+                this.computeBody(newSelectedNode);
             } else {
-                this.BODY_PANE.textContent = "";
+                this.setBody("", true); // No node selected
             }
         }
-        this.scrollSelectedNodeIntoView();
+        if (this.selectedNode) {
+            this.scrollNodeIntoView(this.selectedNode);
+        }
         this.updateCollapseAllPosition(); // In case the height made the scrollbar appear/disappear
     }
 
-    private setBody(node: TreeNode) {
+    private computeBody(node: TreeNode) {
         // Look for a line in the text starting with "@wrap" or "@nowrap",
         // if not found, check the parent of node recursively.
         // Note: wrap is default so only need to check for nowrap
@@ -1236,22 +1241,26 @@ export class LeoEditor {
             }
             currentNode = currentNode.parent;
         }
-        if (nowrapFound) {
-            this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
-        } else {
-            this.BODY_PANE.style.whiteSpace = "pre-wrap"; // Wrap text
-        }
         let text = this.data[node.gnx]?.bodyString || "";
         text = text.replace(this.urlRegex, url => {
             return `<a href="${url}" target="_blank" contenteditable="plaintext-only" rel="noopener noreferrer">${url}</a>`;
         });
+        this.setBody(text, !nowrapFound);
+    }
+
+    public setBody(text: string, wrap: boolean) {
+        if (wrap) {
+            this.BODY_PANE.style.whiteSpace = "pre-wrap"; // Wrap text
+        } else {
+            this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
+        }
         this.BODY_PANE.innerHTML = text;
     }
 
-    private scrollSelectedNodeIntoView() {
-        if (!this.selectedNode || !this.flatRows) return; // Not initialized yet
+    private scrollNodeIntoView(node: TreeNode) {
+        if (!this.flatRows) return; // Not initialized yet
 
-        const selectedIndex = this.flatRows.findIndex(row => row.node === this.selectedNode);
+        const selectedIndex = this.flatRows.findIndex(row => row.node === node);
         if (selectedIndex === -1) return; // Not found (shouldn't happen)
         const nodePosition = selectedIndex * this.ROW_HEIGHT;
 
@@ -1357,27 +1366,6 @@ export class LeoEditor {
         }
     }
 
-    private throttle<T extends any[]>(func: (...args: T) => void, limit: number) {
-        let lastCall = 0;
-        let timeout: ReturnType<typeof setTimeout>;
-
-        return (...args: T): void => {
-            const now = Date.now();
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-            if (now - lastCall >= limit) {
-                lastCall = now;
-                func(...args);
-            } else {
-                timeout = setTimeout(() => {
-                    lastCall = Date.now();
-                    func(...args);
-                }, limit - (now - lastCall));
-            }
-        };
-    }
-
     private showToast(message: string, duration = 2000) {
         if (!this.TOAST) return;
         this.TOAST.textContent = message;
@@ -1393,26 +1381,6 @@ export class LeoEditor {
             setTimeout(() => { this.TOAST.hidden = true; }, 220);
             this.__toastTimer = null;
         }, duration);
-    }
-
-    private safeLocalStorageGet(key: string): string | null {
-        try {
-            return localStorage.getItem(key);
-        } catch (e) {
-            return null;
-        }
-    }
-
-    private safeLocalStorageSet(key: string, value: string) {
-        try {
-            localStorage.setItem(key, value);
-        } catch (e) {
-            // ignore
-        }
-    }
-
-    private preventDefault = (e: Event) => {
-        e.preventDefault(); // Utility function used in setupBodyPaneHandlers
     }
 
     private updateProportion() {
@@ -1441,7 +1409,7 @@ export class LeoEditor {
         }
     }
 
-    private handleDrag = this.throttle((e) => {
+    private handleDrag = utils.throttle((e) => {
         if (this.currentLayout === 'vertical') {
             let clientX = e.clientX;
             if (e.touches) {
@@ -1529,7 +1497,7 @@ export class LeoEditor {
         this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 58 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
 
-    private handleSecondaryDrag = this.throttle((e) => {
+    private handleSecondaryDrag = utils.throttle((e) => {
         if (this.currentLayout === 'vertical') {
             let clientY = e.clientY;
             if (e.touches) {
@@ -1583,7 +1551,7 @@ export class LeoEditor {
         }
     }
 
-    private handleCrossDrag = this.throttle((e) => {
+    private handleCrossDrag = utils.throttle((e) => {
         let clientX = e.clientX;
         let clientY = e.clientY;
         if (e.touches) {
@@ -1707,9 +1675,6 @@ export class LeoEditor {
             this.HTML_ELEMENT.setAttribute('data-layout', 'vertical');
         }
         this.updatePanelSizes(); // Proportions will have changed so we must update sizes
-        if (this.flatRows) {
-            this.renderTree();
-        }
     };
 
     private restoreLastFocusedElement() {
@@ -1739,7 +1704,7 @@ export class LeoEditor {
         this.OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
         this.OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
         this.OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
-        this.OUTLINE_PANE.addEventListener("scroll", this.throttle(this.renderTree, 33));
+        this.OUTLINE_PANE.addEventListener("scroll", utils.throttle(this.renderTree, 33));
         this.OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
         document.addEventListener("click", (e) => {
             this.closeMenusEvent(e);
@@ -1748,8 +1713,8 @@ export class LeoEditor {
 
     private setupBodyPaneHandlers() {
         this.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
-        this.BODY_PANE.addEventListener("beforeinput", this.preventDefault); // Block text changes
-        this.BODY_PANE.addEventListener("paste", this.preventDefault); // Block text changes
+        this.BODY_PANE.addEventListener("beforeinput", utils.preventDefault); // Block text changes
+        this.BODY_PANE.addEventListener("paste", utils.preventDefault); // Block text changes
 
     }
 
@@ -1763,7 +1728,7 @@ export class LeoEditor {
     }
 
     private setupWindowHandlers() {
-        window.addEventListener('resize', this.throttle(this.handleWindowResize, 33));
+        window.addEventListener('resize', utils.throttle(this.handleWindowResize, 33));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
         window.addEventListener('beforeunload', this.saveAll);
     }
@@ -2101,7 +2066,7 @@ export class LeoEditor {
         const row = this.flatRows![rowIndex]!;
 
         // Select the node if not already selected
-        if (row.node !== this.selectedNode) {
+        if (row.isSelected === false) {
             this.selectAndOrToggleAndRedraw(row.node);
         }
 
@@ -2206,6 +2171,9 @@ export class LeoEditor {
         this.HTML_ELEMENT.setAttribute('data-transition', 'true');
         const newLayout = this.currentLayout === 'vertical' ? 'horizontal' : 'vertical';
         this.applyLayout(newLayout);
+        if (this.flatRows) {
+            this.renderTree();
+        }
     }
 
     private handleMenuToggleClick = () => {
@@ -2362,13 +2330,13 @@ export class LeoEditor {
             selected: selectedPosition,
             expanded: expandedPositions
         };
-        this.safeLocalStorageSet(this.title + this.genTimestamp, JSON.stringify(dataToSave)); // Key is title + genTimestamp
+        utils.safeLocalStorageSet(this.title + this.genTimestamp, JSON.stringify(dataToSave)); // Key is title + genTimestamp
     }
 
     private loadDocumentStateFromLocalStorage(): TreeNode | null {
         // returns the selected node if found, otherwise null
         let initialSelectedNode = null;
-        const savedData = this.safeLocalStorageGet(this.title + this.genTimestamp); // Key is title + genTimestamp
+        const savedData = utils.safeLocalStorageGet(this.title + this.genTimestamp); // Key is title + genTimestamp
         if (savedData) {
             try {
                 const parsedData = JSON.parse(savedData);
@@ -2418,7 +2386,7 @@ export class LeoEditor {
             theme: this.currentTheme,
             layout: this.currentLayout
         };
-        this.safeLocalStorageSet('layoutPreferences', JSON.stringify(layoutPreferences));
+        utils.safeLocalStorageSet('layoutPreferences', JSON.stringify(layoutPreferences));
     }
 
     private saveConfigPreferences() {
@@ -2443,11 +2411,11 @@ export class LeoEditor {
             findBody: this.OPT_BODY.checked,
             findScope: selectedFindScope
         };
-        this.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
+        utils.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
     }
 
     private loadThemeAndLayoutPreferences() {
-        const savedPrefs = this.safeLocalStorageGet('layoutPreferences');
+        const savedPrefs = utils.safeLocalStorageGet('layoutPreferences');
         if (savedPrefs) {
             try {
                 const prefs = JSON.parse(savedPrefs);
@@ -2473,7 +2441,7 @@ export class LeoEditor {
     }
 
     private loadConfigPreferences() {
-        const savedPrefs = this.safeLocalStorageGet('configPreferences');
+        const savedPrefs = utils.safeLocalStorageGet('configPreferences');
         if (savedPrefs) {
             try {
                 const prefs = JSON.parse(savedPrefs);

@@ -4,11 +4,18 @@
  */
 
 import './style.css';
+
+import { LeoModel } from './LeoModel';
+import { LeoView } from './LeoView';
+import { LeoController } from './LeoController';
+
 import { LeoEditor } from './LeoEditor';
-
 class LeoWebApp {
-
     private editor: LeoEditor;
+
+    private model!: LeoModel;
+    private view!: LeoView;
+    private controller!: LeoController;
 
     constructor() {
         this.editor = new LeoEditor();
@@ -25,8 +32,16 @@ class LeoWebApp {
     }
 
     private setupApp(): void {
-        // Initialize the Leo editor
         this.editor.handleDOMContentLoaded();
+
+        // TODO : Uncomment when MVC components are ready
+        // // Initialize the MVC components
+        // this.model = new LeoModel();
+        // this.view = new LeoView();
+        // this.controller = new LeoController(this.model, this.view);
+
+        // // Initialize the application
+        // this.controller.initialize();
     }
 
 }
