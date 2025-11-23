@@ -951,7 +951,7 @@ export class LeoEditor {
 
             // Only need to redraw the affected node if visible, no need to re-flatten because structure didn't change
             if (this.isVisible(this.selectedNode)) {
-                this.renderTree();
+                this.buildRowsRenderTree();
             }
         }
     }
@@ -1211,9 +1211,10 @@ export class LeoEditor {
         // Update body pane if selection changed (selectedNode cannot be null here because of isNew check)
         if (isNew) {
             if (newSelectedNode && this.data[newSelectedNode.gnx]) {
-                this.computeBody(newSelectedNode);
+                const [text, wrap] = this.computeBody(newSelectedNode);
+                this.showBody(text, wrap);
             } else {
-                this.setBody("", true); // No node selected
+                this.showBody("", true); // No node selected
             }
         }
         if (this.selectedNode) {
@@ -1222,7 +1223,7 @@ export class LeoEditor {
         this.updateCollapseAllPosition(); // In case the height made the scrollbar appear/disappear
     }
 
-    private computeBody(node: TreeNode) {
+    private computeBody(node: TreeNode): [string, boolean] {
         // Look for a line in the text starting with "@wrap" or "@nowrap",
         // if not found, check the parent of node recursively.
         // Note: wrap is default so only need to check for nowrap
@@ -1245,10 +1246,10 @@ export class LeoEditor {
         text = text.replace(this.urlRegex, url => {
             return `<a href="${url}" target="_blank" contenteditable="plaintext-only" rel="noopener noreferrer">${url}</a>`;
         });
-        this.setBody(text, !nowrapFound);
+        return [text, !nowrapFound];
     }
 
-    public setBody(text: string, wrap: boolean) {
+    public showBody(text: string, wrap: boolean) {
         if (wrap) {
             this.BODY_PANE.style.whiteSpace = "pre-wrap"; // Wrap text
         } else {
@@ -1756,13 +1757,17 @@ export class LeoEditor {
                 this.FIND_INPUT.focus();
             }
         });
-        const findScopeRadios = document.querySelectorAll('input[name="find-scope"]');
+        const findScopeRadios = this.getFindScopeRadios();
         findScopeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
                 this.initialFindNode = null; // Reset initial find node when scope changes
-                this.renderTree(); // Re-render to update node highlighting
+                this.buildRowsRenderTree(); // Re-render to update node highlighting
             });
         });
+    }
+
+    public getFindScopeRadios(): NodeListOf<HTMLInputElement> {
+        return document.querySelectorAll('input[name="find-scope"]');
     }
 
     private setupButtonFocusPrevention() {
@@ -2204,7 +2209,7 @@ export class LeoEditor {
 
     private updateNodeIcons = () => {
         this.HTML_ELEMENT.setAttribute('data-show-icons', this.SHOW_NODE_ICONS.checked ? 'true' : 'false');
-        this.renderTree(); // Re-render to apply icon changes
+        this.buildRowsRenderTree(); // Re-render to apply icon changes
     }
 
     private toggleButtonVisibility(button1: HTMLElement | null, button2: HTMLElement | null, isVisible: boolean) {
@@ -2463,7 +2468,7 @@ export class LeoEditor {
         this.showTab("find");
         this.FIND_INPUT.focus();
         this.FIND_INPUT.select();
-        this.renderTree(); // To show or remove initial-find highlight
+        this.buildRowsRenderTree(); // To show or remove initial-find highlight
     }
 
     private findNext() {
