@@ -1296,35 +1296,23 @@ export class LeoEditor {
 
         this.SPACER.innerHTML = "";
         this.SPACER.style.height = this.flatRows.length * this.ROW_HEIGHT + "px";
-
-        let selectedRadioValue = ''; // Falsy for now
-        const selectedRadio = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
-        if (selectedRadio) {
-            selectedRadioValue = selectedRadio.value;
-        }
-
-        const searchSuboutline = selectedRadioValue === 'suboutline' && this.initialFindNode; // Will contain the node or null
-        const searchNodeOnly = selectedRadioValue === 'node'; // selected node only
-
         for (let i = startIndex; i < endIndex; i++) {
             const row = this.flatRows[i]!;
             const div = document.createElement("div");
             div.className = "node";
+
             if (row.label) {
                 div.title = row.label;
             }
 
-            if (row.node === this.selectedNode) {
+            // Apply classes based on computed properties from controller
+            if (row.isSelected) {
                 div.classList.add("selected");
-            } else if (this.selectedNode && this.isAncestorOf(row.node, this.selectedNode)) {
+            }
+            if (row.isAncestor) {
                 div.classList.add("ancestor");
             }
-
-            if (searchNodeOnly && row.node === this.selectedNode) {
-                div.classList.add("initial-find");
-            }
-
-            if (searchSuboutline && (row.node === searchSuboutline || this.isAncestorOf(searchSuboutline, row.node))) {
+            if (row.isInitialFind) {
                 div.classList.add("initial-find");
             }
 
@@ -1338,8 +1326,6 @@ export class LeoEditor {
             const caret = document.createElement("span");
             caret.className = row.toggled ? "caret toggled" : "caret";
 
-            row.toggled = false; // Reset toggled state after rendering
-
             if (row.hasChildren) {
                 caret.setAttribute("data-expanded", row.isExpanded ? "true" : "false");
             }
@@ -1348,16 +1334,11 @@ export class LeoEditor {
             const labelSpan = document.createElement("span");
             labelSpan.className = "node-text";
 
-            // If dark mode, invert the icons' 4 bit to swap dirty borders inverted
-            if (this.currentTheme === 'dark') {
-                let invertedIcon = this.data[row.node.gnx]!.icon! ^ 8; // Toggle the 4 bit
-                labelSpan.classList.add("icon" + invertedIcon);
-            } else {
-                labelSpan.classList.add("icon" + (this.data[row.node.gnx]!.icon || 0));
-            }
+            // Apply icon class from computed property
+            labelSpan.classList.add("icon" + row.icon);
 
             labelSpan.textContent = row.label;
-            if (row.node === this.selectedNode) {
+            if (row.isSelected) {
                 this.selectedLabelElement = labelSpan;
             }
 
@@ -2390,8 +2371,7 @@ export class LeoEditor {
     }
 
     private saveConfigPreferences() {
-        const findScopeChecked = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
-        const selectedFindScope = findScopeChecked?.value || 'entire';
+        const selectedFindScope = this.getFindScope();
 
         const preferences = {
             showPrevNextMark: this.SHOW_PREV_NEXT_MARK.checked,
@@ -2667,11 +2647,7 @@ export class LeoEditor {
             this.initialFindNode = this.selectedNode; // Set initial find node if not already set
         }
 
-        let selectedRadioValue = ''; // Falsy for now
-        const selectedRadio = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
-        if (selectedRadio) {
-            selectedRadioValue = selectedRadio.value;
-        }
+        let selectedRadioValue = this.getFindScope();
 
         let pattern; // Create regex pattern based on search options
         try {
