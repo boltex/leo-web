@@ -1,11 +1,52 @@
-import { TreeNode, NodeData, FlatRow, MenuEntry } from './types';
+import { TreeNode, FlatRow, MenuEntry } from './types';
 import * as utils from './utils';
+
+/*
+    Properties (DOM Elements):
+
+    MAIN_CONTAINER, OUTLINE_PANE, BODY_PANE, LOG_PANE
+    FIND_INPUT, OPT_HEADLINE, etc. (Search inputs)
+    COLLAPSE_ALL_BTN, HOIST_BTN, DEHOIST_BTN, etc. (Buttons)
+    RESIZERS (Vertical, Horizontal, Cross)
+    MENU, TOAST
+    selectedLabelElement
+
+    Properties (UI State):
+
+    flatRows: FlatRow[]
+    currentTheme
+    currentLayout
+    mainRatio, secondaryRatio
+    isDragging, isMenuShown
+    ROW_HEIGHT, LEFT_OFFSET
+
+    Methods (Rendering):
+
+    renderTree()
+    updateNodeIcons()
+    scrollNodeIntoView(node)
+    highlightMatchInHeadline(...)
+    highlightMatchInBody(...)
+
+    Methods (UI Management):
+
+    initializeThemeAndLayout()
+    applyTheme(theme)
+    applyLayout(layout)
+    updatePanelSizes()
+    updateProportion()
+    showToast(message)
+    buildMenu(entries)
+    openTopMenu(...), closeAllSubmenus()
+    updateButtonVisibility()
+    updateHoistButtonStates(), updateMarkedButtonStates()
+    showTab(tabName)
+    showBody(text, wrap)
+*/
 
 export class LeoView {
     // Elements
     private selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane
-    private ROW_HEIGHT = 26;
-    private LEFT_OFFSET = 16; // Padding from left edge
 
     private MAIN_CONTAINER: HTMLElement;
     private OUTLINE_FIND_CONTAINER: HTMLElement;
@@ -65,6 +106,7 @@ export class LeoView {
     private MENU: HTMLElement;
     private TOAST: HTMLElement;
     private HTML_ELEMENT: HTMLElement;
+    private defaultTitle = "Leo Editor for the web";
 
     private activeTopMenu: HTMLDivElement | null = null;
     private focusedMenuItem: HTMLDivElement | null = null;
@@ -75,16 +117,17 @@ export class LeoView {
 
     private currentTheme = 'light'; // Default theme
     private currentLayout = 'vertical'; // Default layout
+    private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
+    private secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
     private isDragging = false;
     private isMenuShown = false;
+    private ROW_HEIGHT = 26;
+    private LEFT_OFFSET = 16; // Padding from left edge
+
     private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
-    private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
     private secondaryIsDragging = false;
     private crossIsDragging = false;
-    private secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
-    // Allow http(s)/ftp with '://', file with // or ///, and mailto: without '//'
-    private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi;
 
     private minWidth = 20;
     private minHeight = 20;
@@ -155,6 +198,84 @@ export class LeoView {
         this.topLevelSubmenus.clear();
     }
 
+    public renderTree = () => {
+        if (!this.flatRows) {
+            return; // Not initialized yet
+        }
+
+        // Render visible rows only
+        const scrollTop = this.OUTLINE_PANE.scrollTop;
+        const viewportHeight = this.OUTLINE_PANE.clientHeight;
+        const viewportWidth = this.OUTLINE_PANE.clientWidth;
+
+        const startIndex = Math.floor(scrollTop / this.ROW_HEIGHT);
+        const visibleCount = Math.ceil(viewportHeight / this.ROW_HEIGHT) + 1;
+        const endIndex = Math.min(this.flatRows.length, startIndex + visibleCount);
+        let leftOffset = this.LEFT_OFFSET;
+
+        // If all nodes have no children, remove the left offset
+        if (this.flatRows.every(row => !row.hasChildren)) {
+            leftOffset = 0;
+        }
+
+        this.SPACER.innerHTML = "";
+        this.SPACER.style.height = this.flatRows.length * this.ROW_HEIGHT + "px";
+        for (let i = startIndex; i < endIndex; i++) {
+            const row = this.flatRows[i]!;
+            const div = document.createElement("div");
+            div.className = "node";
+
+            if (row.label) {
+                div.title = row.label;
+            }
+
+            // Apply classes based on computed properties from controller
+            if (row.isSelected) {
+                div.classList.add("selected");
+            }
+            if (row.isAncestor) {
+                div.classList.add("ancestor");
+            }
+            if (row.isInitialFind) {
+                div.classList.add("initial-find");
+            }
+
+            div.style.top = (i * this.ROW_HEIGHT) + "px";
+            div.style.height = this.ROW_HEIGHT + "px";
+
+            const leftPosition = (row.depth * 20) + leftOffset;
+            div.style.left = leftPosition + "px";
+            div.style.width = (viewportWidth - leftPosition) + "px";
+
+            const caret = document.createElement("span");
+            caret.className = row.toggled ? "caret toggled" : "caret";
+
+            if (row.hasChildren) {
+                caret.setAttribute("data-expanded", row.isExpanded ? "true" : "false");
+            }
+            div.appendChild(caret);
+
+            const labelSpan = document.createElement("span");
+            labelSpan.className = "node-text";
+
+            // Apply icon class from computed property
+            labelSpan.classList.add("icon" + row.icon);
+
+            labelSpan.textContent = row.label;
+            if (row.isSelected) {
+                this.selectedLabelElement = labelSpan;
+            }
+
+            div.appendChild(labelSpan);
+            this.SPACER.appendChild(div);
+        }
+    }
+
+    public updateNodeIcons = () => {
+        this.HTML_ELEMENT.setAttribute('data-show-icons', this.SHOW_NODE_ICONS.checked ? 'true' : 'false');
+        this.renderTree(); // Re-render to apply icon changes
+    }
+
     private restoreLastFocusedElement() {
         if (this.lastFocusedElement && this.lastFocusedElement.focus) {
             // also check if visible by checking its size
@@ -165,7 +286,7 @@ export class LeoView {
         }
     }
 
-    private buildMenu(entries: MenuEntry[], level = 0) {
+    public buildMenu(entries: MenuEntry[], level = 0) {
         const menu = level === 0 ? document.getElementById("top-menu")! : document.createElement("div");
 
         menu.className = "menu" + (level > 0 ? " submenu" : "");
@@ -276,7 +397,7 @@ export class LeoView {
         submenu.style.display = "";
     }
 
-    private closeAllSubmenus() {
+    public closeAllSubmenus() {
         document.querySelectorAll(".submenu.visible").forEach(sub =>
             sub.classList.remove("visible")
         );
@@ -318,7 +439,57 @@ export class LeoView {
         }
     }
 
-    private updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean) => {
+
+    private highlightMatchInHeadline(startIndex: number, endIndex: number) {
+        // Use the global selectedLabelElement which is already set after selectAndOrToggleAndRedraw
+        if (!this.selectedLabelElement) return;
+        // Find the first text node in the label element
+        let textNode = null;
+        for (const node of this.selectedLabelElement.childNodes) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                textNode = node;
+                break;
+            }
+        }
+        if (!textNode) return;
+        try {
+            const range = document.createRange();
+            range.setStart(textNode, startIndex);
+            range.setEnd(textNode, endIndex);
+
+            const selection = window.getSelection()!;
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } catch (e) {
+            console.error('Error setting headline selection:', e);
+        }
+    }
+
+    private highlightMatchInBody(startIndex: number, endIndex: number) {
+        // The body pane content is set directly as textContent, so it's a single text node
+        if (!this.BODY_PANE.firstChild) return;
+        try {
+            const range = document.createRange();
+            const start = utils.getTextNodeAtIndex(this.BODY_PANE, startIndex);
+            const end = utils.getTextNodeAtIndex(this.BODY_PANE, endIndex);
+
+            if (!start || !end) {
+                console.warn("Invalid range: could not resolve text nodes");
+                return;
+            }
+
+            range.setStart(start.node, start.offset);
+            range.setEnd(end.node, end.offset);
+
+            const sel = window.getSelection()!;
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } catch (e) {
+            console.error('Error setting body selection:', e);
+        }
+    }
+
+    public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean) => {
         this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked);
         this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked);
         this.toggleButtonVisibility(this.NEXT_BTN, this.PREV_BTN, this.SHOW_PREV_NEXT_HISTORY.checked && hasHistory);
@@ -348,29 +519,25 @@ export class LeoView {
         this.TRIGGER_AREA.style.width = ((visibleButtonCount * 40) + 10) + 'px';
     }
 
-    private updateNodeIcons = () => {
-        this.HTML_ELEMENT.setAttribute('data-show-icons', this.SHOW_NODE_ICONS.checked ? 'true' : 'false');
-        // ! done in controller
-        // this.renderTree(); // Re-render to apply icon changes
-    }
+
 
     // * Button states
-    private updateMarkedButtonStates(hasMarkedNodes: boolean) {
+    public updateMarkedButtonStates(hasMarkedNodes: boolean) {
         this.NEXT_MARKED_BTN.disabled = !hasMarkedNodes;
         this.PREV_MARKED_BTN.disabled = !hasMarkedNodes;
     }
 
-    private updateHoistButtonStates(hoist: boolean, deHoist: boolean) {
+    public updateHoistButtonStates(hoist: boolean, deHoist: boolean) {
         this.HOIST_BTN.disabled = hoist;
         this.DEHOIST_BTN.disabled = deHoist;
     }
 
-    private updateHistoryButtonStates(previous: boolean, next: boolean) {
+    public updateHistoryButtonStates(previous: boolean, next: boolean) {
         this.PREV_BTN.disabled = previous;
         this.NEXT_BTN.disabled = next;
     }
 
-    private updateContextMenuState(mark: boolean, unmark: boolean, hoist: boolean, dehoist: boolean) {
+    public updateContextMenuState(mark: boolean, unmark: boolean, hoist: boolean, dehoist: boolean) {
         this.toggleButtonVisibility(this.ACTION_MARK, null, mark);
         this.toggleButtonVisibility(this.ACTION_UNMARK, null, unmark);
         this.toggleButtonVisibility(this.ACTION_HOIST, null, hoist);
@@ -378,7 +545,7 @@ export class LeoView {
     }
 
     // * UI utilities
-    private toggleButtonVisibility(button1: HTMLElement | null, button2: HTMLElement | null, isVisible: boolean) {
+    public toggleButtonVisibility(button1: HTMLElement | null, button2: HTMLElement | null, isVisible: boolean) {
         if (button1) {
             button1.classList.toggle('hidden-button', !isVisible);
         }
@@ -387,7 +554,7 @@ export class LeoView {
         }
     }
 
-    private showTab(tabName: string) {
+    public showTab(tabName: string) {
         // Set HTML_ELEMENT attributes. CSS rules will show/hide tabs based on these.
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
     }
@@ -439,16 +606,45 @@ export class LeoView {
         this.HTML_ELEMENT.setAttribute('data-show-icons', visible ? 'true' : 'false');
     }
 
+    public initializeThemeAndLayout() {
+        document.title = this.defaultTitle;
+        this.loadThemeAndLayoutPreferences();
+    }
 
+    private loadThemeAndLayoutPreferences() {
+        const savedPrefs = utils.safeLocalStorageGet('layoutPreferences');
+        if (savedPrefs) {
+            try {
+                const prefs = JSON.parse(savedPrefs);
+                if (typeof prefs.mainRatio === 'number') {
+                    this.mainRatio = prefs.mainRatio;
+                }
+                if (typeof prefs.secondaryRatio === 'number') {
+                    this.secondaryRatio = prefs.secondaryRatio;
+                }
+                if (prefs.theme) {
+                    this.applyTheme(prefs.theme);
+                }
+                if (prefs.layout) {
+                    this.applyLayout(prefs.layout);
+                }
+            } catch (e) {
+                console.error('Error loading layout preferences:', e);
+            }
+        } else {
+            this.applyTheme(this.currentTheme);
+            this.applyLayout(this.currentLayout);
+        }
+    }
 
-    private applyTheme(theme: string) {
+    public applyTheme(theme: string) {
         this.currentTheme = theme;
         this.HTML_ELEMENT.setAttribute('data-theme', theme);
         this.THEME_TOGGLE.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
         this.THEME_ICON.innerHTML = theme === 'dark' ? '🌙' : '☀️';
     };
 
-    private applyLayout(layout: string) {
+    public applyLayout(layout: string) {
         this.currentLayout = layout;
         this.LAYOUT_TOGGLE.title = layout === 'vertical' ? 'Switch to horizontal layout' : 'Switch to vertical layout';
         if (layout === 'horizontal') {
@@ -459,13 +655,13 @@ export class LeoView {
         this.updatePanelSizes(); // Proportions will have changed so we must update sizes
     };
 
-    private updatePanelSizes() {
+    public updatePanelSizes() {
         this.updateOutlineContainerSize();
         this.updateOutlinePaneSize();
         this.positionCrossDragger();
     }
 
-    private updateOutlineContainerSize() {
+    public updateOutlineContainerSize() {
         if (this.currentLayout === 'vertical') {
             let newWidth = window.innerWidth * this.mainRatio;
             if (newWidth < this.minWidth) {
@@ -483,7 +679,7 @@ export class LeoView {
         }
     }
 
-    private updateOutlinePaneSize() {
+    public updateOutlinePaneSize() {
         if (this.currentLayout === 'vertical') {
             const containerHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight;
             let newHeight = containerHeight * this.secondaryRatio;
@@ -507,11 +703,19 @@ export class LeoView {
         this.updateCollapseAllPosition();
     }
 
-    private updateCollapseAllPosition() {
+    public updateProportion() {
+        if (this.currentLayout === 'vertical') {
+            this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetWidth / window.innerWidth;
+        } else {
+            this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetHeight / this.MAIN_CONTAINER.offsetHeight;
+        }
+    }
+
+    public updateCollapseAllPosition() {
         this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 58 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
 
-    private positionCrossDragger() {
+    public positionCrossDragger() {
         if (this.currentLayout === 'vertical') {
             const outlineWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
             const paneHeight = this.OUTLINE_PANE.offsetHeight + this.TOP_MENU_TOGGLE.offsetHeight;
@@ -526,7 +730,7 @@ export class LeoView {
 
     }
 
-    private focusMenuItem(item: HTMLDivElement | null) {
+    public focusMenuItem(item: HTMLDivElement | null) {
         if (!item) return; // Safety check
         if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
         item.classList.add("focused");
@@ -541,16 +745,6 @@ export class LeoView {
             ancestor = ancestor.parentElement?.closest(".submenu")?.parentElement?.closest(".menu-item");
         }
     }
-
-
-    private updateProportion() {
-        if (this.currentLayout === 'vertical') {
-            this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetWidth / window.innerWidth;
-        } else {
-            this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetHeight / this.MAIN_CONTAINER.offsetHeight;
-        }
-    }
-
 
     public showToast(message: string, duration = 2000) {
         if (!this.TOAST) return;
@@ -567,6 +761,15 @@ export class LeoView {
             setTimeout(() => { this.TOAST.hidden = true; }, 220);
             this.__toastTimer = null;
         }, duration);
+    }
+
+    public showBody(text: string, wrap: boolean) {
+        if (wrap) {
+            this.BODY_PANE.style.whiteSpace = "pre-wrap"; // Wrap text
+        } else {
+            this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
+        }
+        this.BODY_PANE.innerHTML = text;
     }
 
 }

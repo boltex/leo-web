@@ -1,4 +1,61 @@
-import { TreeNode, NodeData } from './types';
+import { TreeNode, NodeData, MenuEntry } from './types';
+
+/*
+# Properties:
+
+tree: TreeNode (Root)
+data: Record<string, NodeData> (Body text/Headlines)
+allNodesInOrder: Array<TreeNode>
+expanded: Set<TreeNode>
+marked: Set<number>
+selectedNode: TreeNode | null
+hoistStack: Array<TreeNode>
+navigationHistory: Array<TreeNode>
+currentHistoryIndex: number
+initialFindNode: TreeNode | null
+menuData: MenuEntry[]
+
+# Methods (Tree Structure & Helpers):
+
+buildClones(node)
+buildParentRefs(node)
+getAllNodesInTreeOrder(node)
+children(node)
+childIndex(node)
+parents(node)
+isAncestorOf(ancestor, descendant)
+hasChildren(node)
+hasParent(node)
+hasBack(node)
+hasNext(node)
+
+# Methods (State Logic):
+
+isExpanded(node)
+isVisible(node)
+isDescendantOfHoistedNode(node)
+getCurrentRoot()
+
+# Methods (Navigation Logic):
+
+moveToBack(node)
+moveToNext(node)
+moveToParent(node)
+moveToFirstChild(node)
+moveToLastChild(node)
+moveToLastNode(node)
+moveToThreadBack(node)
+moveToThreadNext(node)
+moveToVisBack(node)
+moveToVisNext(node)
+
+# Methods (Actions/Mutations):
+
+hoistNode() / dehoistNode()
+toggleMark(node)
+addToHistory(node)
+
+*/
 
 export class LeoModel {
     public tree: TreeNode = {
@@ -97,6 +154,56 @@ export class LeoModel {
         }
     };
 
+    private menuData: MenuEntry[] = [
+        {
+            label: "File",
+            entries: [
+                { label: "Open...", action: "open" },
+                {
+                    label: "Export",
+                    entries: [
+                        { label: "As PDF...", action: "export_pdf" },
+                        { label: "As Image...", action: "export_img" },
+                    ],
+                },
+                { label: "Exit", action: "exit" },
+            ],
+        },
+        {
+            label: "Edit",
+            entries: [
+                { label: "Undo", action: "undo" },
+                { label: "Redo", action: "redo" },
+                { label: "Cut", action: "cut" },
+                { label: "Copy", action: "copy" },
+                { label: "Paste", action: "paste" },
+            ],
+        },
+        {
+            label: "View",
+            entries: [
+                { label: "Zoom In", action: "zoom_in" },
+                { label: "Zoom Out", action: "zoom_out" },
+                {
+                    label: "Orientation",
+                    entries: [
+                        { label: "Portrait", action: "orient_portrait" },
+                        { label: "Landscape", action: "orient_landscape" },
+                    ],
+                },
+                { label: "Fullscreen", action: "fullscreen" },
+            ],
+        },
+        {
+            label: "Help",
+            entries: [
+                { label: "Documentation", action: "docs" },
+                { label: "About", action: "about" },
+            ],
+        },
+    ];
+
+
     // Note: Also use buildClones and buildParentRefs
     // to add icon member to data entries as needed:
     // hasBody: 1, isMarked: 2, isClone: 4, isDirty: 8
@@ -105,9 +212,10 @@ export class LeoModel {
     public expanded: Set<TreeNode> = new Set(); // No need to add the root because 'isExpanded' will return true for it
     public marked: Set<number> = new Set(); // Set of gnx (not nodes) that are marked
     public selectedNode: TreeNode | null = null; // Track the currently selected node
+    public hoistStack: Array<TreeNode> = []; // Track hoisted nodes
     public navigationHistory: Array<TreeNode> = [];
     public currentHistoryIndex = -1; // -1 means no history yet
-    public hoistStack: Array<TreeNode> = []; // Track hoisted nodes
+    private initialFindNode: TreeNode | null = null; // Node where to start the find (null means from the top)
 
     constructor() {
         this.buildClones(this.tree);
@@ -182,16 +290,6 @@ export class LeoModel {
         return node && node.children ? node.children.slice() : [];
     }
 
-    public childIndex(node: TreeNode): number {
-        // Given a node, return its index among its siblings (0 for first, 1 for second, etc).
-        const parent = node.parent;
-        if (parent) {
-            const siblings = this.children(parent);
-            return siblings.indexOf(node);
-        }
-        return 0; // Should not happen for valid nodes because the top nodes are in the #outline-pane div
-    }
-
     public parents(node: TreeNode): Array<TreeNode> {
         // Given a node, return an array of its ancestor nodes, closest first.
         const ancestors: Array<TreeNode> = [];
@@ -223,38 +321,9 @@ export class LeoModel {
         return !!(node.children && node.children.length > 0);
     }
 
-    public isExpanded(node: TreeNode): boolean {
-        // Given a node, return true if it is expanded.
-        if (!node.parent) return true; // The root node is always considered expanded
-        return this.expanded.has(node);
-    }
-
-    public isDescendantOfHoistedNode(node: TreeNode): boolean {
-        if (!node || this.hoistStack.length === 0) {
-            return false;
-        } else {
-            const hoistedNode = this.hoistStack[this.hoistStack.length - 1]!;
-            return hoistedNode === node || this.isAncestorOf(hoistedNode, node);
-        }
-    }
-
-    public isVisible(node: TreeNode): boolean {
-        // Return True if node is visible in the outline.
-        if (!node.parent) return false; // Root node is not visible
-
-        // First check if the node is descendant of the hoisted node
-        if (this.hoistStack.length > 0 && !this.isDescendantOfHoistedNode(node)) {
-            return false;
-        }
-
-        // Then check if all ancestors are expanded
-        const ancestors = this.parents(node);
-        for (const ancestor of ancestors) {
-            if (!this.isExpanded(ancestor)) {
-                return false;
-            }
-        }
-        return true;
+    public hasParent(node: TreeNode): boolean {
+        // Given a node, return true if it has a parent. Except if that parent is the hidden root node.
+        return !!node.parent && !!node.parent.parent;
     }
 
     public hasBack(node: TreeNode): boolean {
@@ -279,9 +348,43 @@ export class LeoModel {
         return false;
     }
 
-    public hasParent(node: TreeNode): boolean {
-        // Given a node, return true if it has a parent. Except if that parent is the hidden root node.
-        return !!node.parent && !!node.parent.parent;
+    public isExpanded(node: TreeNode): boolean {
+        // Given a node, return true if it is expanded.
+        if (!node.parent) return true; // The root node is always considered expanded
+        return this.expanded.has(node);
+    }
+
+    public isVisible(node: TreeNode): boolean {
+        // Return True if node is visible in the outline.
+        if (!node.parent) return false; // Root node is not visible
+
+        // First check if the node is descendant of the hoisted node
+        if (this.hoistStack.length > 0 && !this.isDescendantOfHoistedNode(node)) {
+            return false;
+        }
+
+        // Then check if all ancestors are expanded
+        const ancestors = this.parents(node);
+        for (const ancestor of ancestors) {
+            if (!this.isExpanded(ancestor)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public isDescendantOfHoistedNode(node: TreeNode): boolean {
+        if (!node || this.hoistStack.length === 0) {
+            return false;
+        } else {
+            const hoistedNode = this.hoistStack[this.hoistStack.length - 1]!;
+            return hoistedNode === node || this.isAncestorOf(hoistedNode, node);
+        }
+    }
+
+    public getCurrentRoot(): TreeNode {
+        // Return the current top of the hoist stack or the main tree root
+        return this.hoistStack.length > 0 ? this.hoistStack[this.hoistStack.length - 1]! : this.tree;
     }
 
     public hasThreadBack(node: TreeNode): boolean {
@@ -296,6 +399,27 @@ export class LeoModel {
             const siblings = this.children(parent);
             const index = siblings.indexOf(node);
             return index > 0 ? siblings[index - 1] : null;
+        }
+        return null;
+    }
+
+    public moveToNext(node: TreeNode): TreeNode | null {
+        // Given a node, return its next sibling. If already last, return null.
+        const parent = node.parent;
+        if (parent) {
+            const siblings = this.children(parent);
+            const index = siblings.indexOf(node);
+            return index < siblings.length - 1 ? siblings[index + 1]! : null;
+        }
+        return null;
+    }
+
+
+    public moveToParent(node: TreeNode): TreeNode | null {
+        // Given a node, return its parent or null if no parent.
+        const parent = node.parent;
+        if (parent) {
+            return parent;
         }
         return null;
     }
@@ -316,38 +440,6 @@ export class LeoModel {
             node = this.moveToLastChild(node)!;
         }
         return node;
-    }
-
-    public moveToNext(node: TreeNode): TreeNode | null {
-        // Given a node, return its next sibling. If already last, return null.
-        const parent = node.parent;
-        if (parent) {
-            const siblings = this.children(parent);
-            const index = siblings.indexOf(node);
-            return index < siblings.length - 1 ? siblings[index + 1]! : null;
-        }
-        return null;
-    }
-
-    public moveToNodeAfterTree(node: TreeNode): TreeNode | null {
-        // Given a node, return the node after the position's tree.
-        while (node) {
-            if (this.hasNext(node)) {
-                node = this.moveToNext(node)!;
-                break;
-            }
-            node = this.moveToParent(node)!;
-        }
-        return node;
-    }
-
-    public moveToParent(node: TreeNode): TreeNode | null {
-        // Given a node, return its parent or null if no parent.
-        const parent = node.parent;
-        if (parent) {
-            return parent;
-        }
-        return null;
     }
 
     public moveToThreadBack(node: TreeNode): TreeNode | null {
@@ -420,6 +512,19 @@ export class LeoModel {
         return node;
     };
 
+    public moveToNodeAfterTree(node: TreeNode): TreeNode | null {
+        // Given a node, return the node after the position's tree.
+        while (node) {
+            if (this.hasNext(node)) {
+                node = this.moveToNext(node)!;
+                break;
+            }
+            node = this.moveToParent(node)!;
+        }
+        return node;
+    }
+
+
     public toggleMark(node: TreeNode) {
         if (!node) return;
         const gnx = node.gnx;
@@ -446,8 +551,5 @@ export class LeoModel {
         this.currentHistoryIndex = this.navigationHistory.length - 1;
     }
 
-    public getCurrentRoot(): TreeNode {
-        // Return the current top of the hoist stack or the main tree root
-        return this.hoistStack.length > 0 ? this.hoistStack[this.hoistStack.length - 1]! : this.tree;
-    }
+
 }

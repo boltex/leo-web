@@ -53,3 +53,40 @@ export function safeLocalStorageSet(key: string, value: string): void {
 export function preventDefault(e: Event): void {
     e.preventDefault();
 }
+
+/**
+ * Get the text node and offset at a given global character index within a root node
+ */
+export function getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let currentNode = walker.nextNode();
+    let remaining = index;
+
+    while (currentNode) {
+        const len = currentNode!.nodeValue!.length;
+        if (remaining <= len) {
+            return { node: currentNode, offset: remaining };
+        }
+        remaining -= len;
+        currentNode = walker.nextNode();
+    }
+    return null;
+}
+
+/**
+ * Get the global character offset within a root node for a given text node and offset
+ */
+export function getGlobalOffset(root: Node, container: Node, offset: number): number {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let total = 0;
+    let current: Node | null = walker.nextNode();
+
+    while (current) {
+        if (current === container) {
+            return total + offset;
+        }
+        total += current.nodeValue!.length;
+        current = walker.nextNode();
+    }
+    return total;
+}
