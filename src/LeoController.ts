@@ -3,51 +3,61 @@ import { LeoView } from "./LeoView";
 
 /*
 
-Properties:
+    # Properties:
 
-model: LeoModel
-view: LeoView
-outlinePaneKeyMap
-urlRegex
+    model: LeoModel
+    view: LeoView
+    outlinePaneKeyMap
+    urlRegex
 
-Methods (Initialization & Setup):
+    # Methods (Initialization & Setup):
 
-constructor()
-setupEventHandlers()
-setupOutlinePaneHandlers()
-setupBodyPaneHandlers()
-setupGlobalHandlers()
+    constructor()
+    setupEventHandlers()
+    setupOutlinePaneHandlers()
+    setupBodyPaneHandlers()
+    setupGlobalHandlers()
+    setupTopMenuHandlers()
 
-Methods (Event Handlers):
+    # Methods (Event Handlers):
 
-handleOutlinePaneClick(e)
-handleOutlinePaneKeyDown(e)
-handleGlobalKeyDown(e)
-handleDrag(), startDrag(), stopDrag()
-handleMenuToggleClick()
-handleThemeToggleClick()
+    handleDOMContentLoaded
+    handleWindowResize
+    handleOutlinePaneClick(e)
+    handleOutlinePaneKeyDown(e)
+    handleGlobalKeyDown(e)
+    handleDrag(), startDrag(), stopDrag()
+    handleSecondaryDrag(), startSecondaryDrag(), stopSecondaryDrag()
+    handleCrossDrag(), startCrossDrag(), stopCrossDrag()
+    handleMenuToggleClick()
+    handleThemeToggleClick()
 
-Methods (Command Execution):
+    # Methods (Command Execution):
 
-selectAndOrToggleAndRedraw(node)
-expandNodeAndGoToFirstChild()
-contractNodeOrGoToParent()
-gotoNextMarkedNode(), gotoPrevMarkedNode()
-previousHistory(), nextHistory()
-collapseAll()
-saveAll()
+    hoistNode
+    dehoistNode
+    selectAndOrToggleAndRedraw(node)
+    expandNodeAndGoToFirstChild()
+    contractNodeOrGoToParent()
+    gotoNextMarkedNode(), gotoPrevMarkedNode()
+    previousHistory(), nextHistory()
+    collapseAll()
 
-Methods (Search Orchestration):
+    # Methods (Search Orchestration):
 
-startFind()
-findNext()
-findPrevious()
+    startFind()
+    findNext()
+    findPrevious()
 
-Methods (Persistence):
+    # Methods (Persistence):
 
-saveDocumentStateToLocalStorage()
-loadDocumentStateFromLocalStorage()
-saveConfigPreferences()
+    saveAllPreferences()
+    saveDocumentStateToLocalStorage()
+    loadDocumentStateFromLocalStorage()
+    saveLayoutPreferences()
+    saveConfigPreferences()
+    loadConfigPreferences()
+
 */
 
 

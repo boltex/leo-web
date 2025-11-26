@@ -2,7 +2,7 @@ import { TreeNode, FlatRow, MenuEntry } from './types';
 import * as utils from './utils';
 
 /*
-    Properties (DOM Elements):
+    # Properties (DOM Elements):
 
     MAIN_CONTAINER, OUTLINE_PANE, BODY_PANE, LOG_PANE
     FIND_INPUT, OPT_HEADLINE, etc. (Search inputs)
@@ -11,7 +11,7 @@ import * as utils from './utils';
     MENU, TOAST
     selectedLabelElement
 
-    Properties (UI State):
+    # Properties (UI State):
 
     flatRows: FlatRow[]
     currentTheme
@@ -20,7 +20,7 @@ import * as utils from './utils';
     isDragging, isMenuShown
     ROW_HEIGHT, LEFT_OFFSET
 
-    Methods (Rendering):
+    # Methods (Rendering):
 
     renderTree()
     updateNodeIcons()
@@ -28,20 +28,33 @@ import * as utils from './utils';
     highlightMatchInHeadline(...)
     highlightMatchInBody(...)
 
-    Methods (UI Management):
+    # Methods (UI Management):
 
+    setupLastFocusedElementTracking()
+    restoreLastFocusedElement()
+    setupButtonContainerAutoHide()
     initializeThemeAndLayout()
+    loadThemeAndLayoutPreferences()
     applyTheme(theme)
     applyLayout(layout)
     updatePanelSizes()
+    updateOutlineContainerSize()
+    updateOutlinePaneSize()
+    updateCollapseAllPosition()
+    positionCrossDragger()
     updateProportion()
     showToast(message)
+
     buildMenu(entries)
+    positionSubmenu()
     openTopMenu(...), closeAllSubmenus()
+    focusMenuItem()
     updateButtonVisibility()
     updateHoistButtonStates(), updateMarkedButtonStates()
     showTab(tabName)
     showBody(text, wrap)
+    findFocus()
+
 */
 
 export class LeoView {
@@ -106,7 +119,6 @@ export class LeoView {
     private MENU: HTMLElement;
     private TOAST: HTMLElement;
     private HTML_ELEMENT: HTMLElement;
-    private defaultTitle = "Leo Editor for the web";
 
     private activeTopMenu: HTMLDivElement | null = null;
     private focusedMenuItem: HTMLDivElement | null = null;
@@ -276,16 +288,6 @@ export class LeoView {
         this.renderTree(); // Re-render to apply icon changes
     }
 
-    private restoreLastFocusedElement() {
-        if (this.lastFocusedElement && this.lastFocusedElement.focus) {
-            // also check if visible by checking its size
-            const rect = this.lastFocusedElement.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0) {
-                this.lastFocusedElement.focus();
-            }
-        }
-    }
-
     public buildMenu(entries: MenuEntry[], level = 0) {
         const menu = level === 0 ? document.getElementById("top-menu")! : document.createElement("div");
 
@@ -411,6 +413,32 @@ export class LeoView {
             item.classList.remove("sub-active")
         );
         this.focusedMenuItem = null;
+    }
+
+
+    public focusMenuItem(item: HTMLDivElement | null) {
+        if (!item) return; // Safety check
+        if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
+        item.classList.add("focused");
+        this.focusedMenuItem = item;
+        item.scrollIntoView({ block: "nearest" });
+        document.querySelectorAll(".menu-item.sub-active").forEach(el =>
+            el.classList.remove("sub-active")
+        );
+        let ancestor = item.parentElement?.closest(".menu-item");
+        while (ancestor) {
+            ancestor.classList.add("sub-active");
+            ancestor = ancestor.parentElement?.closest(".submenu")?.parentElement?.closest(".menu-item");
+        }
+    }
+
+    public closeMenusEvent(e: MouseEvent) {
+        this.MENU.style.display = "none";
+        const target = e.target as Element;
+        if (!target.closest('.menu')) {
+            this.closeAllSubmenus();
+            this.activeTopMenu = null;
+        }
     }
 
     public setBody(text: string, wrap: boolean) {
@@ -559,55 +587,70 @@ export class LeoView {
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
     }
 
-    public getActionButtons(): HTMLElement[] {
-        return Array.from(document.querySelectorAll('.action-button'));
-    }
-
-    public getTopMenuToggle(): HTMLElement {
-        return this.TOP_MENU_TOGGLE;
-    }
-
-    public getFocusableElements(): HTMLElement[] {
-        return [
-            this.OUTLINE_PANE,
-            this.BODY_PANE,
-            ...Array.from(this.OUTLINE_FIND_CONTAINER.querySelectorAll<HTMLElement>('input'))
-        ];
-    }
-
-    public getConfigCheckboxes() {
-        return {
-            showPrevNextMark: this.SHOW_PREV_NEXT_MARK,
-            showToggleMark: this.SHOW_TOGGLE_MARK,
-            showNextHistory: this.SHOW_PREV_NEXT_HISTORY,
-            showHoistDehoist: this.SHOW_HOIST_DEHOIST,
-            showLayoutOrientation: this.SHOW_LAYOUT_ORIENTATION,
-            showThemeToggle: this.SHOW_THEME_TOGGLE,
-            showNodeIcons: this.SHOW_NODE_ICONS,
-            showCollapseAll: this.SHOW_COLLAPSE_ALL,
-        };
-    }
-
-    public getConfigState() {
-        const checkboxes = this.getConfigCheckboxes();
-        return {
-            showPrevNextMark: checkboxes.showPrevNextMark.checked,
-            showToggleMark: checkboxes.showToggleMark.checked,
-            showNextHistory: checkboxes.showNextHistory.checked,
-            showHoistDehoist: checkboxes.showHoistDehoist.checked,
-            showLayoutOrientation: checkboxes.showLayoutOrientation.checked,
-            showThemeToggle: checkboxes.showThemeToggle.checked,
-            showNodeIcons: checkboxes.showNodeIcons.checked,
-            showCollapseAll: checkboxes.showCollapseAll.checked,
-        };
-    }
-
     public setIconsVisible(visible: boolean) {
         this.HTML_ELEMENT.setAttribute('data-show-icons', visible ? 'true' : 'false');
     }
 
-    public initializeThemeAndLayout() {
-        document.title = this.defaultTitle;
+    public setupLastFocusedElementTracking() {
+        const focusableElements = [this.OUTLINE_PANE, this.BODY_PANE];
+        // All elements that also need to be tracked for focus are 'input' elements inside the outline/find container
+        const allInputs = this.OUTLINE_FIND_CONTAINER.querySelectorAll<HTMLElement>('input');
+        allInputs.forEach(input => {
+            focusableElements.push(input);
+        });
+
+        focusableElements.forEach(element => {
+            element.addEventListener('focus', () => {
+                this.lastFocusedElement = element;
+            });
+        });
+    }
+
+    private restoreLastFocusedElement() {
+        if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+            // also check if visible by checking its size
+            const rect = this.lastFocusedElement.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                this.lastFocusedElement.focus();
+            }
+        }
+    }
+
+    public setupButtonContainerAutoHide() {
+        let hideTimeout: ReturnType<typeof setTimeout>;
+        const showButtons = () => {
+            clearTimeout(hideTimeout);
+            if (this.isMenuShown) {
+                return;
+            }
+            this.BUTTON_CONTAINER.classList.remove('hidden');
+        }
+
+        const hideButtons = () => {
+            hideTimeout = setTimeout(() => {
+                this.BUTTON_CONTAINER.classList.add('hidden');
+            }, 1000);
+        };
+        this.TRIGGER_AREA.addEventListener('mouseenter', showButtons);
+        this.BUTTON_CONTAINER.addEventListener('mouseenter', showButtons);
+        this.TRIGGER_AREA.addEventListener('mouseleave', (e) => {
+            if (!this.BUTTON_CONTAINER.contains(e.relatedTarget as Node | null)) {
+                hideButtons();
+            }
+        });
+        this.BUTTON_CONTAINER.addEventListener('mouseleave', (e) => {
+            if (e.relatedTarget !== this.TRIGGER_AREA) {
+                hideButtons();
+            }
+        });
+        showButtons();
+        hideTimeout = setTimeout(() => {
+            this.BUTTON_CONTAINER.classList.add('hidden');
+        }, 1500);
+    }
+
+    public initializeThemeAndLayout(defaultTitle: string) {
+        document.title = defaultTitle;
         this.loadThemeAndLayoutPreferences();
     }
 
@@ -711,6 +754,15 @@ export class LeoView {
         }
     }
 
+
+    public updateSecondaryProportion() {
+        if (this.currentLayout === 'vertical') {
+            this.secondaryRatio = (this.OUTLINE_PANE.offsetHeight - 6) / this.OUTLINE_FIND_CONTAINER.offsetHeight;
+        } else {
+            this.secondaryRatio = this.OUTLINE_PANE.offsetWidth / this.OUTLINE_FIND_CONTAINER.offsetWidth;
+        }
+    }
+
     public updateCollapseAllPosition() {
         this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 58 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
@@ -730,21 +782,6 @@ export class LeoView {
 
     }
 
-    public focusMenuItem(item: HTMLDivElement | null) {
-        if (!item) return; // Safety check
-        if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
-        item.classList.add("focused");
-        this.focusedMenuItem = item;
-        item.scrollIntoView({ block: "nearest" });
-        document.querySelectorAll(".menu-item.sub-active").forEach(el =>
-            el.classList.remove("sub-active")
-        );
-        let ancestor = item.parentElement?.closest(".menu-item");
-        while (ancestor) {
-            ancestor.classList.add("sub-active");
-            ancestor = ancestor.parentElement?.closest(".submenu")?.parentElement?.closest(".menu-item");
-        }
-    }
 
     public showToast(message: string, duration = 2000) {
         if (!this.TOAST) return;
@@ -770,6 +807,64 @@ export class LeoView {
             this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
         }
         this.BODY_PANE.innerHTML = text;
+    }
+
+    // * Getters 
+    public findFocus(): number {
+        // Returns 1 if focus in outline-pane, 2 if in body-pane, 0 otherwise
+        if (document.activeElement === this.OUTLINE_PANE || this.OUTLINE_PANE.contains(document.activeElement)) {
+            return 1;
+        } else if (document.activeElement === this.BODY_PANE || this.BODY_PANE.contains(document.activeElement)) {
+            return 2;
+        }
+        return 0;
+    }
+
+    public getActionButtons(): HTMLElement[] {
+        return Array.from(document.querySelectorAll('.action-button'));
+    }
+
+    public getTopMenuToggle(): HTMLElement {
+        return this.TOP_MENU_TOGGLE;
+    }
+
+    public getFocusableElements(): HTMLElement[] {
+        return [
+            this.OUTLINE_PANE,
+            this.BODY_PANE,
+            ...Array.from(this.OUTLINE_FIND_CONTAINER.querySelectorAll<HTMLElement>('input'))
+        ];
+    }
+
+    public getFindScopeRadios(): NodeListOf<HTMLInputElement> {
+        return document.querySelectorAll('input[name="find-scope"]');
+    }
+
+    public getConfigCheckboxes() {
+        return {
+            showPrevNextMark: this.SHOW_PREV_NEXT_MARK,
+            showToggleMark: this.SHOW_TOGGLE_MARK,
+            showNextHistory: this.SHOW_PREV_NEXT_HISTORY,
+            showHoistDehoist: this.SHOW_HOIST_DEHOIST,
+            showLayoutOrientation: this.SHOW_LAYOUT_ORIENTATION,
+            showThemeToggle: this.SHOW_THEME_TOGGLE,
+            showNodeIcons: this.SHOW_NODE_ICONS,
+            showCollapseAll: this.SHOW_COLLAPSE_ALL,
+        };
+    }
+
+    public getConfigState() {
+        const checkboxes = this.getConfigCheckboxes();
+        return {
+            showPrevNextMark: checkboxes.showPrevNextMark.checked,
+            showToggleMark: checkboxes.showToggleMark.checked,
+            showNextHistory: checkboxes.showNextHistory.checked,
+            showHoistDehoist: checkboxes.showHoistDehoist.checked,
+            showLayoutOrientation: checkboxes.showLayoutOrientation.checked,
+            showThemeToggle: checkboxes.showThemeToggle.checked,
+            showNodeIcons: checkboxes.showNodeIcons.checked,
+            showCollapseAll: checkboxes.showCollapseAll.checked,
+        };
     }
 
 }

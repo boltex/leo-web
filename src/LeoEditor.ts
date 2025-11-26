@@ -3,8 +3,9 @@ import * as utils from './utils';
 
 export class LeoEditor {
 
+    // * Model Properties *
     private defaultTitle = "Virtual Tree View Demo";
-    private genTimestamp = "1234567890"; // Change this to force reload of saved localstorage data.
+    private genTimestamp = "1234567890"; // For uniqueness of saved localstorage data.
     private tree: TreeNode = {
         "gnx": 0,
         "children": [
@@ -55,8 +56,7 @@ export class LeoEditor {
         ]
     };
 
-    // Note: Also use buildClones and buildParentRefs
-    // to add icon member to data entries as needed:
+    // Note: Also use buildClones and buildParentRefs to add icon member to data entries as needed:
     // hasBody: 1, isMarked: 2, isClone: 4, isDirty: 8
     private data: Record<string, NodeData> = {
         "1": {
@@ -162,39 +162,10 @@ export class LeoEditor {
     private navigationHistory: Array<TreeNode> = [];
     private currentHistoryIndex = -1; // -1 means no history yet
     private initialFindNode: TreeNode | null = null; // Node where to start the find (null means from the top)
-    private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
 
-    private flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
-    private currentTheme = 'light'; // Default theme
-    private currentLayout = 'vertical'; // Default layout
-    private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
-    private secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
-    private isMenuShown = false;
-    private isDragging = false;
-    private ROW_HEIGHT = 26;
-    private LEFT_OFFSET = 16; // Padding from left edge
-    private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
-    private secondaryIsDragging = false;
-    private crossIsDragging = false;
-    private __toastTimer: ReturnType<typeof setTimeout> | null = null;
-    private minWidth = 20;
-    private minHeight = 20;
+    // * View Properties *
+    private selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane
 
-    private outlinePaneKeyMap: { [key: string]: () => void } = {
-        'Enter': () => { console.log('Oops!') },
-        'Tab': () => { console.log('Oops!') },
-        ' ': () => { console.log('Oops!') },
-        'ArrowUp': () => { console.log('Oops!') },
-        'ArrowDown': () => { console.log('Oops!') },
-        'ArrowLeft': () => { console.log('Oops!') },
-        'ArrowRight': () => { console.log('Oops!') },
-        'PageUp': () => { console.log('Oops!') },
-        'PageDown': () => { console.log('Oops!') },
-        'Home': () => { console.log('Oops!') },
-        'End': () => { console.log('Oops!') },
-    };
-
-    // Elements
     private MAIN_CONTAINER: HTMLElement;
     private OUTLINE_FIND_CONTAINER: HTMLElement;
     private OUTLINE_PANE: HTMLElement;
@@ -254,12 +225,44 @@ export class LeoEditor {
     private TOAST: HTMLElement;
     private HTML_ELEMENT: HTMLElement;
 
-    private selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane
-
     private activeTopMenu: HTMLDivElement | null = null;
     private focusedMenuItem: HTMLDivElement | null = null;
     private topLevelItems: HTMLDivElement[] = [];
     private topLevelSubmenus = new Map();
+
+    private flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
+
+    private currentTheme = 'light'; // Default theme
+    private currentLayout = 'vertical'; // Default layout
+    private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
+    private secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
+    private isDragging = false;
+    private isMenuShown = false;
+    private ROW_HEIGHT = 26;
+    private LEFT_OFFSET = 16; // Padding from left edge
+
+    private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
+    private secondaryIsDragging = false;
+    private crossIsDragging = false;
+    private __toastTimer: ReturnType<typeof setTimeout> | null = null;
+    private minWidth = 20;
+    private minHeight = 20;
+
+    // Controller Properties
+    private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
+    private outlinePaneKeyMap: { [key: string]: () => void } = {
+        'Enter': () => { console.log('Oops!') },
+        'Tab': () => { console.log('Oops!') },
+        ' ': () => { console.log('Oops!') },
+        'ArrowUp': () => { console.log('Oops!') },
+        'ArrowDown': () => { console.log('Oops!') },
+        'ArrowLeft': () => { console.log('Oops!') },
+        'ArrowRight': () => { console.log('Oops!') },
+        'PageUp': () => { console.log('Oops!') },
+        'PageDown': () => { console.log('Oops!') },
+        'Home': () => { console.log('Oops!') },
+        'End': () => { console.log('Oops!') },
+    };
 
     constructor() {
         // Initialize DOM elements
@@ -340,7 +343,7 @@ export class LeoEditor {
         this.buildMenu(this.menuData);
 
         // Now apply theme & layout before anything else to avoid flash of unstyled content
-        this.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
+        this.initializeThemeAndLayout(this.defaultTitle); // gets ratios from localStorage and applies layout and theme
         this.buildClones(this.tree);
         this.buildParentRefs(this.tree);
         this.allNodesInOrder = this.getAllNodesInTreeOrder(this.tree); // Initialize the global array once
@@ -348,6 +351,8 @@ export class LeoEditor {
         // Finally, set up interactions
         this.initializeInteractions(); // sets up event handlers and button focus prevention
     }
+
+    // * Model Methods (Tree Structure & Helpers) *
 
     // Build clones when repeated in the tree
     private buildClones(node: TreeNode) {
@@ -381,7 +386,6 @@ export class LeoEditor {
         buildClonesWithChildren(node); // Start the recursive process
     }
 
-    // Add parent references to all nodes recursively
     private buildParentRefs(node: TreeNode, parent?: TreeNode) {
         node.parent = parent;
         if (node.children) {
@@ -391,7 +395,6 @@ export class LeoEditor {
         }
     }
 
-    // Helper function to get all nodes in tree order
     private getAllNodesInTreeOrder(node: TreeNode): Array<TreeNode> {
         const result: Array<TreeNode> = [];
         const traverse = (n: TreeNode) => {
@@ -408,7 +411,6 @@ export class LeoEditor {
         return result;
     }
 
-    // * Navigation helpers
     private children(node: TreeNode): Array<TreeNode> {
         // Given a node, return a shallow copy of its children array or an empty array.
         return node && node.children ? node.children.slice() : [];
@@ -472,6 +474,8 @@ export class LeoEditor {
         return false;
     }
 
+    // * Model Methods (State Logic) *
+
     private isExpanded(node: TreeNode): boolean {
         // Given a node, return true if it is expanded.
         if (!node.parent) return true; // The root node is always considered expanded
@@ -510,6 +514,8 @@ export class LeoEditor {
         // Return the current top of the hoist stack or the main tree root
         return this.hoistStack.length > 0 ? this.hoistStack[this.hoistStack.length - 1]! : this.tree;
     }
+
+    // * Model Methods (Navigation Logic) *
 
     private moveToBack(node: TreeNode) {
         // Given a node, return its previous sibling. If first, or no parent, return null.
@@ -642,36 +648,7 @@ export class LeoEditor {
         return node;
     }
 
-    private hoistNode = () => {
-        // This method in an MVC model would be in the controller because it affects the model (hoist stack) and view (button states)
-        if (!this.selectedNode) return;
-
-        // If selected node is already hoisted: no-op (Even if button should be disabled in that case)
-        if (this.hoistStack.length > 0 && this.hoistStack[this.hoistStack.length - 1] === this.selectedNode) return;
-
-        if (!this.selectedNode.parent) {
-            return; // root node (though it should never be selected anyway)
-        }
-
-        this.hoistStack.push(this.selectedNode);
-        if (this.hasChildren(this.selectedNode) && !this.isExpanded(this.selectedNode)) {
-            this.expanded.add(this.selectedNode);
-            this.selectedNode.toggled = true; // Mark as toggled
-        }
-        this.updateHoistButtonStates();
-        this.updateContextMenuState(); // Node was already selected so no need to reupdate based on hoist
-        this.buildRowsRenderTree();
-    }
-
-    private dehoistNode = () => {
-        // This method in an MVC model would be in the controller because it affects the model (hoist stack) and view (button states)
-        if (this.hoistStack.length === 0) {
-            return;
-        }
-        const previousHoist = this.hoistStack.pop()!;
-        this.selectAndOrToggleAndRedraw(previousHoist);
-        this.updateHoistButtonStates();
-    }
+    // * Model Methods (Actions/Mutations) *
 
     private toggleMark(node: TreeNode) {
         if (!node) return;
@@ -698,444 +675,7 @@ export class LeoEditor {
         this.currentHistoryIndex = this.navigationHistory.length - 1;
     }
 
-    private expandNodeAndGoToFirstChild() {
-        // If the presently selected node has children, expand it if needed and go to the first child.
-        let node = this.selectedNode!;
-        if (this.hasChildren(node)) {
-            if (!this.isExpanded(node)) {
-                this.expanded.add(node);
-                node.toggled = true; // Mark as toggled
-            }
-            node = this.moveToFirstChild(node)!;
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    }
-
-    private contractNodeOrGoToParent() {
-        // If the presently selected node is expanded, collapse it. Otherwise go to the parent.
-        let node = this.selectedNode!;
-        if (this.hasChildren(node) && this.isExpanded(node)) {
-            this.selectAndOrToggleAndRedraw(null, node);
-        } else if (this.hasParent(node)) {
-            const parent = this.moveToParent(node)!;
-            if (this.isVisible(parent)) {
-                // Contract all children first
-                for (const child of this.children(parent)) {
-                    if (this.isExpanded(child)) {
-                        this.expanded.delete(child);
-                        child.toggled = true; // Mark as toggled
-                    }
-                }
-                this.selectAndOrToggleAndRedraw(parent);
-            }
-        }
-    }
-
-    private selectVisBack() {
-        // Select the visible node preceding the presently selected node.
-        let node = this.selectedNode!;
-        if (this.moveToVisBack(node)) {
-            node = this.moveToVisBack(node)!;
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    }
-
-    private selectVisNext() {
-        // Select the visible node following the presently selected node.
-        let node = this.selectedNode!;
-        if (this.moveToVisNext(node)) {
-            node = this.moveToVisNext(node)!;
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    }
-
-    private gotoFirstSiblingOrParent() {
-        // Select the first sibling of the presently selected node, or its parent if already first.
-        let node = this.selectedNode!;
-        const currentRoot = this.getCurrentRoot();
-        if (this.hasBack(node)) {
-            let firstVisibleSibling = null;
-            let current = node;
-            while (this.hasBack(current)) {
-                let prev = this.moveToBack(current)!;
-                if (this.isVisible(prev)) {
-                    firstVisibleSibling = prev;
-                    current = prev;
-                } else {
-                    break;
-                }
-            }
-            if (firstVisibleSibling) {
-                node = firstVisibleSibling;
-            }
-        } else if (this.hasParent(node) && node !== currentRoot) {
-            const parent = this.moveToParent(node)!;
-            if (parent === currentRoot || this.isDescendantOfHoistedNode(parent)) {
-                node = parent;
-            }
-        }
-        this.selectAndOrToggleAndRedraw(node);
-    };
-
-    private gotoLastSiblingOrVisNext() {
-        // Select the last sibling of the presently selected node, or the next visible node if already last.
-        let node = this.selectedNode!;
-        const currentRoot = this.getCurrentRoot();
-        if (this.hasNext(node)) {
-            let lastVisibleSibling = null;
-            let current = node;
-            while (this.hasNext(current)) {
-                let next = this.moveToNext(current)!;
-                if (this.isVisible(next)) {
-                    lastVisibleSibling = next;
-                    current = next;
-                } else {
-                    break;
-                }
-            }
-            if (lastVisibleSibling) {
-                node = lastVisibleSibling;
-            }
-        } else if (this.moveToVisNext(node)) {
-            node = this.moveToVisNext(node)!;
-        }
-        if (node) this.selectAndOrToggleAndRedraw(node);
-    };
-
-    private gotoFirstVisibleNode() {
-        // Get the current root (could be hoisted node or hidden root)
-        const currentRoot = this.getCurrentRoot()!;
-
-        // If we're hoisted, the first visible node could be the hoisted node itself
-        if (this.hoistStack.length > 0) {
-            this.selectAndOrToggleAndRedraw(currentRoot);
-            return;
-        }
-
-        // Otherwise, select the first child of the root node
-        const firstNode = this.moveToFirstChild(currentRoot);
-        if (firstNode) {
-            this.selectAndOrToggleAndRedraw(firstNode);
-        }
-    };
-
-    private gotoLastVisibleNode() {
-        // Select the last visible node in the outline.
-        let node = this.selectedNode!;
-        while (node) {
-            const next = this.moveToVisNext(node);
-            if (next && this.isVisible(next)) {
-                node = next;
-            } else {
-                break;
-            }
-        }
-        if (node) {
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    };
-
-    private collapseAll = () => {
-        // Collapse all nodes in visible outline and select the proper top-level node
-        const currentRoot = this.getCurrentRoot()!;
-        if (currentRoot === this.tree) {
-            this.expanded.clear();
-        } else {
-            const nodesToRemove: TreeNode[] = [];
-            this.expanded.forEach(node => {
-                if (node === currentRoot || this.isAncestorOf(currentRoot, node)) {
-                    nodesToRemove.push(node);
-                }
-            });
-            nodesToRemove.forEach(node => this.expanded.delete(node));
-        }
-        if (this.hoistStack.length > 0) {
-            this.selectAndOrToggleAndRedraw(currentRoot);
-        } else {
-            let node = this.selectedNode!;
-            // If currently selected node is a descendant of a top-level node, find that top-level node
-            while (node && this.hasParent(node) && node.parent !== this.tree) {
-                node = this.moveToParent(node)!;
-            }
-            if (node) this.selectAndOrToggleAndRedraw(node);
-        }
-    };
-
-    private toggleSelected() {
-        if (this.selectedNode && this.selectedNode.children && this.selectedNode.children.length > 0) {
-            this.selectAndOrToggleAndRedraw(null, this.selectedNode);
-        }
-    }
-
-    private toggleMarkCurrentNode = () => {
-        if (this.selectedNode) {
-            this.toggleMark(this.selectedNode);
-            this.updateMarkedButtonStates();
-            this.updateButtonVisibility();
-
-            // Only need to redraw the affected node if visible, no need to re-flatten because structure didn't change
-            if (this.isVisible(this.selectedNode)) {
-                this.buildRowsRenderTree();
-            }
-        }
-    }
-
-    private gotoNextMarkedNode = () => {
-        if (!this.selectedNode || this.marked.size === 0) {
-            return;
-        }
-
-        const currentIndex = this.allNodesInOrder.findIndex(node => node === this.selectedNode);
-        if (currentIndex === -1) {
-            return; // Should never happen
-        }
-
-        let foundMarked = false;
-        for (let i = 1; i <= this.allNodesInOrder.length; i++) {
-            const nextIndex = (currentIndex + i) % this.allNodesInOrder.length; // Wrap around
-            const node = this.allNodesInOrder[nextIndex]!;
-
-            if (node === this.selectedNode) {
-                continue;
-            }
-
-            if (this.marked.has(node.gnx)) {
-                this.selectAndOrToggleAndRedraw(node);
-                foundMarked = true;
-                break;
-            }
-        }
-
-        if (!foundMarked) {
-            if (this.marked.size === 1 && this.marked.has(this.selectedNode.gnx)) {
-                this.showToast("Only one marked node.");
-            } else {
-                this.showToast("No other marked nodes found.");
-            }
-        }
-    }
-
-    private gotoPrevMarkedNode = () => {
-        if (!this.selectedNode || this.marked.size === 0) {
-            return;
-        }
-
-        const currentIndex = this.allNodesInOrder.findIndex(node => node === this.selectedNode);
-        if (currentIndex === -1) {
-            return; // Should never happen
-        }
-
-        let foundMarked = false;
-        for (let i = 1; i <= this.allNodesInOrder.length; i++) {
-            const prevIndex = (currentIndex - i + this.allNodesInOrder.length) % this.allNodesInOrder.length; // Wrap around
-            const node = this.allNodesInOrder[prevIndex]!;
-
-            if (node === this.selectedNode) {
-                continue;
-            }
-
-            if (this.marked.has(node.gnx)) {
-                this.selectAndOrToggleAndRedraw(node);
-                foundMarked = true;
-                break;
-            }
-        }
-
-        if (!foundMarked) {
-            if (this.marked.size === 1 && this.marked.has(this.selectedNode.gnx)) {
-                this.showToast("Only one marked node.");
-            } else {
-                this.showToast("No other marked nodes found.");
-            }
-        }
-    }
-
-    private updateHistoryButtonStates() {
-        this.PREV_BTN.disabled = this.currentHistoryIndex <= 0;
-        this.NEXT_BTN.disabled = this.currentHistoryIndex >= this.navigationHistory.length - 1 || this.navigationHistory.length === 0;
-    }
-
-    private updateContextMenuState() {
-        const hasSelectedNode = !!this.selectedNode;
-        const isCurrentlyHoisted = this.hoistStack.length > 0 && hasSelectedNode && this.hoistStack[this.hoistStack.length - 1] === this.selectedNode;
-        this.toggleButtonVisibility(this.ACTION_MARK, null, hasSelectedNode && !this.marked.has(this.selectedNode!.gnx));
-        this.toggleButtonVisibility(this.ACTION_UNMARK, null, hasSelectedNode && this.marked.has(this.selectedNode!.gnx));
-        this.toggleButtonVisibility(this.ACTION_HOIST, null, hasSelectedNode && this.hasChildren(this.selectedNode!) && !isCurrentlyHoisted);
-        this.toggleButtonVisibility(this.ACTION_DEHOIST, null, this.hoistStack.length > 0); // only check hoist stack length
-    }
-
-    private previousHistory = () => {
-        if (this.currentHistoryIndex > 0) {
-            this.currentHistoryIndex--;
-            const node = this.navigationHistory[this.currentHistoryIndex];
-            this.selectAndOrToggleAndRedraw(node); // Goto node without adding to history
-            this.updateHistoryButtonStates();
-        }
-    }
-
-    private nextHistory = () => {
-        if (this.currentHistoryIndex < this.navigationHistory.length - 1) {
-            this.currentHistoryIndex++;
-            const node = this.navigationHistory[this.currentHistoryIndex];
-            this.selectAndOrToggleAndRedraw(node); // Goto node without adding to history
-            this.updateHistoryButtonStates();
-        }
-    }
-
-    private flattenTree(
-        node: TreeNode,
-        depth = 0,
-        isRoot = true,
-        selectedNode: TreeNode | null,
-        initialFindNode: TreeNode | null,
-    ): FlatRow[] {
-        // In an MVC model, this belongs to the controller as it builds the view model (flatRows) from the model (tree, expanded, hoistStack, selectedNode)
-        const flatRows: FlatRow[] = [];
-
-        if (!isRoot && !this.isVisible(node)) {
-            return flatRows; // Skip hidden nodes
-        }
-
-        if (!isRoot) {
-            flatRows.push({
-                label: this.data[node.gnx]!.headString || `Node ${node.gnx}`,
-                depth: depth,
-                toggled: false, // Reset each time
-                hasChildren: this.hasChildren(node),
-                isExpanded: this.isExpanded(node),
-                node: node,
-                // Computed display properties
-                isSelected: node === selectedNode,
-                isAncestor: selectedNode ? this.isAncestorOf(node, selectedNode) : false,
-                isInitialFind: this.computeIsInitialFind(node, initialFindNode, this.selectedNode),
-                icon: this.data[node.gnx]!.icon || 0
-            });
-        }
-
-        if (this.isExpanded(node) || isRoot) {
-            const children = this.children(node);
-            for (const child of children) {
-                flatRows.push(...this.flattenTree(child, depth + 1, false, selectedNode, initialFindNode));
-            }
-        }
-
-        return flatRows;
-    }
-
-    private computeIsInitialFind(
-        node: TreeNode,
-        initialFindNode: TreeNode | null,
-        selectedNode: TreeNode | null
-    ): boolean {
-        const findScope = this.getFindScope();
-        if (findScope === 'node' && node === selectedNode) {
-            return true;
-        }
-        if (findScope === 'suboutline' && initialFindNode) {
-            return node === initialFindNode || this.isAncestorOf(initialFindNode, node);
-        }
-        return false;
-    }
-
-    private getFindScope(): string {
-        let selectedRadioValue = '';
-        const selectedRadio = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
-        if (selectedRadio) {
-            selectedRadioValue = selectedRadio.value;
-        }
-        return selectedRadioValue;
-    }
-
-    private buildRowsRenderTree(): void {
-        // In an MVC model, this builds from the model (tree, expanded, hoistStack, selectedNode) the view model (flatRows) and triggers the view update (renderTree)
-        // So it belongs to the controller.
-        this.flatRows = this.flattenTree(this.getCurrentRoot(), 0, !this.hoistStack.length, this.selectedNode, this.initialFindNode);
-        this.renderTree();
-    }
-
-    private selectAndOrToggleAndRedraw(newSelectedNode: TreeNode | null = null, nodeToToggle: TreeNode | null = null) {
-        // Handle toggling if requested
-        if (nodeToToggle) {
-            if (this.isExpanded(nodeToToggle)) {
-                this.expanded.delete(nodeToToggle);
-            } else {
-                this.expanded.add(nodeToToggle);
-            }
-            nodeToToggle.toggled = true; // Mark as toggled
-        }
-
-        const isNew = newSelectedNode && newSelectedNode !== this.selectedNode;
-
-        // Handle selection if requested
-        if (isNew) {
-            let hoistTop = this.getCurrentRoot();
-
-            // While the top of hoist stack is not an ancestor of the new selected node, pop it
-            while (newSelectedNode !== hoistTop && this.hoistStack.length > 0 && !this.isAncestorOf(hoistTop, newSelectedNode)) {
-                this.hoistStack.pop();
-                hoistTop = this.getCurrentRoot();
-            }
-
-            // Ensure all parent nodes are expanded so the selected node is visible
-            let currentNode = newSelectedNode;
-            while (currentNode && currentNode.parent && currentNode !== hoistTop) {
-                // Skip the hidden root node since it's always expanded (When hoist is implemented, stop at hoist root)
-                if (currentNode.parent.parent) {
-                    this.expanded.add(currentNode.parent);
-                }
-                currentNode = currentNode.parent;
-            }
-
-            this.selectedNode = newSelectedNode;
-            this.addToHistory(newSelectedNode);
-            this.updateHistoryButtonStates();
-            this.updateButtonVisibility();
-            this.updateHoistButtonStates();
-            this.updateContextMenuState();
-        }
-
-        this.buildRowsRenderTree();
-
-        // Update body pane if selection changed (selectedNode cannot be null here because of isNew check)
-        if (isNew) {
-            if (newSelectedNode && this.data[newSelectedNode.gnx]) {
-                const [text, wrap] = this.computeBody(newSelectedNode);
-                this.showBody(text, wrap);
-            } else {
-                this.showBody("", true); // No node selected
-            }
-        }
-        if (this.selectedNode) {
-            this.scrollNodeIntoView(this.selectedNode);
-        }
-        this.updateCollapseAllPosition(); // In case the height made the scrollbar appear/disappear
-    }
-
-    private computeBody(node: TreeNode): [string, boolean] {
-        // Look for a line in the text starting with "@wrap" or "@nowrap",
-        // if not found, check the parent of node recursively.
-        // Note: wrap is default so only need to check for nowrap
-        let currentNode = node;
-        let nowrapFound = false;
-        while (currentNode.parent) { // Make sure to stop at the hidden root node
-            const body = this.data[currentNode.gnx]?.bodyString || "";
-            const wrapMatch = body.match(/^\s*@wrap\s*$/m);
-            const nowrapMatch = body.match(/^\s*@nowrap\s*$/m);
-            if (wrapMatch) {
-                break;  // Stop searching if @wrap (default) is found
-            }
-            if (nowrapMatch) {
-                nowrapFound = true;
-                break;  // Stop searching if @nowrap is found
-            }
-            currentNode = currentNode.parent;
-        }
-        let text = this.data[node.gnx]?.bodyString || "";
-        text = text.replace(this.urlRegex, url => {
-            return `<a href="${url}" target="_blank" contenteditable="plaintext-only" rel="noopener noreferrer">${url}</a>`;
-        });
-        return [text, !nowrapFound];
-    }
+    // * View Methods (Rendering) *
 
     private renderTree = () => {
         if (!this.flatRows) {
@@ -1282,6 +822,120 @@ export class LeoEditor {
         }
     }
 
+    // * View Methods (UI Management) *
+    private setupLastFocusedElementTracking() {
+        const focusableElements = [this.OUTLINE_PANE, this.BODY_PANE];
+        // All elements that also need to be tracked for focus are 'input' elements inside the outline/find container
+        const allInputs = this.OUTLINE_FIND_CONTAINER.querySelectorAll<HTMLElement>('input');
+        allInputs.forEach(input => {
+            focusableElements.push(input);
+        });
+
+        focusableElements.forEach(element => {
+            element.addEventListener('focus', () => {
+                this.lastFocusedElement = element;
+            });
+        });
+    }
+
+    private restoreLastFocusedElement() {
+        if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+            // also check if visible by checking its size
+            const rect = this.lastFocusedElement.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                this.lastFocusedElement.focus();
+            }
+        }
+    }
+
+    private setupButtonContainerAutoHide() {
+        let hideTimeout: ReturnType<typeof setTimeout>;
+        const showButtons = () => {
+            clearTimeout(hideTimeout);
+            if (this.isMenuShown) {
+                return;
+            }
+            this.BUTTON_CONTAINER.classList.remove('hidden');
+        }
+
+        const hideButtons = () => {
+            hideTimeout = setTimeout(() => {
+                this.BUTTON_CONTAINER.classList.add('hidden');
+            }, 1000);
+        };
+        this.TRIGGER_AREA.addEventListener('mouseenter', showButtons);
+        this.BUTTON_CONTAINER.addEventListener('mouseenter', showButtons);
+        this.TRIGGER_AREA.addEventListener('mouseleave', (e) => {
+            if (!this.BUTTON_CONTAINER.contains(e.relatedTarget as Node | null)) {
+                hideButtons();
+            }
+        });
+        this.BUTTON_CONTAINER.addEventListener('mouseleave', (e) => {
+            if (e.relatedTarget !== this.TRIGGER_AREA) {
+                hideButtons();
+            }
+        });
+        showButtons();
+        hideTimeout = setTimeout(() => {
+            this.BUTTON_CONTAINER.classList.add('hidden');
+        }, 1500);
+    }
+
+    private initializeThemeAndLayout(defaultTitle: string) {
+        document.title = defaultTitle;
+        this.loadThemeAndLayoutPreferences();
+    }
+
+    private loadThemeAndLayoutPreferences() {
+        const savedPrefs = utils.safeLocalStorageGet('layoutPreferences');
+        if (savedPrefs) {
+            try {
+                const prefs = JSON.parse(savedPrefs);
+                if (typeof prefs.mainRatio === 'number') {
+                    this.mainRatio = prefs.mainRatio;
+                }
+                if (typeof prefs.secondaryRatio === 'number') {
+                    this.secondaryRatio = prefs.secondaryRatio;
+                }
+                if (prefs.theme) {
+                    this.applyTheme(prefs.theme);
+                }
+                if (prefs.layout) {
+                    this.applyLayout(prefs.layout);
+                }
+            } catch (e) {
+                console.error('Error loading layout preferences:', e);
+            }
+        } else {
+            this.applyTheme(this.currentTheme);
+            this.applyLayout(this.currentLayout);
+        }
+    }
+
+    private applyTheme(theme: string) {
+        this.currentTheme = theme;
+        this.HTML_ELEMENT.setAttribute('data-theme', theme);
+        this.THEME_TOGGLE.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+        this.THEME_ICON.innerHTML = theme === 'dark' ? '🌙' : '☀️';
+    };
+
+    private applyLayout(layout: string) {
+        this.currentLayout = layout;
+        this.LAYOUT_TOGGLE.title = layout === 'vertical' ? 'Switch to horizontal layout' : 'Switch to vertical layout';
+        if (layout === 'horizontal') {
+            this.HTML_ELEMENT.setAttribute('data-layout', 'horizontal');
+        } else {
+            this.HTML_ELEMENT.setAttribute('data-layout', 'vertical');
+        }
+        this.updatePanelSizes(); // Proportions will have changed so we must update sizes
+    };
+
+    private updatePanelSizes() {
+        this.updateOutlineContainerSize();
+        this.updateOutlinePaneSize();
+        this.positionCrossDragger();
+    }
+
     private updateOutlineContainerSize() {
         if (this.currentLayout === 'vertical') {
             let newWidth = window.innerWidth * this.mainRatio;
@@ -1297,66 +951,6 @@ export class LeoEditor {
             }
             this.OUTLINE_FIND_CONTAINER.style.height = `${newHeight}px`;
             this.OUTLINE_FIND_CONTAINER.style.width = '100%';
-        }
-    }
-
-    private handleDrag = utils.throttle((e) => {
-        if (this.currentLayout === 'vertical') {
-            let clientX = e.clientX;
-            if (e.touches) {
-                clientX = e.touches[0].clientX;
-            }
-            const newWidth = clientX;
-            if (newWidth >= this.minWidth) {
-                this.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
-            } else {
-                this.OUTLINE_FIND_CONTAINER.style.width = (this.minWidth - 3) + 'px';
-            }
-        } else {
-            let clientY = e.clientY;
-            if (e.touches) {
-                clientY = e.touches[0].clientY;
-            }
-            const newHeight = clientY - this.TOP_MENU_TOGGLE.offsetHeight;
-            if (newHeight >= this.minWidth) {
-                this.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
-            } else {
-                this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
-            }
-            this.renderTree(); // Resizing vertically, so need to re-render tree
-        }
-        this.positionCrossDragger();
-        this.updateCollapseAllPosition();
-    }, 33);
-
-    private startDrag = (e: Event) => {
-        this.isDragging = true;
-        document.body.classList.add('dragging-main');
-        e.preventDefault();
-        document.addEventListener('mousemove', this.handleDrag);
-        document.addEventListener('mouseup', this.stopDrag);
-        document.addEventListener('touchmove', this.handleDrag, { passive: false });
-        document.addEventListener('touchend', this.stopDrag);
-    }
-
-    private stopDrag = () => {
-        if (this.isDragging) {
-            this.isDragging = false;
-            document.body.classList.remove('dragging-main');
-            document.removeEventListener('mousemove', this.handleDrag);
-            document.removeEventListener('mouseup', this.stopDrag);
-            document.removeEventListener('touchmove', this.handleDrag);
-            document.removeEventListener('touchend', this.stopDrag);
-            this.updateProportion();
-            this.renderTree();
-        }
-    }
-
-    private updateSecondaryProportion() {
-        if (this.currentLayout === 'vertical') {
-            this.secondaryRatio = (this.OUTLINE_PANE.offsetHeight - 6) / this.OUTLINE_FIND_CONTAINER.offsetHeight;
-        } else {
-            this.secondaryRatio = this.OUTLINE_PANE.offsetWidth / this.OUTLINE_FIND_CONTAINER.offsetWidth;
         }
     }
 
@@ -1388,137 +982,6 @@ export class LeoEditor {
         this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 58 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
 
-    private handleSecondaryDrag = utils.throttle((e) => {
-        if (this.currentLayout === 'vertical') {
-            let clientY = e.clientY;
-            if (e.touches) {
-                clientY = e.touches[0].clientY;
-            }
-            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
-            const relativeY = clientY - containerRect.top;
-            const containerHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight;
-            if (relativeY >= this.minHeight && relativeY <= containerHeight - this.minHeight) {
-                this.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
-                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
-            }
-            this.renderTree(); // Resizing vertically, so need to re-render tree
-        } else {
-            let clientX = e.clientX;
-            if (e.touches) {
-                clientX = e.touches[0].clientX;
-            }
-            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
-            const relativeX = clientX - containerRect.left;
-            const containerWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
-            if (relativeX >= this.minHeight && relativeX <= containerWidth - this.minHeight) {
-                this.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
-                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
-            }
-        }
-        this.positionCrossDragger();
-        this.updateCollapseAllPosition();
-    }, 33);
-
-    private startSecondaryDrag = (e: Event) => {
-        this.secondaryIsDragging = true;
-        document.body.classList.add('dragging-secondary');
-        e.preventDefault();
-        document.addEventListener('mousemove', this.handleSecondaryDrag);
-        document.addEventListener('mouseup', this.stopSecondaryDrag);
-        document.addEventListener('touchmove', this.handleSecondaryDrag, { passive: false });
-        document.addEventListener('touchend', this.stopSecondaryDrag);
-    }
-
-    private stopSecondaryDrag = () => {
-        if (this.secondaryIsDragging) {
-            this.secondaryIsDragging = false;
-            document.body.classList.remove('dragging-secondary');
-            document.removeEventListener('mousemove', this.handleSecondaryDrag);
-            document.removeEventListener('mouseup', this.stopSecondaryDrag);
-            document.removeEventListener('touchmove', this.handleSecondaryDrag);
-            document.removeEventListener('touchend', this.stopSecondaryDrag);
-            this.updateSecondaryProportion();
-            this.renderTree();
-        }
-    }
-
-    private handleCrossDrag = utils.throttle((e) => {
-        let clientX = e.clientX;
-        let clientY = e.clientY;
-        if (e.touches) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        }
-
-        if (this.currentLayout === 'vertical') {
-            // Handle cross drag when in vertical layout
-
-            // do main first as per handleDrag
-            const newWidth = clientX;
-            if (newWidth >= this.minWidth) {
-                this.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
-            } else {
-                this.OUTLINE_FIND_CONTAINER.style.width = (this.minWidth - 3) + 'px';
-            }
-            // then secondary as per handleSecondaryDrag
-            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
-            const relativeY = clientY - containerRect.top;
-            const containerHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight;
-            if (relativeY >= this.minHeight && relativeY <= containerHeight - this.minHeight) {
-                this.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
-                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
-            }
-        } else {
-            // Handle cross drag when in horizontal layout
-
-            // do main first as per handleDrag
-            const newHeight = clientY - this.TOP_MENU_TOGGLE.offsetHeight;
-            if (newHeight >= this.minWidth) {
-                this.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
-            } else {
-                this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
-            }
-            // then secondary as per handleSecondaryDrag
-            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
-            const relativeX = clientX - containerRect.left;
-            const containerWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
-            if (relativeX >= this.minHeight && relativeX <= containerWidth - this.minHeight) {
-                this.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
-                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
-            }
-        }
-        this.positionCrossDragger();
-
-        this.renderTree(); // Render afterward as it would be in each branch of the if/else
-        this.updateCollapseAllPosition();
-    }, 33);
-
-    private startCrossDrag = (e: Event) => {
-        this.crossIsDragging = true;
-        document.body.classList.add('dragging-cross');
-        e.preventDefault();
-        document.addEventListener('mousemove', this.handleCrossDrag);
-        document.addEventListener('mouseup', this.stopCrossDrag);
-        document.addEventListener('touchmove', this.handleCrossDrag, { passive: false });
-        document.addEventListener('touchend', this.stopCrossDrag);
-
-    }
-
-    private stopCrossDrag = () => {
-        if (this.crossIsDragging) {
-            this.crossIsDragging = false;
-            document.body.classList.remove('dragging-cross');
-            document.removeEventListener('mousemove', this.handleCrossDrag);
-            document.removeEventListener('mouseup', this.stopCrossDrag);
-            document.removeEventListener('touchmove', this.handleCrossDrag);
-            document.removeEventListener('touchend', this.stopCrossDrag);
-
-            this.updateProportion();
-            this.updateSecondaryProportion();
-
-            this.renderTree();
-        }
-    }
 
     private positionCrossDragger() {
         if (this.currentLayout === 'vertical') {
@@ -1534,40 +997,19 @@ export class LeoEditor {
         }
     }
 
-    private initializeThemeAndLayout() {
-        document.title = this.defaultTitle;
-        this.loadThemeAndLayoutPreferences();
-    }
-
-    private applyTheme(theme: string) {
-        this.currentTheme = theme;
-        this.HTML_ELEMENT.setAttribute('data-theme', theme);
-        this.THEME_TOGGLE.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
-        this.THEME_ICON.innerHTML = theme === 'dark' ? '🌙' : '☀️';
-    };
-
-    private applyLayout(layout: string) {
-        this.currentLayout = layout;
-        this.LAYOUT_TOGGLE.title = layout === 'vertical' ? 'Switch to horizontal layout' : 'Switch to vertical layout';
-        if (layout === 'horizontal') {
-            this.HTML_ELEMENT.setAttribute('data-layout', 'horizontal');
-        } else {
-            this.HTML_ELEMENT.setAttribute('data-layout', 'vertical');
-        }
-        this.updatePanelSizes(); // Proportions will have changed so we must update sizes
-    };
-
-    private updatePanelSizes() {
-        this.updateOutlineContainerSize();
-        this.updateOutlinePaneSize();
-        this.positionCrossDragger();
-    }
-
     private updateProportion() {
         if (this.currentLayout === 'vertical') {
             this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetWidth / window.innerWidth;
         } else {
             this.mainRatio = this.OUTLINE_FIND_CONTAINER.offsetHeight / this.MAIN_CONTAINER.offsetHeight;
+        }
+    }
+
+    private updateSecondaryProportion() {
+        if (this.currentLayout === 'vertical') {
+            this.secondaryRatio = (this.OUTLINE_PANE.offsetHeight - 6) / this.OUTLINE_FIND_CONTAINER.offsetHeight;
+        } else {
+            this.secondaryRatio = this.OUTLINE_PANE.offsetWidth / this.OUTLINE_FIND_CONTAINER.offsetWidth;
         }
     }
 
@@ -1667,6 +1109,27 @@ export class LeoEditor {
         return menu;
     }
 
+    private positionSubmenu(parentItem: HTMLDivElement, submenu: HTMLElement, level: number) {
+        submenu.style.display = "flex";
+        const rect = parentItem.getBoundingClientRect();
+        const subRect = submenu.getBoundingClientRect();
+
+        if (level === 0) {
+            submenu.style.left = rect.left + "px";
+            submenu.style.top = rect.bottom + "px";
+        } else {
+            const spaceRight = window.innerWidth - rect.right;
+            const spaceLeft = rect.left;
+            if (spaceRight < subRect.width && spaceLeft > subRect.width) {
+                submenu.style.left = -subRect.width + "px";
+            } else {
+                submenu.style.left = rect.width + "px";
+            }
+            submenu.style.top = "0px";
+        }
+        submenu.style.display = "";
+    }
+
     private openTopMenu(item: HTMLDivElement, sub: HTMLElement | null, level: number) {
         this.closeAllSubmenus();
         this.activeTopMenu = item;
@@ -1692,6 +1155,31 @@ export class LeoEditor {
             item.classList.remove("sub-active")
         );
         this.focusedMenuItem = null;
+    }
+
+    private focusMenuItem(item: HTMLDivElement | null) {
+        if (!item) return; // Safety check
+        if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
+        item.classList.add("focused");
+        this.focusedMenuItem = item;
+        item.scrollIntoView({ block: "nearest" });
+        document.querySelectorAll(".menu-item.sub-active").forEach(el =>
+            el.classList.remove("sub-active")
+        );
+        let ancestor = item.parentElement?.closest(".menu-item");
+        while (ancestor) {
+            ancestor.classList.add("sub-active");
+            ancestor = ancestor.parentElement?.closest(".submenu")?.parentElement?.closest(".menu-item");
+        }
+    }
+
+    private closeMenusEvent(e: MouseEvent) {
+        this.MENU.style.display = "none";
+        const target = e.target as Element;
+        if (!target.closest('.menu')) {
+            this.closeAllSubmenus();
+            this.activeTopMenu = null;
+        }
     }
 
     private updateButtonVisibility = () => {
@@ -1724,6 +1212,20 @@ export class LeoEditor {
         this.TRIGGER_AREA.style.width = ((visibleButtonCount * 40) + 10) + 'px';
     }
 
+    private updateContextMenuState() {
+        const hasSelectedNode = !!this.selectedNode;
+        const isCurrentlyHoisted = this.hoistStack.length > 0 && hasSelectedNode && this.hoistStack[this.hoistStack.length - 1] === this.selectedNode;
+        this.toggleButtonVisibility(this.ACTION_MARK, null, hasSelectedNode && !this.marked.has(this.selectedNode!.gnx));
+        this.toggleButtonVisibility(this.ACTION_UNMARK, null, hasSelectedNode && this.marked.has(this.selectedNode!.gnx));
+        this.toggleButtonVisibility(this.ACTION_HOIST, null, hasSelectedNode && this.hasChildren(this.selectedNode!) && !isCurrentlyHoisted);
+        this.toggleButtonVisibility(this.ACTION_DEHOIST, null, this.hoistStack.length > 0); // only check hoist stack length
+    }
+
+    private updateHistoryButtonStates() {
+        this.PREV_BTN.disabled = this.currentHistoryIndex <= 0;
+        this.NEXT_BTN.disabled = this.currentHistoryIndex >= this.navigationHistory.length - 1 || this.navigationHistory.length === 0;
+    }
+
     private updateHoistButtonStates() {
         const isCurrentlyHoisted = this.hoistStack.length > 0 && this.hoistStack[this.hoistStack.length - 1] === this.selectedNode;
         this.DEHOIST_BTN.disabled = this.hoistStack.length === 0;
@@ -1734,6 +1236,15 @@ export class LeoEditor {
         const hasMarkedNodes = this.marked.size > 0;
         this.NEXT_MARKED_BTN.disabled = !hasMarkedNodes;
         this.PREV_MARKED_BTN.disabled = !hasMarkedNodes;
+    }
+
+    private toggleButtonVisibility(button1: HTMLElement | null, button2: HTMLElement | null, isVisible: boolean) {
+        if (button1) {
+            button1.classList.toggle('hidden-button', !isVisible);
+        }
+        if (button2) {
+            button2.classList.toggle('hidden-button', !isVisible);
+        }
     }
 
     private showTab(tabName: string) {
@@ -1750,26 +1261,27 @@ export class LeoEditor {
         this.BODY_PANE.innerHTML = text;
     }
 
-    private closeMenusEvent(e: MouseEvent) {
-        this.MENU.style.display = "none";
-        const target = e.target as Element;
-        if (!target.closest('.menu')) {
-            this.closeAllSubmenus();
-            this.activeTopMenu = null;
+    private findFocus(): number {
+        // Returns 1 if focus in outline-pane, 2 if in body-pane, 0 otherwise
+        if (document.activeElement === this.OUTLINE_PANE || this.OUTLINE_PANE.contains(document.activeElement)) {
+            return 1;
+        } else if (document.activeElement === this.BODY_PANE || this.BODY_PANE.contains(document.activeElement)) {
+            return 2;
         }
+        return 0;
     }
 
-    private restoreLastFocusedElement() {
-        if (this.lastFocusedElement && this.lastFocusedElement.focus) {
-            // also check if visible by checking its size
-            const rect = this.lastFocusedElement.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0) {
-                this.lastFocusedElement.focus();
-            }
-        }
+    public getFindScopeRadios(): NodeListOf<HTMLInputElement> {
+        return document.querySelectorAll('input[name="find-scope"]');
     }
 
-    // Setup and organize all event handlers
+    // * Controller Methods (Initialization & Setup) *
+    private initializeInteractions() {
+        this.setupEventHandlers();
+        this.setupButtonFocusPrevention();
+        this.setupLastFocusedElementTracking();
+    }
+
     private setupEventHandlers() {
         this.setupOutlinePaneHandlers();
         this.setupBodyPaneHandlers();
@@ -1812,7 +1324,7 @@ export class LeoEditor {
     private setupWindowHandlers() {
         window.addEventListener('resize', utils.throttle(this.handleWindowResize, 33));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
-        window.addEventListener('beforeunload', this.saveAll);
+        window.addEventListener('beforeunload', this.saveAllPreferences);
     }
 
     private setupButtonHandlers() {
@@ -1840,35 +1352,6 @@ export class LeoEditor {
         this.ACTION_DEHOIST.addEventListener('click', this.dehoistNode);
     }
 
-    private setupFindPaneHandlers() {
-        this.FIND_INPUT.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && e.shiftKey) {
-                e.preventDefault();
-                this.OPT_BODY.focus();
-            }
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                this.findNext();
-            }
-        });
-        this.OPT_BODY.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && !e.shiftKey) {
-                e.preventDefault();
-                this.FIND_INPUT.focus();
-            }
-        });
-        const findScopeRadios = this.getFindScopeRadios();
-        findScopeRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                this.initialFindNode = null; // Reset initial find node when scope changes
-                this.buildRowsRenderTree(); // Re-render to update node highlighting
-            });
-        });
-    }
-
-    public getFindScopeRadios(): NodeListOf<HTMLInputElement> {
-        return document.querySelectorAll('input[name="find-scope"]');
-    }
 
     private setupButtonFocusPrevention() {
         const actionButtons = document.querySelectorAll('.action-button');
@@ -1879,21 +1362,6 @@ export class LeoEditor {
         });
         this.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
             e.preventDefault();
-        });
-    }
-
-    private setupLastFocusedElementTracking() {
-        const focusableElements = [this.OUTLINE_PANE, this.BODY_PANE];
-        // All elements that also need to be tracked for focus are 'input' elements inside the outline/find container
-        const allInputs = this.OUTLINE_FIND_CONTAINER.querySelectorAll<HTMLElement>('input');
-        allInputs.forEach(input => {
-            focusableElements.push(input);
-        });
-
-        focusableElements.forEach(element => {
-            element.addEventListener('focus', () => {
-                this.lastFocusedElement = element;
-            });
         });
     }
 
@@ -2042,37 +1510,54 @@ export class LeoEditor {
 
     }
 
-    private setupButtonContainerAutoHide() {
-        let hideTimeout: ReturnType<typeof setTimeout>;
-        const showButtons = () => {
-            clearTimeout(hideTimeout);
-            if (this.isMenuShown) {
-                return;
-            }
-            this.BUTTON_CONTAINER.classList.remove('hidden');
-        }
 
-        const hideButtons = () => {
-            hideTimeout = setTimeout(() => {
-                this.BUTTON_CONTAINER.classList.add('hidden');
-            }, 1000);
-        };
-        this.TRIGGER_AREA.addEventListener('mouseenter', showButtons);
-        this.BUTTON_CONTAINER.addEventListener('mouseenter', showButtons);
-        this.TRIGGER_AREA.addEventListener('mouseleave', (e) => {
-            if (!this.BUTTON_CONTAINER.contains(e.relatedTarget as Node | null)) {
-                hideButtons();
+    private setupFindPaneHandlers() {
+        this.FIND_INPUT.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && e.shiftKey) {
+                e.preventDefault();
+                this.OPT_BODY.focus();
+            }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.findNext();
             }
         });
-        this.BUTTON_CONTAINER.addEventListener('mouseleave', (e) => {
-            if (e.relatedTarget !== this.TRIGGER_AREA) {
-                hideButtons();
+        this.OPT_BODY.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                this.FIND_INPUT.focus();
             }
         });
-        showButtons();
-        hideTimeout = setTimeout(() => {
-            this.BUTTON_CONTAINER.classList.add('hidden');
-        }, 1500);
+        const findScopeRadios = this.getFindScopeRadios();
+        findScopeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                this.initialFindNode = null; // Reset initial find node when scope changes
+                this.buildRowsRenderTree(); // Re-render to update node highlighting
+            });
+        });
+    }
+
+    // * Controller Methods (Event Handlers) *
+    public handleDOMContentLoaded() {
+        this.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
+        this.loadConfigPreferences();
+
+        const initialSelectedNode = this.loadDocumentStateFromLocalStorage();
+        if (!initialSelectedNode) {
+            this.selectAndOrToggleAndRedraw(this.tree.children![0]); // sets selectedNode amd flatRows
+        } else {
+            this.selectAndOrToggleAndRedraw(initialSelectedNode); // sets selectedNode amd flatRows
+        }
+        this.setupButtonContainerAutoHide();
+        this.updateMarkedButtonStates();
+        // Finish startup by setting focus to outline pane and setting the log pane's active tab
+        this.OUTLINE_PANE.focus();
+        this.showTab("log");
+    }
+
+    private handleWindowResize = () => {
+        this.updatePanelSizes();
+        this.renderTree();
     }
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
@@ -2135,6 +1620,7 @@ export class LeoEditor {
             }
         }
     }
+
 
     private handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
@@ -2223,34 +1709,189 @@ export class LeoEditor {
         }
     }
 
-    private handleWindowResize = () => {
-        this.updatePanelSizes();
-        this.renderTree();
-    }
-
-    public handleDOMContentLoaded() {
-        this.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
-        this.loadConfigPreferences();
-
-        const initialSelectedNode = this.loadDocumentStateFromLocalStorage();
-        if (!initialSelectedNode) {
-            this.selectAndOrToggleAndRedraw(this.tree.children![0]); // sets selectedNode amd flatRows
+    private handleDrag = utils.throttle((e) => {
+        if (this.currentLayout === 'vertical') {
+            let clientX = e.clientX;
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+            }
+            const newWidth = clientX;
+            if (newWidth >= this.minWidth) {
+                this.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
+            } else {
+                this.OUTLINE_FIND_CONTAINER.style.width = (this.minWidth - 3) + 'px';
+            }
         } else {
-            this.selectAndOrToggleAndRedraw(initialSelectedNode); // sets selectedNode amd flatRows
+            let clientY = e.clientY;
+            if (e.touches) {
+                clientY = e.touches[0].clientY;
+            }
+            const newHeight = clientY - this.TOP_MENU_TOGGLE.offsetHeight;
+            if (newHeight >= this.minWidth) {
+                this.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
+            } else {
+                this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
+            }
+            this.renderTree(); // Resizing vertically, so need to re-render tree
         }
-        this.setupButtonContainerAutoHide();
-        this.updateMarkedButtonStates();
-        // Finish startup by setting focus to outline pane and setting the log pane's active tab
-        this.OUTLINE_PANE.focus();
-        this.showTab("log");
+        this.positionCrossDragger();
+        this.updateCollapseAllPosition();
+    }, 33);
+
+    private startDrag = (e: Event) => {
+        this.isDragging = true;
+        document.body.classList.add('dragging-main');
+        e.preventDefault();
+        document.addEventListener('mousemove', this.handleDrag);
+        document.addEventListener('mouseup', this.stopDrag);
+        document.addEventListener('touchmove', this.handleDrag, { passive: false });
+        document.addEventListener('touchend', this.stopDrag);
     }
 
-    private handleThemeToggleClick = () => {
-        // Only animate once button pressed, so page-load wont animate color changes.
-        this.HTML_ELEMENT.setAttribute('data-transition', 'true');
-        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
-        this.applyTheme(newTheme);
-        this.renderTree(); // Re-render to update icon colors
+    private stopDrag = () => {
+        if (this.isDragging) {
+            this.isDragging = false;
+            document.body.classList.remove('dragging-main');
+            document.removeEventListener('mousemove', this.handleDrag);
+            document.removeEventListener('mouseup', this.stopDrag);
+            document.removeEventListener('touchmove', this.handleDrag);
+            document.removeEventListener('touchend', this.stopDrag);
+            this.updateProportion();
+            this.renderTree();
+        }
+    }
+
+
+    private handleSecondaryDrag = utils.throttle((e) => {
+        if (this.currentLayout === 'vertical') {
+            let clientY = e.clientY;
+            if (e.touches) {
+                clientY = e.touches[0].clientY;
+            }
+            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const relativeY = clientY - containerRect.top;
+            const containerHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight;
+            if (relativeY >= this.minHeight && relativeY <= containerHeight - this.minHeight) {
+                this.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            }
+            this.renderTree(); // Resizing vertically, so need to re-render tree
+        } else {
+            let clientX = e.clientX;
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+            }
+            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const relativeX = clientX - containerRect.left;
+            const containerWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
+            if (relativeX >= this.minHeight && relativeX <= containerWidth - this.minHeight) {
+                this.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            }
+        }
+        this.positionCrossDragger();
+        this.updateCollapseAllPosition();
+    }, 33);
+
+    private startSecondaryDrag = (e: Event) => {
+        this.secondaryIsDragging = true;
+        document.body.classList.add('dragging-secondary');
+        e.preventDefault();
+        document.addEventListener('mousemove', this.handleSecondaryDrag);
+        document.addEventListener('mouseup', this.stopSecondaryDrag);
+        document.addEventListener('touchmove', this.handleSecondaryDrag, { passive: false });
+        document.addEventListener('touchend', this.stopSecondaryDrag);
+    }
+
+    private stopSecondaryDrag = () => {
+        if (this.secondaryIsDragging) {
+            this.secondaryIsDragging = false;
+            document.body.classList.remove('dragging-secondary');
+            document.removeEventListener('mousemove', this.handleSecondaryDrag);
+            document.removeEventListener('mouseup', this.stopSecondaryDrag);
+            document.removeEventListener('touchmove', this.handleSecondaryDrag);
+            document.removeEventListener('touchend', this.stopSecondaryDrag);
+            this.updateSecondaryProportion();
+            this.renderTree();
+        }
+    }
+
+    private handleCrossDrag = utils.throttle((e) => {
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+
+        if (this.currentLayout === 'vertical') {
+            // Handle cross drag when in vertical layout
+
+            // do main first as per handleDrag
+            const newWidth = clientX;
+            if (newWidth >= this.minWidth) {
+                this.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
+            } else {
+                this.OUTLINE_FIND_CONTAINER.style.width = (this.minWidth - 3) + 'px';
+            }
+            // then secondary as per handleSecondaryDrag
+            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const relativeY = clientY - containerRect.top;
+            const containerHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight;
+            if (relativeY >= this.minHeight && relativeY <= containerHeight - this.minHeight) {
+                this.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            }
+        } else {
+            // Handle cross drag when in horizontal layout
+
+            // do main first as per handleDrag
+            const newHeight = clientY - this.TOP_MENU_TOGGLE.offsetHeight;
+            if (newHeight >= this.minWidth) {
+                this.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
+            } else {
+                this.OUTLINE_FIND_CONTAINER.style.height = (this.minWidth - 3) + 'px';
+            }
+            // then secondary as per handleSecondaryDrag
+            const containerRect = this.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const relativeX = clientX - containerRect.left;
+            const containerWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
+            if (relativeX >= this.minHeight && relativeX <= containerWidth - this.minHeight) {
+                this.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
+                this.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            }
+        }
+        this.positionCrossDragger();
+
+        this.renderTree(); // Render afterward as it would be in each branch of the if/else
+        this.updateCollapseAllPosition();
+    }, 33);
+
+    private startCrossDrag = (e: Event) => {
+        this.crossIsDragging = true;
+        document.body.classList.add('dragging-cross');
+        e.preventDefault();
+        document.addEventListener('mousemove', this.handleCrossDrag);
+        document.addEventListener('mouseup', this.stopCrossDrag);
+        document.addEventListener('touchmove', this.handleCrossDrag, { passive: false });
+        document.addEventListener('touchend', this.stopCrossDrag);
+
+    }
+
+    private stopCrossDrag = () => {
+        if (this.crossIsDragging) {
+            this.crossIsDragging = false;
+            document.body.classList.remove('dragging-cross');
+            document.removeEventListener('mousemove', this.handleCrossDrag);
+            document.removeEventListener('mouseup', this.stopCrossDrag);
+            document.removeEventListener('touchmove', this.handleCrossDrag);
+            document.removeEventListener('touchend', this.stopCrossDrag);
+
+            this.updateProportion();
+            this.updateSecondaryProportion();
+
+            this.renderTree();
+        }
     }
 
     private handleLayoutToggleClick = () => {
@@ -2277,231 +1918,402 @@ export class LeoEditor {
         this.positionCrossDragger();
     }
 
-
-    private toggleButtonVisibility(button1: HTMLElement | null, button2: HTMLElement | null, isVisible: boolean) {
-        if (button1) {
-            button1.classList.toggle('hidden-button', !isVisible);
-        }
-        if (button2) {
-            button2.classList.toggle('hidden-button', !isVisible);
-        }
+    private handleThemeToggleClick = () => {
+        // Only animate once button pressed, so page-load wont animate color changes.
+        this.HTML_ELEMENT.setAttribute('data-transition', 'true');
+        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.applyTheme(newTheme);
+        this.renderTree(); // Re-render to update icon colors
     }
 
-    private positionSubmenu(parentItem: HTMLDivElement, submenu: HTMLElement, level: number) {
-        submenu.style.display = "flex";
-        const rect = parentItem.getBoundingClientRect();
-        const subRect = submenu.getBoundingClientRect();
+    // * Controller Methods (Command Execution) *
 
-        if (level === 0) {
-            submenu.style.left = rect.left + "px";
-            submenu.style.top = rect.bottom + "px";
-        } else {
-            const spaceRight = window.innerWidth - rect.right;
-            const spaceLeft = rect.left;
-            if (spaceRight < subRect.width && spaceLeft > subRect.width) {
-                submenu.style.left = -subRect.width + "px";
+    private hoistNode = () => {
+        // This method in an MVC model would be in the controller because it affects the model (hoist stack) and view (button states)
+        if (!this.selectedNode) return;
+
+        // If selected node is already hoisted: no-op (Even if button should be disabled in that case)
+        if (this.hoistStack.length > 0 && this.hoistStack[this.hoistStack.length - 1] === this.selectedNode) return;
+
+        if (!this.selectedNode.parent) {
+            return; // root node (though it should never be selected anyway)
+        }
+
+        this.hoistStack.push(this.selectedNode);
+        if (this.hasChildren(this.selectedNode) && !this.isExpanded(this.selectedNode)) {
+            this.expanded.add(this.selectedNode);
+            this.selectedNode.toggled = true; // Mark as toggled
+        }
+        this.updateHoistButtonStates();
+        this.updateContextMenuState(); // Node was already selected so no need to reupdate based on hoist
+        this.buildRowsRenderTree();
+    }
+
+    private dehoistNode = () => {
+        // This method in an MVC model would be in the controller because it affects the model (hoist stack) and view (button states)
+        if (this.hoistStack.length === 0) {
+            return;
+        }
+        const previousHoist = this.hoistStack.pop()!;
+        this.selectAndOrToggleAndRedraw(previousHoist);
+        this.updateHoistButtonStates();
+    }
+
+    private selectAndOrToggleAndRedraw(newSelectedNode: TreeNode | null = null, nodeToToggle: TreeNode | null = null) {
+        // Handle toggling if requested
+        if (nodeToToggle) {
+            if (this.isExpanded(nodeToToggle)) {
+                this.expanded.delete(nodeToToggle);
             } else {
-                submenu.style.left = rect.width + "px";
+                this.expanded.add(nodeToToggle);
             }
-            submenu.style.top = "0px";
+            nodeToToggle.toggled = true; // Mark as toggled
         }
-        submenu.style.display = "";
-    }
 
-    private focusMenuItem(item: HTMLDivElement | null) {
-        if (!item) return; // Safety check
-        if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
-        item.classList.add("focused");
-        this.focusedMenuItem = item;
-        item.scrollIntoView({ block: "nearest" });
-        document.querySelectorAll(".menu-item.sub-active").forEach(el =>
-            el.classList.remove("sub-active")
-        );
-        let ancestor = item.parentElement?.closest(".menu-item");
-        while (ancestor) {
-            ancestor.classList.add("sub-active");
-            ancestor = ancestor.parentElement?.closest(".submenu")?.parentElement?.closest(".menu-item");
-        }
-    }
+        const isNew = newSelectedNode && newSelectedNode !== this.selectedNode;
 
-    private saveAll = () => {
-        this.saveLayoutPreferences();
-        this.saveConfigPreferences();
-        this.saveDocumentStateToLocalStorage();
-    }
+        // Handle selection if requested
+        if (isNew) {
+            let hoistTop = this.getCurrentRoot();
 
-    private saveDocumentStateToLocalStorage() {
-        // Use the allNodesInOrder tree, the full list from the top as if all nodes were expanded,
-        // to note the position of hoisted node(s), expanded node(s), and the currently selected node.
-        let hoistStackPositions = []; // empty means no hoist
-        for (const hoisted of this.hoistStack) {
-            const pos = this.allNodesInOrder.indexOf(hoisted);
-            if (pos !== -1) {
-                hoistStackPositions.push(pos);
+            // While the top of hoist stack is not an ancestor of the new selected node, pop it
+            while (newSelectedNode !== hoistTop && this.hoistStack.length > 0 && !this.isAncestorOf(hoistTop, newSelectedNode)) {
+                this.hoistStack.pop();
+                hoistTop = this.getCurrentRoot();
             }
-        }
-        const expandedPositions = [];
-        for (const node of this.expanded) {
-            const pos = this.allNodesInOrder.indexOf(node);
-            if (pos !== -1) {
-                expandedPositions.push(pos);
+
+            // Ensure all parent nodes are expanded so the selected node is visible
+            let currentNode = newSelectedNode;
+            while (currentNode && currentNode.parent && currentNode !== hoistTop) {
+                // Skip the hidden root node since it's always expanded (When hoist is implemented, stop at hoist root)
+                if (currentNode.parent.parent) {
+                    this.expanded.add(currentNode.parent);
+                }
+                currentNode = currentNode.parent;
             }
-        }
-        const selectedPosition = this.allNodesInOrder.indexOf(this.selectedNode!); // -1 means no selection
-        const markedArray = Array.from(this.marked); // Marked are the gnx keys, not numeric positions from allNodesInOrder
-        const dataToSave = {
-            marked: markedArray,
-            hoistStack: hoistStackPositions,
-            selected: selectedPosition,
-            expanded: expandedPositions
-        };
-        utils.safeLocalStorageSet(this.genTimestamp, JSON.stringify(dataToSave)); // Key is title + genTimestamp
-    }
 
-    private loadDocumentStateFromLocalStorage(): TreeNode | null {
-        // returns the selected node if found, otherwise null
-        let initialSelectedNode = null;
-        const savedData = utils.safeLocalStorageGet(this.genTimestamp); // Key is title + genTimestamp
-        if (savedData) {
-            try {
-                const parsedData = JSON.parse(savedData);
-                // Start by rebuilding marked set and their related node icons
-                if (parsedData && Array.isArray(parsedData.marked)) {
-                    this.marked.clear();
-                    parsedData.marked.forEach((gnx: number) => {
-                        this.marked.add(gnx);
-                        // Update icon state to reflect marked status
-                        if (this.data[gnx]) {
-                            this.data[gnx].icon = (this.data[gnx].icon || 0) | 2; // Set marked bit
-                        }
-                    });
-                }
-                // If document stated data is found, rebuild hoist stack, expanded set, and selected node
-                if (parsedData && Array.isArray(parsedData.expanded) && Array.isArray(parsedData.hoistStack) && typeof parsedData.selected === 'number') {
-                    const expandedPositions = parsedData.expanded;
-                    let expandedPositionsIndex = 0;
-                    const hoistPositions = parsedData.hoistStack;
-                    const selectedPosition = parsedData.selected;
-                    for (const hoisted of hoistPositions) {
-                        if (hoisted >= 0 && hoisted < this.allNodesInOrder.length) {
-                            this.hoistStack.push(this.allNodesInOrder[hoisted]!);
-                        }
-                    }
-                    for (const node of expandedPositions) {
-                        if (node >= 0 && node < this.allNodesInOrder.length) {
-                            this.expanded.add(this.allNodesInOrder[node]!);
-                        }
-                    }
-                    if (selectedPosition >= 0 && selectedPosition < this.allNodesInOrder.length) {
-                        initialSelectedNode = this.allNodesInOrder[selectedPosition]!;
-                    }
-                }
-                return initialSelectedNode;
-            } catch (e) {
-                console.error('Error loading document state from localStorage:', e);
-            }
-        }
-        return null;
-    }
-
-    private saveLayoutPreferences() {
-        const layoutPreferences = {
-            mainRatio: this.mainRatio,
-            secondaryRatio: this.secondaryRatio,
-            theme: this.currentTheme,
-            layout: this.currentLayout
-        };
-        utils.safeLocalStorageSet('layoutPreferences', JSON.stringify(layoutPreferences));
-    }
-
-    private saveConfigPreferences() {
-        const selectedFindScope = this.getFindScope();
-
-        const preferences = {
-            showPrevNextMark: this.SHOW_PREV_NEXT_MARK.checked,
-            showToggleMark: this.SHOW_TOGGLE_MARK.checked,
-            showPrevNextHistory: this.SHOW_PREV_NEXT_HISTORY.checked,
-            showHoistDehoist: this.SHOW_HOIST_DEHOIST.checked,
-            showLayoutOrientation: this.SHOW_LAYOUT_ORIENTATION.checked,
-            showThemeToggle: this.SHOW_THEME_TOGGLE.checked,
-            showNodeIcons: this.SHOW_NODE_ICONS.checked,
-            showCollapseAll: this.SHOW_COLLAPSE_ALL.checked,
-            // Find-pane options
-            findWholeWord: this.OPT_WHOLE.checked,
-            findIgnoreCase: this.OPT_IGNORECASE.checked,
-            findRegexp: this.OPT_REGEXP.checked,
-            findMark: this.OPT_MARK.checked,
-            findHeadline: this.OPT_HEADLINE.checked,
-            findBody: this.OPT_BODY.checked,
-            findScope: selectedFindScope
-        };
-        utils.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
-    }
-
-    private loadThemeAndLayoutPreferences() {
-        const savedPrefs = utils.safeLocalStorageGet('layoutPreferences');
-        if (savedPrefs) {
-            try {
-                const prefs = JSON.parse(savedPrefs);
-                if (typeof prefs.mainRatio === 'number') {
-                    this.mainRatio = prefs.mainRatio;
-                }
-                if (typeof prefs.secondaryRatio === 'number') {
-                    this.secondaryRatio = prefs.secondaryRatio;
-                }
-                if (prefs.theme) {
-                    this.applyTheme(prefs.theme);
-                }
-                if (prefs.layout) {
-                    this.applyLayout(prefs.layout);
-                }
-            } catch (e) {
-                console.error('Error loading layout preferences:', e);
-            }
-        } else {
-            this.applyTheme(this.currentTheme);
-            this.applyLayout(this.currentLayout);
-        }
-    }
-
-    private loadConfigPreferences() {
-        const savedPrefs = utils.safeLocalStorageGet('configPreferences');
-        if (savedPrefs) {
-            try {
-                const prefs = JSON.parse(savedPrefs);
-                this.SHOW_PREV_NEXT_MARK.checked = prefs.showPrevNextMark ?? false;
-                this.SHOW_TOGGLE_MARK.checked = prefs.showToggleMark ?? false;
-                this.SHOW_PREV_NEXT_HISTORY.checked = prefs.showPrevNextHistory ?? true;
-                this.SHOW_HOIST_DEHOIST.checked = prefs.showHoistDehoist ?? false;
-                this.SHOW_LAYOUT_ORIENTATION.checked = prefs.showLayoutOrientation ?? true;
-                this.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
-                this.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
-                this.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
-                // Find-pane options
-                this.OPT_WHOLE.checked = prefs.findWholeWord ?? this.OPT_WHOLE.checked;
-                this.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? this.OPT_IGNORECASE.checked;
-                this.OPT_REGEXP.checked = prefs.findRegexp ?? this.OPT_REGEXP.checked;
-                this.OPT_MARK.checked = prefs.findMark ?? this.OPT_MARK.checked;
-                this.OPT_HEADLINE.checked = prefs.findHeadline ?? this.OPT_HEADLINE.checked;
-                this.OPT_BODY.checked = prefs.findBody ?? this.OPT_BODY.checked;
-                // Set the find scope radio
-                if (prefs.findScope) {
-                    const scopeRadio = document.getElementById('scope-' + prefs.findScope) as HTMLInputElement | null;
-                    if (scopeRadio) scopeRadio.checked = true;
-                }
-
-                this.updateButtonVisibility();
-                this.updateNodeIcons();
-            } catch (e) {
-                console.error('Error loading config preferences:', e);
-            }
-        } else {
+            this.selectedNode = newSelectedNode;
+            this.addToHistory(newSelectedNode);
+            this.updateHistoryButtonStates();
             this.updateButtonVisibility();
-            this.updateNodeIcons();
+            this.updateHoistButtonStates();
+            this.updateContextMenuState();
+        }
+
+        this.buildRowsRenderTree();
+
+        // Update body pane if selection changed (selectedNode cannot be null here because of isNew check)
+        if (isNew) {
+            if (newSelectedNode && this.data[newSelectedNode.gnx]) {
+                const [text, wrap] = this.computeBody(newSelectedNode);
+                this.showBody(text, wrap);
+            } else {
+                this.showBody("", true); // No node selected
+            }
+        }
+        if (this.selectedNode) {
+            this.scrollNodeIntoView(this.selectedNode);
+        }
+        this.updateCollapseAllPosition(); // In case the height made the scrollbar appear/disappear
+    }
+
+    private computeBody(node: TreeNode): [string, boolean] {
+        // Look for a line in the text starting with "@wrap" or "@nowrap",
+        // if not found, check the parent of node recursively.
+        // Note: wrap is default so only need to check for nowrap
+        let currentNode = node;
+        let nowrapFound = false;
+        while (currentNode.parent) { // Make sure to stop at the hidden root node
+            const body = this.data[currentNode.gnx]?.bodyString || "";
+            const wrapMatch = body.match(/^\s*@wrap\s*$/m);
+            const nowrapMatch = body.match(/^\s*@nowrap\s*$/m);
+            if (wrapMatch) {
+                break;  // Stop searching if @wrap (default) is found
+            }
+            if (nowrapMatch) {
+                nowrapFound = true;
+                break;  // Stop searching if @nowrap is found
+            }
+            currentNode = currentNode.parent;
+        }
+        let text = this.data[node.gnx]?.bodyString || "";
+        text = text.replace(this.urlRegex, url => {
+            return `<a href="${url}" target="_blank" contenteditable="plaintext-only" rel="noopener noreferrer">${url}</a>`;
+        });
+        return [text, !nowrapFound];
+    }
+
+    private expandNodeAndGoToFirstChild() {
+        // If the presently selected node has children, expand it if needed and go to the first child.
+        let node = this.selectedNode!;
+        if (this.hasChildren(node)) {
+            if (!this.isExpanded(node)) {
+                this.expanded.add(node);
+                node.toggled = true; // Mark as toggled
+            }
+            node = this.moveToFirstChild(node)!;
+            this.selectAndOrToggleAndRedraw(node);
         }
     }
 
-    // Find functionality
+    private contractNodeOrGoToParent() {
+        // If the presently selected node is expanded, collapse it. Otherwise go to the parent.
+        let node = this.selectedNode!;
+        if (this.hasChildren(node) && this.isExpanded(node)) {
+            this.selectAndOrToggleAndRedraw(null, node);
+        } else if (this.hasParent(node)) {
+            const parent = this.moveToParent(node)!;
+            if (this.isVisible(parent)) {
+                // Contract all children first
+                for (const child of this.children(parent)) {
+                    if (this.isExpanded(child)) {
+                        this.expanded.delete(child);
+                        child.toggled = true; // Mark as toggled
+                    }
+                }
+                this.selectAndOrToggleAndRedraw(parent);
+            }
+        }
+    }
+
+    private selectVisBack() {
+        // Select the visible node preceding the presently selected node.
+        let node = this.selectedNode!;
+        if (this.moveToVisBack(node)) {
+            node = this.moveToVisBack(node)!;
+            this.selectAndOrToggleAndRedraw(node);
+        }
+    }
+
+    private selectVisNext() {
+        // Select the visible node following the presently selected node.
+        let node = this.selectedNode!;
+        if (this.moveToVisNext(node)) {
+            node = this.moveToVisNext(node)!;
+            this.selectAndOrToggleAndRedraw(node);
+        }
+    }
+
+    private gotoFirstSiblingOrParent() {
+        // Select the first sibling of the presently selected node, or its parent if already first.
+        let node = this.selectedNode!;
+        const currentRoot = this.getCurrentRoot();
+        if (this.hasBack(node)) {
+            let firstVisibleSibling = null;
+            let current = node;
+            while (this.hasBack(current)) {
+                let prev = this.moveToBack(current)!;
+                if (this.isVisible(prev)) {
+                    firstVisibleSibling = prev;
+                    current = prev;
+                } else {
+                    break;
+                }
+            }
+            if (firstVisibleSibling) {
+                node = firstVisibleSibling;
+            }
+        } else if (this.hasParent(node) && node !== currentRoot) {
+            const parent = this.moveToParent(node)!;
+            if (parent === currentRoot || this.isDescendantOfHoistedNode(parent)) {
+                node = parent;
+            }
+        }
+        this.selectAndOrToggleAndRedraw(node);
+    };
+
+    private gotoLastSiblingOrVisNext() {
+        // Select the last sibling of the presently selected node, or the next visible node if already last.
+        let node = this.selectedNode!;
+        const currentRoot = this.getCurrentRoot();
+        if (this.hasNext(node)) {
+            let lastVisibleSibling = null;
+            let current = node;
+            while (this.hasNext(current)) {
+                let next = this.moveToNext(current)!;
+                if (this.isVisible(next)) {
+                    lastVisibleSibling = next;
+                    current = next;
+                } else {
+                    break;
+                }
+            }
+            if (lastVisibleSibling) {
+                node = lastVisibleSibling;
+            }
+        } else if (this.moveToVisNext(node)) {
+            node = this.moveToVisNext(node)!;
+        }
+        if (node) this.selectAndOrToggleAndRedraw(node);
+    };
+
+    private gotoFirstVisibleNode() {
+        // Get the current root (could be hoisted node or hidden root)
+        const currentRoot = this.getCurrentRoot()!;
+
+        // If we're hoisted, the first visible node could be the hoisted node itself
+        if (this.hoistStack.length > 0) {
+            this.selectAndOrToggleAndRedraw(currentRoot);
+            return;
+        }
+
+        // Otherwise, select the first child of the root node
+        const firstNode = this.moveToFirstChild(currentRoot);
+        if (firstNode) {
+            this.selectAndOrToggleAndRedraw(firstNode);
+        }
+    };
+
+    private gotoLastVisibleNode() {
+        // Select the last visible node in the outline.
+        let node = this.selectedNode!;
+        while (node) {
+            const next = this.moveToVisNext(node);
+            if (next && this.isVisible(next)) {
+                node = next;
+            } else {
+                break;
+            }
+        }
+        if (node) {
+            this.selectAndOrToggleAndRedraw(node);
+        }
+    };
+
+    private previousHistory = () => {
+        if (this.currentHistoryIndex > 0) {
+            this.currentHistoryIndex--;
+            const node = this.navigationHistory[this.currentHistoryIndex];
+            this.selectAndOrToggleAndRedraw(node); // Goto node without adding to history
+            this.updateHistoryButtonStates();
+        }
+    }
+
+    private nextHistory = () => {
+        if (this.currentHistoryIndex < this.navigationHistory.length - 1) {
+            this.currentHistoryIndex++;
+            const node = this.navigationHistory[this.currentHistoryIndex];
+            this.selectAndOrToggleAndRedraw(node); // Goto node without adding to history
+            this.updateHistoryButtonStates();
+        }
+    }
+
+    private toggleSelected() {
+        if (this.selectedNode && this.selectedNode.children && this.selectedNode.children.length > 0) {
+            this.selectAndOrToggleAndRedraw(null, this.selectedNode);
+        }
+    }
+
+    private toggleMarkCurrentNode = () => {
+        if (this.selectedNode) {
+            this.toggleMark(this.selectedNode);
+            this.updateMarkedButtonStates();
+            this.updateButtonVisibility();
+
+            // Only need to redraw the affected node if visible, no need to re-flatten because structure didn't change
+            if (this.isVisible(this.selectedNode)) {
+                this.buildRowsRenderTree();
+            }
+        }
+    }
+
+    private gotoNextMarkedNode = () => {
+        if (!this.selectedNode || this.marked.size === 0) {
+            return;
+        }
+
+        const currentIndex = this.allNodesInOrder.findIndex(node => node === this.selectedNode);
+        if (currentIndex === -1) {
+            return; // Should never happen
+        }
+
+        let foundMarked = false;
+        for (let i = 1; i <= this.allNodesInOrder.length; i++) {
+            const nextIndex = (currentIndex + i) % this.allNodesInOrder.length; // Wrap around
+            const node = this.allNodesInOrder[nextIndex]!;
+
+            if (node === this.selectedNode) {
+                continue;
+            }
+
+            if (this.marked.has(node.gnx)) {
+                this.selectAndOrToggleAndRedraw(node);
+                foundMarked = true;
+                break;
+            }
+        }
+
+        if (!foundMarked) {
+            if (this.marked.size === 1 && this.marked.has(this.selectedNode.gnx)) {
+                this.showToast("Only one marked node.");
+            } else {
+                this.showToast("No other marked nodes found.");
+            }
+        }
+    }
+
+    private gotoPrevMarkedNode = () => {
+        if (!this.selectedNode || this.marked.size === 0) {
+            return;
+        }
+
+        const currentIndex = this.allNodesInOrder.findIndex(node => node === this.selectedNode);
+        if (currentIndex === -1) {
+            return; // Should never happen
+        }
+
+        let foundMarked = false;
+        for (let i = 1; i <= this.allNodesInOrder.length; i++) {
+            const prevIndex = (currentIndex - i + this.allNodesInOrder.length) % this.allNodesInOrder.length; // Wrap around
+            const node = this.allNodesInOrder[prevIndex]!;
+
+            if (node === this.selectedNode) {
+                continue;
+            }
+
+            if (this.marked.has(node.gnx)) {
+                this.selectAndOrToggleAndRedraw(node);
+                foundMarked = true;
+                break;
+            }
+        }
+
+        if (!foundMarked) {
+            if (this.marked.size === 1 && this.marked.has(this.selectedNode.gnx)) {
+                this.showToast("Only one marked node.");
+            } else {
+                this.showToast("No other marked nodes found.");
+            }
+        }
+    }
+
+    private collapseAll = () => {
+        // Collapse all nodes in visible outline and select the proper top-level node
+        const currentRoot = this.getCurrentRoot()!;
+        if (currentRoot === this.tree) {
+            this.expanded.clear();
+        } else {
+            const nodesToRemove: TreeNode[] = [];
+            this.expanded.forEach(node => {
+                if (node === currentRoot || this.isAncestorOf(currentRoot, node)) {
+                    nodesToRemove.push(node);
+                }
+            });
+            nodesToRemove.forEach(node => this.expanded.delete(node));
+        }
+        if (this.hoistStack.length > 0) {
+            this.selectAndOrToggleAndRedraw(currentRoot);
+        } else {
+            let node = this.selectedNode!;
+            // If currently selected node is a descendant of a top-level node, find that top-level node
+            while (node && this.hasParent(node) && node.parent !== this.tree) {
+                node = this.moveToParent(node)!;
+            }
+            if (node) this.selectAndOrToggleAndRedraw(node);
+        }
+    };
+
+    // * Controller Methods (Search Orchestration) *
     private startFind() {
         this.initialFindNode = null; // If null, find next will set this, used with "Suboutline Only" find radio option (value: suboutline)
         this.showTab("find");
@@ -2853,19 +2665,229 @@ export class LeoEditor {
         }
     }
 
-    private findFocus() {
-        // Returns 1 if focus in outline-pane, 2 if in body-pane, 0 otherwise
-        if (document.activeElement === this.OUTLINE_PANE || this.OUTLINE_PANE.contains(document.activeElement)) {
-            return 1;
-        } else if (document.activeElement === this.BODY_PANE || this.BODY_PANE.contains(document.activeElement)) {
-            return 2;
-        }
-        return 0;
+    // * Controller Methods (Persistence) *
+
+    private saveAllPreferences = () => {
+        this.saveLayoutPreferences();
+        this.saveConfigPreferences();
+        this.saveDocumentStateToLocalStorage();
     }
 
-    private initializeInteractions() {
-        this.setupEventHandlers();
-        this.setupButtonFocusPrevention();
-        this.setupLastFocusedElementTracking();
+    private saveDocumentStateToLocalStorage() {
+        // Use the allNodesInOrder tree, the full list from the top as if all nodes were expanded,
+        // to note the position of hoisted node(s), expanded node(s), and the currently selected node.
+        let hoistStackPositions = []; // empty means no hoist
+        for (const hoisted of this.hoistStack) {
+            const pos = this.allNodesInOrder.indexOf(hoisted);
+            if (pos !== -1) {
+                hoistStackPositions.push(pos);
+            }
+        }
+        const expandedPositions = [];
+        for (const node of this.expanded) {
+            const pos = this.allNodesInOrder.indexOf(node);
+            if (pos !== -1) {
+                expandedPositions.push(pos);
+            }
+        }
+        const selectedPosition = this.allNodesInOrder.indexOf(this.selectedNode!); // -1 means no selection
+        const markedArray = Array.from(this.marked); // Marked are the gnx keys, not numeric positions from allNodesInOrder
+        const dataToSave = {
+            marked: markedArray,
+            hoistStack: hoistStackPositions,
+            selected: selectedPosition,
+            expanded: expandedPositions
+        };
+        utils.safeLocalStorageSet(this.genTimestamp, JSON.stringify(dataToSave)); // Key is title + genTimestamp
     }
+
+    private loadDocumentStateFromLocalStorage(): TreeNode | null {
+        // returns the selected node if found, otherwise null
+        let initialSelectedNode = null;
+        const savedData = utils.safeLocalStorageGet(this.genTimestamp); // Key is title + genTimestamp
+        if (savedData) {
+            try {
+                const parsedData = JSON.parse(savedData);
+                // Start by rebuilding marked set and their related node icons
+                if (parsedData && Array.isArray(parsedData.marked)) {
+                    this.marked.clear();
+                    parsedData.marked.forEach((gnx: number) => {
+                        this.marked.add(gnx);
+                        // Update icon state to reflect marked status
+                        if (this.data[gnx]) {
+                            this.data[gnx].icon = (this.data[gnx].icon || 0) | 2; // Set marked bit
+                        }
+                    });
+                }
+                // If document stated data is found, rebuild hoist stack, expanded set, and selected node
+                if (parsedData && Array.isArray(parsedData.expanded) && Array.isArray(parsedData.hoistStack) && typeof parsedData.selected === 'number') {
+                    const expandedPositions = parsedData.expanded;
+                    let expandedPositionsIndex = 0;
+                    const hoistPositions = parsedData.hoistStack;
+                    const selectedPosition = parsedData.selected;
+                    for (const hoisted of hoistPositions) {
+                        if (hoisted >= 0 && hoisted < this.allNodesInOrder.length) {
+                            this.hoistStack.push(this.allNodesInOrder[hoisted]!);
+                        }
+                    }
+                    for (const node of expandedPositions) {
+                        if (node >= 0 && node < this.allNodesInOrder.length) {
+                            this.expanded.add(this.allNodesInOrder[node]!);
+                        }
+                    }
+                    if (selectedPosition >= 0 && selectedPosition < this.allNodesInOrder.length) {
+                        initialSelectedNode = this.allNodesInOrder[selectedPosition]!;
+                    }
+                }
+                return initialSelectedNode;
+            } catch (e) {
+                console.error('Error loading document state from localStorage:', e);
+            }
+        }
+        return null;
+    }
+
+    private saveLayoutPreferences() {
+        const layoutPreferences = {
+            mainRatio: this.mainRatio,
+            secondaryRatio: this.secondaryRatio,
+            theme: this.currentTheme,
+            layout: this.currentLayout
+        };
+        utils.safeLocalStorageSet('layoutPreferences', JSON.stringify(layoutPreferences));
+    }
+
+    private saveConfigPreferences() {
+        const selectedFindScope = this.getFindScope();
+
+        const preferences = {
+            showPrevNextMark: this.SHOW_PREV_NEXT_MARK.checked,
+            showToggleMark: this.SHOW_TOGGLE_MARK.checked,
+            showPrevNextHistory: this.SHOW_PREV_NEXT_HISTORY.checked,
+            showHoistDehoist: this.SHOW_HOIST_DEHOIST.checked,
+            showLayoutOrientation: this.SHOW_LAYOUT_ORIENTATION.checked,
+            showThemeToggle: this.SHOW_THEME_TOGGLE.checked,
+            showNodeIcons: this.SHOW_NODE_ICONS.checked,
+            showCollapseAll: this.SHOW_COLLAPSE_ALL.checked,
+            // Find-pane options
+            findWholeWord: this.OPT_WHOLE.checked,
+            findIgnoreCase: this.OPT_IGNORECASE.checked,
+            findRegexp: this.OPT_REGEXP.checked,
+            findMark: this.OPT_MARK.checked,
+            findHeadline: this.OPT_HEADLINE.checked,
+            findBody: this.OPT_BODY.checked,
+            findScope: selectedFindScope
+        };
+        utils.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
+    }
+
+    private loadConfigPreferences() {
+        const savedPrefs = utils.safeLocalStorageGet('configPreferences');
+        if (savedPrefs) {
+            try {
+                const prefs = JSON.parse(savedPrefs);
+                this.SHOW_PREV_NEXT_MARK.checked = prefs.showPrevNextMark ?? false;
+                this.SHOW_TOGGLE_MARK.checked = prefs.showToggleMark ?? false;
+                this.SHOW_PREV_NEXT_HISTORY.checked = prefs.showPrevNextHistory ?? true;
+                this.SHOW_HOIST_DEHOIST.checked = prefs.showHoistDehoist ?? false;
+                this.SHOW_LAYOUT_ORIENTATION.checked = prefs.showLayoutOrientation ?? true;
+                this.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
+                this.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
+                this.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
+                // Find-pane options
+                this.OPT_WHOLE.checked = prefs.findWholeWord ?? this.OPT_WHOLE.checked;
+                this.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? this.OPT_IGNORECASE.checked;
+                this.OPT_REGEXP.checked = prefs.findRegexp ?? this.OPT_REGEXP.checked;
+                this.OPT_MARK.checked = prefs.findMark ?? this.OPT_MARK.checked;
+                this.OPT_HEADLINE.checked = prefs.findHeadline ?? this.OPT_HEADLINE.checked;
+                this.OPT_BODY.checked = prefs.findBody ?? this.OPT_BODY.checked;
+                // Set the find scope radio
+                if (prefs.findScope) {
+                    const scopeRadio = document.getElementById('scope-' + prefs.findScope) as HTMLInputElement | null;
+                    if (scopeRadio) scopeRadio.checked = true;
+                }
+
+                this.updateButtonVisibility();
+                this.updateNodeIcons();
+            } catch (e) {
+                console.error('Error loading config preferences:', e);
+            }
+        } else {
+            this.updateButtonVisibility();
+            this.updateNodeIcons();
+        }
+    }
+
+    // * Controller Methods (Finally, the actual render tree building) *
+    private flattenTree(
+        node: TreeNode,
+        depth = 0,
+        isRoot = true,
+        selectedNode: TreeNode | null,
+        initialFindNode: TreeNode | null,
+    ): FlatRow[] {
+        // In an MVC model, this belongs to the controller as it builds the view model (flatRows) from the model (tree, expanded, hoistStack, selectedNode)
+        const flatRows: FlatRow[] = [];
+
+        if (!isRoot && !this.isVisible(node)) {
+            return flatRows; // Skip hidden nodes
+        }
+
+        if (!isRoot) {
+            flatRows.push({
+                label: this.data[node.gnx]!.headString || `Node ${node.gnx}`,
+                depth: depth,
+                toggled: false, // Reset each time
+                hasChildren: this.hasChildren(node),
+                isExpanded: this.isExpanded(node),
+                node: node,
+                // Computed display properties
+                isSelected: node === selectedNode,
+                isAncestor: selectedNode ? this.isAncestorOf(node, selectedNode) : false,
+                isInitialFind: this.computeIsInitialFind(node, initialFindNode, this.selectedNode),
+                icon: this.data[node.gnx]!.icon || 0
+            });
+        }
+
+        if (this.isExpanded(node) || isRoot) {
+            const children = this.children(node);
+            for (const child of children) {
+                flatRows.push(...this.flattenTree(child, depth + 1, false, selectedNode, initialFindNode));
+            }
+        }
+
+        return flatRows;
+    }
+
+    private computeIsInitialFind(
+        node: TreeNode,
+        initialFindNode: TreeNode | null,
+        selectedNode: TreeNode | null
+    ): boolean {
+        const findScope = this.getFindScope();
+        if (findScope === 'node' && node === selectedNode) {
+            return true;
+        }
+        if (findScope === 'suboutline' && initialFindNode) {
+            return node === initialFindNode || this.isAncestorOf(initialFindNode, node);
+        }
+        return false;
+    }
+
+    private getFindScope(): string {
+        let selectedRadioValue = '';
+        const selectedRadio = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
+        if (selectedRadio) {
+            selectedRadioValue = selectedRadio.value;
+        }
+        return selectedRadioValue;
+    }
+
+    private buildRowsRenderTree(): void {
+        // In an MVC model, this builds from the model (tree, expanded, hoistStack, selectedNode) the view model (flatRows) and triggers the view update (renderTree)
+        // So it belongs to the controller.
+        this.flatRows = this.flattenTree(this.getCurrentRoot(), 0, !this.hoistStack.length, this.selectedNode, this.initialFindNode);
+        this.renderTree();
+    }
+
 }

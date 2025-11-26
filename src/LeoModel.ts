@@ -1,63 +1,64 @@
 import { TreeNode, NodeData, MenuEntry } from './types';
 
 /*
-# Properties:
+    # Properties:
 
-tree: TreeNode (Root)
-data: Record<string, NodeData> (Body text/Headlines)
-allNodesInOrder: Array<TreeNode>
-expanded: Set<TreeNode>
-marked: Set<number>
-selectedNode: TreeNode | null
-hoistStack: Array<TreeNode>
-navigationHistory: Array<TreeNode>
-currentHistoryIndex: number
-initialFindNode: TreeNode | null
-menuData: MenuEntry[]
+    defaultTitle: string;
+    tree: TreeNode (Root)
+    data: Record<string, NodeData> (Body text/Headlines)
+    allNodesInOrder: Array<TreeNode>
+    expanded: Set<TreeNode>
+    marked: Set<number>
+    selectedNode: TreeNode | null
+    hoistStack: Array<TreeNode>
+    navigationHistory: Array<TreeNode>
+    currentHistoryIndex: number
+    initialFindNode: TreeNode | null
+    menuData: MenuEntry[]
 
-# Methods (Tree Structure & Helpers):
+    # Methods (Tree Structure & Helpers):
 
-buildClones(node)
-buildParentRefs(node)
-getAllNodesInTreeOrder(node)
-children(node)
-childIndex(node)
-parents(node)
-isAncestorOf(ancestor, descendant)
-hasChildren(node)
-hasParent(node)
-hasBack(node)
-hasNext(node)
+    buildClones(node)
+    buildParentRefs(node)
+    getAllNodesInTreeOrder(node)
+    children(node)
+    parents(node)
+    isAncestorOf(ancestor, descendant)
+    hasChildren(node)
+    hasParent(node)
+    hasBack(node)
+    hasNext(node)
 
-# Methods (State Logic):
+    # Methods (State Logic):
 
-isExpanded(node)
-isVisible(node)
-isDescendantOfHoistedNode(node)
-getCurrentRoot()
+    isExpanded(node)
+    isVisible(node)
+    isDescendantOfHoistedNode(node)
+    getCurrentRoot()
 
-# Methods (Navigation Logic):
+    # Methods (Navigation Logic):
 
-moveToBack(node)
-moveToNext(node)
-moveToParent(node)
-moveToFirstChild(node)
-moveToLastChild(node)
-moveToLastNode(node)
-moveToThreadBack(node)
-moveToThreadNext(node)
-moveToVisBack(node)
-moveToVisNext(node)
+    moveToBack(node)
+    moveToNext(node)
+    moveToParent(node)
+    moveToFirstChild(node)
+    moveToLastChild(node)
+    moveToLastNode(node)
+    moveToThreadBack(node)
+    moveToThreadNext(node)
+    moveToVisBack(node)
+    moveToVisNext(node)
+    moveToNodeAfterTree(node)
 
-# Methods (Actions/Mutations):
+    # Methods (Actions/Mutations):
 
-hoistNode() / dehoistNode()
-toggleMark(node)
-addToHistory(node)
+    toggleMark(node)
+    addToHistory(node)
 
 */
 
 export class LeoModel {
+    private defaultTitle = "Leo Editor for the web";
     public tree: TreeNode = {
         "gnx": 0,
         "children": [
