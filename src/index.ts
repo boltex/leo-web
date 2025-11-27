@@ -11,14 +11,13 @@ import { LeoController } from './LeoController';
 
 import { LeoEditor } from './LeoEditor';
 class LeoWebApp {
-    private editor: LeoEditor;
+    private editor!: LeoEditor;
 
     private model!: LeoModel;
     private view!: LeoView;
     private controller!: LeoController;
 
     constructor() {
-        this.editor = new LeoEditor();
         this.init();
     }
 
@@ -32,7 +31,9 @@ class LeoWebApp {
     }
 
     private setupApp(): void {
-        this.editor.handleDOMContentLoaded();
+        this.editor = new LeoEditor();
+
+        this.editor.initialize();
 
         // TODO : Uncomment when MVC components are ready
         // // Initialize the MVC components

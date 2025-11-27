@@ -13,10 +13,15 @@ import { LeoView } from "./LeoView";
     # Methods (Initialization & Setup):
 
     constructor()
+    initializeInteractions()
     setupEventHandlers()
     setupOutlinePaneHandlers()
     setupBodyPaneHandlers()
-    setupGlobalHandlers()
+    setupResizerHandlers()
+    setupWindowHandlers()
+    setupButtonHandlers()
+    setupButtonFocusPrevention()
+    setupConfigCheckboxes()
     setupTopMenuHandlers()
 
     # Methods (Event Handlers):
@@ -24,11 +29,16 @@ import { LeoView } from "./LeoView";
     handleDOMContentLoaded
     handleWindowResize
     handleOutlinePaneClick(e)
+    handleOutlinePaneDblClick(e)
+    handleContextMenu(e)
     handleOutlinePaneKeyDown(e)
+    handleBodyPaneKeyDown(e)
+
     handleGlobalKeyDown(e)
     handleDrag(), startDrag(), stopDrag()
     handleSecondaryDrag(), startSecondaryDrag(), stopSecondaryDrag()
     handleCrossDrag(), startCrossDrag(), stopCrossDrag()
+    handleLayoutToggleClick()
     handleMenuToggleClick()
     handleThemeToggleClick()
 
@@ -39,8 +49,15 @@ import { LeoView } from "./LeoView";
     selectAndOrToggleAndRedraw(node)
     expandNodeAndGoToFirstChild()
     contractNodeOrGoToParent()
-    gotoNextMarkedNode(), gotoPrevMarkedNode()
+    selectVisBack/selectVisNext
+    gotoFirstSiblingOrParent()
+    gotoLastSiblingOrVisNext()
+    gotoFirstVisibleNode()
+    gotoLastVisibleNode()
     previousHistory(), nextHistory()
+    toggleSelected()
+    toggleMarkCurrentNode()
+    gotoNextMarkedNode(), gotoPrevMarkedNode()
     collapseAll()
 
     # Methods (Search Orchestration):
@@ -58,6 +75,8 @@ import { LeoView } from "./LeoView";
     saveConfigPreferences()
     loadConfigPreferences()
 
+    * Controller Methods (Finally, the actual render tree building) *
+    buildRowsRenderTree - and its helper flattenTree, etc.
 */
 
 

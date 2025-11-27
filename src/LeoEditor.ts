@@ -354,7 +354,6 @@ export class LeoEditor {
 
     // * Model Methods (Tree Structure & Helpers) *
 
-    // Build clones when repeated in the tree
     private buildClones(node: TreeNode) {
 
         const visitedNodes: Record<string, TreeNode> = {}; // Keys are gnx, values are node references
@@ -1538,7 +1537,7 @@ export class LeoEditor {
     }
 
     // * Controller Methods (Event Handlers) *
-    public handleDOMContentLoaded() {
+    public initialize() {
         this.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
 
@@ -2819,6 +2818,13 @@ export class LeoEditor {
     }
 
     // * Controller Methods (Finally, the actual render tree building) *
+    private buildRowsRenderTree(): void {
+        // In an MVC model, this builds from the model (tree, expanded, hoistStack, selectedNode) the view model (flatRows) and triggers the view update (renderTree)
+        // So it belongs to the controller.
+        this.flatRows = this.flattenTree(this.getCurrentRoot(), 0, !this.hoistStack.length, this.selectedNode, this.initialFindNode);
+        this.renderTree();
+    }
+
     private flattenTree(
         node: TreeNode,
         depth = 0,
@@ -2881,13 +2887,6 @@ export class LeoEditor {
             selectedRadioValue = selectedRadio.value;
         }
         return selectedRadioValue;
-    }
-
-    private buildRowsRenderTree(): void {
-        // In an MVC model, this builds from the model (tree, expanded, hoistStack, selectedNode) the view model (flatRows) and triggers the view update (renderTree)
-        // So it belongs to the controller.
-        this.flatRows = this.flattenTree(this.getCurrentRoot(), 0, !this.hoistStack.length, this.selectedNode, this.initialFindNode);
-        this.renderTree();
     }
 
 }
