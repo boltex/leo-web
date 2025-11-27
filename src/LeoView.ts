@@ -59,90 +59,90 @@ import * as utils from './utils';
 
 export class LeoView {
     // Elements
-    private selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane
+    public selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane
 
     private MAIN_CONTAINER: HTMLElement;
-    private OUTLINE_FIND_CONTAINER: HTMLElement;
-    private OUTLINE_PANE: HTMLElement;
-    private COLLAPSE_ALL_BTN: HTMLElement;
+    public OUTLINE_FIND_CONTAINER: HTMLElement;
+    public OUTLINE_PANE: HTMLElement;
+    public COLLAPSE_ALL_BTN: HTMLElement;
     private SPACER: HTMLElement;
-    private BODY_PANE: HTMLElement;
-    private VERTICAL_RESIZER: HTMLElement;
-    private LOG_PANE: HTMLElement;
-    private HORIZONTAL_RESIZER: HTMLElement;
-    private CROSS_RESIZER: HTMLElement;
-    private THEME_TOGGLE: HTMLElement;
+    public BODY_PANE: HTMLElement;
+    public VERTICAL_RESIZER: HTMLElement;
+    public LOG_PANE: HTMLElement;
+    public HORIZONTAL_RESIZER: HTMLElement;
+    public CROSS_RESIZER: HTMLElement;
+    public THEME_TOGGLE: HTMLElement;
     private THEME_ICON: HTMLElement;
-    private LAYOUT_TOGGLE: HTMLElement;
-    private MENU_TOGGLE: HTMLElement;
-    private TOP_MENU_TOGGLE: HTMLElement;
+    public LAYOUT_TOGGLE: HTMLElement;
+    public MENU_TOGGLE: HTMLElement;
+    public TOP_MENU_TOGGLE: HTMLElement;
 
-    private DEHOIST_BTN: HTMLButtonElement;
-    private HOIST_BTN: HTMLButtonElement;
-    private NEXT_BTN: HTMLButtonElement;
-    private PREV_BTN: HTMLButtonElement;
+    public DEHOIST_BTN: HTMLButtonElement;
+    public HOIST_BTN: HTMLButtonElement;
+    public NEXT_BTN: HTMLButtonElement;
+    public PREV_BTN: HTMLButtonElement;
 
-    private NEXT_MARKED_BTN: HTMLButtonElement;
-    private TOGGLE_MARK_BTN: HTMLButtonElement;
-    private PREV_MARKED_BTN: HTMLButtonElement;
+    public NEXT_MARKED_BTN: HTMLButtonElement;
+    public TOGGLE_MARK_BTN: HTMLButtonElement;
+    public PREV_MARKED_BTN: HTMLButtonElement;
 
-    private BUTTON_CONTAINER: HTMLElement;
-    private TRIGGER_AREA: HTMLElement;
+    public BUTTON_CONTAINER: HTMLElement;
+    public TRIGGER_AREA: HTMLElement;
 
-    private ACTION_MARK: HTMLElement;
-    private ACTION_UNMARK: HTMLElement;
-    private ACTION_HOIST: HTMLElement;
-    private ACTION_DEHOIST: HTMLElement;
+    public ACTION_MARK: HTMLElement;
+    public ACTION_UNMARK: HTMLElement;
+    public ACTION_HOIST: HTMLElement;
+    public ACTION_DEHOIST: HTMLElement;
 
-    private FIND_INPUT: HTMLInputElement;
-    private OPT_HEADLINE: HTMLInputElement;
-    private OPT_BODY: HTMLInputElement;
-    private OPT_WHOLE: HTMLInputElement;
-    private OPT_IGNORECASE: HTMLInputElement;
-    private OPT_REGEXP: HTMLInputElement;
-    private OPT_MARK: HTMLInputElement;
+    public FIND_INPUT: HTMLInputElement;
+    public OPT_HEADLINE: HTMLInputElement;
+    public OPT_BODY: HTMLInputElement;
+    public OPT_WHOLE: HTMLInputElement;
+    public OPT_IGNORECASE: HTMLInputElement;
+    public OPT_REGEXP: HTMLInputElement;
+    public OPT_MARK: HTMLInputElement;
 
-    private LOG_TAB: HTMLDivElement;
-    private FIND_TAB: HTMLDivElement;
-    private UNDO_TAB: HTMLDivElement;
-    private SETTINGS_TAB: HTMLDivElement;
+    public LOG_TAB: HTMLDivElement;
+    public FIND_TAB: HTMLDivElement;
+    public UNDO_TAB: HTMLDivElement;
+    public SETTINGS_TAB: HTMLDivElement;
 
-    private SHOW_PREV_NEXT_MARK: HTMLInputElement;
-    private SHOW_TOGGLE_MARK: HTMLInputElement;
-    private SHOW_PREV_NEXT_HISTORY: HTMLInputElement;
-    private SHOW_HOIST_DEHOIST: HTMLInputElement;
-    private SHOW_LAYOUT_ORIENTATION: HTMLInputElement;
-    private SHOW_THEME_TOGGLE: HTMLInputElement;
-    private SHOW_NODE_ICONS: HTMLInputElement;
-    private SHOW_COLLAPSE_ALL: HTMLInputElement;
+    public SHOW_PREV_NEXT_MARK: HTMLInputElement;
+    public SHOW_TOGGLE_MARK: HTMLInputElement;
+    public SHOW_PREV_NEXT_HISTORY: HTMLInputElement;
+    public SHOW_HOIST_DEHOIST: HTMLInputElement;
+    public SHOW_LAYOUT_ORIENTATION: HTMLInputElement;
+    public SHOW_THEME_TOGGLE: HTMLInputElement;
+    public SHOW_NODE_ICONS: HTMLInputElement;
+    public SHOW_COLLAPSE_ALL: HTMLInputElement;
 
-    private MENU: HTMLElement;
+    public MENU: HTMLElement;
     private TOAST: HTMLElement;
-    private HTML_ELEMENT: HTMLElement;
+    public HTML_ELEMENT: HTMLElement;
 
-    private activeTopMenu: HTMLDivElement | null = null;
-    private focusedMenuItem: HTMLDivElement | null = null;
-    private topLevelItems: HTMLDivElement[] = [];
-    private topLevelSubmenus = new Map();
+    public activeTopMenu: HTMLDivElement | null = null;
+    public focusedMenuItem: HTMLDivElement | null = null;
+    public topLevelItems: HTMLDivElement[] = [];
+    public topLevelSubmenus = new Map();
 
-    private flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
+    public flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
 
-    private currentTheme = 'light'; // Default theme
-    private currentLayout = 'vertical'; // Default layout
-    private mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
-    private secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
-    private isDragging = false;
-    private isMenuShown = false;
-    private ROW_HEIGHT = 26;
+    public currentTheme = 'light'; // Default theme
+    public currentLayout = 'vertical'; // Default layout
+    public mainRatio = 0.25; // Default proportion between outline-find-container and body-pane widths (defaults to 1/4)
+    public secondaryRatio = 0.75; // Default proportion between the outline-pane and the log-pane (defaults to 3/4)
+    public isDragging = false;
+    public isMenuShown = false;
+    public ROW_HEIGHT = 26;
     private LEFT_OFFSET = 16; // Padding from left edge
 
     private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
-    private secondaryIsDragging = false;
-    private crossIsDragging = false;
+    public secondaryIsDragging = false;
+    public crossIsDragging = false;
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-    private minWidth = 20;
-    private minHeight = 20;
+    public minWidth = 20;
+    public minHeight = 20;
 
     constructor() {
 
@@ -367,7 +367,7 @@ export class LeoView {
         return menu;
     }
 
-    private openTopMenu(item: HTMLDivElement, sub: HTMLElement | null, level: number) {
+    public openTopMenu(item: HTMLDivElement, sub: HTMLElement | null, level: number) {
         this.closeAllSubmenus();
         this.activeTopMenu = item;
         const targetSubmenu = sub || this.topLevelSubmenus.get(item);
@@ -378,7 +378,7 @@ export class LeoView {
         this.focusedMenuItem = null;
     }
 
-    private positionSubmenu(parentItem: HTMLDivElement, submenu: HTMLElement, level: number) {
+    public positionSubmenu(parentItem: HTMLDivElement, submenu: HTMLElement, level: number) {
         submenu.style.display = "flex";
         const rect = parentItem.getBoundingClientRect();
         const subRect = submenu.getBoundingClientRect();
@@ -468,7 +468,7 @@ export class LeoView {
     }
 
 
-    private highlightMatchInHeadline(startIndex: number, endIndex: number) {
+    public highlightMatchInHeadline(startIndex: number, endIndex: number) {
         // Use the global selectedLabelElement which is already set after selectAndOrToggleAndRedraw
         if (!this.selectedLabelElement) return;
         // Find the first text node in the label element
@@ -493,7 +493,7 @@ export class LeoView {
         }
     }
 
-    private highlightMatchInBody(startIndex: number, endIndex: number) {
+    public highlightMatchInBody(startIndex: number, endIndex: number) {
         // The body pane content is set directly as textContent, so it's a single text node
         if (!this.BODY_PANE.firstChild) return;
         try {
@@ -606,7 +606,7 @@ export class LeoView {
         });
     }
 
-    private restoreLastFocusedElement() {
+    public restoreLastFocusedElement() {
         if (this.lastFocusedElement && this.lastFocusedElement.focus) {
             // also check if visible by checking its size
             const rect = this.lastFocusedElement.getBoundingClientRect();

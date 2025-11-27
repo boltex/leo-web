@@ -58,7 +58,8 @@ import { TreeNode, NodeData, MenuEntry } from './types';
 */
 
 export class LeoModel {
-    private defaultTitle = "Leo Editor for the web";
+    public defaultTitle = "Leo Editor for the web";
+    public genTimestamp = "1234567890"; // For uniqueness of saved localstorage data.
     public tree: TreeNode = {
         "gnx": 0,
         "children": [
@@ -155,7 +156,7 @@ export class LeoModel {
         }
     };
 
-    private menuData: MenuEntry[] = [
+    public menuData: MenuEntry[] = [
         {
             label: "File",
             entries: [
@@ -216,13 +217,12 @@ export class LeoModel {
     public hoistStack: Array<TreeNode> = []; // Track hoisted nodes
     public navigationHistory: Array<TreeNode> = [];
     public currentHistoryIndex = -1; // -1 means no history yet
-    private initialFindNode: TreeNode | null = null; // Node where to start the find (null means from the top)
+    public initialFindNode: TreeNode | null = null; // Node where to start the find (null means from the top)
 
     constructor() {
         this.buildClones(this.tree);
         this.buildParentRefs(this.tree);
         this.allNodesInOrder = this.getAllNodesInTreeOrder(this.tree); // Initialize the global array once
-
     }
 
     // Build clones when repeated in the tree
