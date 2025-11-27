@@ -7,19 +7,7 @@ export class LeoController {
     private model: LeoModel;
     private view: LeoView;
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
-    private outlinePaneKeyMap: { [key: string]: () => void } = {
-        'Enter': () => { console.log('Oops!') },
-        'Tab': () => { console.log('Oops!') },
-        ' ': () => { console.log('Oops!') },
-        'ArrowUp': () => { console.log('Oops!') },
-        'ArrowDown': () => { console.log('Oops!') },
-        'ArrowLeft': () => { console.log('Oops!') },
-        'ArrowRight': () => { console.log('Oops!') },
-        'PageUp': () => { console.log('Oops!') },
-        'PageDown': () => { console.log('Oops!') },
-        'Home': () => { console.log('Oops!') },
-        'End': () => { console.log('Oops!') },
-    };
+    private outlinePaneKeyMap: { [key: string]: () => void };
 
     constructor(model: LeoModel, view: LeoView) {
         this.model = model;
@@ -139,18 +127,17 @@ export class LeoController {
 
     private setupConfigCheckboxes() {
         const view = this.view;
-        view.SHOW_PREV_NEXT_MARK.addEventListener('change', this.updateButtonVisibility);
-        view.SHOW_TOGGLE_MARK.addEventListener('change', this.updateButtonVisibility);
-        view.SHOW_PREV_NEXT_HISTORY.addEventListener('change', this.updateButtonVisibility);
-        view.SHOW_HOIST_DEHOIST.addEventListener('change', this.updateButtonVisibility);
-        view.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.updateButtonVisibility);
-        view.SHOW_THEME_TOGGLE.addEventListener('change', this.updateButtonVisibility);
+        view.SHOW_PREV_NEXT_MARK.addEventListener('change', this.refreshButtonVisibility);
+        view.SHOW_TOGGLE_MARK.addEventListener('change', this.refreshButtonVisibility);
+        view.SHOW_PREV_NEXT_HISTORY.addEventListener('change', this.refreshButtonVisibility);
+        view.SHOW_HOIST_DEHOIST.addEventListener('change', this.refreshButtonVisibility);
+        view.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.refreshButtonVisibility);
+        view.SHOW_THEME_TOGGLE.addEventListener('change', this.refreshButtonVisibility);
         view.SHOW_NODE_ICONS.addEventListener('change', view.updateNodeIcons);
-        view.SHOW_COLLAPSE_ALL.addEventListener('change', this.updateButtonVisibility);
+        view.SHOW_COLLAPSE_ALL.addEventListener('change', this.refreshButtonVisibility);
     }
 
-    private updateButtonVisibility = () => {
-        // Call view version TODO : RENAME ONE OR THE OTHER TO AVOID CONFUSION
+    private refreshButtonVisibility = () => {
         this.view.updateButtonVisibility(this.model.marked.size > 0, this.model.navigationHistory.length > 1);
     }
 
@@ -735,13 +722,12 @@ export class LeoController {
             model.expanded.add(model.selectedNode);
             model.selectedNode.toggled = true; // Mark as toggled
         }
-        this.updateHoistButtonStates();
-        this.updateContextMenuState(); // Node was already selected so no need to reupdate based on hoist
+        this.refreshHoistButtonStates();
+        this.refreshContextMenuState(); // Node was already selected so no need to reupdate based on hoist
         this.buildRowsRenderTree();
     }
 
-    private updateHoistButtonStates(): void {
-        // Call view version TODO : RENAME ONE OR THE OTHER TO AVOID CONFUSION
+    private refreshHoistButtonStates(): void {
         const model = this.model;
         const isCurrentlyHoisted = model.hoistStack.length > 0 && model.hoistStack[model.hoistStack.length - 1] === model.selectedNode;
         this.view.updateHoistButtonStates(
@@ -750,10 +736,8 @@ export class LeoController {
         );
     }
 
-    private updateContextMenuState(): void {
-        // Call view version TODO : RENAME ONE OR THE OTHER TO AVOID CONFUSION
+    private refreshContextMenuState(): void {
         const model = this.model;
-
         const hasSelectedNode = !!model.selectedNode;
         const isCurrentlyHoisted = model.hoistStack.length > 0 && hasSelectedNode && model.hoistStack[model.hoistStack.length - 1] === model.selectedNode;
         this.view.updateContextMenuState(
@@ -771,7 +755,7 @@ export class LeoController {
         }
         const previousHoist = this.model.hoistStack.pop()!;
         this.selectAndOrToggleAndRedraw(previousHoist);
-        this.updateHoistButtonStates();
+        this.refreshHoistButtonStates();
     }
 
     private selectAndOrToggleAndRedraw(newSelectedNode: TreeNode | null = null, nodeToToggle: TreeNode | null = null) {
@@ -815,9 +799,9 @@ export class LeoController {
                 model.currentHistoryIndex <= 0,
                 model.currentHistoryIndex >= model.navigationHistory.length - 1 || !model.navigationHistory.length
             );
-            this.updateButtonVisibility();
-            this.updateHoistButtonStates();
-            this.updateContextMenuState();
+            this.refreshButtonVisibility();
+            this.refreshHoistButtonStates();
+            this.refreshContextMenuState();
         }
 
         this.buildRowsRenderTree();
@@ -1046,7 +1030,7 @@ export class LeoController {
         if (model.selectedNode) {
             model.toggleMark(model.selectedNode);
             this.view.updateMarkedButtonStates(model.marked.size > 0);
-            this.updateButtonVisibility();
+            this.refreshButtonVisibility();
 
             // Only need to redraw the affected node if visible, no need to re-flatten because structure didn't change
             if (model.isVisible(model.selectedNode)) {
@@ -1656,13 +1640,13 @@ export class LeoController {
                     if (scopeRadio) scopeRadio.checked = true;
                 }
 
-                this.updateButtonVisibility();
+                this.refreshButtonVisibility();
                 view.updateNodeIcons();
             } catch (e) {
                 console.error('Error loading config preferences:', e);
             }
         } else {
-            this.updateButtonVisibility();
+            this.refreshButtonVisibility();
             view.updateNodeIcons();
         }
     }
