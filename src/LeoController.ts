@@ -81,7 +81,7 @@ export class LeoController {
     }
 
     private setupWindowHandlers() {
-        window.addEventListener('resize', utils.throttle(this.handleWindowResize, 33));
+        window.addEventListener('resize', utils.throttle(() => this.view.handleWindowResize(), 33));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
         window.addEventListener('beforeunload', this.saveAllPreferences);
     }
@@ -320,11 +320,6 @@ export class LeoController {
         // Finish startup by setting focus to outline pane and setting the log pane's active tab
         view.OUTLINE_PANE.focus();
         view.showTab("log");
-    }
-
-    private handleWindowResize = () => {
-        this.view.updatePanelSizes();
-        this.view.renderTree();
     }
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
@@ -668,38 +663,15 @@ export class LeoController {
     }
 
     private handleLayoutToggleClick = () => {
-        const view = this.view;
-        view.HTML_ELEMENT.setAttribute('data-transition', 'true');
-        const newLayout = view.currentLayout === 'vertical' ? 'horizontal' : 'vertical';
-        view.applyLayout(newLayout);
-        if (view.flatRows) {
-            view.renderTree();
-        }
+        this.view.toggleLayout();
     }
 
     private handleMenuToggleClick = () => {
-        const view = this.view;
-        view.isMenuShown = !view.isMenuShown;
-        view.HTML_ELEMENT.setAttribute('data-show-menu', view.isMenuShown ? 'true' : 'false');
-        if (view.isMenuShown) {
-            view.BUTTON_CONTAINER.classList.add('hidden');
-        } else {
-            view.BUTTON_CONTAINER.classList.remove('hidden');
-            // Set focus on last focused element
-            view.restoreLastFocusedElement();
-        }
-        view.updateOutlinePaneSize();
-        view.updateOutlineContainerSize();
-        view.positionCrossDragger();
+        this.view.toggleMenu();
     }
 
     private handleThemeToggleClick = () => {
-        const view = this.view;
-        // Only animate once button pressed, so page-load wont animate color changes.
-        view.HTML_ELEMENT.setAttribute('data-transition', 'true');
-        const newTheme = view.currentTheme === 'dark' ? 'light' : 'dark';
-        view.applyTheme(newTheme);
-        view.renderTree(); // Re-render to update icon colors
+        this.view.toggleTheme();
     }
 
     // * Controller Methods (Command Execution) *
@@ -1655,10 +1627,9 @@ export class LeoController {
     private buildRowsRenderTree(): void {
         const view = this.view;
         const model = this.model;
-        // In an MVC model, this builds from the model (tree, expanded, hoistStack, selectedNode) the view model (flatRows) and triggers the view update (renderTree)
-        // So it belongs to the controller.
-        view.flatRows = this.flattenTree(model.getCurrentRoot(), 0, !model.hoistStack.length, model.selectedNode, model.initialFindNode);
-        view.renderTree();
+        // Calculate data, then pass to View. View handles the rendering.
+        const rows = this.flattenTree(model.getCurrentRoot(), 0, !model.hoistStack.length, model.selectedNode, model.initialFindNode);
+        view.setTreeData(rows);
     }
 
     private flattenTree(

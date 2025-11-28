@@ -1,62 +1,6 @@
 import { TreeNode, FlatRow, MenuEntry } from './types';
 import * as utils from './utils';
 
-/*
-    # Properties (DOM Elements):
-
-    MAIN_CONTAINER, OUTLINE_PANE, BODY_PANE, LOG_PANE
-    FIND_INPUT, OPT_HEADLINE, etc. (Search inputs)
-    COLLAPSE_ALL_BTN, HOIST_BTN, DEHOIST_BTN, etc. (Buttons)
-    RESIZERS (Vertical, Horizontal, Cross)
-    MENU, TOAST
-    selectedLabelElement
-
-    # Properties (UI State):
-
-    flatRows: FlatRow[]
-    currentTheme
-    currentLayout
-    mainRatio, secondaryRatio
-    isDragging, isMenuShown
-    ROW_HEIGHT, LEFT_OFFSET
-
-    # Methods (Rendering):
-
-    renderTree()
-    updateNodeIcons()
-    scrollNodeIntoView(node)
-    highlightMatchInHeadline(...)
-    highlightMatchInBody(...)
-
-    # Methods (UI Management):
-
-    setupLastFocusedElementTracking()
-    restoreLastFocusedElement()
-    setupButtonContainerAutoHide()
-    initializeThemeAndLayout()
-    loadThemeAndLayoutPreferences()
-    applyTheme(theme)
-    applyLayout(layout)
-    updatePanelSizes()
-    updateOutlineContainerSize()
-    updateOutlinePaneSize()
-    updateCollapseAllPosition()
-    positionCrossDragger()
-    updateProportion()
-    showToast(message)
-
-    buildMenu(entries)
-    positionSubmenu()
-    openTopMenu(...), closeAllSubmenus()
-    focusMenuItem()
-    updateButtonVisibility()
-    updateHoistButtonStates(), updateMarkedButtonStates()
-    showTab(tabName)
-    showBody(text, wrap)
-    findFocus()
-
-*/
-
 export class LeoView {
     // Elements
     public selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane
@@ -125,7 +69,14 @@ export class LeoView {
     public topLevelItems: HTMLDivElement[] = [];
     public topLevelSubmenus = new Map();
 
-    public flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
+    private _flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
+    public get flatRows(): FlatRow[] | null {
+        return this._flatRows;
+    }
+    public setTreeData(rows: FlatRow[]) {
+        this._flatRows = rows;
+        this.renderTree();
+    }
 
     public currentTheme = 'light'; // Default theme
     public currentLayout = 'vertical'; // Default layout
@@ -211,7 +162,7 @@ export class LeoView {
     }
 
     public renderTree = () => {
-        if (!this.flatRows) {
+        if (!this._flatRows) {
             return; // Not initialized yet
         }
 
@@ -222,18 +173,18 @@ export class LeoView {
 
         const startIndex = Math.floor(scrollTop / this.ROW_HEIGHT);
         const visibleCount = Math.ceil(viewportHeight / this.ROW_HEIGHT) + 1;
-        const endIndex = Math.min(this.flatRows.length, startIndex + visibleCount);
+        const endIndex = Math.min(this._flatRows.length, startIndex + visibleCount);
         let leftOffset = this.LEFT_OFFSET;
 
         // If all nodes have no children, remove the left offset
-        if (this.flatRows.every(row => !row.hasChildren)) {
+        if (this._flatRows.every(row => !row.hasChildren)) {
             leftOffset = 0;
         }
 
         this.SPACER.innerHTML = "";
-        this.SPACER.style.height = this.flatRows.length * this.ROW_HEIGHT + "px";
+        this.SPACER.style.height = this._flatRows.length * this.ROW_HEIGHT + "px";
         for (let i = startIndex; i < endIndex; i++) {
-            const row = this.flatRows[i]!;
+            const row = this._flatRows[i]!;
             const div = document.createElement("div");
             div.className = "node";
 
@@ -451,9 +402,9 @@ export class LeoView {
     }
 
     public scrollNodeIntoView(node: TreeNode) {
-        if (!this.flatRows) return; // Not initialized yet
+        if (!this._flatRows) return; // Not initialized yet
 
-        const selectedIndex = this.flatRows.findIndex(row => row.node === node);
+        const selectedIndex = this._flatRows.findIndex(row => row.node === node);
         if (selectedIndex === -1) return; // Not found (shouldn't happen)
         const nodePosition = selectedIndex * this.ROW_HEIGHT;
 
@@ -767,6 +718,44 @@ export class LeoView {
         this.COLLAPSE_ALL_BTN.style.inset = `${this.isMenuShown ? 58 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
 
+    public toggleMenu() {
+        this.isMenuShown = !this.isMenuShown;
+        this.HTML_ELEMENT.setAttribute('data-show-menu', this.isMenuShown ? 'true' : 'false');
+
+        if (this.isMenuShown) {
+            this.BUTTON_CONTAINER.classList.add('hidden');
+        } else {
+            this.BUTTON_CONTAINER.classList.remove('hidden');
+            // Set focus on last focused element
+            this.restoreLastFocusedElement();
+        }
+
+        // Recalculate layout dependent items
+        this.updateOutlinePaneSize();
+        this.updateOutlineContainerSize();
+        this.positionCrossDragger();
+    }
+
+    public toggleTheme() {
+        // Only animate once button pressed, so page-load wont animate color changes.
+        this.HTML_ELEMENT.setAttribute('data-transition', 'true');
+        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.applyTheme(newTheme);
+        this.renderTree(); // Re-render to update icon colors
+    }
+
+    public toggleLayout() {
+        this.HTML_ELEMENT.setAttribute('data-transition', 'true');
+        const newLayout = this.currentLayout === 'vertical' ? 'horizontal' : 'vertical';
+        this.applyLayout(newLayout);
+        this.renderTree();
+    }
+
+    public handleWindowResize() {
+        this.updatePanelSizes();
+        this.renderTree();
+    }
+
     public positionCrossDragger() {
         if (this.currentLayout === 'vertical') {
             const outlineWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
@@ -781,7 +770,6 @@ export class LeoView {
         }
 
     }
-
 
     public showToast(message: string, duration = 2000) {
         if (!this.TOAST) return;
