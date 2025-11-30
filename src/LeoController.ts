@@ -27,7 +27,6 @@ export class LeoController {
         };
         view.buildMenu(model.menuData);
         view.initializeThemeAndLayout(model.defaultTitle); // gets ratios from localStorage and applies layout and theme
-        this.initializeInteractions(); // sets up event handlers and button focus prevention
     }
 
 
@@ -305,6 +304,7 @@ export class LeoController {
 
     // * Controller Methods (Event Handlers) *
     public initialize() {
+        this.initializeInteractions(); // sets up event handlers and button focus prevention
         const view = this.view;
         view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();

@@ -29,3 +29,14 @@ export interface MenuEntry {
     action?: string;
     entries?: MenuEntry[];
 }
+
+declare global {
+    interface Window {
+        showDirectoryPicker(options?: {
+            id?: string;
+            mode?: "read" | "readwrite";
+            startIn?: "desktop" | "documents" | "downloads" | "music" | "pictures" | "videos" | FileSystemHandle;
+        }): Promise<FileSystemDirectoryHandle>;
+
+    }
+}

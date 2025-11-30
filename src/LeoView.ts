@@ -62,6 +62,9 @@ export class LeoView {
 
     public MENU: HTMLElement;
     private TOAST: HTMLElement;
+    private WORKSPACE_DIALOG: HTMLElement;
+    private CHOOSE_FOLDER_BTN: HTMLButtonElement;
+
     public HTML_ELEMENT: HTMLElement;
 
     public activeTopMenu: HTMLDivElement | null = null;
@@ -154,6 +157,8 @@ export class LeoView {
 
         this.MENU = document.getElementById('menu')!;
         this.TOAST = document.getElementById('toast')!;
+        this.WORKSPACE_DIALOG = document.getElementById('workspace-dialog')!;
+        this.CHOOSE_FOLDER_BTN = document.getElementById('choose-folder-btn')! as HTMLButtonElement;
         this.HTML_ELEMENT = document.documentElement;
 
         // Build the menu
@@ -769,6 +774,25 @@ export class LeoView {
             this.CROSS_RESIZER.style.top = (outlineHeight) + 'px';
         }
 
+    }
+
+    public requestWorkspaceDirectory(): Promise<FileSystemDirectoryHandle> {
+        return new Promise((resolve, reject) => {
+            this.WORKSPACE_DIALOG.style.display = "flex";
+
+            this.CHOOSE_FOLDER_BTN.onclick = async () => {
+                try {
+                    const dir = await window.showDirectoryPicker({ mode: "readwrite" });
+                    resolve(dir);
+                } catch (e) {
+                    reject(e);
+                }
+            };
+        });
+    }
+
+    public hideWorkspaceDialog() {
+        this.WORKSPACE_DIALOG.style.display = "none";
     }
 
     public showToast(message: string, duration = 2000) {

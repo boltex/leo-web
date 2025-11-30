@@ -9,10 +9,7 @@ import { LeoModel } from './LeoModel';
 import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 
-// import { LeoEditor } from './LeoEditor';
-
 class LeoWebApp {
-    // private editor!: LeoEditor;
 
     private model!: LeoModel;
     private view!: LeoView;
@@ -32,8 +29,6 @@ class LeoWebApp {
     }
 
     private setupApp(): void {
-        // this.editor = new LeoEditor();
-        // this.editor.initialize();
 
         // Initialize the MVC components
         this.model = new LeoModel();
