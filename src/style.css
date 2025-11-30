@@ -51,6 +51,8 @@
   --menu-font-family: sans-serif;
   --menu-display: none;
   --buttons-display: flex;
+  /* body pane wrap */
+  --body-pane-wrap: pre;
 }
 
 [data-active-tab="log"] {
@@ -153,6 +155,10 @@
   --secondary-resizer-before-left: -5px;
   --secondary-resizer-after-right: -5px;
   --secondary-resizer-after-bottom: unset;
+}
+
+[data-body-wrap="true"] {
+  --body-pane-wrap: pre-wrap;
 }
 
 html {
@@ -586,7 +592,7 @@ body.dragging-cross {
   background-color: var(--body-pane-color);
   overflow-y: auto;
   font-family: "Consolas", "Monaco", "Courier New", monospace;
-  white-space: pre-wrap;
+  white-space: var(--body-pane-wrap);
   transition: var(--body-pane-transition);
 }
 

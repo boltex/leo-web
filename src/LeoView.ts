@@ -789,11 +789,7 @@ export class LeoView {
     }
 
     public showBody(text: string, wrap: boolean) {
-        if (wrap) {
-            this.BODY_PANE.style.whiteSpace = "pre-wrap"; // Wrap text
-        } else {
-            this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
-        }
+        this.HTML_ELEMENT.setAttribute('data-body-wrap', wrap ? 'true' : 'false');
         this.BODY_PANE.innerHTML = text;
     }
 
