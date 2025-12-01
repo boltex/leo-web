@@ -28,15 +28,22 @@ class LeoWebApp {
         }
     }
 
-    private setupApp(): void {
+    private async setupApp(): Promise<void> {
 
         // Initialize the MVC components
         this.model = new LeoModel();
         this.view = new LeoView();
         this.controller = new LeoController(this.model, this.view);
-
-        // Initialize the application
         this.controller.initialize();
+
+        // this.controller = new LeoController(this.model, this.view);
+        const dirHandle = await this.view.requestWorkspaceDirectory();
+        // this.model.setWorkspace(dirHandle);
+        console.log('Workspace directory selected:', dirHandle);
+        this.view.hideWorkspaceDialog();
+
+        // Continue bootstrapping: Initialize controller after workspace is set
+        this.controller.initializeInteractions();
     }
 
 }

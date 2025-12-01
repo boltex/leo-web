@@ -53,6 +53,8 @@
   --buttons-display: flex;
   /* body pane wrap */
   --body-pane-wrap: pre;
+  /* workspace dialog */
+  --workspace-dialog-display: none;
 }
 
 [data-active-tab="log"] {
@@ -159,6 +161,10 @@
 
 [data-body-wrap="true"] {
   --body-pane-wrap: pre-wrap;
+}
+
+[data-show-workspace-dialog="true"] {
+  --workspace-dialog-display: flex;
 }
 
 html {
@@ -754,7 +760,6 @@ body.dragging-secondary .node {
   top: 0px;
   right: 12px;
   padding-top: 8px;
-  display: flex;
   flex-direction: row-reverse;
   justify-content: flex-start;
   gap: 8px;
@@ -1223,4 +1228,44 @@ a:hover {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
+}
+
+/* Workspace dialog */
+#workspace-dialog {
+  display: var(--workspace-dialog-display);
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+/* Center modal with backdrop */
+#workspace-dialog.modal {
+  position: fixed;
+  inset: 0; /* full-screen */
+  background: rgba(0, 0, 0, 0.35); /* backdrop */
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+}
+#workspace-dialog .modal-content {
+  position: relative;
+  max-width: 520px;
+  width: calc(100% - 48px);
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: var(--body-pane-color);
+  color: var(--text-color);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--find-border-color);
+}
+#workspace-dialog .modal-content button {
+  /* Center button */
+  display: block;
+  margin: 16px auto 0 auto;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--find-border-color);
+  background: var(--resizer-color);
+  color: var(--text-color);
+  cursor: pointer;
+}
+#workspace-dialog .modal-content button:hover {
+  background: var(--hover-bg);
 }

@@ -778,21 +778,29 @@ export class LeoView {
 
     public requestWorkspaceDirectory(): Promise<FileSystemDirectoryHandle> {
         return new Promise((resolve, reject) => {
-            this.WORKSPACE_DIALOG.style.display = "flex";
-
+            this.HTML_ELEMENT.setAttribute('data-show-workspace-dialog', 'true');
+            this._setWorkspaceDialogButtonText('Choose Folder');
             this.CHOOSE_FOLDER_BTN.onclick = async () => {
                 try {
+                    this._setWorkspaceDialogButtonText('Choosing...');
                     const dir = await window.showDirectoryPicker({ mode: "readwrite" });
                     resolve(dir);
                 } catch (e) {
-                    reject(e);
+                    // reject(e);
+                    // Do not reject, simply let the dialog available for the user to retry
+                    this._setWorkspaceDialogButtonText('Choose Folder');
+                    console.warn('Directory selection cancelled or failed:', e);
                 }
             };
         });
     }
 
+    private _setWorkspaceDialogButtonText(text: string) {
+        this.CHOOSE_FOLDER_BTN.textContent = text;
+    }
+
     public hideWorkspaceDialog() {
-        this.WORKSPACE_DIALOG.style.display = "none";
+        this.HTML_ELEMENT.setAttribute('data-show-workspace-dialog', 'false');
     }
 
     public showToast(message: string, duration = 2000) {

@@ -31,7 +31,7 @@ export class LeoController {
 
 
     // * Controller Methods (Initialization & Setup) *
-    private initializeInteractions() {
+    public initializeInteractions() {
         this.setupEventHandlers();
         this.setupButtonFocusPrevention();
         this.view.setupLastFocusedElementTracking();
