@@ -303,7 +303,7 @@ export class LeoController {
     }
 
     // * Controller Methods (Event Handlers) *
-    public initialize() {
+    public async initialize() {
         this.initializeInteractions(); // sets up event handlers and button focus prevention
         const view = this.view;
         view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
@@ -317,9 +317,19 @@ export class LeoController {
         }
         view.setupButtonContainerAutoHide();
         view.updateMarkedButtonStates(this.model.marked.size > 0);
-        // Finish startup by setting focus to outline pane and setting the log pane's active tab
-        view.OUTLINE_PANE.focus();
         view.showTab("log");
+
+        // Prompt user to select workspace directory
+        const dirHandle = await this.view.requestWorkspaceDirectory();
+        this.model.setWorkspaceDirHandle(dirHandle);
+        console.log('Workspace directory selected:', dirHandle);
+        this.view.hideWorkspaceDialog();
+
+        // Finish startup by setting focus to outline pane
+        view.OUTLINE_PANE.focus();
+
+        // Continue bootstrapping: Initialize controller after workspace is set
+        this.initializeInteractions();
     }
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
@@ -1666,7 +1676,8 @@ export class LeoController {
         if (model.isExpanded(node) || isRoot) {
             const children = model.children(node);
             for (const child of children) {
-                flatRows.push(...this.flattenTree(child, depth + 1, false, selectedNode, initialFindNode));
+                // Root node's children appear at depth 0
+                flatRows.push(...this.flattenTree(child, depth + (isRoot ? 0 : 1), false, selectedNode, initialFindNode));
             }
         }
 

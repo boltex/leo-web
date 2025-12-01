@@ -34,16 +34,9 @@ class LeoWebApp {
         this.model = new LeoModel();
         this.view = new LeoView();
         this.controller = new LeoController(this.model, this.view);
-        this.controller.initialize();
+        await this.controller.initialize();
 
-        // this.controller = new LeoController(this.model, this.view);
-        const dirHandle = await this.view.requestWorkspaceDirectory();
-        // this.model.setWorkspace(dirHandle);
-        console.log('Workspace directory selected:', dirHandle);
-        this.view.hideWorkspaceDialog();
-
-        // Continue bootstrapping: Initialize controller after workspace is set
-        this.controller.initializeInteractions();
+        console.log('Leo Web App initialized.');
     }
 
 }
