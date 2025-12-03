@@ -162,8 +162,6 @@ export class LeoModel {
     public currentHistoryIndex = -1; // -1 means no history yet
     public initialFindNode: TreeNode | null = null; // Node where to start the find (null means from the top)
 
-    public workspaceDirHandle: FileSystemDirectoryHandle | null = null; // The FileSystemDirectoryHandle for the workspace
-
     constructor() {
         this.buildClones(this.tree);
         this.buildParentRefs(this.tree);
@@ -495,10 +493,6 @@ export class LeoModel {
         }
         this.navigationHistory.push(node); // Add the new node to history
         this.currentHistoryIndex = this.navigationHistory.length - 1;
-    }
-
-    public setWorkspaceDirHandle(handle: FileSystemDirectoryHandle) {
-        this.workspaceDirHandle = handle;
     }
 
 }

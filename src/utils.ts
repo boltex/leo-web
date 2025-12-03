@@ -90,3 +90,20 @@ export function getGlobalOffset(root: Node, container: Node, offset: number): nu
     }
     return total;
 }
+
+
+/**
+ * Read all entries from a directory handle, returning a sorted array of name/kind/handle objects
+ */
+export async function readDirectory(dirHandle: FileSystemDirectoryHandle): Promise<Array<{ name: string; kind: 'file' | 'directory'; handle: FileSystemHandle }>> {
+    const entries = [];
+    for await (const [name, handle] of dirHandle.entries()) {
+        entries.push({
+            name,
+            kind: handle.kind, // "file" or "directory"
+            handle
+        });
+    }
+    entries.sort((a, b) => a.name.localeCompare(b.name));
+    return entries;
+}

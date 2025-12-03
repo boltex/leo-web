@@ -1,4 +1,4 @@
-import { TreeNode, FlatRow, MenuEntry } from './types';
+import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions } from './types';
 import * as utils from './utils';
 
 export class LeoView {
@@ -62,8 +62,14 @@ export class LeoView {
 
     public MENU: HTMLElement;
     private TOAST: HTMLElement;
-    private WORKSPACE_DIALOG: HTMLElement;
     private CHOOSE_FOLDER_BTN: HTMLButtonElement;
+
+    private FILE_DIALOG_TITLE: HTMLElement;
+    private FILE_DIALOG_CLOSE: HTMLButtonElement;
+    private FILE_DIALOG_PATH: HTMLElement;
+    private FILE_DIALOG_LIST: HTMLElement;
+    private FILE_DIALOG_FILENAME: HTMLInputElement;
+    private FILE_DIALOG_CONFIRM: HTMLButtonElement;
 
     public HTML_ELEMENT: HTMLElement;
 
@@ -97,6 +103,10 @@ export class LeoView {
 
     public minWidth = 20;
     public minHeight = 20;
+
+    // Window's workspace for open/save dialog and file access
+    public workspaceDirHandle: FileSystemDirectoryHandle | null = null; // The FileSystemDirectoryHandle for the workspace
+
 
     constructor() {
 
@@ -157,8 +167,15 @@ export class LeoView {
 
         this.MENU = document.getElementById('menu')!;
         this.TOAST = document.getElementById('toast')!;
-        this.WORKSPACE_DIALOG = document.getElementById('workspace-dialog')!;
         this.CHOOSE_FOLDER_BTN = document.getElementById('choose-folder-btn')! as HTMLButtonElement;
+
+        this.FILE_DIALOG_TITLE = document.getElementById('file-dialog-title')!
+        this.FILE_DIALOG_CLOSE = document.getElementById('file-dialog-close') as HTMLButtonElement;
+        this.FILE_DIALOG_PATH = document.getElementById('file-dialog-path')!
+        this.FILE_DIALOG_LIST = document.getElementById('file-dialog-list')!
+        this.FILE_DIALOG_FILENAME = document.getElementById('file-dialog-filename') as HTMLInputElement;
+        this.FILE_DIALOG_CONFIRM = document.getElementById('file-dialog-confirm') as HTMLButtonElement;
+
         this.HTML_ELEMENT = document.documentElement;
 
         // Build the menu
@@ -784,6 +801,7 @@ export class LeoView {
                 try {
                     this._setWorkspaceDialogButtonText('Choosing...');
                     const dir = await window.showDirectoryPicker({ mode: "readwrite" });
+                    this.setWorkspaceDirHandle(dir);
                     resolve(dir);
                 } catch (e) {
                     // reject(e);
@@ -882,5 +900,97 @@ export class LeoView {
             showCollapseAll: checkboxes.showCollapseAll.checked,
         };
     }
+
+    public setWorkspaceDirHandle(handle: FileSystemDirectoryHandle) {
+        this.workspaceDirHandle = handle;
+    }
+
+    public getWorkspaceDirHandle(): FileSystemDirectoryHandle | null {
+        return this.workspaceDirHandle;
+    }
+
+    /* This code may be useful to get open chosen file:
+        const filename = this.FILE_DIALOG_FILENAME.value;
+        const current = pathStack[pathStack.length - 1];
+        const fileHandle = await current.handle.getFileHandle(filename);
+    */
+
+    // This populate the choose-file/folder dialog UI with the contents of the given pathStack
+    public async refreshDialog(pathStack: FilePath[]) {
+        const current = pathStack[pathStack.length - 1]!;
+
+        this.FILE_DIALOG_PATH.textContent =
+            "/" + pathStack.map(p => p.name).join("/");
+
+        this.FILE_DIALOG_LIST.innerHTML = "";
+
+        const entries = await utils.readDirectory(current.handle);
+
+        // Parent directory ("..")
+        if (pathStack.length > 1) {
+            const li = document.createElement("li");
+            li.textContent = "..";
+            li.classList.add("folder");
+            li.onclick = () => { pathStack.pop(); this.refreshDialog(pathStack); };
+            this.FILE_DIALOG_LIST.appendChild(li);
+        }
+
+        // Subfolders/files
+        for (const e of entries) {
+            const li = document.createElement("li");
+            li.textContent = e.name;
+            li.classList.add(e.kind);
+
+            li.onclick = () => {
+                if (e.kind === "directory") {
+                    pathStack.push({ name: e.name, handle: e.handle as FileSystemDirectoryHandle });
+                    this.refreshDialog(pathStack);
+                } else {
+                    this.FILE_DIALOG_FILENAME.value = e.name;
+                }
+            };
+
+            this.FILE_DIALOG_LIST.appendChild(li);
+        }
+    }
+
+    // Shows a file open dialog to the user which allows to select a file for opening-purposes.
+    public async showOpenDialog(options?: OpenDialogOptions): Promise<FileSystemFileHandle | null> {
+        return new Promise(async (resolve) => {
+            this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'true');
+            this.FILE_DIALOG_TITLE.textContent = options?.title || 'Open File';
+            this.FILE_DIALOG_FILENAME.value = "";
+            this.FILE_DIALOG_FILENAME.disabled = true;
+            const pathStack: FilePath[] = [];
+            if (this.workspaceDirHandle) {
+                pathStack.push({ name: this.workspaceDirHandle.name, handle: this.workspaceDirHandle });
+            } else {
+                throw new Error("Workspace directory handle is not set.");
+            }
+
+            await this.refreshDialog(pathStack);
+            this.FILE_DIALOG_CONFIRM.textContent = options?.openLabel || 'Open';
+            this.FILE_DIALOG_CONFIRM.onclick = async () => {
+                const filename = this.FILE_DIALOG_FILENAME.value;
+                const current = pathStack[pathStack.length - 1]!;
+                try {
+                    const fileHandle = await current.handle.getFileHandle(filename);
+                    this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
+                    resolve(fileHandle);
+                } catch (e) {
+                    console.error('Error getting file handle:', e);
+                    // Do not close dialog, let user retry
+                }
+            };
+
+            this.FILE_DIALOG_CLOSE.onclick = () => {
+                this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
+                resolve(null);
+            };
+        });
+    }
+
+
+
 
 }

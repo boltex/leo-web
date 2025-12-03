@@ -240,6 +240,25 @@
         </ul>
     </div>
     <div id="toast" role="status" aria-live="polite" hidden></div>
+
+    <div id="file-dialog" class="modal">
+        <div class="modal-content">
+            <div class="file-dialog-header">
+                <span id="file-dialog-title">Open File</span>
+                <button id="file-dialog-close">✕</button>
+            </div>
+
+            <div id="file-dialog-path"></div>
+
+            <ul id="file-dialog-list" class="file-list"></ul>
+
+            <div class="file-dialog-footer">
+                <input id="file-dialog-filename" />
+                <button id="file-dialog-confirm">OK</button>
+            </div>
+        </div>
+    </div>
+
     <div id="workspace-dialog" class="modal">
         <div class="modal-content">
             <h2>📁 Choose a Workspace</h2>

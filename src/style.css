@@ -55,6 +55,8 @@
   --body-pane-wrap: pre;
   /* workspace dialog */
   --workspace-dialog-display: none;
+  /* file dialog */
+  --file-dialog-display: none;
 }
 
 [data-active-tab="log"] {
@@ -165,6 +167,10 @@
 
 [data-show-workspace-dialog="true"] {
   --workspace-dialog-display: flex;
+}
+
+[data-show-file-dialog="true"] {
+  --file-dialog-display: flex;
 }
 
 html {
@@ -1230,13 +1236,8 @@ a:hover {
   pointer-events: auto;
 }
 
-/* Workspace dialog */
-#workspace-dialog {
-  display: var(--workspace-dialog-display);
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-}
-/* Center modal with backdrop */
-#workspace-dialog.modal {
+/* Modal Dialog */
+.modal {
   position: fixed;
   inset: 0; /* full-screen */
   background: rgba(0, 0, 0, 0.35); /* backdrop */
@@ -1244,7 +1245,7 @@ a:hover {
   align-items: center;
   justify-content: center;
 }
-#workspace-dialog .modal-content {
+.modal-content {
   position: relative;
   max-width: 520px;
   width: calc(100% - 48px);
@@ -1255,8 +1256,14 @@ a:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   border: 1px solid var(--find-border-color);
 }
+
+/* Workspace dialog */
+#workspace-dialog {
+  display: var(--workspace-dialog-display);
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
 #workspace-dialog .modal-content button {
-  /* Center button */
   display: block;
   margin: 16px auto 0 auto;
   padding: 8px 12px;
@@ -1268,4 +1275,10 @@ a:hover {
 }
 #workspace-dialog .modal-content button:hover {
   background: var(--hover-bg);
+}
+
+/* File open/save dialog */
+#file-dialog {
+  display: var(--file-dialog-display);
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }

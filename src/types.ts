@@ -30,13 +30,15 @@ export interface MenuEntry {
     entries?: MenuEntry[];
 }
 
-declare global {
-    interface Window {
-        showDirectoryPicker(options?: {
-            id?: string;
-            mode?: "read" | "readwrite";
-            startIn?: "desktop" | "documents" | "downloads" | "music" | "pictures" | "videos" | FileSystemHandle;
-        }): Promise<FileSystemDirectoryHandle>;
+// E.g. const pathStack: FilePath[] = [{ name: "/", handle: rootHandle }];
+export interface FilePath {
+    name: string;
+    handle: FileSystemDirectoryHandle;
+}
 
-    }
+// Options for open dialog. More to be added later.
+export interface OpenDialogOptions {
+    defaultUri?: string; // Default URI to open
+    openLabel?: string; // A human-readable string for the open button.
+    title?: string; // Dialog title.
 }

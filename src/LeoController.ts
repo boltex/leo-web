@@ -304,32 +304,37 @@ export class LeoController {
 
     // * Controller Methods (Event Handlers) *
     public async initialize() {
-        this.initializeInteractions(); // sets up event handlers and button focus prevention
         const view = this.view;
+        const model = this.model;
+        this.initializeInteractions(); // sets up event handlers and button focus prevention
         view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
 
         const initialSelectedNode = this.loadDocumentStateFromLocalStorage();
         if (!initialSelectedNode) {
-            this.selectAndOrToggleAndRedraw(this.model.tree.children![0]); // sets selectedNode amd flatRows
+            this.selectAndOrToggleAndRedraw(model.tree.children![0]); // sets selectedNode amd flatRows
         } else {
             this.selectAndOrToggleAndRedraw(initialSelectedNode); // sets selectedNode amd flatRows
         }
         view.setupButtonContainerAutoHide();
-        view.updateMarkedButtonStates(this.model.marked.size > 0);
+        view.updateMarkedButtonStates(model.marked.size > 0);
         view.showTab("log");
 
         // Prompt user to select workspace directory
-        const dirHandle = await this.view.requestWorkspaceDirectory();
-        this.model.setWorkspaceDirHandle(dirHandle);
+        const dirHandle = await view.requestWorkspaceDirectory();
         console.log('Workspace directory selected:', dirHandle);
-        this.view.hideWorkspaceDialog();
+        view.hideWorkspaceDialog();
 
         // Finish startup by setting focus to outline pane
         view.OUTLINE_PANE.focus();
 
         // Continue bootstrapping: Initialize controller after workspace is set
         this.initializeInteractions();
+
+        // TEST OPEN / SAVE FILE DIALOG
+        const chosenFileHandle = await view.showOpenDialog();
+        console.log('Chosen OPEN FILE handle:', chosenFileHandle);
+
     }
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
