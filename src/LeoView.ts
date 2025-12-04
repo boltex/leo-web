@@ -66,6 +66,7 @@ export class LeoView {
 
     private FILE_DIALOG_TITLE: HTMLElement;
     private FILE_DIALOG_CLOSE: HTMLButtonElement;
+    private FILE_DIALOG_UP: HTMLButtonElement;
     private FILE_DIALOG_PATH: HTMLElement;
     private FILE_DIALOG_LIST: HTMLElement;
     private FILE_DIALOG_FILENAME: HTMLInputElement;
@@ -171,6 +172,7 @@ export class LeoView {
 
         this.FILE_DIALOG_TITLE = document.getElementById('file-dialog-title')!
         this.FILE_DIALOG_CLOSE = document.getElementById('file-dialog-close') as HTMLButtonElement;
+        this.FILE_DIALOG_UP = document.getElementById('file-dialog-up') as HTMLButtonElement;
         this.FILE_DIALOG_PATH = document.getElementById('file-dialog-path')!
         this.FILE_DIALOG_LIST = document.getElementById('file-dialog-list')!
         this.FILE_DIALOG_FILENAME = document.getElementById('file-dialog-filename') as HTMLInputElement;
@@ -926,25 +928,43 @@ export class LeoView {
 
         const entries = await utils.readDirectory(current.handle);
 
+        // Sort: directories first, then files; each group alphabetically (case-insensitive)
+        entries.sort((a, b) => {
+            const aIsDir = a.kind === "directory";
+            const bIsDir = b.kind === "directory";
+            if (aIsDir && !bIsDir) return -1;
+            if (!aIsDir && bIsDir) return 1;
+            return a.name.localeCompare(b.name, undefined, { sensitivity: "accent", numeric: true });
+        });
+
         // Parent directory ("..")
-        if (pathStack.length > 1) {
-            const li = document.createElement("li");
-            li.textContent = "..";
-            li.classList.add("folder");
-            li.onclick = () => { pathStack.pop(); this.refreshDialog(pathStack); };
-            this.FILE_DIALOG_LIST.appendChild(li);
-        }
+        this.FILE_DIALOG_UP.disabled = pathStack.length <= 1;
+        this.FILE_DIALOG_UP.onclick = () => {
+            if (pathStack.length > 1) {
+                pathStack.pop();
+                this.refreshDialog(pathStack);
+            }
+        };
 
         // Subfolders/files
         for (const e of entries) {
             const li = document.createElement("li");
             li.textContent = e.name;
             li.classList.add(e.kind);
-
-            li.onclick = () => {
+            li.ondblclick = () => {
                 if (e.kind === "directory") {
                     pathStack.push({ name: e.name, handle: e.handle as FileSystemDirectoryHandle });
                     this.refreshDialog(pathStack);
+                }
+            };
+            li.onclick = () => {
+                const previouslySelected = this.FILE_DIALOG_LIST.querySelector("li.selected");
+                if (previouslySelected) {
+                    previouslySelected.classList.remove("selected");
+                }
+                li.classList.add("selected");
+                if (e.kind === "directory") {
+                    // If directory, do nothing for now, but may add a 'directory mode' later
                 } else {
                     this.FILE_DIALOG_FILENAME.value = e.name;
                 }
@@ -972,6 +992,10 @@ export class LeoView {
             this.FILE_DIALOG_CONFIRM.textContent = options?.openLabel || 'Open';
             this.FILE_DIALOG_CONFIRM.onclick = async () => {
                 const filename = this.FILE_DIALOG_FILENAME.value;
+                if (!filename) {
+                    // No file selected
+                    return;
+                }
                 const current = pathStack[pathStack.length - 1]!;
                 try {
                     const fileHandle = await current.handle.getFileHandle(filename);
