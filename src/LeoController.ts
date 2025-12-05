@@ -2,6 +2,7 @@ import { LeoModel } from "./LeoModel";
 import { LeoView } from "./LeoView";
 import { TreeNode, FlatRow } from "./types";
 import * as utils from './utils';
+import { workspace } from "./workspace";
 
 export class LeoController {
     private model: LeoModel;
@@ -334,6 +335,11 @@ export class LeoController {
         // TEST OPEN / SAVE FILE DIALOG
         const chosenFileHandle = await view.showOpenDialog();
         console.log('Chosen OPEN FILE handle:', chosenFileHandle);
+        const resolveResult = await view.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
+        console.log('Reolves to:', resolveResult);
+
+        // test workspace singleton
+        workspace.test();
 
     }
 
