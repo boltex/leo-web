@@ -1,5 +1,6 @@
 import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions } from './types';
 import * as utils from './utils';
+import { workspace } from './workspace';
 
 export class LeoView {
     // Elements
@@ -104,10 +105,6 @@ export class LeoView {
 
     public minWidth = 20;
     public minHeight = 20;
-
-    // Window's workspace for open/save dialog and file access
-    public workspaceDirHandle: FileSystemDirectoryHandle | null = null; // The FileSystemDirectoryHandle for the workspace
-
 
     constructor() {
 
@@ -803,7 +800,6 @@ export class LeoView {
                 try {
                     this._setWorkspaceDialogButtonText('Choosing...');
                     const dir = await window.showDirectoryPicker({ mode: "readwrite" });
-                    this.setWorkspaceDirHandle(dir);
                     resolve(dir);
                 } catch (e) {
                     // reject(e);
@@ -903,14 +899,6 @@ export class LeoView {
         };
     }
 
-    public setWorkspaceDirHandle(handle: FileSystemDirectoryHandle) {
-        this.workspaceDirHandle = handle;
-    }
-
-    public getWorkspaceDirHandle(): FileSystemDirectoryHandle | null {
-        return this.workspaceDirHandle;
-    }
-
     /* This code may be useful to get open chosen file:
         const filename = this.FILE_DIALOG_FILENAME.value;
         const current = pathStack[pathStack.length - 1];
@@ -982,8 +970,8 @@ export class LeoView {
             this.FILE_DIALOG_FILENAME.value = "";
             this.FILE_DIALOG_FILENAME.disabled = true;
             const pathStack: FilePath[] = [];
-            if (this.workspaceDirHandle) {
-                pathStack.push({ name: this.workspaceDirHandle.name, handle: this.workspaceDirHandle });
+            if (workspace.getWorkspaceDirHandle()) {
+                pathStack.push({ name: workspace.getWorkspaceDirHandle()!.name, handle: workspace.getWorkspaceDirHandle()! });
             } else {
                 throw new Error("Workspace directory handle is not set.");
             }

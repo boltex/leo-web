@@ -324,6 +324,7 @@ export class LeoController {
         // Prompt user to select workspace directory
         const dirHandle = await view.requestWorkspaceDirectory();
         console.log('Workspace directory selected:', dirHandle);
+        workspace.setWorkspaceDirHandle(dirHandle);
         view.hideWorkspaceDialog();
 
         // Finish startup by setting focus to outline pane
@@ -333,9 +334,9 @@ export class LeoController {
         this.initializeInteractions();
 
         // TEST OPEN / SAVE FILE DIALOG
-        const chosenFileHandle = await view.showOpenDialog();
+        const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();
         console.log('Chosen OPEN FILE handle:', chosenFileHandle);
-        const resolveResult = await view.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
+        const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
         console.log('Reolves to:', resolveResult);
 
         // test workspace singleton
