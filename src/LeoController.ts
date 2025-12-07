@@ -322,10 +322,16 @@ export class LeoController {
         view.showTab("log");
 
         // Prompt user to select workspace directory
-        const dirHandle = await view.requestWorkspaceDirectory();
+        let dirHandle: FileSystemDirectoryHandle | null = null;
+        while (!dirHandle) {
+            dirHandle = await view.requestWorkspaceDirectory().catch(e => {
+                console.error('Error selecting workspace directory:', e);
+                return null;
+            });
+        }
+
         console.log('Workspace directory selected:', dirHandle);
         workspace.setWorkspaceDirHandle(dirHandle);
-        view.hideWorkspaceDialog();
 
         // Finish startup by setting focus to outline pane
         view.OUTLINE_PANE.focus();
@@ -338,7 +344,7 @@ export class LeoController {
         console.log('Chosen OPEN FILE handle:', chosenFileHandle);
         if (chosenFileHandle) {
             const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
-            console.log('Reolves to:', resolveResult);
+            console.log('Resolves to:', resolveResult);
         } else {
             console.log('No file chosen in OPEN dialog');
         }

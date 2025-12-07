@@ -65,7 +65,7 @@ export class LeoView {
     private TOAST: HTMLElement;
     private MODAL_DIALOG_TITLE: HTMLElement;
     private MODAL_DIALOG_DESCRIPTION: HTMLElement;
-    private CHOOSE_FOLDER_BTN: HTMLButtonElement;
+    private MODAL_DIALOG_BTN: HTMLButtonElement;
 
     private FILE_DIALOG_TITLE: HTMLElement;
     private FILE_DIALOG_CLOSE: HTMLButtonElement;
@@ -170,7 +170,7 @@ export class LeoView {
 
         this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;
-        this.CHOOSE_FOLDER_BTN = document.getElementById('choose-folder-btn')! as HTMLButtonElement;
+        this.MODAL_DIALOG_BTN = document.getElementById('modal-dialog-btn')! as HTMLButtonElement;
 
         this.FILE_DIALOG_TITLE = document.getElementById('file-dialog-title')!
         this.FILE_DIALOG_CLOSE = document.getElementById('file-dialog-close') as HTMLButtonElement;
@@ -799,31 +799,65 @@ export class LeoView {
 
     public requestWorkspaceDirectory(): Promise<FileSystemDirectoryHandle> {
         return new Promise((resolve, reject) => {
-            this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
-            this._setWorkspaceDialogButtonText('Choose Folder');
-            this.MODAL_DIALOG_TITLE.textContent = '📁 Choose a Workspace';
-            this.MODAL_DIALOG_DESCRIPTION.textContent = 'Leo-Web needs permission to read and write files in a folder of your choice.';
-            this.CHOOSE_FOLDER_BTN.onclick = async () => {
-                try {
-                    this._setWorkspaceDialogButtonText('Choosing...');
-                    const dir = await window.showDirectoryPicker({ mode: "readwrite" });
-                    resolve(dir);
-                } catch (e) {
-                    // reject(e);
-                    // Do not reject, simply let the dialog available for the user to retry
-                    this._setWorkspaceDialogButtonText('Choose Folder');
-                    console.warn('Directory selection cancelled or failed:', e);
-                }
-            };
+            this.showMessageDialog({
+                title: '📁 Choose a Workspace',
+                description: 'Leo-Web needs permission to read and write files in a folder of your choice.',
+                primaryLabel: 'Choose Folder',
+                onPrimaryClick: async (setPrimaryLabel) => {
+                    setPrimaryLabel('Choosing...');
+                    try {
+                        const dir = await window.showDirectoryPicker({ mode: 'readwrite' });
+                        resolve(dir);
+                    } catch (e) {
+                        reject(e);
+                    }
+                },
+            });
         });
     }
 
-    private _setWorkspaceDialogButtonText(text: string) {
-        this.CHOOSE_FOLDER_BTN.textContent = text;
-    }
+    public showMessageDialog(options: {
+        title: string;
+        description?: string;
+        primaryLabel?: string;
+        onPrimaryClick?: (setPrimaryLabel: (text: string) => void) => void | Promise<void>;
+        autoShow?: boolean; // default true
+    }) {
+        console.log('Showing message dialog with options:', options);
+        const { title, description, primaryLabel = 'OK', onPrimaryClick, autoShow = true } = options;
 
-    public hideWorkspaceDialog() {
-        this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+        // Show dialog
+        if (autoShow) {
+            this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
+        }
+
+        // Set content
+        this.MODAL_DIALOG_TITLE.textContent = title;
+        this.MODAL_DIALOG_DESCRIPTION.textContent = description ?? '';
+        this.MODAL_DIALOG_BTN.textContent = primaryLabel;
+
+        // Wire primary button
+        const setPrimaryLabel = (text: string) => this.MODAL_DIALOG_BTN.textContent = text;
+        this.MODAL_DIALOG_BTN.onclick = () => {
+            if (!onPrimaryClick) {
+                console.log('closing!', 1)
+                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+                return;
+            }
+            const maybePromise = onPrimaryClick(setPrimaryLabel);
+            if (maybePromise && typeof (maybePromise as Promise<void>).then === 'function') {
+                // Optional: prevent double clicks while async op runs
+                this.MODAL_DIALOG_BTN.disabled = true;
+                (maybePromise as Promise<void>).finally(() => {
+                    console.log('closing!', 2)
+                    this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+                    this.MODAL_DIALOG_BTN.disabled = false;
+                });
+            } else {
+                console.log('closing!', 3)
+                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+            }
+        };
     }
 
     public showToast(message: string, duration = 2000) {
