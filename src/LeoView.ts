@@ -968,7 +968,6 @@ export class LeoView {
             this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'true');
             this.FILE_DIALOG_TITLE.textContent = options?.title || 'Open File';
             this.FILE_DIALOG_FILENAME.value = "";
-            this.FILE_DIALOG_FILENAME.disabled = true;
             const pathStack: FilePath[] = [];
             if (workspace.getWorkspaceDirHandle()) {
                 pathStack.push({ name: workspace.getWorkspaceDirHandle()!.name, handle: workspace.getWorkspaceDirHandle()! });
@@ -978,7 +977,7 @@ export class LeoView {
 
             await this.refreshDialog(pathStack);
             this.FILE_DIALOG_CONFIRM.textContent = options?.openLabel || 'Open';
-            this.FILE_DIALOG_CONFIRM.onclick = async () => {
+            const openCallback = async () => {
                 const filename = this.FILE_DIALOG_FILENAME.value;
                 if (!filename) {
                     // No file selected
@@ -991,7 +990,15 @@ export class LeoView {
                     resolve(fileHandle);
                 } catch (e) {
                     console.error('Error getting file handle:', e);
+                    this.FILE_DIALOG_TITLE.textContent = (options?.title || 'Open File') + ' - Error: Could not open file';
                     // Do not close dialog, let user retry
+                }
+            };
+            this.FILE_DIALOG_CONFIRM.onclick = openCallback;
+            // Also call on Enter key in filename input
+            this.FILE_DIALOG_FILENAME.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    openCallback();
                 }
             };
 
