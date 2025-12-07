@@ -336,8 +336,12 @@ export class LeoController {
         // TEST OPEN / SAVE FILE DIALOG
         const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();
         console.log('Chosen OPEN FILE handle:', chosenFileHandle);
-        const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
-        console.log('Reolves to:', resolveResult);
+        if (chosenFileHandle) {
+            const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
+            console.log('Reolves to:', resolveResult);
+        } else {
+            console.log('No file chosen in OPEN dialog');
+        }
 
         // test workspace singleton
         workspace.test();

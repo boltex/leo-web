@@ -63,6 +63,8 @@ export class LeoView {
 
     public MENU: HTMLElement;
     private TOAST: HTMLElement;
+    private MODAL_DIALOG_TITLE: HTMLElement;
+    private MODAL_DIALOG_DESCRIPTION: HTMLElement;
     private CHOOSE_FOLDER_BTN: HTMLButtonElement;
 
     private FILE_DIALOG_TITLE: HTMLElement;
@@ -165,6 +167,9 @@ export class LeoView {
 
         this.MENU = document.getElementById('menu')!;
         this.TOAST = document.getElementById('toast')!;
+
+        this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
+        this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;
         this.CHOOSE_FOLDER_BTN = document.getElementById('choose-folder-btn')! as HTMLButtonElement;
 
         this.FILE_DIALOG_TITLE = document.getElementById('file-dialog-title')!
@@ -794,8 +799,10 @@ export class LeoView {
 
     public requestWorkspaceDirectory(): Promise<FileSystemDirectoryHandle> {
         return new Promise((resolve, reject) => {
-            this.HTML_ELEMENT.setAttribute('data-show-workspace-dialog', 'true');
+            this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
             this._setWorkspaceDialogButtonText('Choose Folder');
+            this.MODAL_DIALOG_TITLE.textContent = '📁 Choose a Workspace';
+            this.MODAL_DIALOG_DESCRIPTION.textContent = 'Leo-Web needs permission to read and write files in a folder of your choice.';
             this.CHOOSE_FOLDER_BTN.onclick = async () => {
                 try {
                     this._setWorkspaceDialogButtonText('Choosing...');
@@ -816,7 +823,7 @@ export class LeoView {
     }
 
     public hideWorkspaceDialog() {
-        this.HTML_ELEMENT.setAttribute('data-show-workspace-dialog', 'false');
+        this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
     }
 
     public showToast(message: string, duration = 2000) {
