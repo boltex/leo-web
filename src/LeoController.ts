@@ -324,6 +324,7 @@ export class LeoController {
         // Prompt user to select workspace directory
         let dirHandle: FileSystemDirectoryHandle | null = null;
         while (!dirHandle) {
+            // Retry until a valid directory is selected
             dirHandle = await view.requestWorkspaceDirectory().catch(e => {
                 console.error('Error selecting workspace directory:', e);
                 return null;
@@ -351,6 +352,17 @@ export class LeoController {
 
         // test workspace singleton
         workspace.test();
+
+        // Now test the save dialog
+        const saveFileHandle: FileSystemFileHandle | null = await view.showSaveDialog();
+        console.log('Chosen SAVE FILE handle:', saveFileHandle);
+        if (saveFileHandle) {
+            const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(saveFileHandle!);
+            console.log('Resolves to:', resolveResult);
+        } else {
+            console.log('No file chosen in SAVE dialog');
+        }
+
 
     }
 

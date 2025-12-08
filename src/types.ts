@@ -42,3 +42,9 @@ export interface OpenDialogOptions {
     openLabel?: string; // A human-readable string for the open button.
     title?: string; // Dialog title.
 }
+
+export interface SaveDialogOptions {
+    defaultUri?: string; // Default URI to open
+    saveLabel?: string; // A human-readable string for the save button.
+    title?: string; // Dialog title.
+}

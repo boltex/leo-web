@@ -1,4 +1,4 @@
-import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions } from './types';
+import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions } from './types';
 import * as utils from './utils';
 import { workspace } from './workspace';
 
@@ -1050,7 +1050,49 @@ export class LeoView {
         });
     }
 
+    public async showSaveDialog(options?: SaveDialogOptions): Promise<FileSystemFileHandle | null> {
+        return new Promise(async (resolve) => {
+            this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'true');
+            this.FILE_DIALOG_TITLE.textContent = options?.title || 'Save File';
+            this.FILE_DIALOG_FILENAME.value = "";
+            const pathStack: FilePath[] = [];
+            if (workspace.getWorkspaceDirHandle()) {
+                pathStack.push({ name: workspace.getWorkspaceDirHandle()!.name, handle: workspace.getWorkspaceDirHandle()! });
+            } else {
+                throw new Error("Workspace directory handle is not set.");
+            }
+            await this.refreshDialog(pathStack);
+            this.FILE_DIALOG_CONFIRM.textContent = options?.saveLabel || 'Save';
+            const saveCallback = async () => {
+                const filename = this.FILE_DIALOG_FILENAME.value;
+                if (!filename) {
+                    // No file selected
+                    return;
+                }
+                const current = pathStack[pathStack.length - 1]!;
+                try {
+                    const fileHandle = await current.handle.getFileHandle(filename, { create: true });
+                    this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
+                    resolve(fileHandle);
+                } catch (e) {
+                    console.error('Error getting file handle:', e);
+                    this.FILE_DIALOG_TITLE.textContent = (options?.title || 'Save File') + ' - Error: Could not save file';
+                    // Do not close dialog, let user retry
+                }
+            };
+            this.FILE_DIALOG_CONFIRM.onclick = saveCallback;
+            // Also call on Enter key in filename input
+            this.FILE_DIALOG_FILENAME.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    saveCallback();
+                }
+            };
 
-
+            this.FILE_DIALOG_CLOSE.onclick = () => {
+                this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
+                resolve(null);
+            };
+        });
+    }
 
 }
