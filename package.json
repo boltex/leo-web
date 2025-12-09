@@ -29,6 +29,7 @@
     "@types/node": "^24.7.0",
     "@types/pako": "^2.0.0",
     "@types/safe-json-stringify": "^1.1.2",
+    "@types/showdown": "^2.0.6",
     "@types/uuid": "^9.0.7",
     "@types/wicg-file-system-access": "^2023.10.7",
     "copy-webpack-plugin": "^12.0.2",
@@ -60,6 +61,7 @@
     "pako": "^2.1.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
+    "showdown": "^2.1.0",
     "typescript": "^5.9.3"
   }
 }

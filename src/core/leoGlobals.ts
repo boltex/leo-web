@@ -6,25 +6,12 @@
  */
 //@+<< imports >>
 //@+node:felix.20251207215313.2: ** << imports >>
-import * as vscodeObj from 'vscode';
-import {
-    ExtensionContext,
-    Uri,
-    env,
-    workspace,
-    window,
-    FileStat, FileType
-} from 'vscode';
+
 import * as os from 'os';
 import * as child from 'child_process';
 import * as path from 'path';
-import * as GitAPI from '../git';
-import * as GitBaseAPI from '../git-base';
-import { RemoteHubApi } from '../remote-hub';
-import { SqlJsStatic } from 'sql.js';
 import * as showdownObj from "showdown";
 import * as pakoObj from 'pako';
-import * as JSZipObj from 'jszip';
 import * as md5Obj from 'md5';
 const dayjsObj = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -47,12 +34,6 @@ export let isNewLeoJSVersion = false; // Used to show messages if first/new vers
 export const isBrowser: boolean = !!(process as any)?.browser; // coerced to boolean
 export const isMac: boolean = process.platform?.startsWith('darwin');
 export const isWindows: boolean = process.platform?.startsWith('win');
-/** the VS Code extensibility API */
-export let vscode: typeof vscodeObj = vscodeObj;
-/** The LeoJS 'Extension Context' */
-export let extensionContext: ExtensionContext;
-/** For accessing files in the LeoJS extension package */
-export let extensionUri: Uri;
 /** For accessing files in the current workspace */
 export let workspaceUri: Uri;
 
