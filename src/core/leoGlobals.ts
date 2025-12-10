@@ -23,6 +23,7 @@ dayjsObj.extend(localizedFormat);
 //@+<< leoGlobals: annotations >>
 //@+node:felix.20251207215313.3: ** << leoGlobals: annotations >>
 import { Uri } from '../workspace';
+import { FileStat } from '../types';
 // For now, define as any, later we will import the actual types.
 // import { LeoApp } from './leoApp';
 // import { Commands } from './leoCommands';
@@ -4475,26 +4476,25 @@ export function os_path_dirname(p_path?: string): string {
         return '';
     }
 
-    if (isBrowser || (workspaceUri && workspaceUri.scheme !== 'file')) {
-        p_path = p_path = p_path.split('\\').join('/'); // FORCE to slashes on web
-        let lastSlashIndex = p_path.lastIndexOf('/');
+    // if (isBrowser || (workspaceUri && workspaceUri.scheme !== 'file')) {
+    p_path = p_path = p_path.split('\\').join('/'); // FORCE to slashes on web
+    let lastSlashIndex = p_path.lastIndexOf('/');
 
-        if (lastSlashIndex === -1) {
-            return '';
-        }
-        p_path = p_path.substring(0, lastSlashIndex);
-
-        return p_path;
+    if (lastSlashIndex === -1) {
+        return '';
     }
+    p_path = p_path.substring(0, lastSlashIndex);
 
-    p_path = path.dirname(p_path);
-    // os.path.normpath does the *reverse* of what we want.
-
-    if (isWindows || isBrowser) {
-        p_path = p_path.split('\\').join('/');
-    }
-    p_path = os_path_fix_drive(p_path); // ALSO EMULATE PYTHON UPPERCASE DRIVE LETTERS!
     return p_path;
+    // }
+
+    // Todo: test this code path on non-web platforms
+    // p_path = path.dirname(p_path); // os.path.normpath does the *reverse* of what we want.
+    // if (isWindows || isBrowser) {
+    //     p_path = p_path.split('\\').join('/');
+    // }
+    // p_path = os_path_fix_drive(p_path); // ALSO EMULATE PYTHON UPPERCASE DRIVE LETTERS!
+    // return p_path;
 }
 //@+node:felix.20251207215313.233: *3* g.os_path_exists
 /**
@@ -4620,7 +4620,7 @@ export async function os_path_getsize(p_path: string): Promise<number> {
                 w_uri
             );
             // OK exists
-            return fileStat.size;
+            return fileStat.size || 0;
         } catch {
             // Does not exist !
             return 0;
@@ -4653,7 +4653,7 @@ export async function os_path_isdir(p_path: string): Promise<boolean> {
                 w_uri
             );
             // OK exists
-            return fileStat.type === FileType.Directory;
+            return fileStat.type === 'directory';
         } catch {
             // Does not exist !
             return false;
@@ -4675,7 +4675,7 @@ export async function os_path_isfile(p_path?: string): Promise<boolean> {
                 w_uri
             );
             // OK exists
-            return fileStat.type === FileType.File;
+            return fileStat.type === 'file';
         } catch {
             // Does not exist !
             return false;
@@ -4843,9 +4843,9 @@ export async function os_path_samefile(
     //  fsPath
     //  toString
     if (
-        w_uri1.path === w_uri2.path ||
-        w_uri1.fsPath === w_uri2.fsPath ||
-        w_uri1.toString() === w_uri2.path.toString()
+
+        w_uri1.fsPath === w_uri2.fsPath
+
     ) {
         return true;
     }
@@ -6138,7 +6138,7 @@ export async function getUrlFromNode(p: Position): Promise<string | undefined> {
         const url = computeFileUrl(s, c, p);
         if (url.startsWith(tag)) {
             let fn = url.slice(tag.length).trimStart();
-            fn = fn.split('#', 1)[0];
+            fn = fn.split('#', 1)[0]!;
             if (await os_path_isfile(fn)) {
                 // Return the *original* url, with a file:// scheme.
                 // g.handleUrl will call computeFileUrl again.
@@ -6368,7 +6368,7 @@ export function isValidUrl(url: string): boolean {
 
     // const parsed = urlparse.urlparse(url);
     const match = url.match(/^([a-zA-Z][a-zA-Z\d+\-.]*):/);
-    const scheme = match ? match[1] : ""; // parsed.scheme;
+    const scheme = match ? match[1]! : ""; // parsed.scheme;
 
     for (const s of table) {
         if (scheme.startsWith(s)) {
@@ -6517,6 +6517,7 @@ export async function openUrlOnClick(c: Commands, url?: string): Promise<string 
     } catch (e) {
         es_exception(e);
     }
+    return undefined;
 }
 //@+node:felix.20251207215313.296: *4* g.openUrlHelper
 /**
@@ -6535,7 +6536,7 @@ export async function openUrlHelper(c: Commands, url?: string): Promise<string |
         return undefined;
     }
 
-    let p, pos, newpos;
+    let p: Position;
     let line;
     // if event:
     //     event.widget = w
@@ -6786,7 +6787,7 @@ export function getUNLFilePart(s: string): string {
         }
     }
     const m = s.match(file_part_pattern);
-    return m && m.length ? m[1] : '';
+    return m && m.length ? m[1]! : '';
 
 }
 //@+node:felix.20251207215313.305: *4* g.openUNLFile

@@ -30,6 +30,12 @@ export interface MenuEntry {
     entries?: MenuEntry[];
 }
 
+export interface FileStat {
+    type: 'file' | 'directory';
+    size?: number;
+    mtime?: number;
+}
+
 // E.g. const pathStack: FilePath[] = [{ name: "/", handle: rootHandle }];
 export interface FilePath {
     name: string;

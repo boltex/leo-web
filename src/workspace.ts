@@ -1,3 +1,5 @@
+import { FileStat } from "./types";
+
 export class Uri {
     // Absolute, root-anchored path (e.g., "/folder/sub/file.txt")
     public resolves: string[]; // path segments under workspace root
@@ -90,7 +92,7 @@ class Fs {
         await dir.removeEntry(name, opts);
     }
 
-    async stat(uri: Uri): Promise<{ type: 'file' | 'directory'; size?: number; mtime?: number }> {
+    async stat(uri: Uri): Promise<FileStat> {
         const { dir, name } = await this.resolveParentAndName(uri);
         try {
             const fh = await dir.getFileHandle(name);
