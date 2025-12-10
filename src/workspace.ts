@@ -1,13 +1,13 @@
-export class URI {
+export class Uri {
     // Absolute, root-anchored path (e.g., "/folder/sub/file.txt")
     public resolves: string[]; // path segments under workspace root
-    public fspath: string;     // canonical absolute path string
+    public fsPath: string;     // canonical absolute path string
 
     constructor(path: string) {
-        const normalized = URI.normalize(path);
+        const normalized = Uri.normalize(path);
         const parts = normalized.slice(1).split('/').filter(Boolean);
         this.resolves = parts;
-        this.fspath = '/' + parts.join('/');
+        this.fsPath = '/' + parts.join('/');
     }
 
     static normalize(path: string): string {
@@ -29,12 +29,12 @@ export class URI {
     }
 
     toString(): string {
-        return this.fspath;
+        return this.fsPath;
     }
 
-    static joinPath(base: URI, ...segments: string[]): URI {
-        const joined = [base.fspath, ...segments].join('/').replace(/\/+/g, '/');
-        return new URI(joined);
+    static joinPath(base: Uri, ...segments: string[]): Uri {
+        const joined = [base.fsPath, ...segments].join('/').replace(/\/+/g, '/');
+        return new Uri(joined);
     }
 }
 
@@ -54,9 +54,9 @@ class Fs {
         return current;
     }
 
-    private async resolveParentAndName(uri: URI): Promise<{ dir: FileSystemDirectoryHandle; name: string }> {
+    private async resolveParentAndName(uri: Uri): Promise<{ dir: FileSystemDirectoryHandle; name: string }> {
         if (uri.resolves.length === 0) {
-            throw new Error(`Path points to workspace root; expected entry: ${uri.fspath}`);
+            throw new Error(`Path points to workspace root; expected entry: ${uri.fsPath}`);
         }
         const parentParts = uri.resolves.slice(0, -1);
         const name = uri.resolves[uri.resolves.length - 1]!;
@@ -64,7 +64,7 @@ class Fs {
         return { dir, name };
     }
 
-    async writeFile(uri: URI, content: Uint8Array): Promise<void> {
+    async writeFile(uri: Uri, content: Uint8Array): Promise<void> {
         const { dir, name } = await this.resolveParentAndName(uri);
         const handle = await dir.getFileHandle(name, { create: true });
         const writable = await handle.createWritable();
@@ -74,23 +74,23 @@ class Fs {
         await writable.close();
     }
 
-    async readFile(uri: URI): Promise<Uint8Array> {
+    async readFile(uri: Uri): Promise<Uint8Array> {
         const { dir, name } = await this.resolveParentAndName(uri);
         const handle = await dir.getFileHandle(name);
         const file = await handle.getFile();
         return new Uint8Array(await file.arrayBuffer());
     }
 
-    async createDirectory(uri: URI): Promise<void> {
+    async createDirectory(uri: Uri): Promise<void> {
         await this.getDirHandle(uri.resolves, true);
     }
 
-    async delete(uri: URI, opts: { recursive?: boolean } = {}): Promise<void> {
+    async delete(uri: Uri, opts: { recursive?: boolean } = {}): Promise<void> {
         const { dir, name } = await this.resolveParentAndName(uri);
         await dir.removeEntry(name, opts);
     }
 
-    async stat(uri: URI): Promise<{ type: 'file' | 'directory'; size?: number; mtime?: number }> {
+    async stat(uri: Uri): Promise<{ type: 'file' | 'directory'; size?: number; mtime?: number }> {
         const { dir, name } = await this.resolveParentAndName(uri);
         try {
             const fh = await dir.getFileHandle(name);
@@ -101,12 +101,12 @@ class Fs {
                 await dir.getDirectoryHandle(name, { create: false });
                 return { type: 'directory' };
             } catch {
-                throw new Error(`Entry not found: ${uri.fspath}`);
+                throw new Error(`Entry not found: ${uri.fsPath}`);
             }
         }
     }
 
-    async readDirectory(uri: URI): Promise<Array<[string, 'file' | 'directory']>> {
+    async readDirectory(uri: Uri): Promise<Array<[string, 'file' | 'directory']>> {
         const dir = await this.getDirHandle(uri.resolves, false);
         const entries: Array<[string, 'file' | 'directory']> = [];
         // @ts-ignore: for older lib.dom.d.ts where entries() may not be typed as async iterable
@@ -121,7 +121,7 @@ class Workspace {
     // Window's workspace in use
     public workspaceDirHandle: FileSystemDirectoryHandle | null = null; // The FileSystemDirectoryHandle for the workspace
 
-    public fs: Fs | undefined;
+    public fs!: Fs; // TODO : initialize properly with a fake class that mimics Fs methods but throws errors or forces setting workspace first. (Or something else?)
 
     constructor() { }
 
@@ -138,24 +138,14 @@ class Workspace {
         return this.workspaceDirHandle;
     }
 
-    // Utility methods for URI creation
-    // Example of a path is "/folder1/folder2/file.txt" where root "/" is the workspaceDirHandle
-    public makeUri(path: string): URI {
-        console.log(`Making URI for path: ${path}`);
-        if (!this.workspaceDirHandle) {
-            throw new Error("Workspace directory not set");
-        }
-        return new URI(path);
-    }
-
     // Optional convenience: derive a URI from a known handle using native resolve()
-    public async uriFromHandle(handle: FileSystemHandle): Promise<URI> {
+    public async uriFromHandle(handle: FileSystemHandle): Promise<Uri> {
         if (!this.workspaceDirHandle) {
             throw new Error("Workspace directory not set");
         }
         const rel = await this.workspaceDirHandle.resolve(handle);
         const path = '/' + (rel?.join('/') ?? '');
-        const uri = new URI(path);
+        const uri = new Uri(path);
         return uri;
     }
 

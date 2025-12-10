@@ -6,7 +6,7 @@
  */
 //@+<< imports >>
 //@+node:felix.20251207215313.2: ** << imports >>
-
+import { workspace } from '../workspace';
 import * as os from 'os';
 import * as child from 'child_process';
 import * as path from 'path';
@@ -22,11 +22,19 @@ dayjsObj.extend(localizedFormat);
 //@-<< imports >>
 //@+<< leoGlobals: annotations >>
 //@+node:felix.20251207215313.3: ** << leoGlobals: annotations >>
-import { LeoApp } from './leoApp';
-import { Commands } from './leoCommands';
-import { IdleTime as IdleTimeClass } from "./idle_time";
-import { Position, VNode } from './leoNodes';
-import { LeoGui } from './leoGui';
+import { Uri } from '../workspace';
+// For now, define as any, later we will import the actual types.
+// import { LeoApp } from './leoApp';
+// import { Commands } from './leoCommands';
+// import { IdleTime as IdleTimeClass } from "./idle_time";
+// import { Position, VNode } from './leoNodes';
+// import { LeoGui } from './leoGui';
+type LeoApp = any;
+type Commands = any;
+type IdleTimeClass = any;
+type Position = any;
+type VNode = any;
+type LeoGui = any;
 //@-<< leoGlobals: annotations >>
 //@+<< leoGlobals: global constants >>
 //@+node:felix.20251207215313.4: ** << leoGlobals: global constants >>
@@ -37,17 +45,10 @@ export const isWindows: boolean = process.platform?.startsWith('win');
 /** For accessing files in the current workspace */
 export let workspaceUri: Uri;
 
-export let SQL: SqlJsStatic;
 export let pako: typeof pakoObj = pakoObj;
 export let showdown: typeof showdownObj = showdownObj;
-export let JSZip: typeof JSZipObj = JSZipObj;
 export let dayjs: typeof dayjsObj = dayjsObj;
 export let md5: typeof md5Obj = md5Obj;
-
-// The singleton Git extension exposed API
-export let gitAPI: GitAPI.API;
-export let gitBaseAPI: GitBaseAPI.API;
-export let remoteHubAPI: RemoteHubApi;
 //@-<< leoGlobals: global constants >>
 //@+<< define g.globalDirectiveList >>
 //@+node:felix.20251207215313.5: ** << define g.globalDirectiveList >>
@@ -170,7 +171,7 @@ export function ivars2instance(c: Commands, g: any, ivars: string[]): any {
         return undefined;
     }
 
-    let ivar: string = ivars[0]; // first
+    let ivar: string = ivars[0]!; // first
 
     if (!['c', 'g'].includes(ivar)) {
         g.trace('can not happen: unknown base', ivar);
@@ -318,8 +319,8 @@ export class FileLikeObject {
      * Read the next line using at.list and at.ptr.
      */
     public readline(): string {
-        if (this.ptr < this._list.length) {
-            const line: string = this._list[this.ptr];
+        if (this._list.length && this.ptr < this._list.length) {
+            const line: string = this._list[this.ptr]!;
             this.ptr++;
             return line;
         }
@@ -655,7 +656,7 @@ export class SettingsDict extends Map<string, any> {
     //     return f"{g.dictToString(self.d)}\n{str(self)}\n"
 
     // = () : trick for toString as per https://stackoverflow.com/a/35361695/920301
-    public toString = (): string => {
+    public override toString = (): string => {
         return `<SettingsDict name:${this._name} `;
     };
 
@@ -841,7 +842,7 @@ export function _callerName(n: number, verbose: boolean = false): string {
  * Return the caller name i levels up the stack.
  */
 export function caller(i: number = 1): string {
-    return callers(i + 1).split(',')[0];
+    return callers(i + 1).split(',')[0]!;
 }
 
 //@+node:felix.20251207215313.50: *3* g.my_name
@@ -849,7 +850,7 @@ export function caller(i: number = 1): string {
  * Return the name of the function or method calling this function
  */
 export function my_name(i: number = 1): string {
-    return callers(-1).split(',')[0];
+    return callers(-1).split(',')[0]!;
 }
 
 //@+node:felix.20251207215313.51: *3* g.get_line & get_line__after
@@ -1073,7 +1074,7 @@ export function findAllValidLanguageDirectives(s: string): string[] {
     const languages: string[] = [];
     let m: RegExpExecArray | null;
     while ((m = g_language_pat.exec(s)) !== null) {
-        const language: string = m[1];
+        const language: string = m[1]!;
         if (isValidLanguage(language)) {
             languages.push(language);
         }
@@ -1250,7 +1251,7 @@ export function isDirective(s: string): boolean {
         if (s2 && '.('.includes(s2.charAt(0))) {
             return false;
         }
-        return globalDirectiveList.includes(m[1]);
+        return globalDirectiveList.includes(m[1]!);
     }
     return false;
 }
@@ -1313,7 +1314,7 @@ export function set_delims_from_string(
     while (count < 3 && i < s.length) {
         i = skip_ws(s, i);
         j = i;
-        while (i < s.length && !is_ws(s[i]) && !is_nl(s, i)) {
+        while (i < s.length && !is_ws(s[i]!) && !is_nl(s, i)) {
             i += 1;
         }
         if (j === i) {
@@ -1455,11 +1456,6 @@ export function update_directives_pat(): void {
 // #1688: Initialize g.directives_pat
 update_directives_pat();
 //@+node:felix.20251207215313.70: ** g.Files & Directories
-//@+node:felix.20251207215313.71: *3* g.isBrowserRepo
-export function isBrowserRepo(): boolean {
-    return isBrowser || (workspaceUri && workspaceUri.scheme !== 'file');
-}
-
 //@+node:felix.20251207215313.72: *3* g.chdir
 /**
  * Change current directory to the directory corresponding to path.
@@ -1482,12 +1478,12 @@ export async function chdir(p_path: string): Promise<void> {
 }
 //@+node:felix.20251207215313.73: *3* g.mkdir
 export async function mkdir(folderName: string): Promise<void> {
-    const w_uri = makeVscodeUri(folderName);
+    const w_uri = makeUri(folderName);
     await workspace.fs.createDirectory(w_uri);
 }
 //@+node:felix.20251207215313.74: *3* g.rmdir
 export async function rmdir(folderName: string): Promise<void> {
-    const w_uri = makeVscodeUri(folderName);
+    const w_uri = makeUri(folderName);
     await workspace.fs.delete(w_uri, { recursive: true });
 }
 //@+node:felix.20251207215313.75: *3* g.computeWindowTitle
@@ -1495,11 +1491,9 @@ export async function rmdir(folderName: string): Promise<void> {
  * @deprecated
  */
 export function computeWindowTitle(fileName: string): string {
-    let branch;
-    let commit;
-    [branch, commit] = gitInfoForFile(fileName); // #1616
+
     if (!fileName) {
-        return branch ? branch + ': untitled' : 'untitled';
+        return 'untitled';
     }
     let w_path;
     let fn;
@@ -1513,9 +1507,6 @@ export function computeWindowTitle(fileName: string): string {
     // Yet another fix for bug 1194209: regularize slashes.
     if ('/\\'.includes(path.sep)) {
         title = title.replace(/\//g, path.sep).replace(/\\/g, path.sep);
-    }
-    if (branch) {
-        title = branch + ': ' + title;
     }
     return title;
 }
@@ -1570,15 +1561,15 @@ export async function filecmp_cmp(
 ): Promise<boolean> {
     let w_same = false;
     let w_uri: Uri;
-    w_uri = makeVscodeUri(path1); // first uri, no matter if shallow or not.
+    w_uri = makeUri(path1); // first uri, no matter if shallow or not.
     if (shallow) {
         const stats1 = await workspace.fs.stat(w_uri);
-        w_uri = makeVscodeUri(path2);
+        w_uri = makeUri(path2);
         const stats2 = await workspace.fs.stat(w_uri);
         w_same = stats1.size === stats2.size && stats1.mtime === stats2.mtime;
     } else {
         const file1 = await workspace.fs.readFile(w_uri);
-        w_uri = makeVscodeUri(path2);
+        w_uri = makeUri(path2);
         const file2 = await workspace.fs.readFile(w_uri);
         w_same = Buffer.compare(file1, file2) === 0;
     }
@@ -1631,7 +1622,7 @@ export async function is_binary_external_file(
     try {
         // with open(fileName, 'rb') as f:
         //     s = f.read(1024)  // bytes, in Python 3.
-        const w_readUri = makeVscodeUri(fileName);
+        const w_readUri = makeUri(fileName);
         const readData = await workspace.fs.readFile(w_readUri);
         const s = readData.slice(0, 1024);
         return is_binary_string(s);
@@ -1647,7 +1638,7 @@ export function is_binary_string(s: Uint8Array): boolean {
     // aList is a list of all non-binary characters.
     // aList = [7, 8, 9, 10, 12, 13, 27] + list(range(0x20, 0x100))
     for (let i = 0; i < s.length; i++) {
-        const byte = s[i];
+        const byte = s[i]!;
         if ((byte < 0x20 || byte > 0xFF) && // Check for non-ASCII and extended ASCII range
             ![0x07, 0x08, 0x09, 0x0A, 0x0C, 0x0D, 0x1B].includes(byte)) { // Exclude specific control characters
             return true; // Binary byte found
@@ -1671,7 +1662,7 @@ export async function isExecutableInPath(executableName: string): Promise<string
                 fullPath = path.join(directory, executableName); // Already ends with that extension.
             }
             const w_exists = await os_path_exists(fullPath);
-            if (w_exists && w_exists.type !== vscode.FileType.Directory) {
+            if (w_exists && w_exists.type !== 'directory') {
                 return fullPath;
             }
         }
@@ -1702,7 +1693,7 @@ export async function makeAllNonExistentDirectories(
 
     // #1450: Create the directory with os.makedirs.
     try {
-        const w_uri = makeVscodeUri(theDir);
+        const w_uri = makeUri(theDir);
         await workspace.fs.createDirectory(w_uri);
         return theDir;
     } catch (exception) {
@@ -1769,7 +1760,7 @@ export async function readFileIntoString(
     let junk: string;
 
     try {
-        const w_uri = makeVscodeUri(fileName);
+        const w_uri = makeUri(fileName);
         let readData = await workspace.fs.readFile(w_uri);
         if (!readData) {
             return ['', undefined];
@@ -1811,7 +1802,7 @@ export async function readFileIntoUnicodeString(
     silent?: boolean
 ): Promise<string | undefined> {
     try {
-        const w_uri = makeVscodeUri(fn);
+        const w_uri = makeUri(fn);
         let s = await workspace.fs.readFile(w_uri);
         return toUnicode(s, encoding);
     } catch (e) {
@@ -1854,7 +1845,7 @@ export function readlineForceUnixNewline(
 }
 //@+node:felix.20251207215313.88: *3* g.os_remove
 export async function os_remove(fileName: string): Promise<void> {
-    const w_uri = makeVscodeUri(fileName);
+    const w_uri = makeUri(fileName);
     await workspace.fs.delete(w_uri);
 }
 //@+node:felix.20251207215313.89: *3* g.sanitize_filename
@@ -1872,7 +1863,7 @@ export function sanitize_filename(s: string): string {
 
     let ch: string;
     for (let i = 0; i < s.length; i++) {
-        ch = s[i];
+        ch = s[i]!;
         if (
             'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(ch)
         ) {
@@ -1960,7 +1951,7 @@ export async function writeFile(
         // with open(fileName, 'wb') as f:
         //     f.write(contents)  // type:ignore
 
-        const w_uri = makeVscodeUri(fileName);
+        const w_uri = makeUri(fileName);
         await workspace.fs.writeFile(w_uri, contents);
 
         return true;
@@ -1987,7 +1978,7 @@ export async function write_file_if_changed(
         if (await os_path_exists(fn)) {
             // with open(fn, 'rb') as f
             //     contents = f.read()
-            const w_uri = makeVscodeUri(fn);
+            const w_uri = makeUri(fn);
             const contents = await workspace.fs.readFile(w_uri);
             if (Buffer.compare(contents, encoded_s) === 0) {
                 return false;
@@ -1995,7 +1986,7 @@ export async function write_file_if_changed(
         }
         // with open(fn, 'wb') as f
         //     f.write(encoded_s);
-        const w_uri = makeVscodeUri(fn);
+        const w_uri = makeUri(fn);
         await workspace.fs.writeFile(w_uri, encoded_s);
         return true;
     } catch (exception) {
@@ -2005,7 +1996,7 @@ export async function write_file_if_changed(
     }
 }
 
-//@+node:felix.20251207215313.95: *3* g.makeVscodeUri
+//@+node:felix.20251207215313.95: *3* g.makeUri
 /**
  * * VSCODE compatibility helper method:
  * Builds a valid URI from a typical filename string.
@@ -2013,30 +2004,8 @@ export async function write_file_if_changed(
  * @param p_fn String form of fsPath or path
  * @returns An URI for file access compatible with web extensions filesystems
  */
-export function makeVscodeUri(p_fn: string): Uri {
-
-    if (isBrowser || (workspaceUri && workspaceUri.scheme !== 'file')) {
-        p_fn = p_fn.replace(/\\/g, "/");
-        try {
-            const workspacePath = workspaceUri.fsPath.replace(/\\/g, "/");
-            if (isBrowser && p_fn.startsWith('/') && !p_fn.startsWith(workspacePath)) {
-                // isBrowser and p_fn is not a workspace path, so we need to add the workspace path.
-                p_fn = workspacePath + p_fn;
-            }
-            const newUri = workspaceUri!.with({ path: p_fn });
-            return newUri;
-        } catch (e) {
-            console.log(
-                "OOPS! LEOJS Tried to build a vscode.URI from a browser scheme's URI 'with' method. Error: ", e
-            );
-            throw new Error(
-                'g.makeVscodeUri cannot make an URI with the string: ' + p_fn
-            );
-        }
-    } else {
-        // Normal file in desktop app
-        return Uri.file(p_fn);
-    }
+export function makeUri(p_fn: string): Uri {
+    return new Uri(p_fn);
 }
 
 //@+node:felix.20251207215313.96: *3* g.relativeDirectory
@@ -2105,7 +2074,7 @@ export function find_word(s: string, word: string, i: number = 0): number {
         }
         // Make sure we are at the start of a word.
         if (i > 0) {
-            const ch = s[i - 1];
+            const ch = s[i - 1]!;
             if (ch === '_' || isAlNum(ch)) {
                 i += word.length;
                 continue;
@@ -2239,7 +2208,7 @@ export function splitLinesAtNewline(s: string): string[] {
     lines = lines.map(z => `${z}\n`);
 
     if (!s.endsWith('\n')) {
-        lines[lines.length - 1] = lines[lines.length - 1].slice(0, -1);
+        lines[lines.length - 1] = lines[lines.length - 1]!.slice(0, -1);
     }
 
     return lines;
@@ -2297,7 +2266,7 @@ export function is_special(s: string, directive: string): [boolean, number] {
 
     if (m) {
         // javascript returns index including spaces before the match after newline
-        return [true, m.index + m[0].length - m[1].length];
+        return [true, m.index + m[0].length - m[1]!.length];
     }
     return [false, -1];
 }
@@ -2340,7 +2309,7 @@ export function is_ws(ch: string): boolean {
     return ch === '\t' || ch === ' ';
 }
 export function is_ws_or_nl(s: string, i: number): boolean {
-    return is_nl(s, i) || (i < s.length && is_ws(s[i]));
+    return is_nl(s, i) || (i < s.length && is_ws(s[i]!));
 }
 //@+node:felix.20251207215313.113: *4* g.match
 /**
@@ -2415,8 +2384,8 @@ export function match_word(s: string, i: number, pattern: string, ignore_case = 
     // }
 
     // // 1. Compute the required boundaries.
-    const bound1 = isWordChar1(pattern[0]);
-    const bound2 = isWordChar(pattern[pattern.length - 1]);
+    const bound1 = isWordChar1(pattern[0]!);
+    const bound2 = isWordChar(pattern[pattern.length - 1]!);
 
     const j = pattern.length;
     if (j === 0) {
@@ -2424,11 +2393,11 @@ export function match_word(s: string, i: number, pattern: string, ignore_case = 
     }
 
     // Special case: \t or \n delimit words!
-    if (i > 2 && s[i - 2] === '\\' && ['t', 'n'].includes(s[i - 1])) {
+    if (i > 2 && s[i - 2] === '\\' && ['t', 'n'].includes(s[i - 1]!)) {
         return true;
     }
     if (bound1) {
-        if (i > 0 && isWordChar(s[i - 1])) {
+        if (i > 0 && isWordChar(s[i - 1]!)) {
             return false;
         }
     }
@@ -2469,7 +2438,7 @@ export function skip_blank_lines(s: string, i: number): number {
     while (i < s.length) {
         if (is_nl(s, i)) {
             i = skip_nl(s, i);
-        } else if (is_ws(s[i])) {
+        } else if (is_ws(s[i]!)) {
             const j = skip_ws(s, i);
             if (is_nl(s, j)) {
                 i = j;
@@ -2486,7 +2455,7 @@ export function skip_blank_lines(s: string, i: number): number {
 //@+node:felix.20251207215313.116: *4* g.skip_c_id
 export function skip_c_id(s: string, i: number): number {
     let n: number = s.length;
-    while (i < n && isWordChar(s[i])) {
+    while (i < n && isWordChar(s[i]!)) {
         i += 1;
     }
     return i;
@@ -2602,7 +2571,7 @@ export function skip_nl(s: string, i: number): number {
 //@+node:felix.20251207215313.121: *4* g.skip_non_ws
 export function skip_non_ws(s: string, i: number): number {
     const n = s.length;
-    while (i < n && !is_ws(s[i])) {
+    while (i < n && !is_ws(s[i]!)) {
         i += 1;
     }
     return i;
@@ -2610,7 +2579,7 @@ export function skip_non_ws(s: string, i: number): number {
 //@+node:felix.20251207215313.122: *4* g.skip_python_string
 export function skip_python_string(s: string, i: number): number {
     if (match(s, i, "'''") || match(s, i, '"""')) {
-        const delim = s[i].repeat(3);
+        const delim = s[i]!.repeat(3);
         i += 3;
         const k = s.indexOf(delim, i);
         if (k > -1) {
@@ -2625,7 +2594,7 @@ export function skip_python_string(s: string, i: number): number {
  * Scan forward to the end of a string.
  */
 export function skip_string(s: string, i: number): number {
-    const delim = s[i];
+    const delim = s[i]!;
     i += 1;
 
     assert('\'"'.includes(delim), delim.toString() + ' ' + s);
@@ -2679,251 +2648,10 @@ export function skip_ws(s: string, i: number): number {
 
 export function skip_ws_and_nl(s: string, i: number): number {
     const n: number = s.length;
-    while (i < n && (is_ws(s[i]) || is_nl(s, i))) {
+    while (i < n && (is_ws(s[i]!) || is_nl(s, i))) {
         i++;
     }
     return i;
-}
-//@+node:felix.20251207215313.126: ** g.Git
-//@+node:felix.20251207215313.127: *3* g.getVSCodeRepository
-/**
- * Calls getRepository form the gitAPI and returns the result.
- */
-export function getVSCodeRepository(c: Commands): null | GitAPI.Repository {
-    const filename = c.fileName();
-    if (!filename) {
-        console.log('git getRepository: outline has no name');
-        return null;
-    }
-    const w_uri = makeVscodeUri(filename);
-    return gitAPI.getRepository(w_uri);
-}
-//@+node:felix.20251207215313.128: *3* g.gitBranchName
-/**
- * Return the git branch name associated with path/.git, or the empty
- * string if path/.git does not exist. If path is None, use the leo-editor
- * directory.
- */
-export function gitBranchName(p_path?: string): string {
-    let [branch, commit] = gitInfo(p_path);
-    return branch;
-}
-
-//@+node:felix.20251207215313.129: *3* g.gitInfoForFile
-/**
- * Return the git (branch, commit) info associated for the given file.
- */
-export function gitInfoForFile(filename: string): [string, string] {
-    // g.gitInfo and g.gitHeadPath now do all the work.
-    return gitInfo(filename);
-}
-//@+node:felix.20251207215313.130: *3* g.gitHeadPath
-
-/**
- * Compute the path to .git/HEAD given the path.
- */
-export async function gitHeadPath(path_s: string): Promise<string | undefined> {
-    // const w_path = path(path_s);
-    // #1780: Look up the directory tree, looking the .git directory.
-    // TODO : HANDLE VSCODE IN THE BROWSER!
-    while (await os_path_exists(path_s)) {
-        const head = path.join(path_s, '.git', 'HEAD');
-        if (await os_path_exists(head)) {
-            return head;
-        }
-        if (path_s === path.dirname(path_s)) {
-            // path.parent()
-            break;
-        }
-        path_s = path.dirname(path_s);
-    }
-    return undefined;
-}
-//@+node:felix.20251207215313.131: *3* g.execGitCommand
-/**
- * Execute the given git command in the given directory.
- * 
- * Return a list of lines, with newlines stripped off.
- */
-export async function execGitCommand(
-    command: string,
-    directory: string
-): Promise<string[]> {
-
-    if (isBrowser) {
-        console.log('LEOJS: GIT COMMAND CALLED FROM BROWSER');
-        void window.showInformationMessage('LeoJS Git Commands are not yet available in "web" version');
-        return [];
-    }
-
-    const git_dir = finalize_join(directory, '.git');
-    const w_exists = await os_path_exists(git_dir);
-    if (!w_exists) {
-        trace('.git directory not found:', git_dir, callers());
-        return [];
-    }
-
-    if (command.includes('\n')) {
-        trace('removing newline from', command);
-        command = command.replace(/\n/g, '');
-    }
-
-    const w_args: string[] = [];
-    const w_options: child.SpawnOptions = {
-        // Child to run independently of its parent process.
-        // (Depends on the platform)
-        // detached: false,
-        // If possible hide the terminal window that could appear
-        windowsHide: true,
-        shell: true,
-        cwd: directory
-    };
-
-    return new Promise((resolve, reject) => {
-        const gitProcess = child.spawn(command, w_args, w_options);
-
-        let accumulatedOutput = '';
-
-        if (gitProcess) {
-
-            if (gitProcess.stdout) {
-                gitProcess.stdout.on('data', (data) => {
-                    accumulatedOutput += data.toString();
-                });
-            }
-            if (gitProcess.stderr) {
-                gitProcess.stderr.on('data', (data) => {
-                    // Optionally, you can log and accumulate the error output too
-                    console.error(data.toString());
-                });
-
-            }
-            gitProcess.on('error', (err) => {
-                console.error(`Error executing command: ${err.message}`);
-                // reject(new Error(`Error executing command: ${err.message}`));
-            });
-
-
-            gitProcess.on('close', (code) => {
-                const lines = splitLines(accumulatedOutput).map((z) => toUnicode(z));
-                if (code === 0) {
-                    // ok
-                } else {
-                    console.error(`Command exited with code ${code}`);
-                    // reject(new Error(`Command exited with code ${code}`));
-                }
-                resolve(lines);
-            });
-        } else {
-            reject(new Error(`No git process has started.`));
-        }
-    });
-
-    // // #1777: Save/restore os.curdir
-    // old_dir = os.getcwd()
-    // if directory
-    //     // trace(f"os.chdir({directory})")
-    //     os.chdir(directory)
-    // let lines: string[] = [];
-
-    // try{
-
-    //     p = subprocess.Popen(
-    //         shlex.split(command),
-    //         stdout=subprocess.PIPE,
-    //         stderr=None,  // Shows error traces.
-    //         // stderr=subprocess.PIPE,
-    //         shell=False,
-    //     )
-    //     out, err = p.communicate()
-
-    //     lines = splitLines(out || []).map((z) => toUnicode(z));
-    //     // lines = [toUnicode(z) for z in splitLines(out or [])]
-    // }
-    // catch(e){
-    //     console.log('LEOJS ERROR IN execGitCommand: ', e);
-    // }
-
-    // // finally
-    // //     os.chdir(old_dir)
-
-    // return lines;
-}
-//@+node:felix.20251207215313.132: *3* g.gitInfo
-/**
- * Path may be a directory or file.
-
-    Return the branch and commit number or ('', '').
- */
-export function gitInfo(p_path?: string): [string, string] {
-
-    // Set defaults.
-    let branch = '';
-    let commit = '';
-    const w_gitAPI = gitAPI;
-    try {
-        if (w_gitAPI && w_gitAPI.repositories.length &&
-            w_gitAPI.repositories[0].state.HEAD
-        ) {
-            branch = w_gitAPI.repositories[0].state.HEAD.name || '';
-            commit = w_gitAPI.repositories[0].state.HEAD.commit || '';
-            if (commit && commit.length) {
-                commit = commit.trim().slice(0, 12);
-            }
-        }
-
-    } catch (errorGit) {
-        console.log('ERROR : LEOJS gitInfo :', errorGit);
-    }
-
-    /*
-    if (p_path == null ){
-        // Default to leo/core.
-        p_path = g.os_path_dirname(__file__)
-    }
-    if !g.os_path_isdir(p_path)
-        p_path = g.os_path_dirname(p_path)
-    // Does path/../ref exist?
-    p_path = g.gitHeadPath(p_path)
-    if !p_path
-        return branch, commit
-    try
-        with open(p_path) as f
-            s = f.read()
-            if !s.startsWith('ref')
-                branch = 'None'
-                commit = s[:7]
-                return branch, commit
-        // On a proper branch
-        pointer = s.split()[1]
-        dirs = pointer.split('/')
-        branch = dirs[-1]
-    except IOError:
-        g.trace('can not open:', p_path)
-        return branch, commit
-    // Try to get a better commit number.
-    git_dir = g.finalize_join(p_path, '..')
-    try
-        p_path = g.finalize_join(git_dir, pointer)
-        with open(p_path) as f:
-            s = f.read()
-        commit = s.strip()[0:12]
-        // shorten the hash to a unique shortname
-    catch IOError
-        try:
-            p_path = g.finalize_join(git_dir, 'packed-refs')
-            with open(p_path) as f:  // type:ignore
-                for line in f:
-                    if line.strip().endswith(' ' + pointer):
-                        commit = line.split()[0][0:12]
-                        break
-        except IOError:
-            pass
-
-    */
-
-    return [branch, commit];
-
 }
 //@+node:felix.20251207215313.133: ** g.Hooks & Plugins
 //@+node:felix.20251207215313.134: *3* g.act_on_node
@@ -3169,7 +2897,7 @@ export function convertRowColToPythonIndex(
     if (row >= lines.length) {
         return s.length;
     }
-    col = Math.min(col, lines[row].length);
+    col = Math.min(col, lines[row]!.length);
     // A big bottleneck
     let prev = 0;
     for (let line of lines.slice(0, row)) {
@@ -3366,7 +3094,7 @@ export function pad(s: string, width: number): string {
  */
 export function removeLeading(s: string, chars: string): string {
     let i = 0;
-    while (i < s.length && chars.includes(s[i])) {
+    while (i < s.length && chars.includes(s[i]!)) {
         i += 1;
     }
     return s.slice(i);
@@ -3376,7 +3104,7 @@ export function removeLeading(s: string, chars: string): string {
  */
 export function removeTrailing(s: string, chars: string): string {
     let i = s.length - 1;
-    while (i >= 0 && chars.includes(s[i])) {
+    while (i >= 0 && chars.includes(s[i]!)) {
         i -= 1;
     }
     i += 1;
@@ -3486,7 +3214,7 @@ export function getPythonEncodingFromString(
         // the first line is an encoding line, it will contain only ascii characters.
         const s = toUnicode(readData, 'ascii');
         const lines = splitLines(s);
-        let line1 = lines[0].trim();
+        let line1 = lines[0]!.trim();
         let e: BufferEncoding;
         if (line1.startsWith(tag) && line1.endsWith(tag2)) {
             e = line1.substring(n1, -n2).trim() as BufferEncoding;
@@ -4243,7 +3971,7 @@ export function es_print_unique_message(message: string, color?: string): boolea
 
 //@+node:felix.20251207215313.202: ** g.Miscellaneous
 //@+node:felix.20251207215313.203: *3* g.IDDialog
-export function IDDialog(): Thenable<string> {
+export function IDDialog(): Promise<string> {
     return vscode.window.showInputBox({
         title: "Enter Leo id",
         prompt: "Please enter an id that identifies you uniquely.\n(Letters and numbers only, and at least 3 characters in length)",
@@ -4290,7 +4018,7 @@ export function maketrans_from_dict(
 
     for (const key in dict) {
         if (dict.hasOwnProperty(key)) {
-            let charCode;
+            let charCode: number;
             // ! IF ALREADY A NUMBER KEY : KEEP THIS KEY!
             // (see https://www.programiz.com/python-programming/methods/string/maketrans
             //  and look for call with single parameter)
@@ -4300,7 +4028,7 @@ export function maketrans_from_dict(
                 // string
                 charCode = key.charCodeAt(0);
             }
-            translationTable[charCode] = dict[key];
+            translationTable[charCode] = dict[key]!;
         }
     }
 
@@ -4482,7 +4210,7 @@ export function rtrim(str: string, ch: string): string {
 //@+node:felix.20251207215313.216: *3* g.rstrip
 export function rstrip(str: string, ch = " \t\n\r") {
     let i = str.length;
-    while (i > 0 && ch.includes(str[i - 1])) {
+    while (i > 0 && ch.includes(str[i - 1]!)) {
         i--;
     }
     return str.substring(0, i);
@@ -4565,7 +4293,7 @@ export function divmod(dividend: number, divisor: number): [number, number] {
 export async function os_listdir(p_path: string): Promise<string[]> {
     let result: string[] = [];
     try {
-        const w_uri = makeVscodeUri(p_path);
+        const w_uri = makeUri(p_path);
         const w_dirInfo = await workspace.fs.readDirectory(w_uri);
         result = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
     } catch (e) {
@@ -4574,7 +4302,7 @@ export async function os_listdir(p_path: string): Promise<string[]> {
     return result;
 }
 //@+node:felix.20251207215313.223: *3* g.setStatusLabel
-export function setStatusLabel(s: string): Thenable<unknown> {
+export function setStatusLabel(s: string): Promise<unknown> {
     return window.showInformationMessage(s);
 }
 //@+node:felix.20251207215313.224: *3* g.truncate
@@ -4591,7 +4319,7 @@ export function truncate(s: string, n: number): string {
 //@+node:felix.20251207215313.225: *3* g.zip
 export function zip<T>(...arrays: T[][]): T[][] {
     const length = Math.min(...arrays.map((arr) => arr.length));
-    return Array.from({ length }, (_, i) => arrays.map((arr) => arr[i]));
+    return Array.from({ length }, (_, i) => arrays.map((arr) => arr[i]!));
 }
 //@+node:felix.20251207215313.226: ** g.os_path_ Wrappers
 //@+at Note: all these methods return Unicode strings. It is up to the user to
@@ -4718,17 +4446,19 @@ export function os_path_basename(p_path: string): string {
         return '';
     }
 
-    if (isBrowser || (workspaceUri && workspaceUri.scheme !== 'file')) {
-        p_path = p_path = p_path.split('\\').join('/'); // FORCE to slashes on web
-        let lastSlashIndex = p_path.lastIndexOf('/');
+    // if (isBrowser || (workspaceUri && workspaceUri.scheme !== 'file')) {
+    p_path = p_path = p_path.split('\\').join('/'); // FORCE to slashes on web
+    let lastSlashIndex = p_path.lastIndexOf('/');
 
-        if (lastSlashIndex === -1) {
-            return p_path;
-        };
-
-        p_path = p_path.substring(lastSlashIndex + 1);
+    if (lastSlashIndex === -1) {
         return p_path;
-    }
+    };
+
+    p_path = p_path.substring(lastSlashIndex + 1);
+    return p_path;
+    // }
+
+    // Todo: test this code path on non-web platforms
 
     p_path = path.basename(p_path);
     p_path = os_path_fix_drive(p_path); // ALSO EMULATE PYTHON UPPERCASE DRIVE LETTERS!
@@ -4780,7 +4510,7 @@ export async function os_path_exists(
         trace('NULL in', p_path.toString(), callers());
         p_path = p_path.split('\x00').join(''); // Fix Python 3 bug on Windows 10.
     }
-    const w_uri = makeVscodeUri(p_path);
+    const w_uri = makeUri(p_path);
     try {
         const stat = await workspace.fs.stat(w_uri);
         return stat;
@@ -4868,8 +4598,11 @@ export async function os_path_getmtime(p_path: string): Promise<number> {
     }
     try {
         // return os.path.getmtime(p_path);
-        const w_uri = makeVscodeUri(p_path);
+        const w_uri = makeUri(p_path);
         const w_stats = await workspace.fs.stat(w_uri);
+        if (!w_stats.mtime) {
+            return 0;
+        }
         return w_stats.mtime / 1000;  // Match Python: seconds as float!
     } catch (exception) {
         return 0;
@@ -4881,7 +4614,7 @@ export async function os_path_getmtime(p_path: string): Promise<number> {
  */
 export async function os_path_getsize(p_path: string): Promise<number> {
     if (p_path) {
-        const w_uri = makeVscodeUri(p_path);
+        const w_uri = makeUri(p_path);
         try {
             const fileStat: FileStat = await workspace.fs.stat(
                 w_uri
@@ -4915,7 +4648,7 @@ export function os_path_isabs(p_path?: string): boolean {
 export async function os_path_isdir(p_path: string): Promise<boolean> {
     if (p_path) {
         try {
-            const w_uri = makeVscodeUri(p_path);
+            const w_uri = makeUri(p_path);
             const fileStat: FileStat = await workspace.fs.stat(
                 w_uri
             );
@@ -4937,7 +4670,7 @@ export async function os_path_isdir(p_path: string): Promise<boolean> {
 export async function os_path_isfile(p_path?: string): Promise<boolean> {
     if (p_path) {
         try {
-            const w_uri = makeVscodeUri(p_path);
+            const w_uri = makeUri(p_path);
             const fileStat: FileStat = await workspace.fs.stat(
                 w_uri
             );
@@ -5102,8 +4835,8 @@ export async function os_path_samefile(
     }
 
     // 2- with fs.stat ino and dev
-    const w_uri1 = makeVscodeUri(fn1);
-    const w_uri2 = makeVscodeUri(fn2);
+    const w_uri1 = makeUri(fn1);
+    const w_uri2 = makeUri(fn2);
 
     // 2.5 with vscode.Uri :
     //  path
@@ -5395,7 +5128,7 @@ export function getDocString(s: string): string {
 
     let i1;
     let i2;
-    [i1, i2] = [s.indexOf(tag1), s.indexOf(tag2)];
+    [i1, i2] = [s.indexOf(tag1!), s.indexOf(tag2!)];
 
     if (i1 === -1 && i2 === -1) {
         return '';
@@ -5483,13 +5216,13 @@ export function python_tokenize(s: string): [string, string, number][] {
     while (i < s.length) {
         let j = i;
         let progress = i;
-        let ch = s[i];
+        let ch = s[i]!;
         let kind;
         if (ch === '\n') {
             [kind, i] = ['nl', i + 1];
         } else if (' \t'.includes(ch)) {
             kind = 'ws';
-            while (i < s.length && ' \t'.includes(s[i])) {
+            while (i < s.length && ' \t'.includes(s[i]!)) {
                 i += 1;
             }
         } else if (ch === '#') {
@@ -5923,8 +5656,8 @@ export function is_invisible_sentinel(
     const delim1 = delims[0] || delims[1];
 
     // Get previous line, to test for previous @verbatim sentinel.
-    const line1 = i > 0 ? contents[i - 1] : '';  // previous line.
-    const line2 = contents[i];
+    const line1 = i > 0 ? contents[i - 1]! : '';  // previous line.
+    const line2 = contents[i]!;
 
     if (!is_sentinel(line2, delims)) {
         return false;  // Non-sentinels are visible everywhere.
@@ -6226,7 +5959,7 @@ export async function findGnx(gnx: string, c: Commands): Promise<Position | unde
 
     if (m && m.length) {
         // Get the actual gnx and line number.
-        gnx = m[1];
+        gnx = m[1]!;
         try {
             n = Number(m[2]);
         } catch (e) {
@@ -6284,7 +6017,7 @@ export async function findUnl(unlList1: string[], c: Commands): Promise<Position
             for (const [m, line_group] of table) {
                 if (m && m.length) {
                     try {
-                        const n = parseInt(m[line_group]);
+                        const n = parseInt(m[line_group]!);
                         result.push(`${m[1]}::${n}`);
                         continue;
                     } catch (e) {
@@ -6307,11 +6040,11 @@ export async function findUnl(unlList1: string[], c: Commands): Promise<Position
         const aList: string[] = [...unlList];
         const p1 = p.copy();
         while (aList && aList.length && p1 && p1.__bool__()) {
-            const m = aList.slice(-1)[0].match(new_pat);
-            if (m && m[1].trim() !== p1.h.trim()) {
+            const m = aList.slice(-1)[0]!.match(new_pat);
+            if (m && m[1]!.trim() !== p1.h.trim()) {
                 return false;
             }
-            if ((!m || !m.length) && aList.slice(-1)[0].trim() !== p1.h.trim()) {
+            if ((!m || !m.length) && aList.slice(-1)[0]!.trim() !== p1.h.trim()) {
                 return false;
             }
             aList.pop();
@@ -6327,9 +6060,9 @@ export async function findUnl(unlList1: string[], c: Commands): Promise<Position
     }
     // Find all target headlines.
     const targets: string[] = [];
-    let m = unlList.slice(-1)[0].match(new_pat);
+    let m = unlList.slice(-1)[0]!.match(new_pat);
     const target = m && m[1] || unlList.slice(-1)[0];
-    targets.push(target.trim());
+    targets.push(target!.trim());
     targets.push(...unlList.slice(0, -1));
 
     // Find all target positions. Prefer later positions.
@@ -6345,7 +6078,7 @@ export async function findUnl(unlList1: string[], c: Commands): Promise<Position
                 assert(p.__eq__(p1));
                 let n = 0;  // The default line number.
                 // Parse the last target.
-                m = unlList.slice(-1)[0].match(new_pat);
+                m = unlList.slice(-1)[0]!.match(new_pat);
                 if (m && m.length) {
                     const line = m[3];
                     try {
@@ -6562,7 +6295,7 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
         if (await os_path_exists(leo_path)) {
 
             // open in vscode's editor
-            const vscodeFileUri = makeVscodeUri(leo_path);
+            const vscodeFileUri = makeUri(leo_path);
             const w_showOptions =
             {
                 viewColumn: vscode.ViewColumn.Beside,
