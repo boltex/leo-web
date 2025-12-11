@@ -1130,12 +1130,21 @@ export class LeoView {
 
 
     public showTextDocument(uri: Uri): void {
-        console.log('TODO: showTextDocument not implemented yet for Leo-Web.', uri);
+
+        console.log('TODO: Test this method -> showTextDocument! Trying to show', uri);
+
+        // Read the file, and open in a new tab or window
+        const content = workspace.fs.readFile(uri).then(data => {
+            const text = new TextDecoder().decode(data);
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.title = uri.fsPath.split('/').pop() || 'Document';
+                const pre = newWindow.document.createElement('pre');
+                pre.textContent = text;
+                newWindow.document.body.appendChild(pre);
+            }
+        });
     }
-
-
-
-
 
 
 
