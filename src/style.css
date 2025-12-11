@@ -1462,9 +1462,7 @@ a:hover {
 
 /* Input dialog */
 #input-dialog {
-  display: var(
-    --message-dialog-display
-  ); /* reuse the same display toggle, or define your own var */
+  display: var(--input-dialog-display);
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 

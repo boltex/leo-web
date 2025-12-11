@@ -1111,6 +1111,12 @@ export class LeoView {
             this.INPUT_DIALOG_TITLE.textContent = options.title;
             this.INPUT_DIALOG_DESCRIPTION.textContent = options.prompt;
             this.INPUT_DIALOG_INPUT.value = options.value || '';
+            if (options.value) {
+                // Select all text for easy replacement
+                setTimeout(() => {
+                    this.INPUT_DIALOG_INPUT.select();
+                }, 0);
+            }
             this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
             const inputCallback = async () => {
                 const inputValue = this.INPUT_DIALOG_INPUT.value;
