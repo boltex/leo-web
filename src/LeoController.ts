@@ -363,6 +363,15 @@ export class LeoController {
             console.log('No file chosen in SAVE dialog');
         }
 
+        // Time to try the input dialog with "view.showInputDialog"
+        const inputResult = await view.showInputDialog({
+            title: "Input Dialog Test",
+            prompt: "Please enter some text:",
+            value: "Default value",
+            placeholder: "Type here..."
+        });
+        console.log("Input dialog result:", inputResult);
+
 
     }
 

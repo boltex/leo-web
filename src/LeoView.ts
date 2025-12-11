@@ -1,6 +1,6 @@
-import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions } from './types';
+import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions } from './types';
 import * as utils from './utils';
-import { workspace } from './workspace';
+import { Uri, workspace } from './workspace';
 
 export class LeoView {
     // Elements
@@ -74,6 +74,11 @@ export class LeoView {
     private FILE_DIALOG_LIST: HTMLElement;
     private FILE_DIALOG_FILENAME: HTMLInputElement;
     private FILE_DIALOG_CONFIRM: HTMLButtonElement;
+
+    private INPUT_DIALOG_TITLE: HTMLElement;
+    private INPUT_DIALOG_DESCRIPTION: HTMLElement;
+    private INPUT_DIALOG_INPUT: HTMLInputElement;
+    private INPUT_DIALOG_BTN: HTMLButtonElement;
 
     public HTML_ELEMENT: HTMLElement;
 
@@ -179,6 +184,11 @@ export class LeoView {
         this.FILE_DIALOG_LIST = document.getElementById('file-dialog-list')!
         this.FILE_DIALOG_FILENAME = document.getElementById('file-dialog-filename') as HTMLInputElement;
         this.FILE_DIALOG_CONFIRM = document.getElementById('file-dialog-confirm') as HTMLButtonElement;
+
+        this.INPUT_DIALOG_TITLE = document.getElementById('input-dialog-title')!;
+        this.INPUT_DIALOG_DESCRIPTION = document.getElementById('input-dialog-description')!;
+        this.INPUT_DIALOG_INPUT = document.getElementById('input-dialog-input')! as HTMLInputElement;
+        this.INPUT_DIALOG_BTN = document.getElementById('input-dialog-btn')! as HTMLButtonElement;
 
         this.HTML_ELEMENT = document.documentElement;
 
@@ -1094,5 +1104,40 @@ export class LeoView {
             };
         });
     }
+
+    public async showInputDialog(options: InputDialogOptions): Promise<string | null> {
+        return new Promise((resolve) => {
+            this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'true');
+            this.INPUT_DIALOG_TITLE.textContent = options.title;
+            this.INPUT_DIALOG_DESCRIPTION.textContent = options.prompt;
+            this.INPUT_DIALOG_INPUT.value = options.value || '';
+            this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
+            const inputCallback = async () => {
+                const inputValue = this.INPUT_DIALOG_INPUT.value;
+                this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+                resolve(inputValue);
+            };
+            this.INPUT_DIALOG_BTN.textContent = 'OK';
+            this.INPUT_DIALOG_BTN.onclick = inputCallback;
+            // Also call on Enter key in input
+            this.INPUT_DIALOG_INPUT.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    inputCallback();
+                }
+            };
+        });
+    }
+
+
+    public showTextDocument(uri: Uri): void {
+        console.log('TODO: showTextDocument not implemented yet for Leo-Web.', uri);
+    }
+
+
+
+
+
+
+
 
 }

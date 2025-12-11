@@ -8,6 +8,7 @@ import './style.css';
 import { LeoModel } from './LeoModel';
 import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
+import { workspace } from "./workspace";
 
 class LeoWebApp {
 
@@ -34,6 +35,8 @@ class LeoWebApp {
         this.model = new LeoModel();
         this.view = new LeoView();
         this.controller = new LeoController(this.model, this.view);
+        workspace.setView(this.view);
+
         await this.controller.initialize();
 
         console.log('Leo Web App initialized.');

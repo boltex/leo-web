@@ -3973,10 +3973,9 @@ export function es_print_unique_message(message: string, color?: string): boolea
 //@+node:felix.20251207215313.202: ** g.Miscellaneous
 //@+node:felix.20251207215313.203: *3* g.IDDialog
 export function IDDialog(): Promise<string> {
-    return vscode.window.showInputBox({
+    return workspace.view.showInputDialog({
         title: "Enter Leo id",
         prompt: "Please enter an id that identifies you uniquely.\n(Letters and numbers only, and at least 3 characters in length)",
-        ignoreFocusOut: true,
     }).then((id) => {
         if (id) {
             return id;
@@ -4303,8 +4302,8 @@ export async function os_listdir(p_path: string): Promise<string[]> {
     return result;
 }
 //@+node:felix.20251207215313.223: *3* g.setStatusLabel
-export function setStatusLabel(s: string): Promise<unknown> {
-    return window.showInformationMessage(s);
+export function setStatusLabel(s: string): void {
+    workspace.view.showToast(s);
 }
 //@+node:felix.20251207215313.224: *3* g.truncate
 export function truncate(s: string, n: number): string {
@@ -6269,13 +6268,18 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
     }
     let leo_path;
 
-    const parsed = Uri.parse(url);
+    const parsed = new URL(url)
 
-    if (parsed.authority) {
-        leo_path = os_path_join(parsed.authority, parsed.path);
+    const authority = (parsed.username ? parsed.username : "") +
+        (parsed.password ? ":" + parsed.password : "") +
+        (parsed.username || parsed.password ? "@" : "") +
+        parsed.host; // host = hostname + ":" + port (if present)
+
+    if (authority) {
+        leo_path = os_path_join(authority, parsed.pathname);
         // "readme.txt" gets parsed into .netloc...
     } else {
-        leo_path = parsed.path;
+        leo_path = parsed.pathname;
     }
 
     if (leo_path.endsWith('\\')) {
@@ -6284,25 +6288,19 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
     if (leo_path.endsWith('/')) {
         leo_path = leo_path.slice(0, -1);
     }
-    if (parsed.scheme === 'file' && leo_path.endsWith('.leo')) {
+    if (parsed.protocol === "file:" && leo_path.endsWith('.leo')) {
 
         void handleUnl(original_url, c);
 
-    } else if (['', 'file'].includes(parsed.scheme)) {
+    } else if (['', 'file'].includes(parsed.protocol.replace(':', ''))) {
 
         // TODO : check if unquote_path is needed !
         const unquote_path = unquoteUrl(leo_path);
         if (await os_path_exists(leo_path)) {
 
-            // open in vscode's editor
-            const vscodeFileUri = makeUri(leo_path);
-            const w_showOptions =
-            {
-                viewColumn: vscode.ViewColumn.Beside,
-                preserveFocus: true,
-                preview: false,
-            };
-            await vscode.window.showTextDocument(vscodeFileUri, w_showOptions);
+            // It'S a file in the workspace
+            const fileUri = makeUri(leo_path);
+            await workspace.view.showTextDocument(fileUri);
 
 
         } else {
@@ -6311,8 +6309,8 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
 
     } else {
         try {
-            // webbrowser.open(url)
-            await env.openExternal(Uri.parse(url));
+            // Open this URL in a new Browser tab
+            window.open(url, '_blank');
         } catch (e) {
             // pass
         }
@@ -6416,92 +6414,8 @@ export async function open_mimetype(c: Commands, p: Position): Promise<void> {
         return undefined;
     }
 
-    if (isBrowser) {
-        // not supported in browser
-        error(' open_mimetype : not supported in browser');
-        return undefined;
-    }
-
-    let leo_path;
-
-    // honor @path
-    let url = p.h.slice(6);
-    let w_path = c.getPath(p) || '';
-    leo_path = finalize_join(w_path, url);
-
-    if (!await os_path_exists(leo_path)) {
-        const tag = 'file://';
-        if (url.startsWith(tag) && !url.startsWith(tag + '#')) {
-            // Finalize the path *before* parsing the url.
-            url = computeFileUrl(url, c, p);
-        }
-
-        const parsed = Uri.parse(url);
-
-        if (parsed.authority) {
-            leo_path = os_path_join(parsed.authority, parsed.path);
-            // "readme.txt" gets parsed into .netloc...
-        } else {
-            leo_path = parsed.path;
-        }
-
-        if (leo_path.endsWith('\\')) {
-            leo_path = leo_path.slice(0, -1);
-        }
-        if (leo_path.endsWith('/')) {
-            leo_path = leo_path.slice(0, -1);
-        }
-        if (!['', 'file'].includes(parsed.scheme)) {
-            error(`@mime: file scheme not supported, ${parsed.scheme} for ${leo_path}`);
-            return undefined;
-        }
-    } else {
-        // ELSE find file with @url method
-        url = leo_path;
-
-    }
-
-    if (await os_path_exists(leo_path)) {
-        // user-specified command string, or sys.platform-determined string
-        let mime_cmd = c.config.getString('mime-open-cmd');
-        if (mime_cmd) {
-            if (mime_cmd.indexOf('%s') === -1) {
-                mime_cmd += ' %s';
-            }
-
-            // Replace the %s placeholder with the actual file path
-            const s = mime_cmd.replace('%s', leo_path);
-
-            // Use spawn instead of exec for non-blocking execution
-            const process = child.spawn(s, { shell: true });
-
-            process.on('error', (error) => {
-                es(`Execution error: ${error.message}`);
-            });
-
-            process.stdout.on('data', (data) => {
-                es(`Output: ${data}`);
-            });
-
-            process.stderr.on('data', (data) => {
-                es(`Error: ${data}`);
-            });
-
-            process.on('exit', (code) => {
-                es(`Process exited with code: ${code}`);
-            });
-
-        } else {
-            await opn(decodeURIComponent(Uri.parse(url).toString()), { wait: false });
-        }
-
-
-    } else {
-        error(`@mime: file does not exist, ${leo_path}`);
-        return undefined;
-    }
-
-    return undefined;
+    // Todo : if even possible to implement in a web environment ?
+    console.log('TODO: Implement g.open_mimetype for node, ', p.h);
 }
 
 //@+node:felix.20251207215313.295: *3* g.openUrlOnClick (open-url-under-cursor)

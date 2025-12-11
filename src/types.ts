@@ -1,3 +1,5 @@
+import { es } from "./core/leoGlobals";
+
 export interface TreeNode {
     gnx: number;
     parent?: TreeNode;
@@ -53,4 +55,11 @@ export interface SaveDialogOptions {
     defaultUri?: string; // Default URI to open
     saveLabel?: string; // A human-readable string for the save button.
     title?: string; // Dialog title.
+}
+
+export interface InputDialogOptions {
+    title: string;
+    prompt: string;
+    placeholder?: string;
+    value?: string;
 }

@@ -57,6 +57,8 @@
   --message-dialog-display: none;
   /* file dialog */
   --file-dialog-display: none;
+  /* input-dialog */
+  --input-dialog-display: none;
 }
 
 [data-active-tab="log"] {
@@ -171,6 +173,10 @@
 
 [data-show-file-dialog="true"] {
   --file-dialog-display: flex;
+}
+
+[data-show-input-dialog="true"] {
+  --input-dialog-display: flex;
 }
 
 html {
@@ -1452,4 +1458,53 @@ a:hover {
 /* Optional: subtle accent border for the dialog content */
 #file-dialog .modal-content {
   border: 1px solid var(--menu-border-color);
+}
+
+/* Input dialog */
+#input-dialog {
+  display: var(
+    --message-dialog-display
+  ); /* reuse the same display toggle, or define your own var */
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+#input-dialog .input-dialog-container {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* space between input and button */
+  margin-top: 12px;
+}
+
+#input-dialog-input {
+  flex: 1; /* input takes remaining width */
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--find-border-color);
+  background: transparent;
+  color: var(--text-color);
+}
+
+#input-dialog-input::placeholder {
+  color: var(--find-placeholder-color);
+}
+
+#input-dialog-input:focus {
+  outline: 2px solid var(--find-selection);
+  border-color: var(--find-selection);
+  outline-offset: -1px;
+}
+
+#input-dialog-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--find-border-color);
+  background: var(--resizer-color);
+  color: var(--text-color);
+  cursor: pointer;
+  flex-shrink: 0; /* keep button width tight */
+  font-weight: 600;
+}
+
+#input-dialog-btn:hover {
+  background: var(--hover-bg);
 }
