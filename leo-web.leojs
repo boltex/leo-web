@@ -77,19 +77,39 @@
     },
     {
       "gnx": "felix.20251211000427.1",
-      "vh": "@clean src/utils2.ts",
+      "vh": "@clean src/utils.ts",
       "children": [
+        {
+          "gnx": "felix.20251211212644.1",
+          "vh": "throttle"
+        },
+        {
+          "gnx": "felix.20251211212701.1",
+          "vh": "safeLocalStorageGet"
+        },
+        {
+          "gnx": "felix.20251211212717.1",
+          "vh": "safeLocalStorageSet"
+        },
+        {
+          "gnx": "felix.20251211212732.1",
+          "vh": "preventDefault"
+        },
+        {
+          "gnx": "felix.20251211212753.1",
+          "vh": "getTextNodeAtIndex"
+        },
+        {
+          "gnx": "felix.20251211212824.1",
+          "vh": "getGlobalOffset"
+        },
+        {
+          "gnx": "felix.20251211212832.1",
+          "vh": "readDirectory"
+        },
         {
           "gnx": "felix.20251211000427.2",
           "vh": "performanceNow"
-        },
-        {
-          "gnx": "felix.20251211000427.3",
-          "vh": "closeLeoTextEditors"
-        },
-        {
-          "gnx": "felix.20251211000427.4",
-          "vh": "closeLeoHelpPanels"
         },
         {
           "gnx": "felix.20251211000427.5",
@@ -106,34 +126,6 @@
         {
           "gnx": "felix.20251211000427.8",
           "vh": "padNumber2"
-        },
-        {
-          "gnx": "felix.20251211000427.9",
-          "vh": "addFileToGlobal"
-        },
-        {
-          "gnx": "felix.20251211000427.10",
-          "vh": "removeFileFromGlobal"
-        },
-        {
-          "gnx": "felix.20251211000427.11",
-          "vh": "buildNodeIconPaths"
-        },
-        {
-          "gnx": "felix.20251211000427.12",
-          "vh": "buildDocumentIconPaths"
-        },
-        {
-          "gnx": "felix.20251211000427.13",
-          "vh": "buildUndoIconPaths"
-        },
-        {
-          "gnx": "felix.20251211000427.14",
-          "vh": "buildButtonsIconPaths"
-        },
-        {
-          "gnx": "felix.20251211000427.15",
-          "vh": "buildGotoIconPaths"
         },
         {
           "gnx": "felix.20251211000427.16",
@@ -162,29 +154,49 @@
         {
           "gnx": "felix.20251211000427.22",
           "vh": "isHexColor"
-        },
-        {
-          "gnx": "felix.20251211000427.23",
-          "vh": "strToLeoUri"
-        },
-        {
-          "gnx": "felix.20251211000427.24",
-          "vh": "strToLeoDetachedUri"
-        },
-        {
-          "gnx": "felix.20251211000427.25",
-          "vh": "leoUriToStr"
-        },
-        {
-          "gnx": "felix.20251211000427.26",
-          "vh": "setContext"
         }
       ]
     },
     {
       "gnx": "felix.20251211000618.1",
-      "vh": "@clean src/types2.ts",
+      "vh": "@clean src/types.ts",
       "children": [
+        {
+          "gnx": "felix.20251211213133.1",
+          "vh": "TreeNode"
+        },
+        {
+          "gnx": "felix.20251211213147.1",
+          "vh": "NodeData"
+        },
+        {
+          "gnx": "felix.20251211213151.1",
+          "vh": "FlatRow"
+        },
+        {
+          "gnx": "felix.20251211213155.1",
+          "vh": "MenuEntry"
+        },
+        {
+          "gnx": "felix.20251211213200.1",
+          "vh": "FileStat"
+        },
+        {
+          "gnx": "felix.20251211213205.1",
+          "vh": "FilePath"
+        },
+        {
+          "gnx": "felix.20251211213209.1",
+          "vh": "OpenDialogOptions"
+        },
+        {
+          "gnx": "felix.20251211213213.1",
+          "vh": "SaveDialogOptions"
+        },
+        {
+          "gnx": "felix.20251211213217.1",
+          "vh": "InputDialogOptions"
+        },
         {
           "gnx": "felix.20251211000618.2",
           "vh": "ConfigMembers"
@@ -248,10 +260,6 @@
         {
           "gnx": "felix.20251211000618.17",
           "vh": "LeoGuiFindTabManagerSettings"
-        },
-        {
-          "gnx": "felix.20251211000618.18",
-          "vh": "Icon"
         },
         {
           "gnx": "felix.20251211000618.19",
@@ -356,33 +364,36 @@
     "felix.20251210234420.18": "/**\n * List of command names for both categories of possible offsets when keeping selection.\n */\npublic static OLD_POS_OFFSETS = {\n    DELETE: [\"cut-node\", \"delete-node\"],\n    ADD: [\"clone-node\", \"async-paste-node\", \"async-paste-retaining-clones\"]\n};\n\n",
     "felix.20251210234420.19": "/**\n * * Overridden 'good' minibuffer command name strings\n */\npublic static MINIBUFFER_OVERRIDDEN_NAMES: { [key: string]: string } = {\n    'paste-node': 'async-paste-node',\n    'paste-retaining-clones': 'async-paste-retaining-clones',\n    'paste-as-template': 'async-paste-as-template',\n    'insert-child': 'async-insert-child',\n    'insert-node': 'async-insert-node',\n    'insert-as-first-child': 'async-insert-as-first-child',\n    'insert-as-last-child': 'async-insert-as-last-child',\n    'insert-node-before': 'async-insert-node-before',\n};\n\n",
     "felix.20251210234451.1": "@language typescript\n@tabwidth -4\n\n// ambient module declaration for https://www.npmjs.com/package/date-format-lite\ndeclare module \"date-format-lite\" { }\n\n// date-format-lite augments built-in Date\ninterface Date {\n    format: (format?: string) => string;\n    masks: { default: string };\n}\n",
-    "felix.20251211000427.1": "import * as vscode from \"vscode\";\nimport { Constants } from \"./constants\";\nimport { Icon } from \"./types\";\nimport { Position } from \"./core/leoNodes\";\n\n// String and other types/structures helper functions, along with common vscode API calls\n\n@language typescript\n@tabwidth -4\n@others\n",
+    "felix.20251211000427.1": "import { Constants } from \"./constants\";\n// import { Position } from \"./core/leoNodes\";\ntype Position = any;\n\n// String and other types/structures helper functions, along with common vscode API calls\n\n@language typescript\n@tabwidth -4\n@others\n",
+    "felix.20251211212644.1": "/**\n * Throttle function execution to limit how often it can be called\n * @param func Function to throttle\n * @param limit Minimum time between calls in milliseconds\n * @returns Throttled version of the function\n */\nexport function throttle<T extends any[]>(func: (...args: T) => void, limit: number) {\n    let lastCall = 0;\n    let timeout: ReturnType<typeof setTimeout>;\n\n    return (...args: T): void => {\n        const now = Date.now();\n        if (timeout) {\n            clearTimeout(timeout);\n        }\n        if (now - lastCall >= limit) {\n            lastCall = now;\n            func(...args);\n        } else {\n            timeout = setTimeout(() => {\n                lastCall = Date.now();\n                func(...args);\n            }, limit - (now - lastCall));\n        }\n    };\n}\n",
+    "felix.20251211212701.1": "/**\n * Safely access localStorage.getItem with error handling\n */\nexport function safeLocalStorageGet(key: string): string | null {\n    try {\n        return localStorage.getItem(key);\n    } catch (e) {\n        return null;\n    }\n}\n",
+    "felix.20251211212717.1": "/**\n * Safely access localStorage.setItem with error handling\n */\nexport function safeLocalStorageSet(key: string, value: string): void {\n    try {\n        localStorage.setItem(key, value);\n    } catch (e) {\n        // ignore\n    }\n}\n",
+    "felix.20251211212732.1": "/**\n * Prevent default event behavior - useful as event handler\n */\nexport function preventDefault(e: Event): void {\n    e.preventDefault();\n}\n",
+    "felix.20251211212753.1": "/**\n * Get the text node and offset at a given global character index within a root node\n */\nexport function getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);\n    let currentNode = walker.nextNode();\n    let remaining = index;\n\n    while (currentNode) {\n        const len = currentNode!.nodeValue!.length;\n        if (remaining <= len) {\n            return { node: currentNode, offset: remaining };\n        }\n        remaining -= len;\n        currentNode = walker.nextNode();\n    }\n    return null;\n}\n",
+    "felix.20251211212824.1": "/**\n * Get the global character offset within a root node for a given text node and offset\n */\nexport function getGlobalOffset(root: Node, container: Node, offset: number): number {\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);\n    let total = 0;\n    let current: Node | null = walker.nextNode();\n\n    while (current) {\n        if (current === container) {\n            return total + offset;\n        }\n        total += current.nodeValue!.length;\n        current = walker.nextNode();\n    }\n    return total;\n}\n",
+    "felix.20251211212832.1": "/**\n * Read all entries from a directory handle, returning an array of name/kind/handle objects\n */\nexport async function readDirectory(dirHandle: FileSystemDirectoryHandle): Promise<Array<{ name: string; kind: 'file' | 'directory'; handle: FileSystemHandle }>> {\n    const entries = [];\n    for await (const [name, handle] of dirHandle.entries()) {\n        entries.push({\n            name,\n            kind: handle.kind, // \"file\" or \"directory\"\n            handle\n        });\n    }\n    return entries;\n}\n",
     "felix.20251211000427.2": "/**\n * * window.performace.now browser/node crossover utility\n */\nexport function performanceNow(): number {\n    const w_now = process.hrtime();\n    const [w_secs, w_nanosecs] = w_now;\n    return w_secs * 1000 + Math.floor(w_nanosecs / 1000000);\n}\n\n",
-    "felix.20251211000427.3": "/**\n * * Closes all visible text editors that have Leo filesystem scheme (that are not dirty)\n */\nexport async function closeLeoTextEditors(): Promise<unknown> {\n    const w_foundTabs: vscode.Tab[] = [];\n\n    vscode.window.tabGroups.all.forEach((p_tabGroup) => {\n        p_tabGroup.tabs.forEach((p_tab) => {\n\n            if (p_tab.input &&\n                (p_tab.input as vscode.TabInputText).uri &&\n                ((p_tab.input as vscode.TabInputText).uri.scheme).startsWith(Constants.URI_LEOJS_SCHEME) &&\n                !p_tab.isDirty\n            ) {\n                w_foundTabs.push(p_tab);\n            }\n        });\n    });\n\n    let q_closedTabs;\n    if (w_foundTabs.length) {\n        q_closedTabs = vscode.window.tabGroups.close(w_foundTabs, true);\n        for (const p_tab of w_foundTabs) {\n            if (p_tab.input) {\n                await vscode.commands.executeCommand(\n                    'vscode.removeFromRecentlyOpened',\n                    (p_tab.input as vscode.TabInputText).uri\n                );\n                // Delete to close all other body tabs.\n                // (w_oldUri will be deleted last below)\n                const w_edit = new vscode.WorkspaceEdit();\n                w_edit.deleteFile((p_tab.input as vscode.TabInputText).uri, { ignoreIfNotExists: true });\n                await vscode.workspace.applyEdit(w_edit);\n            }\n        }\n    } else {\n        q_closedTabs = Promise.resolve(true);\n    }\n\n    return q_closedTabs;\n}\n\n",
-    "felix.20251211000427.4": "export async function closeLeoHelpPanels(): Promise<unknown> {\n\n    // * Close all open help panels \n    const w_foundTabs: vscode.Tab[] = [];\n    vscode.window.tabGroups.all.forEach((p_tabGroup) => {\n        p_tabGroup.tabs.forEach((p_tab) => {\n            if (\n                p_tab.label.endsWith(Constants.URI_HELP_FILENAME)\n            ) {\n                w_foundTabs.push(p_tab);\n            }\n        });\n    });\n\n    let q_closedTabs;\n    if (w_foundTabs.length) {\n        q_closedTabs = vscode.window.tabGroups.close(w_foundTabs, true);\n        for (const p_tab of w_foundTabs) {\n            if (p_tab.label === Constants.URI_HELP_FILENAME && p_tab.input) {\n                // Not a preview\n                await vscode.commands.executeCommand(\n                    'vscode.removeFromRecentlyOpened',\n                    (p_tab.input as vscode.TabInputText).uri\n                );\n                // Delete to close all other body tabs.\n                // (w_oldUri will be deleted last below)\n                const w_edit = new vscode.WorkspaceEdit();\n                w_edit.deleteFile((p_tab.input as vscode.TabInputText).uri, { ignoreIfNotExists: true });\n                await vscode.workspace.applyEdit(w_edit);\n            }\n        }\n    } else {\n        q_closedTabs = Promise.resolve(true);\n    }\n    return q_closedTabs;\n\n}\n",
     "felix.20251211000427.5": "/**\n * * Unique numeric Id\n */\nvar uniqueId: number = 0;\n\n",
     "felix.20251211000427.6": "/**\n * * Get new uniqueID\n */\nexport function getUniqueId(): string {\n    const id = uniqueId++;\n    return id.toString();\n}\n\n",
     "felix.20251211000427.7": "export function getNonce(): string {\n    let text = '';\n    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\n    for (let i = 0; i < 32; i++) {\n        text += possible.charAt(Math.floor(Math.random() * possible.length));\n    }\n    return text;\n}\n\n",
     "felix.20251211000427.8": "/**\n * * Build a string for representing a number that's 2 digits wide, padding with a zero if needed\n * @param p_number Between 0 and 99\n * @returns a 2 digit wide string representation of the number, left padded with zeros as needed.\n */\nexport function padNumber2(p_number: number): string {\n    return (\"0\" + p_number).slice(-2);\n}\n\n",
-    "felix.20251211000427.9": "/**\n * * Performs the actual addition into workspaceState context\n * @param p_context Needed to get to vscode workspace storage\n * @param p_file path+file name string\n * @param p_key A constant string such as RECENT_FILES_KEY or LAST_FILES_KEY\n * @returns A promise that resolves when the workspace storage modification is done\n */\nexport function addFileToWorkspace(p_context: vscode.ExtensionContext, p_file: string, p_key: string): Thenable<void> {\n    // Just push that string into the context.workspaceState.<something> array\n    const w_contextEntry: string[] = p_context.workspaceState.get(p_key) || [];\n    if (w_contextEntry) {\n        if (!w_contextEntry.includes(p_file)) {\n            w_contextEntry.push(p_file);\n            if (w_contextEntry.length > 10) {\n                w_contextEntry.shift();\n            }\n        }\n        return p_context.workspaceState.update(p_key, w_contextEntry); // Added file\n    } else {\n        // First so create key entry with an array of single file\n        return p_context.workspaceState.update(p_key, [p_file]);\n    }\n}\n\n",
-    "felix.20251211000427.10": "/**\n * * Removes file entry from workspaceState context\n * @param p_context Needed to get to vscode workspace storage\n * @param p_file path+file name string\n * @param p_key A constant string such as RECENT_FILES_KEY or LAST_FILES_KEY\n * @returns A promise that resolves when the workspace storage modification is done\n  */\nexport function removeFileFromWorkspace(p_context: vscode.ExtensionContext, p_file: string, p_key: string): Thenable<void> {\n    // Check if exist in context.workspaceState.<something> and remove if found\n    const w_files: string[] = p_context.workspaceState.get(p_key) || [];\n    if (w_files && w_files.includes(p_file)) {\n        w_files.splice(w_files.indexOf(p_file), 1); // Splice and update\n        return p_context.workspaceState.update(p_key, w_files);\n    }\n    return Promise.resolve(); // not even in list so just resolve\n}\n\n",
-    "felix.20251211000427.11": "/**\n * * Build all possible strings for node icons graphic file paths\n * @param p_context Needed to get to absolute paths on the system\n * @returns An array of the 16 vscode node icons used in this vscode expansion\n */\nexport function buildNodeIconPaths(p_context: vscode.ExtensionContext): Icon[] {\n    return Array(16).fill(\"\").map((p_val, p_index) => {\n        return {\n\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_PATH + padNumber2(p_index) + Constants.GUI.ICON_FILE_EXT),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_PATH + padNumber2(p_index) + Constants.GUI.ICON_FILE_EXT),\n        };\n    });\n}\n\n",
-    "felix.20251211000427.12": "/**\n * * Build all possible strings for documents icons graphic file paths\n * @param p_context Needed to get to absolute paths on the system\n * @returns An array containing icons for the documents tree view\n */\nexport function buildDocumentIconPaths(p_context: vscode.ExtensionContext): Icon[] {\n    return [\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_DOCUMENT),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_DOCUMENT)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_DOCUMENT_DIRTY),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_DOCUMENT_DIRTY)\n        }\n    ];\n}\n\n",
-    "felix.20251211000427.13": "/**\n * * Build all possible strings for undo icons graphic file paths\n * @param p_context Needed to get to absolute paths on the system\n * @returns An array containing icons for the undo tree view\n */\nexport function buildUndoIconPaths(p_context: vscode.ExtensionContext): Icon[] {\n    return [\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_UNDO_ACTIVE),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_UNDO_ACTIVE)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_UNDO),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_UNDO)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_REDO_ACTIVE),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_REDO_ACTIVE)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_REDO),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_REDO)\n        }\n    ];\n}\n\n",
-    "felix.20251211000427.14": "/**\n * * Build all possible strings for buttons icons graphic file paths\n * @param p_context Needed to get to absolute paths on the system\n * @returns An array containing icons for the documents tree view\n */\nexport function buildButtonsIconPaths(p_context: vscode.ExtensionContext): Icon[] {\n    return [\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_BUTTON),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_BUTTON)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_BUTTON_RCLICK),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_BUTTON_RCLICK)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_BUTTON_ADD),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_BUTTON_ADD)\n        }\n    ];\n}\n\n",
-    "felix.20251211000427.15": "/**\n * * Build all possible strings for the goto panel\n * @param p_context Needed to get to absolute paths on the system\n * @returns An array containing icons for the goto tree view\n */\nexport function buildGotoIconPaths(p_context: vscode.ExtensionContext): Icon[] {\n    return [\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_PARENT),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_PARENT)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_NODE),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_NODE)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_BODY),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_BODY)\n        },\n        {\n            light: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_LIGHT_TAG),\n            dark: vscode.Uri.joinPath(p_context.extensionUri, Constants.GUI.ICON_DARK_TAG)\n        }\n    ];\n}\n\n",
-    "felix.20251211000427.16": "/**\n * Convert Leo's internal filetype descriptions array\n * to vscode's option format for open/save dialogs.\n */\nexport function convertLeoFiletypes(p_filetypes: [string, string][]): { [name: string]: string[] } {\n    /*\n        from :\n            [\n                [\"\", \"\"],\n                [\"Leo files\", \"*.leojs *.leo *.db\"]\n                ['C/C++ files', '*.c'],\n                ['C/C++ files', '*.cpp'],\n                ['C/C++ files', '*.h'],\n                ['C/C++ files', '*.hpp'],\n                ['Images', '*.png *.jpg'],\n                ['TypeScript', '*.ts *.tsx']\n            ],\n\n        to :\n        {\n            'Leo files': ['leojs', 'leo', 'db'],\n            'C/C++ files': ['c', 'cpp', 'h', 'hpp']\n            'Images': ['png', 'jpg']\n            'TypeScript': ['ts', 'tsx']\n        }\n    */\n\n    const w_types: { [name: string]: string[] } = {};\n    p_filetypes.forEach(type => {\n        const typeName = type[0];\n        if (!typeName) {\n            return; // Skip empty type names\n        }\n\n        // Extract extensions from current entry\n        const extensions = type[1].split(\" \").map((p_entry) => {\n            return p_entry.startsWith(\"*.\") ? p_entry.substring(2) : p_entry;\n        }).filter(ext => ext); // Filter out empty strings\n\n        // If type already exists, merge extensions, otherwise create new entry\n        if (w_types[typeName]) {\n            // Add only extensions that don't already exist in the array\n            extensions.forEach(ext => {\n                if (!w_types[typeName].includes(ext)) {\n                    w_types[typeName].push(ext);\n                }\n            });\n        } else {\n            w_types[typeName] = extensions;\n        }\n    });\n    return w_types;\n}\n",
+    "felix.20251211000427.16": "/**\n * Convert Leo's internal filetype descriptions array\n * to vscode's option format for open/save dialogs.\n */\nexport function convertLeoFiletypes(p_filetypes: [string, string][]): { [name: string]: string[] } {\n    /*\n        from :\n            [\n                [\"\", \"\"],\n                [\"Leo files\", \"*.leojs *.leo *.db\"]\n                ['C/C++ files', '*.c'],\n                ['C/C++ files', '*.cpp'],\n                ['C/C++ files', '*.h'],\n                ['C/C++ files', '*.hpp'],\n                ['Images', '*.png *.jpg'],\n                ['TypeScript', '*.ts *.tsx']\n            ],\n\n        to :\n        {\n            'Leo files': ['leojs', 'leo', 'db'],\n            'C/C++ files': ['c', 'cpp', 'h', 'hpp']\n            'Images': ['png', 'jpg']\n            'TypeScript': ['ts', 'tsx']\n        }\n    */\n\n    const w_types: { [name: string]: string[] } = {};\n    p_filetypes.forEach(type => {\n        const typeName = type[0];\n        if (!typeName) {\n            return; // Skip empty type names\n        }\n\n        // Extract extensions from current entry\n        const extensions = type[1].split(\" \").map((p_entry) => {\n            return p_entry.startsWith(\"*.\") ? p_entry.substring(2) : p_entry;\n        }).filter(ext => ext); // Filter out empty strings\n\n        // If type already exists, merge extensions, otherwise create new entry\n        if (w_types[typeName]) {\n            // Add only extensions that don't already exist in the array\n            extensions.forEach(ext => {\n                if (!w_types[typeName]!.includes(ext)) {\n                    w_types[typeName]!.push(ext);\n                }\n            });\n        } else {\n            w_types[typeName] = extensions;\n        }\n    });\n    return w_types;\n}\n",
     "felix.20251211000427.17": "/**\n * * Returns milliseconds between the p_start process.hrtime tuple and p_end (or current call to process.hrtime)\n * @param p_start starting process.hrtime to subtract from p_end or current immediate time\n * @param p_end optional end process.hrtime (or immediate time)\n * @returns number of milliseconds passed since the given start hrtime\n */\nexport function getDurationMs(p_start: [number, number], p_end?: [number, number]): number {\n    if (!p_end) {\n        p_end = process.hrtime();\n    }\n    const w_secs = p_end[0] - p_start[0];\n    const w_nanosecs = p_end[1] - p_start[1];\n\n    return w_secs * 1000 + Math.floor(w_nanosecs / 1000000);\n}\n\n",
     "felix.20251211000427.18": "/**\n * Milliseconds converted into seconds, limiting to two decimals. \n */\nexport function getDurationSeconds(p_start: [number, number], p_end?: [number, number]): number {\n    return parseFloat((getDurationMs(p_start, p_end) / 1000).toFixed(2));\n}\n",
     "felix.20251211000427.19": "/**\n * * Extracts the file name from a full path, such as \"foo.bar\" from \"/abc/def/foo.bar\"\n * @param p_path Full path such as \"/var/drop/foo/boo/moo.js\" or \"C:\\Documents and Settings\\img\\recycled log.jpg\"\n * @returns file name string such as \"moo.js\" or \"recycled log.jpg\"\"\n */\nexport function getFileFromPath(p_path: string): string {\n    return p_path.replace(/^.*[\\\\\\/]/, '');\n}\n\n",
     "felix.20251211000427.20": "export function isAlphaNumeric(str: string): boolean {\n    let code: number;\n    let i: number;\n    let len: number;\n    for (i = 0, len = str.length; i < len; i++) {\n        code = str.charCodeAt(i);\n        if (!(code > 47 && code < 58) && // numeric (0-9)\n            !(code > 64 && code < 91) && // upper alpha (A-Z)\n            !(code > 96 && code < 123) // lower alpha (a-z)\n        ) {\n            return false;\n        }\n    }\n    return true;\n};\n",
     "felix.20251211000427.21": "/**\n * * Checks if a node would become dirty if it were to now have body content at all\n * @param p_node LeoNode from vscode's outline\n * @param p_newHasBody Flag to signify presence of body content, to be compared with its current state\n * @returns True if it would change the icon with actual body content, false otherwise\n */\nexport function isIconChangedByEdit(p_node: Position, p_newHasBody: boolean): boolean {\n    // hasBody can be undefined so force boolean.\n    if (!p_node.isDirty() || (!!p_node.bodyString().length === !p_newHasBody)) {\n        return true;\n    }\n    return false;\n}\n\n",
     "felix.20251211000427.22": "/**\n * * Checks if a string is formatted as a valid rrggbb color code.\n * @param p_hexString hexadecimal 6 digits string, without leading '0x'\n * @returns True if the string is a valid representation of an hexadecimal 6 digit number\n */\nexport function isHexColor(p_hexString: string): boolean {\n    return typeof p_hexString === 'string'\n        && p_hexString.length === 6\n        && !isNaN(Number('0x' + p_hexString));\n}\n\n",
-    "felix.20251211000427.23": "/**\n* Builds a 'Leo Scheme' vscode.Uri from a gnx (or strings like 'LEO BODY' or empty strings to decorate breadcrumbs)\n* @param p_str leo node gnx strings are used to build Uri\n* @returns A vscode 'Uri' object\n*/\nexport function strToLeoUri(p_str: string): vscode.Uri {\n    return vscode.Uri.parse(Constants.URI_SCHEME_HEADER + p_str);\n}\n\n",
-    "felix.20251211000427.24": "/**\n* Builds a 'Leo Detached Scheme' vscode.Uri from a gnx \n* @param p_str leo node gnx strings are used to build Uri\n* @returns A vscode 'Uri' object\n*/\nexport function strToLeoDetachedUri(p_str: string): vscode.Uri {\n    return vscode.Uri.parse(Constants.URI_SCHEME_DETACHED_HEADER + p_str);\n}\n\n",
-    "felix.20251211000427.25": "/**\n * * Gets the gnx, (or another string like 'LEO BODY' or other), from a vscode.Uri object\n * @param p_uri Source uri to extract from\n * @returns The string source that was used to build this Uri\n */\nexport function leoUriToStr(p_uri: vscode.Uri): string {\n    // For now, just remove the '/' before the path string\n    return p_uri.path.substring(1);\n}\n\n",
-    "felix.20251211000427.26": "/**\n * * Sets a vscode context variable with 'vscode.commands.executeCommand' & 'setContext'\n * @param p_key Key string name such as constants 'leoReady' or 'treeOpened', etc.\n * @param p_value Value to be assigned to the p_key 'key'\n * @returns A Thenable that is returned by the executeCommand call\n */\nexport function setContext(p_key: string, p_value: any): Thenable<unknown> {\n    return vscode.commands.executeCommand(Constants.VSCODE_COMMANDS.SET_CONTEXT, p_key, p_value);\n}\n\n",
-    "felix.20251211000618.1": "import { Position } from \"./core/leoNodes\";\nimport { RClick } from \"./core/mod_scripting\";\n\n@language typescript\n@tabwidth -4\n@others\n",
+    "felix.20251211000618.1": "// import { Position } from \"./core/leoNodes\";\n// import { RClick } from \"./core/mod_scripting\";\n// For now, these imports are commented out until implemented.\ntype RClick = any;\ntype Position = any;\n\n@language typescript\n@tabwidth -4\n@others\n",
+    "felix.20251211213133.1": "export interface TreeNode {\n    gnx: number;\n    parent?: TreeNode;\n    children?: TreeNode[];\n    toggled?: boolean; // To track if node was toggled (expanded/collapsed) since last render\n}",
+    "felix.20251211213147.1": "export interface NodeData {\n    headString: string;\n    bodyString: string;\n    icon?: number; // Bitmask for icons: hasBody: 1, isMarked: 2, isClone: 4, isDirty: 8\n}",
+    "felix.20251211213151.1": "export interface FlatRow {\n    label: string;\n    depth: number;\n    toggled: boolean; // Will make it render with toggled class\n    hasChildren: boolean;\n    isExpanded: boolean;\n    node: TreeNode;\n    isSelected: boolean;\n    isAncestor: boolean;      // Is ancestor of selected node\n    isInitialFind: boolean;   // Used for find scope highlighting\n    icon: number;             // Icon number for the node\n}",
+    "felix.20251211213155.1": "export interface MenuEntry {\n    label: string;\n    action?: string;\n    entries?: MenuEntry[];\n}",
+    "felix.20251211213200.1": "export interface FileStat {\n    type: 'file' | 'directory';\n    size?: number;\n    mtime?: number;\n}\n",
+    "felix.20251211213205.1": "export interface FilePath {\n    name: string;\n    handle: FileSystemDirectoryHandle;\n}",
+    "felix.20251211213209.1": "export interface OpenDialogOptions {\n    defaultUri?: string; // Default URI to open\n    openLabel?: string; // A human-readable string for the open button.\n    title?: string; // Dialog title.\n}",
+    "felix.20251211213213.1": "export interface SaveDialogOptions {\n    defaultUri?: string; // Default URI to open\n    saveLabel?: string; // A human-readable string for the save button.\n    title?: string; // Dialog title.\n}",
+    "felix.20251211213217.1": "export interface InputDialogOptions {\n    title: string;\n    prompt: string;\n    placeholder?: string;\n    value?: string;\n}",
     "felix.20251211000618.2": "/**\n * * Types of the various JSON configuration keys such as treeKeepFocus, defaultReloadIgnore, etc.\n */\nexport interface ConfigMembers {\n    checkForChangeExternalFiles: string;\n    defaultReloadIgnore: string;\n    sessionPerWorkspace: boolean;\n    leoTreeBrowse: boolean;\n    treeKeepFocus: boolean;\n    treeKeepFocusWhenAside: boolean;\n\n    collapseAllShortcut: boolean;\n    activityViewShortcut: boolean;\n    goAnywhereShortcut: boolean;\n\n    showUnlOnStatusBar: boolean,\n\n    treeInExplorer: boolean;\n\n    showFileOnOutline: boolean;\n    showHoistDehoistOnOutline: boolean;\n    showPrevNextOnOutline: boolean;\n    showPromoteDemoteOnOutline: boolean;\n    showRecentFilesOnOutline: boolean;\n    showSettingsOnOutline: boolean;\n    showShowLogOnOutline: boolean;\n    showUndoRedoOnOutline: boolean;\n\n    showEditOnNodes: boolean;\n    showAddOnNodes: boolean;\n    showMarkOnNodes: boolean;\n    showCloneOnNodes: boolean;\n    showCopyOnNodes: boolean;\n\n    // showEditionOnBody: boolean; // clone delete insert(s)\n    // showClipboardOnBody: boolean; // cut copy paste(s)\n    // showPromoteOnBody: boolean; // promote demote\n    // showExecuteOnBody: boolean; // extract(s)\n    // showExtractOnBody: boolean;\n    // showImportOnBody: boolean;\n    // showRefreshOnBody: boolean;\n    // showHoistOnBody: boolean;\n    // showMarkOnBody: boolean;\n    // showSortOnBody: boolean;\n\n    invertNodeContrast: boolean;\n    leoID: string;\n}\n\n",
     "felix.20251211000618.3": "/**\n * * Structure for configuration settings changes used along with welcome/settings webview.\n */\nexport interface ConfigSetting {\n    code: string;\n    value: any;\n}\n\n",
     "felix.20251211000618.4": "/**\n * * Location of focus to be set when current/last command is resolved\n */\nexport const enum Focus {\n    NoChange = 0, // Stays on goto pane, or other current panel.\n    Body, // Forces body to appear, refresh leaves focus on body.\n    Outline, // Forces outline to appear, refresh leaves focus on Outline.\n    Goto\n}\n\n",
@@ -399,7 +410,6 @@
     "felix.20251211000618.15": "/**\n * * Enum type for the search scope radio buttons of the find panel.\n */\nexport const enum LeoSearchScope {\n    entireOutline = 0,\n    subOutlineOnly,\n    nodeOnly,\n    fileOnly\n}\n\n",
     "felix.20251211000618.16": "/**\n * * Search settings structure for use with the 'find' webview\n */\nexport interface LeoSearchSettings {\n    // Nav options\n    navText: string;\n    isTag: boolean;\n    showParents: boolean;\n    searchOptions: number;\n    // Find/change strings...\n    findText: string;  // find_text\n    replaceText: string; // change_text\n    // Find options...\n    wholeWord: boolean;\n    ignoreCase: boolean;\n    regExp: boolean;\n    markFinds: boolean;\n    markChanges: boolean;\n    searchHeadline: boolean;\n    searchBody: boolean;\n    searchScope: LeoSearchScope; // 0, 1 or 2 for outline, sub-outline, or node.\n}\n\n",
     "felix.20251211000618.17": "/**\n * * Leo's GUI search settings internal structure\n */\nexport interface LeoGuiFindTabManagerSettings {\n    // Nav options\n    nav_text: string;\n    is_tag: boolean;\n    show_parents: boolean;\n    search_options: number;\n    //Find/change strings...\n    find_text: string,\n    change_text: string,\n    // Find options...\n    ignore_case: boolean,\n    mark_changes: boolean,\n    mark_finds: boolean,\n    node_only: boolean,\n    file_only: boolean,\n    pattern_match: boolean,\n    search_body: boolean,\n    search_headline: boolean,\n    suboutline_only: boolean,\n    whole_word: boolean\n}\n\n",
-    "felix.20251211000618.18": "/**\n * * Icon path names used in leoNodes for rendering in treeview\n */\nexport interface Icon {\n    light: string | vscode.Uri;\n    dark: string | vscode.Uri;\n}\n\n",
     "felix.20251211000618.19": "/**\n * * LeoBody virtual file time information object\n */\nexport interface BodyTimeInfo {\n    ctime: number;\n    mtime: number;\n}\n\n",
     "felix.20251211000618.20": "/**\n * * Body position\n * Used in BodySelectionInfo interface\n */\nexport interface BodyPosition {\n    line: number;\n    col: number;\n}\n\n",
     "felix.20251211000618.21": "/**\n * * LeoBody cursor active position and text selection state, along with gnx\n */\nexport interface BodySelectionInfo {\n    gnx: string;\n    // scroll is stored as-is as the 'scrollBarSpot' in Leo\n    // ! TEST scroll as single number only (for Leo vertical scroll value)\n    scroll: number;\n    // scroll: {\n    //     start: BodyPosition;\n    //     end: BodyPosition;\n    // }\n    insert: BodyPosition;\n    start: BodyPosition;\n    end: BodyPosition;\n}\n\n",
@@ -407,10 +417,10 @@
     "felix.20251211000618.23": "/**\n * * Parameter structure used in the 'runAskYesNoDialog' equivalent when asking user input\n */\nexport interface runAskYesNoDialogParameters {\n    \"ask\": string;\n    \"message\": string;\n    \"yes_all\": boolean;\n    \"no_all\": boolean;\n}\n\n",
     "felix.20251211000618.24": "/**\n * * Parameter structure used in the 'runAskOkDialog' equivalent when showing a warning\n */\nexport interface runWarnMessageDialogParameters {\n    \"warn\": string;\n    \"message\": string;\n}\n\n",
     "felix.20251211000618.25": "/**\n * * Parameter structure for non-blocking info message about detected file changes\n */\nexport interface runInfoMessageDialogParameters {\n    \"message\": string;\n}\n\n",
-    "felix.20251211000618.26": "/**\n * * Used in showAskModalDialog to get answer from user interaction\n */\nexport interface AskMessageItem extends vscode.MessageItem {\n    value: string;\n}\n\n",
-    "felix.20251211000618.27": "/**\n * * Used in switch Leo document to get answer from user interaction\n */\nexport interface ChooseDocumentItem extends vscode.QuickPickItem {\n    value: number;\n}\n\n",
-    "felix.20251211000618.28": "/**\n * * Used to select a button's rclick by index\n */\nexport interface ChooseRClickItem extends vscode.QuickPickItem {\n    index: number;\n    rclick?: RClick;\n}\n\n",
-    "felix.20251211000618.29": "/**\n * * Used by the minibuffer command pallette\n */\nexport interface MinibufferCommand extends vscode.QuickPickItem {\n    func: string;\n}\n",
+    "felix.20251211000618.26": "/**\n * * Used in showAskModalDialog to get answer from user interaction\n */\nexport interface AskMessageItem {\n    label: string;\n    description?: string;\n    value: string;\n}\n\n",
+    "felix.20251211000618.27": "/**\n * * Used in switch Leo document to get answer from user interaction\n */\nexport interface ChooseDocumentItem {\n    value: number;\n    label: string;\n    description?: string;\n}\n\n",
+    "felix.20251211000618.28": "/**\n * * Used to select a button's rclick by index\n */\nexport interface ChooseRClickItem {\n    index: number;\n    rclick?: RClick;\n    label: string;\n    description?: string;\n}\n\n",
+    "felix.20251211000618.29": "/**\n * * Used by the minibuffer command pallette\n */\nexport interface MinibufferCommand {\n    func: string;\n    label: string;\n    description?: string;\n}\n\n",
     "felix.20251211000618.30": "export type UnlType = 'shortGnx' | 'fullGnx' | 'shortLegacy' | 'fullLegacy';\n\n",
     "felix.20251207200255.1": "# This file contains almost all of LeoJS sources.\n\n# See the \"About this file\" node for important notes.\n",
     "ekr.20140902032918.18591": "@language rest\n@wrap\n\nLeo uses a model/view/controller architecture.\n\n- Controller: The Commands class and its helpers in leoCommands.py and leoEditCommands.py.\n\n- Model: The VNode and Position classes in leoNodes.py.\n\n- View: The gui-independent base classes are in the node \"Gui Base Classes\". The Qt-Specific subclasses are in the node \"Qt gui\".\n\n**Important**: The general organization of these classes have changed hardly at all in Leo's 20+ year history.  The reason is that what each class does is fairly obvious.  How the gets the job done may have changed drastically, but *that's an internal implementation detail of the class itself*.  This is the crucial design principle that allows Leo's code to remain stable.  *Classes do not know or meddle in the internal details of other classes*.  As a result, nobody, including EKR, needs to remember internal details.\n\n",
@@ -438,10 +448,10 @@
       "_mod_time": 1765428602.58
     },
     "felix.20251211000427.1": {
-      "_mod_time": 1765429473.263
+      "_mod_time": 1765515349.78
     },
     "felix.20251211000618.1": {
-      "_mod_time": 1765429605.456
+      "_mod_time": 1765515070.464
     }
   }
 }

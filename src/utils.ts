@@ -1,3 +1,9 @@
+import { Constants } from "./constants";
+// import { Position } from "./core/leoNodes";
+type Position = any;
+
+// String and other types/structures helper functions, along with common vscode API calls
+
 /**
  * Throttle function execution to limit how often it can be called
  * @param func Function to throttle
@@ -24,7 +30,6 @@ export function throttle<T extends any[]>(func: (...args: T) => void, limit: num
         }
     };
 }
-
 /**
  * Safely access localStorage.getItem with error handling
  */
@@ -35,7 +40,6 @@ export function safeLocalStorageGet(key: string): string | null {
         return null;
     }
 }
-
 /**
  * Safely access localStorage.setItem with error handling
  */
@@ -46,14 +50,12 @@ export function safeLocalStorageSet(key: string, value: string): void {
         // ignore
     }
 }
-
 /**
  * Prevent default event behavior - useful as event handler
  */
 export function preventDefault(e: Event): void {
     e.preventDefault();
 }
-
 /**
  * Get the text node and offset at a given global character index within a root node
  */
@@ -72,7 +74,6 @@ export function getTextNodeAtIndex(root: Node, index: number): { node: Node; off
     }
     return null;
 }
-
 /**
  * Get the global character offset within a root node for a given text node and offset
  */
@@ -90,8 +91,6 @@ export function getGlobalOffset(root: Node, container: Node, offset: number): nu
     }
     return total;
 }
-
-
 /**
  * Read all entries from a directory handle, returning an array of name/kind/handle objects
  */
@@ -106,3 +105,167 @@ export async function readDirectory(dirHandle: FileSystemDirectoryHandle): Promi
     }
     return entries;
 }
+/**
+ * * window.performace.now browser/node crossover utility
+ */
+export function performanceNow(): number {
+    const w_now = process.hrtime();
+    const [w_secs, w_nanosecs] = w_now;
+    return w_secs * 1000 + Math.floor(w_nanosecs / 1000000);
+}
+
+/**
+ * * Unique numeric Id
+ */
+var uniqueId: number = 0;
+
+/**
+ * * Get new uniqueID
+ */
+export function getUniqueId(): string {
+    const id = uniqueId++;
+    return id.toString();
+}
+
+export function getNonce(): string {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+/**
+ * * Build a string for representing a number that's 2 digits wide, padding with a zero if needed
+ * @param p_number Between 0 and 99
+ * @returns a 2 digit wide string representation of the number, left padded with zeros as needed.
+ */
+export function padNumber2(p_number: number): string {
+    return ("0" + p_number).slice(-2);
+}
+
+/**
+ * Convert Leo's internal filetype descriptions array
+ * to vscode's option format for open/save dialogs.
+ */
+export function convertLeoFiletypes(p_filetypes: [string, string][]): { [name: string]: string[] } {
+    /*
+        from :
+            [
+                ["", ""],
+                ["Leo files", "*.leojs *.leo *.db"]
+                ['C/C++ files', '*.c'],
+                ['C/C++ files', '*.cpp'],
+                ['C/C++ files', '*.h'],
+                ['C/C++ files', '*.hpp'],
+                ['Images', '*.png *.jpg'],
+                ['TypeScript', '*.ts *.tsx']
+            ],
+
+        to :
+        {
+            'Leo files': ['leojs', 'leo', 'db'],
+            'C/C++ files': ['c', 'cpp', 'h', 'hpp']
+            'Images': ['png', 'jpg']
+            'TypeScript': ['ts', 'tsx']
+        }
+    */
+
+    const w_types: { [name: string]: string[] } = {};
+    p_filetypes.forEach(type => {
+        const typeName = type[0];
+        if (!typeName) {
+            return; // Skip empty type names
+        }
+
+        // Extract extensions from current entry
+        const extensions = type[1].split(" ").map((p_entry) => {
+            return p_entry.startsWith("*.") ? p_entry.substring(2) : p_entry;
+        }).filter(ext => ext); // Filter out empty strings
+
+        // If type already exists, merge extensions, otherwise create new entry
+        if (w_types[typeName]) {
+            // Add only extensions that don't already exist in the array
+            extensions.forEach(ext => {
+                if (!w_types[typeName]!.includes(ext)) {
+                    w_types[typeName]!.push(ext);
+                }
+            });
+        } else {
+            w_types[typeName] = extensions;
+        }
+    });
+    return w_types;
+}
+/**
+ * * Returns milliseconds between the p_start process.hrtime tuple and p_end (or current call to process.hrtime)
+ * @param p_start starting process.hrtime to subtract from p_end or current immediate time
+ * @param p_end optional end process.hrtime (or immediate time)
+ * @returns number of milliseconds passed since the given start hrtime
+ */
+export function getDurationMs(p_start: [number, number], p_end?: [number, number]): number {
+    if (!p_end) {
+        p_end = process.hrtime();
+    }
+    const w_secs = p_end[0] - p_start[0];
+    const w_nanosecs = p_end[1] - p_start[1];
+
+    return w_secs * 1000 + Math.floor(w_nanosecs / 1000000);
+}
+
+/**
+ * Milliseconds converted into seconds, limiting to two decimals. 
+ */
+export function getDurationSeconds(p_start: [number, number], p_end?: [number, number]): number {
+    return parseFloat((getDurationMs(p_start, p_end) / 1000).toFixed(2));
+}
+/**
+ * * Extracts the file name from a full path, such as "foo.bar" from "/abc/def/foo.bar"
+ * @param p_path Full path such as "/var/drop/foo/boo/moo.js" or "C:\Documents and Settings\img\recycled log.jpg"
+ * @returns file name string such as "moo.js" or "recycled log.jpg""
+ */
+export function getFileFromPath(p_path: string): string {
+    return p_path.replace(/^.*[\\\/]/, '');
+}
+
+export function isAlphaNumeric(str: string): boolean {
+    let code: number;
+    let i: number;
+    let len: number;
+    for (i = 0, len = str.length; i < len; i++) {
+        code = str.charCodeAt(i);
+        if (!(code > 47 && code < 58) && // numeric (0-9)
+            !(code > 64 && code < 91) && // upper alpha (A-Z)
+            !(code > 96 && code < 123) // lower alpha (a-z)
+        ) {
+            return false;
+        }
+    }
+    return true;
+};
+/**
+ * * Checks if a node would become dirty if it were to now have body content at all
+ * @param p_node LeoNode from vscode's outline
+ * @param p_newHasBody Flag to signify presence of body content, to be compared with its current state
+ * @returns True if it would change the icon with actual body content, false otherwise
+ */
+export function isIconChangedByEdit(p_node: Position, p_newHasBody: boolean): boolean {
+    // hasBody can be undefined so force boolean.
+    if (!p_node.isDirty() || (!!p_node.bodyString().length === !p_newHasBody)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * * Checks if a string is formatted as a valid rrggbb color code.
+ * @param p_hexString hexadecimal 6 digits string, without leading '0x'
+ * @returns True if the string is a valid representation of an hexadecimal 6 digit number
+ */
+export function isHexColor(p_hexString: string): boolean {
+    return typeof p_hexString === 'string'
+        && p_hexString.length === 6
+        && !isNaN(Number('0x' + p_hexString));
+}
+
