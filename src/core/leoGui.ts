@@ -11,18 +11,10 @@
 //@+<< leoGui imports >>
 //@+node:felix.20251213133753.210: ** << leoGui imports >>
 import * as g from './leoGlobals';
-
-// import { StringFindTabManager } from './findTabManager';
-// import { Position } from './leoNodes';
-// import { Commands } from './leoCommands';
-// import { LeoFrame, StringTextWrapper } from './leoFrame';
-
-// For now, use any but will later be replaced by actual imports.
-type StringFindTabManager = any;
-type Position = any;
-type Commands = any;
-class LeoFrame { constructor(c: Commands, title: string, gui: LeoGui) { } }
-class StringTextWrapper { }
+import { StringFindTabManager } from './findTabManager';
+import { Position } from './leoNodes';
+import { Commands } from './leoCommands';
+import { LeoFrame, StringTextWrapper } from './leoFrame';
 
 //@-<< leoGui imports >>
 //@+others
@@ -287,7 +279,7 @@ export class LeoGui {
         title: string,
         filetypes: [string, string][],
         startpath?: string
-    ): Promise<string> {
+    ): Thenable<string> {
         this.oops();
         return Promise.resolve('no');
     }
@@ -297,7 +289,7 @@ export class LeoGui {
         title: string,
         filetypes: [string, string][],
         startpath?: string
-    ): Promise<string[]> {
+    ): Thenable<string[]> {
         this.oops();
         return Promise.resolve(['no']);
     }
@@ -309,7 +301,7 @@ export class LeoGui {
         c: Commands,
         title: string,
         filetypes: [string, string][],
-    ): Promise<string> {
+    ): Thenable<string> {
         this.oops();
         return Promise.resolve('no');
     }
@@ -338,14 +330,14 @@ export class LeoGui {
         options?: any,
         token?: any,
         tabList?: string[]
-    ): Promise<string | undefined> {
+    ): Thenable<string | undefined> {
         return Promise.resolve('');
     }
     //@+node:felix.20251213133753.226: *4* LeoGui.get1Char (LeoJs)
     public get1Char(
         options?: any,
         token?: any
-    ): Promise<string | undefined> {
+    ): Thenable<string | undefined> {
         return Promise.resolve('');
     }
     //@+node:felix.20251213133753.227: *4* leoGui.getWorkspaceSession
@@ -361,7 +353,7 @@ export class LeoGui {
     /**
      * Sets session files list for this workspace
      */
-    public setWorkspaceSession(p_files: string[]): Promise<void> {
+    public setWorkspaceSession(p_files: string[]): Thenable<void> {
         return Promise.resolve();
     }
 
@@ -536,17 +528,17 @@ export class LeoGui {
         return w.toString();
     }
     //@+node:felix.20251213133753.246: *4* goAnywhere
-    public goAnywhere(): Promise<unknown> {
+    public goAnywhere(): Thenable<unknown> {
         return Promise.resolve();
     }
 
     //@+node:felix.20251213133753.247: *4* openAside
-    public openAside(): Promise<unknown> {
+    public openAside(): Thenable<unknown> {
         return Promise.resolve();
     }
 
     //@+node:felix.20251213133753.248: *4* showSettings
-    public showSettings(): Promise<unknown> {
+    public showSettings(): Thenable<unknown> {
         return Promise.resolve();
     }
 
@@ -582,12 +574,12 @@ export class NullGui extends LeoGui {
     public fullRefresh(p_keepFocus?: boolean): void { }
     public showNavResults(): void { }
 
-    public override replaceClipboardWith(s: string): Promise<string> {
+    public override replaceClipboardWith(s: string): Thenable<string> {
         this.clipboardContents = s; // also set immediate clipboard string
         return Promise.resolve(s);
     }
 
-    public asyncGetTextFromClipboard(): Promise<string> {
+    public asyncGetTextFromClipboard(): Thenable<string> {
         return Promise.resolve(this.clipboardContents);
     }
 
@@ -640,7 +632,7 @@ export class NullGui extends LeoGui {
         theCopyright: string,
         url: string,
         email: string
-    ): Promise<unknown> {
+    ): Thenable<unknown> {
         return Promise.resolve('');
     }
 
@@ -648,7 +640,7 @@ export class NullGui extends LeoGui {
         c: Commands,
         title: string,
         filetypes: [string, string][],
-    ): Promise<string> {
+    ): Thenable<string> {
         return Promise.resolve('');
     }
 
@@ -656,7 +648,7 @@ export class NullGui extends LeoGui {
         c: Commands,
         title: string,
         filetypes: [string, string][],
-    ): Promise<string[]> {
+    ): Thenable<string[]> {
         return Promise.resolve([]);
     }
 
@@ -664,7 +656,7 @@ export class NullGui extends LeoGui {
         c: Commands,
         title: string,
         filetypes: [string, string][],
-    ): Promise<string> {
+    ): Thenable<string> {
         return Promise.resolve('');
     }
 
@@ -673,7 +665,7 @@ export class NullGui extends LeoGui {
         title: string,
         message: string,
         buttonText?: string
-    ): Promise<unknown> {
+    ): Thenable<unknown> {
         return Promise.resolve('');
     }
 
@@ -683,7 +675,7 @@ export class NullGui extends LeoGui {
         message: string,
         yes_all?: boolean,
         no_all?: boolean
-    ): Promise<string> {
+    ): Thenable<string> {
         return Promise.resolve('');
     }
 
@@ -696,7 +688,7 @@ export class NullGui extends LeoGui {
         yesToAllMessage = '',
         defaultButton = 'Yes',
         cancelMessage = ''
-    ): Promise<string> {
+    ): Thenable<string> {
         return Promise.resolve('');
     }
 
