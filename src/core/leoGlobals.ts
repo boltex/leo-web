@@ -1042,7 +1042,7 @@ export function comment_delims_from_extension(
         ext = path.extname(root);
     }
 
-    let language = app.extension_dict[ext.substring(1)];
+    let language = app.extension_dict[ext.substring(1)]!;
 
     if (ext) {
         return set_delims_from_language(language);
@@ -1111,7 +1111,7 @@ export function findLanguageDirectives(c: Commands, p: Position): string | undef
     function find_language(p_or_v: Position | VNode): string | undefined {
         for (const s of [p_or_v.h, p_or_v.b]) {
             for (const m of s.matchAll(g_language_pat)) {
-                const language = m[1];
+                const language = m[1]!;
                 if (isValidLanguage(language)) {
                     return language;
                 }
@@ -6109,7 +6109,7 @@ export async function getUrlFromNode(p: Position): Promise<string | undefined> {
     }
     const c = p.v.context;
     assert(c);
-    let table = [p.h, p.b ? splitLines(p.b)[0] : ''];
+    let table: string[] = [p.h, p.b ? splitLines(p.b)[0]! : ''];
 
     // table = [g.match_word(s, 0, '@url') ? s.slice(4) : s for s in table];
     table = table.map((s) =>
@@ -6637,7 +6637,7 @@ export async function openUrlHelper(c: Commands, url?: string): Promise<string |
         const importMatch = importStatementMatch || fromImportStatementMatch;
 
         if (importMatch) {
-            moduleName = importMatch[1];
+            moduleName = importMatch[1]!;
             filename = moduleName + '.py';
             filename_w = moduleName + '.pyw';
         }
@@ -6816,7 +6816,7 @@ export function parsePathData(c: Commands): Record<string, string> {
     for (const line of lines) {
         const m = line.match(path_data_pattern);
         if (m && m.length) {
-            let [key, w_path] = [m[1], m[2]];
+            let [key, w_path] = [m[1]!, m[2]!];
             if (d[key]) {
                 trace(`Ignoring duplicate key: ${line}`);
             } else {

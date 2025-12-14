@@ -334,12 +334,162 @@
           ]
         },
         {
-          "gnx": "felix.20251207200355.1",
+          "gnx": "felix.20251214160339.1",
           "vh": "Core classes",
           "children": [
             {
+              "gnx": "felix.20251214160339.2",
+              "vh": "@file src/core/decorators.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.7",
+              "vh": "@file src/core/idle_time.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.15",
+              "vh": "@file src/core/leoApp.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.153",
+              "vh": "@file src/core/leoAtFile.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.333",
+              "vh": "@file src/core/leoCache.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.370",
+              "vh": "@file src/core/leoChapters.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.405",
+              "vh": "@file src/core/leoCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.660",
+              "vh": "@file src/core/leoCompare.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.701",
+              "vh": "@file src/core/leoConfig.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.834",
+              "vh": "@file src/core/leoExternalFiles.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.870",
+              "vh": "@file src/core/leoFileCommands.ts"
+            },
+            {
               "gnx": "felix.20251207215313.1",
               "vh": "@file src/core/leoGlobals.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1297",
+              "vh": "@file src/core/leoHistory.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1305",
+              "vh": "@file src/core/leoImport.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1444",
+              "vh": "@file src/core/leoMarkup.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1466",
+              "vh": "@file src/core/leoNodes.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1696",
+              "vh": "@file src/core/leoPersistence.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1743",
+              "vh": "@file src/core/leoPlugins.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1760",
+              "vh": "@file src/core/leoRst.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1806",
+              "vh": "@file src/core/leoSessions.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1823",
+              "vh": "@file src/core/leoShadow.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1865",
+              "vh": "@file src/core/leoUndo.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.1993",
+              "vh": "@file src/core/mod_scripting.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.2041",
+              "vh": "@file src/core/nodeTags.ts"
+            },
+            {
+              "gnx": "felix.20251214160339.2057",
+              "vh": "@file src/core/quicksearch.ts"
+            }
+          ]
+        },
+        {
+          "gnx": "felix.20251214160853.1",
+          "vh": "Command classes",
+          "children": [
+            {
+              "gnx": "felix.20251214160853.2",
+              "vh": "@file src/commands/baseCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.16",
+              "vh": "@file src/commands/bufferCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.32",
+              "vh": "@file src/commands/commanderEditCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.68",
+              "vh": "@file src/commands/commanderFileCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.113",
+              "vh": "@file src/commands/commanderHelpCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.128",
+              "vh": "@file src/commands/commanderOutlineCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.236",
+              "vh": "@file src/commands/editCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.386",
+              "vh": "@file src/commands/editFileCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.464",
+              "vh": "@file src/commands/helpCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.491",
+              "vh": "@file src/commands/gotoCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.514",
+              "vh": "@file src/commands/killBufferCommands.ts"
+            },
+            {
+              "gnx": "felix.20251214160853.536",
+              "vh": "@file src/commands/rectangleCommands.ts"
             }
           ]
         },
@@ -362,6 +512,146 @@
             {
               "gnx": "felix.20251213133753.209",
               "vh": "@file src/core/leoGui.ts"
+            }
+          ]
+        },
+        {
+          "gnx": "felix.20251214160933.1",
+          "vh": "Importer plugins",
+          "children": [
+            {
+              "gnx": "felix.20251214160933.2",
+              "vh": "@file src/importers/base_importer.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.30",
+              "vh": "@file src/importers/c.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.33",
+              "vh": "@file src/importers/coffeescript.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.35",
+              "vh": "@file src/importers/csharp.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.37",
+              "vh": "@file src/importers/cython.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.39",
+              "vh": "@file src/importers/dart.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.41",
+              "vh": "@file src/importers/elisp.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.44",
+              "vh": "@file src/importers/html.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.46",
+              "vh": "@file src/importers/ini.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.49",
+              "vh": "@file src/importers/java.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.51",
+              "vh": "@file src/importers/javascript.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.54",
+              "vh": "@file src/importers/leo_rst.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.63",
+              "vh": "@file src/importers/lua.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.66",
+              "vh": "@file src/importers/markdown.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.74",
+              "vh": "@file src/importers/org.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.77",
+              "vh": "@file src/importers/otl.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.82",
+              "vh": "@file src/importers/pascal.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.85",
+              "vh": "@file src/importers/perl.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.89",
+              "vh": "@file src/importers/php.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.91",
+              "vh": "@file src/importers/python.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.103",
+              "vh": "@file src/importers/rust.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.119",
+              "vh": "@file src/importers/tcl.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.121",
+              "vh": "@file src/importers/treepad.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.124",
+              "vh": "@file src/importers/typescript.ts"
+            },
+            {
+              "gnx": "felix.20251214160933.128",
+              "vh": "@file src/importers/xml.ts"
+            }
+          ]
+        },
+        {
+          "gnx": "felix.20251214160938.1",
+          "vh": "Writer plugins",
+          "children": [
+            {
+              "gnx": "felix.20251214160938.2",
+              "vh": "@file src/writers/basewriter.ts"
+            },
+            {
+              "gnx": "felix.20251214160938.6",
+              "vh": "@file src/writers/dart.ts"
+            },
+            {
+              "gnx": "felix.20251214160938.9",
+              "vh": "@file src/writers/leo_rst.ts"
+            },
+            {
+              "gnx": "felix.20251214160938.14",
+              "vh": "@file src/writers/markdown.ts"
+            },
+            {
+              "gnx": "felix.20251214160938.19",
+              "vh": "@file src/writers/org.ts"
+            },
+            {
+              "gnx": "felix.20251214160938.24",
+              "vh": "@file src/writers/otl.ts"
+            },
+            {
+              "gnx": "felix.20251214160938.28",
+              "vh": "@file src/writers/treepad.ts"
             }
           ]
         }
@@ -445,10 +735,12 @@
     "felix.20251211000618.29": "/**\n * * Used by the minibuffer command pallette\n */\nexport interface MinibufferCommand {\n    func: string;\n    label: string;\n    description?: string;\n}\n\n",
     "felix.20251211000618.30": "export type UnlType = 'shortGnx' | 'fullGnx' | 'shortLegacy' | 'fullLegacy';\n\n",
     "felix.20251207200255.1": "# This file contains almost all of LeoJS sources.\n\n# See the \"About this file\" node for important notes.\n",
-    "ekr.20140902032918.18591": "@language rest\n@wrap\n\nLeo uses a model/view/controller architecture.\n\n- Controller: The Commands class and its helpers in leoCommands.py and leoEditCommands.py.\n\n- Model: The VNode and Position classes in leoNodes.py.\n\n- View: The gui-independent base classes are in the node \"Gui Base Classes\". The Qt-Specific subclasses are in the node \"Qt gui\".\n\n**Important**: The general organization of these classes have changed hardly at all in Leo's 20+ year history.  The reason is that what each class does is fairly obvious.  How the gets the job done may have changed drastically, but *that's an internal implementation detail of the class itself*.  This is the crucial design principle that allows Leo's code to remain stable.  *Classes do not know or meddle in the internal details of other classes*.  As a result, nobody, including EKR, needs to remember internal details.\n\n",
+    "ekr.20140902032918.18591": "@language rest\n@wrap\n\nLeo uses a model/view/controller architecture.\n\n- Controller: The Commands class and its helpers in leoCommands.py and leoEditCommands.py.\n\n- Model: The VNode and Position classes in leoNodes.py.\n\n- View: The gui-independent base classes are in the node \"Gui Base Classes\". \n\n**Important**: The general organization of these classes have changed hardly at all in Leo's 20+ year history.  The reason is that what each class does is fairly obvious.  How the gets the job done may have changed drastically, but *that's an internal implementation detail of the class itself*.  This is the crucial design principle that allows Leo's code to remain stable.  *Classes do not know or meddle in the internal details of other classes*.  As a result, nobody, including EKR, needs to remember internal details.\n\n",
     "ekr.20140831085423.18639": "Here is what you *must know* to understand Leo's core:\n\n1. A **widget** is an actual Qt widget.\n\nLeo's core seldom accesses widgets directly.  Instead...\n\n2. A **wrapper class** defines a standard api that hides the details\n   of the underlying gui **text** widgets.\n\nLeo's core uses this api almost exclusively. That is, Leo's core code treats wrappers *as if* they were only text widgets there are!\n\nThere is, however, a back door for (hopefully rare!) special cases. All wrapper classes define an official ``widget`` ivar, so core or plugin code can gain access to the real Qt widget using wrapper.widget. Searching for wrapper.widget will find all gui-dependent snippets of code in Leo's core.\n",
     "ekr.20140831085423.18630": "This outline contains all of Leo's core source code.\n\nLeo's code uses the following conventions throughout:\n\nc:  a commander.\nch: a character.\nd:  a dict.\nf:  an open file.\nfn: a file name.\ng:  the leoGlobals module.\ni, j, k: indices into a string.\np:  a Position.\ns:  a string.\nt:  a text widget.\nu:  an undoer.\nw:  a gui widget.\nv:  a Vnode\nz:  a local temp.\n\nIn more limited contexts, the following conventions apply:\n\nsi:     a g.ShortcutInfo object.\nks:     a g.KeyStroke object\nstroke: a KeyStroke object.\n\nbtw:    leoFrame.BaseTextWrapper\nstw:    leoFrame.StringTextWrapper\n\nbqtw:   qt_text.BaseQTextWrapper\nlqtb:   qt_text.LeoQTextBrowser\nqhlw:   qt_text.QHeadlineWrapper\nqmbw:   qt_text.QMinibufferWrapper\nqlew:   qt_text.QLineEditWrapper\nqsciw:  qt_text.QScintiallaWrapper\nqtew:   qt_text.QTextEditWrapper",
-    "ekr.20140831085423.18631": "The following 'official' ivars will always exist:\n\nc.frame                 The frame containing the log,body,tree, etc.\nc.frame.body            The body pane.\nc.frame.body.widget     The gui widget for the body pane.\nc.frame.body.wrapper    The high level interface for the body widget.\nc.frame.iconBar         The icon bar.\nc.frame.log             The log pane.\nc.frame.log.widget      The gui widget for the log pane.\nc.frame.log.wrapper     The high-level inteface for the log pane.\nc.frame.tree            The tree pane.\n\nThe following were official ivars that no longer exist:\n\nc.frame.body.bodyCtrl   Use c.frame.body.wrapper instead.\nc.frame.log.logCtrl     Use c.frame.log.wrapper instead.\n"
+    "ekr.20140831085423.18631": "The following 'official' ivars will always exist:\n\nc.frame                 The frame containing the log,body,tree, etc.\nc.frame.body            The body pane.\nc.frame.body.widget     The gui widget for the body pane.\nc.frame.body.wrapper    The high level interface for the body widget.\nc.frame.iconBar         The icon bar.\nc.frame.log             The log pane.\nc.frame.log.widget      The gui widget for the log pane.\nc.frame.log.wrapper     The high-level inteface for the log pane.\nc.frame.tree            The tree pane.\n\nThe following were official ivars that no longer exist:\n\nc.frame.body.bodyCtrl   Use c.frame.body.wrapper instead.\nc.frame.log.logCtrl     Use c.frame.log.wrapper instead.\n",
+    "felix.20251214160933.1": "// Leo loads these plugins automatically.  Do not add them to @enabled-plugins nodes.\n\n// These plugins now contain the importer code for all kinds of @auto nodes.\n// Each plugin must define a top-level importer_dict dictionary describing the plugin.\n@language typescript\n",
+    "felix.20251214160938.1": "// Leo loads these plugins automatically.  Do not add them to @enabled-plugins nodes.\n\n// These plugins contain the write code for all kinds of special @auto nodes.\n// Each plugin must define a top-level writer_dict dictionary describing the plugin.\n@language typescript\n"
   },
   "uas": {
     "felix.20251102225128.1": {
