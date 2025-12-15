@@ -525,7 +525,7 @@ export class LeoImportCommands {
         this.encoding = c.getEncoding(p);
         const firstLevel = p.level();
         try {
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             let s = '';
             // with open(fileName, 'w') as theFile:
             for (const w_p of p.self_and_subtree(false)) {
@@ -557,7 +557,7 @@ export class LeoImportCommands {
         const firstLevel = p.level();
 
         try {
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             let theFile: string = '';
             // theFile = open(fileName, 'wb')  // Fix crasher: open in 'wb' mode.
             for (const w_p of p.self_and_subtree(false)) {
@@ -594,7 +594,7 @@ export class LeoImportCommands {
         this.webType = webType;
         try {
             // theFile = open(fileName, 'w')
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             let theFile: string = '';
             for (const p of current.self_and_subtree(false)) {
                 const s = this.positionToWeb(p);
@@ -687,7 +687,7 @@ export class LeoImportCommands {
             //@+node:felix.20251214160339.1329: *5* << Write s into newFileName >> (remove-sentinels)
             // Remove sentinels command.
             try {
-                const w_uri = g.makeVscodeUri(newFileName);
+                const w_uri = g.makeUri(newFileName);
                 const writeData = Buffer.from(s, 'utf8');
                 await vscode.workspace.fs.writeFile(w_uri, writeData);
 
@@ -743,7 +743,7 @@ export class LeoImportCommands {
 
         try {
             // with open(filename, 'w', this.encoding) as f
-            const w_uri = g.makeVscodeUri(filename);
+            const w_uri = g.makeUri(filename);
 
             let f = '';
 
@@ -1846,7 +1846,7 @@ export class MindMapImporter {
         p.h = fn;
         try {
             //f = open(p_path)
-            const w_uri = g.makeVscodeUri(p_path);
+            const w_uri = g.makeUri(p_path);
             const readData = await vscode.workspace.fs.readFile(w_uri);
             const s = Buffer.from(readData).toString('utf8');
 
@@ -2838,7 +2838,7 @@ export class TabImporter {
                 try {
                     g.setGlobalOpenDir(fn);
                     // s = open(fn).read();
-                    const w_uri = g.makeVscodeUri(fn);
+                    const w_uri = g.makeUri(fn);
                     const readData = await vscode.workspace.fs.readFile(w_uri);
                     s = Buffer.from(readData).toString('utf8');
                     s = s.replace(/\r/g, '');
@@ -3054,7 +3054,7 @@ export class ToDoImporter {
             return [];
         }
         try {
-            const w_uri = g.makeVscodeUri(p_path);
+            const w_uri = g.makeUri(p_path);
             const readData = await vscode.workspace.fs.readFile(w_uri);
             const contents = Buffer.from(readData).toString('utf8');
 
@@ -3086,7 +3086,7 @@ export class ToDoImporter {
                 // with open(w_path, 'r') as f:
                 //     contents = f.read()
 
-                const w_uri = g.makeVscodeUri(w_path);
+                const w_uri = g.makeUri(w_path);
                 const readData = await vscode.workspace.fs.readFile(w_uri);
                 const contents = Buffer.from(readData).toString('utf8');
                 const tasks = this.parse_file_contents(contents);
@@ -3363,7 +3363,7 @@ export class ZimImportController {
         }
 
         //index = open(pathToIndex).read()
-        const w_uri = g.makeVscodeUri(pathToIndex);
+        const w_uri = g.makeUri(pathToIndex);
         const readData = await vscode.workspace.fs.readFile(w_uri);
         const index = Buffer.from(readData).toString('utf8');
 
@@ -3598,7 +3598,7 @@ export class LegacyExternalFileImporter {
         // with open(p_path, 'r') as f
         //     s = f.read()
 
-        const w_uri = g.makeVscodeUri(p_path);
+        const w_uri = g.makeUri(p_path);
         const readData = await vscode.workspace.fs.readFile(w_uri);
         let s = Buffer.from(readData).toString('utf8');
 

@@ -1,4 +1,4 @@
-import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions } from './types';
+import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions } from './types';
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
 
@@ -1152,6 +1152,30 @@ export class LeoView {
         });
     }
 
+    /**
+     * Method that mimics VSCode's showInformationMessage API.
+     */
+    public showInformationMessage(message: string, options?: MessageOptions): void {
+        // if modal is true, use showMessageDialog, if false, use toast
+        // TODO: improve showToast and showMessageDialog to support 'details' option of the MessageOptions interface
+        if (options?.modal) {
+            if (options.detail) {
+                this.showMessageDialog({
+                    title: message,
+                    description: options.detail,
+                });
+            } else {
+                this.showMessageDialog({
+                    title: 'ℹ️ Information',
+                    description: message,
+                });
+            }
+
+        } else {
+            this.showToast(message, 2000);
+        }
+
+    }
 
 
 

@@ -196,7 +196,7 @@ export class ShadowController {
             // Fix bug 1243847: unicode error when saving @shadow nodes.
             // f.write(g.toEncodedString(s, encoding));
 
-            const w_writeUri = g.makeVscodeUri(fileName);
+            const w_writeUri = g.makeUri(fileName);
             const writeData = g.toEncodedString(s, encoding);
 
             await vscode.workspace.fs.writeFile(w_writeUri, writeData);

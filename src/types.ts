@@ -4,6 +4,20 @@
 type RClick = any;
 type Position = any;
 
+export interface MessageOptions {
+
+    /**
+        * Indicates that this message should be modal.
+        */
+    modal?: boolean;
+
+    /**
+        * Human-readable detail message that is rendered less prominent. _Note_ that detail
+        * is only shown for modal messages.
+        */
+    detail?: string;
+}
+
 export interface TreeNode {
     gnx: number;
     parent?: TreeNode;
@@ -36,6 +50,7 @@ export interface FileStat {
     type: 'file' | 'directory';
     size?: number;
     mtime?: number;
+    permissions?: { Readonly?: 1 }
 }
 export interface FilePath {
     name: string;

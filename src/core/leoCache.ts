@@ -5,7 +5,6 @@
  */
 //@+<< leoCache imports & annotations >>
 //@+node:felix.20251214160339.334: ** << leoCache imports & annotations >>
-import * as vscode from 'vscode';
 import * as pako from 'pako';
 import { Database } from 'sql.js';
 import * as g from './leoGlobals';
@@ -283,7 +282,7 @@ export class SqlitePickleShare {
                         if (g.isBrowserRepo()) {
                             // web
                             w_exists = g.extensionContext.workspaceState.get<string>(
-                                g.makeVscodeUri(this.dbfile).fsPath
+                                g.makeUri(this.dbfile).fsPath
                             );
                         } else {
                             // Desktop
@@ -292,7 +291,7 @@ export class SqlitePickleShare {
                         if (w_exists) {
                             // this.conn = await sqlite3.connect(dbfile);
                             const filebuffer = await this.readFileBuffer(
-                                g.makeVscodeUri(this.dbfile)
+                                g.makeUri(this.dbfile)
                             );
                             this.conn = new g.SQL.Database(filebuffer);
                             this.watchSetup(this.dbfile);
@@ -527,7 +526,7 @@ export class SqlitePickleShare {
             // don't use string!
             // databaseFilePath.replace(/\\/g, '/')
             new vscode.RelativePattern(
-                g.makeVscodeUri(this.root),
+                g.makeUri(this.root),
                 'cache.sqlite'
             )
         );
@@ -571,7 +570,7 @@ export class SqlitePickleShare {
                     this.conn.close();
                 }
                 this.readFileBuffer(
-                    g.makeVscodeUri(this.dbfile)
+                    g.makeUri(this.dbfile)
                 ).then((p_result) => {
                     this.conn = new g.SQL.Database(p_result);
                 }, (p_reason) => {
@@ -608,9 +607,9 @@ export class SqlitePickleShare {
                 return Promise.resolve();
             }
             try {
-                db_uri = g.makeVscodeUri(this.dbfile);
+                db_uri = g.makeUri(this.dbfile);
             } catch (e) {
-                console.error("ERROR g.makeVscodeUri(this.dbfile) FAILED with error: ", e);
+                console.error("ERROR g.makeUri(this.dbfile) FAILED with error: ", e);
                 return Promise.resolve();
             }
 

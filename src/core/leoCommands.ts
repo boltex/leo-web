@@ -987,7 +987,7 @@ export class Commands {
         //@+node:felix.20251214160339.444: *4* checkShebang
         async function checkShebang(filepath: string): Promise<boolean> {
 
-            const w_uri = g.makeVscodeUri(filepath);
+            const w_uri = g.makeUri(filepath);
             let readData = await vscode.workspace.fs.readFile(w_uri);
 
             // const file = fs.readFileSync(filepath, { encoding: 'utf-8' });
@@ -1489,7 +1489,7 @@ export class Commands {
 
         const s = parts.join("");
 
-        const w_uri = g.makeVscodeUri(outputFileName);
+        const w_uri = g.makeUri(outputFileName);
         const writeData = Buffer.from(s, 'utf8');
         await vscode.workspace.fs.writeFile(w_uri, writeData);
 
@@ -3232,7 +3232,7 @@ export class Commands {
                 // Write the invalid outline to the corresponding leo.txt file.
                 const filename = g.os_path_normpath(g.os_path_expanduser(`~/.leo/BAD-${c.shortFileName()}.txt`));
                 try {
-                    const w_uri = g.makeVscodeUri(filename);
+                    const w_uri = g.makeUri(filename);
                     void vscode.workspace.fs.writeFile(w_uri, g.toEncodedString(translated_contents, 'utf-8', true));
                     g.es_print('');
                     g.es_print(`Wrote ${filename}`);
@@ -3617,11 +3617,11 @@ export class Commands {
             // USE this random string!
             const randomString = crypto.randomBytes(3).toString('hex');
             const tmpFile = `${os.tmpdir()}/leoScript-${randomString}`;
-            const tmpDirUri = g.makeVscodeUri(tmpFile);
+            const tmpDirUri = g.makeUri(tmpFile);
             await vscode.workspace.fs.createDirectory(tmpDirUri);
 
             root_path = path.join(tmpFile, `temp.${ext}`);
-            root_pathUri = g.makeVscodeUri(root_path);
+            root_pathUri = g.makeUri(root_path);
 
             // fs.writeFileSync(root_path, script, 'utf-8');
             await g.vscode.workspace.fs.writeFile(root_pathUri, Buffer.from(script, 'utf-8'));
@@ -3959,7 +3959,7 @@ export class Commands {
      */
     public async looksLikeDerivedFile(fn: string): Promise<boolean> {
         try {
-            const w_uri = g.makeVscodeUri(fn);
+            const w_uri = g.makeUri(fn);
             const readData = await vscode.workspace.fs.readFile(w_uri);
             const s = Buffer.from(readData).toString('utf8');
             return s.indexOf('@+leo-ver=') > -1;
@@ -4059,7 +4059,7 @@ export class Commands {
                 //@+<< find files in sub_directory >>
                 //@+node:felix.20251214160339.558: *5* << find files in sub_directory >>
                 // Set files to the list of full, absolute, files in subdirectory.
-                const subDirUri = g.makeVscodeUri(sub_directory);
+                const subDirUri = g.makeUri(sub_directory);
 
                 for (let ext of extensions) {
                     const pattern = new vscode.RelativePattern(subDirUri, `**/*${ext}`);

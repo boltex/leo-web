@@ -1,5 +1,5 @@
 /**
- * Text and numeric constants used throughout leojs
+ * Text and numeric constants used throughout leo-web.
  */
 export class Constants {
 
@@ -154,60 +154,60 @@ export class Constants {
      */
     public static CONTEXT_FLAGS = {
         // Main flags for connection and opened file
-        LEO_STARTUP_DONE: "leojsStartupDone",
-        LEO_OPENING_FILE: "leojsOpeningFile",
-        LEO_ID_UNSET: "leojsIdUnset",
-        LEO_READY: "leojsReady", // Extension activated and classes created and ready
-        TREE_OPENED: "leojsTreeOpened", // At least one Leo file opened
-        TREE_TITLED: "leojsTreeTitled", // Tree is a Leo file and not a new untitled document
+        LEO_STARTUP_DONE: "leoWebStartupDone",
+        LEO_OPENING_FILE: "leoWebOpeningFile",
+        LEO_ID_UNSET: "leoWebIdUnset",
+        LEO_READY: "leoWebReady", // Extension activated and classes created and ready
+        TREE_OPENED: "leoWebTreeOpened", // At least one Leo file opened
+        TREE_TITLED: "leoWebTreeTitled", // Tree is a Leo file and not a new untitled document
 
         // 'states' flags for currently opened tree view
-        LEO_CHANGED: "leojsChanged",
-        LEO_CAN_UNDO: "leojsCanUndo",
-        LEO_CAN_REDO: "leojsCanRedo",
-        LEO_CAN_BACK: "leojsCanGoBack",
-        LEO_CAN_NEXT: "leojsCanGoNext",
-        LEO_CAN_DEMOTE: "leojsCanDemote",
-        LEO_CAN_PROMOTE: "leojsCanPromote",
-        LEO_CAN_DEHOIST: "leojsCanDehoist",
-        LEO_CAN_HOIST: "leojsCanHoist", // isNotRoot equivalent, Computed by hand
-        LEO_TOP_HOIST_CHAPTER: "leojsTopHoistChapter",
-        LEO_EDIT_HEADLINE: "leojsEditHeadline",
+        LEO_CHANGED: "leoWebChanged",
+        LEO_CAN_UNDO: "leoWebCanUndo",
+        LEO_CAN_REDO: "leoWebCanRedo",
+        LEO_CAN_BACK: "leoWebCanGoBack",
+        LEO_CAN_NEXT: "leoWebCanGoNext",
+        LEO_CAN_DEMOTE: "leoWebCanDemote",
+        LEO_CAN_PROMOTE: "leoWebCanPromote",
+        LEO_CAN_DEHOIST: "leoWebCanDehoist",
+        LEO_CAN_HOIST: "leoWebCanHoist", // isNotRoot equivalent, Computed by hand
+        LEO_TOP_HOIST_CHAPTER: "leoWebTopHoistChapter",
+        LEO_EDIT_HEADLINE: "leoWebEditHeadline",
 
         // 'states' flags about current selection, for visibility and commands availability
-        SELECTED_MARKED: "leojsMarked", // no need for unmarked here, use !leojsMarked
-        SELECTED_CLONE: "leojsCloned",
-        SELECTED_DIRTY: "leojsDirty",
-        SELECTED_EMPTY: "leojsEmpty",
-        SELECTED_CHILD: "leojsChild", // Has children
-        SELECTED_ATFILE: "leojsAtFile", // Can be refreshed
-        SELECTED_ATLEOFILE: "leojsAtLeoFile", // Can be used with 'open-at-leo-file' command
+        SELECTED_MARKED: "leoWebMarked", // no need for unmarked here, use !leoWebMarked
+        SELECTED_CLONE: "leoWebCloned",
+        SELECTED_DIRTY: "leoWebDirty",
+        SELECTED_EMPTY: "leoWebEmpty",
+        SELECTED_CHILD: "leoWebChild", // Has children
+        SELECTED_ATFILE: "leoWebAtFile", // Can be refreshed
+        SELECTED_ATLEOFILE: "leoWebAtLeoFile", // Can be used with 'open-at-leo-file' command
 
         // Statusbar Flag 'keybindings in effect'
-        LEO_SELECTED: "leojsObjectSelected", // keybindings "On": Outline or body has focus
+        LEO_SELECTED: "leoWebObjectSelected", // keybindings "On": Outline or body has focus
 
         // Context Flags for 'when' clauses, used concatenated, for each outline node
-        NODE_MARKED: "leojsNodeMarked",  // Selected node is marked
-        NODE_UNMARKED: "leojsNodeUnmarked", // Selected node is unmarked (Needed for regexp)
-        NODE_ATFILE: "leojsNodeAtFile", // Selected node is an @file or @clean, etc...
-        NODE_ATLEOFILE: "leojsNodeAtLeoFile", // Selected node is an @leo file
-        NODE_CLONED: "leojsNodeCloned",
-        NODE_ROOT: "leojsNodeRoot",
-        NODE_NOT_ROOT: "leojsNodeNotRoot",
-        NODE_TAGS: "leojsNodeTags",
+        NODE_MARKED: "leoWebNodeMarked",  // Selected node is marked
+        NODE_UNMARKED: "leoWebNodeUnmarked", // Selected node is unmarked (Needed for regexp)
+        NODE_ATFILE: "leoWebNodeAtFile", // Selected node is an @file or @clean, etc...
+        NODE_ATLEOFILE: "leoWebNodeAtLeoFile", // Selected node is an @leo file
+        NODE_CLONED: "leoWebNodeCloned",
+        NODE_ROOT: "leoWebNodeRoot",
+        NODE_NOT_ROOT: "leoWebNodeNotRoot",
+        NODE_TAGS: "leoWebNodeTags",
 
         // Flags for undo nodes 
-        UNDO_BEAD: "leojsUndoNode",
-        NOT_UNDO_BEAD: "leojsNoUndoNode",
+        UNDO_BEAD: "leoWebUndoNode",
+        NOT_UNDO_BEAD: "leoWebNoUndoNode",
 
         // Flags for Leo documents tree view icons and hover node command buttons
-        DOCUMENT_SELECTED_TITLED: "leojsDocumentSelectedTitled",
-        DOCUMENT_TITLED: "leojsDocumentTitled",
-        DOCUMENT_SELECTED_UNTITLED: "leojsDocumentSelectedUntitled",
-        DOCUMENT_UNTITLED: "leojsDocumentUntitled",
+        DOCUMENT_SELECTED_TITLED: "leoWebDocumentSelectedTitled",
+        DOCUMENT_TITLED: "leoWebDocumentTitled",
+        DOCUMENT_SELECTED_UNTITLED: "leoWebDocumentSelectedUntitled",
+        DOCUMENT_UNTITLED: "leoWebDocumentUntitled",
 
         // Flags for focus context
-        FOCUS_FIND: "leojsFindFocus",
+        FOCUS_FIND: "leoWebFindFocus",
 
     };
 
@@ -556,7 +556,7 @@ export class Constants {
         GOTO_NEXT_VISIBLE: "goto-next-visible",
         GOTO_PREV_VISIBLE: "goto-prev-visible",
         GOTO_NEXT_MARKED: "goto-next-marked",
-        // GOTO_PREV_MARKED: "goto-prev-marked", // ! Not in Leo's menu nor LeoJS package.json.
+        // GOTO_PREV_MARKED: "goto-prev-marked", // ! Not in Leo's menu
         GOTO_NEXT_CLONE: "goto-next-clone",
         CONTRACT_OR_GO_LEFT: "contract-or-go-left",
         EXPAND_AND_GO_RIGHT: "expand-and-go-right",

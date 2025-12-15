@@ -140,7 +140,7 @@ export class BaseLeoCompare {
             return;
         }
         try {
-            const w_uri = g.makeVscodeUri(dir1);
+            const w_uri = g.makeUri(dir1);
             const w_dirInfo = await vscode.workspace.fs.readDirectory(w_uri);
             list1 = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
         } catch (exception) {
@@ -148,7 +148,7 @@ export class BaseLeoCompare {
             return;
         }
         try {
-            const w_uri = g.makeVscodeUri(dir2);
+            const w_uri = g.makeUri(dir2);
             const w_dirInfo = await vscode.workspace.fs.readDirectory(w_uri);
             list2 = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
         } catch (exception) {
@@ -236,7 +236,7 @@ export class BaseLeoCompare {
 
         if (this.outputFile) {
             // WRITE WHAT ACCUMULATED IN this.outputFile !
-            const w_uri = g.makeVscodeUri(this.outputFileName);
+            const w_uri = g.makeUri(this.outputFileName);
             const writeData = Buffer.from(this.outputFile, 'utf8');
             await vscode.workspace.fs.writeFile(w_uri, writeData);
 
@@ -513,7 +513,7 @@ export class BaseLeoCompare {
     //@+node:felix.20251214160339.677: *4* compare.doOpen
     public async doOpen(name: string): Promise<string[] | undefined> {
         try {
-            const w_uri = g.makeVscodeUri(name);
+            const w_uri = g.makeUri(name);
             const content = await vscode.workspace.fs.readFile(w_uri);
             const s = g.toUnicode(content);
 
@@ -636,7 +636,7 @@ export class BaseLeoCompare {
             if (this.appendOutput) {
                 this.show('appending to ' + this.outputFileName);
                 // this.outputFile = open(this.outputFileName, "ab");
-                const w_uri = g.makeVscodeUri(this.outputFileName);
+                const w_uri = g.makeUri(this.outputFileName);
                 const content = await vscode.workspace.fs.readFile(w_uri);
                 this.outputFile = g.toUnicode(content);
             } else {
@@ -964,7 +964,7 @@ export class CompareLeoOutlines {
     public async get_file(p_path: string): Promise<string> {
         // with open(p_path, 'rb') as f
         //     s = f.read()
-        const w_uri = g.makeVscodeUri(p_path);
+        const w_uri = g.makeUri(p_path);
         const s = await vscode.workspace.fs.readFile(w_uri);
 
         return g.toUnicode(s).replace(/\r/g, '');

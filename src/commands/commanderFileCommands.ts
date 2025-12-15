@@ -1167,7 +1167,7 @@ export class CommanderFileCommands {
                 if (s.startsWith('@nocolor\n')) {
                     s = s.slice('@nocolor\n'.length);
                 }
-                const w_uri = g.makeVscodeUri(fileName);
+                const w_uri = g.makeUri(fileName);
                 const writeData = Buffer.from(s, 'utf8');
                 await vscode.workspace.fs.writeFile(w_uri, writeData);
                 return g.blue('wrote:', fileName);
@@ -1219,7 +1219,7 @@ export class CommanderFileCommands {
                 }
                 // f.write(s)
                 // f.flush()
-                const w_uri = g.makeVscodeUri(fileName);
+                const w_uri = g.makeUri(fileName);
                 const writeData = Buffer.from(s, 'utf8');
                 await vscode.workspace.fs.writeFile(w_uri, writeData);
                 g.blue('wrote:', fileName);

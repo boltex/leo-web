@@ -238,7 +238,7 @@ export class StringFindTabManager {
         const find = this.c.findCommands;
 
         // Find/change text boxes.
-        const table1 = [
+        const table1: [string, string, string][] = [
             ['find_findbox', 'find_text', ''], // '<find pattern here>' in original Leo
             ['find_replacebox', 'change_text', ''],
         ];
@@ -249,7 +249,7 @@ export class StringFindTabManager {
         }
 
         // Check boxes.
-        const table2 = [
+        const table2: [string, string][] = [
             ['ignore_case', 'check_box_ignore_case'],
             ['mark_changes', 'check_box_mark_changes'],
             ['mark_finds', 'check_box_mark_finds'],

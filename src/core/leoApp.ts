@@ -2,7 +2,7 @@
 //@+node:felix.20251214160339.15: * @file src/core/leoApp.ts
 //@+<< imports >>
 //@+node:felix.20251214160339.16: ** << imports >>
-import * as vscode from 'vscode';
+import { Uri, workspace } from '../workspace';
 import * as Bowser from 'bowser';
 import * as os from 'os';
 import * as path from 'path';
@@ -66,6 +66,7 @@ import { ScriptingController } from './mod_scripting';
 import { SessionManager, TopLevelSessionsCommands } from './leoSessions';
 import { BaseWriter } from '../writers/basewriter';
 import * as leoPlugins from './leoPlugins';
+import { LEO_SETTINGS } from '../leoSettings';
 
 //@-<< imports >>
 //@+others
@@ -222,7 +223,7 @@ export class LeoApp {
     //@-<< LeoApp: error messages >>
     //@+<< LeoApp: global directories >>
     //@+node:felix.20251214160339.28: *5* << LeoApp: global directories >>
-    // public extensionsDir: string | undefined; // The leo / extensions directory // UNUSED in leojs
+    // public extensionsDir: string | undefined; // The leo / extensions directory // UNUSED in leo web
     public globalConfigDir: string | undefined; // leo / config directory
     public globalOpenDir: string | undefined; // The directory last used to open a file.
     public homeDir: string | undefined; // The user's home directory.
@@ -242,7 +243,7 @@ export class LeoApp {
     public globalRegisters: any = {}; // The global register list.
     public initial_cwd: string = process.cwd(); // For restart-leo.
     public leoID: string = ''; // The id part of gnx's, using empty for falsy.
-    public LeoIDWarningShown = false; // LEOJS : to prevent second warning. (Original would have exited before)
+    public LeoIDWarningShown = false; // LEO-WEB to prevent second warning. (Original would have exited before)
     public loadedThemes: any[] = []; // List of loaded theme.leo files.
     public lossage: any[] = []; // List of last 100 keystrokes.
     public paste_c: any = null; // The commander that pasted the last outline.
@@ -304,7 +305,7 @@ export class LeoApp {
     public already_open_files: string[] = []; // A list of file names that * might * be open in another copy of Leo.
     public inBridge: boolean = false; // True: running from leoBridge module.
     public inScript: boolean = false; // True: executing a script.
-    public hasScriptShownlog: boolean = false; // True: executing a script has show the log pane. (LeoJS only)
+    public hasScriptShownlog: boolean = false; // True: executing a script has show the log pane.
     public initing: boolean = true; // True: we are initializing the app.
     public initComplete: boolean = false; // True: late bindings are not allowed.
     public killed: boolean = false; // True: we are about to destroy the root window.
@@ -1046,14 +1047,10 @@ export class LeoApp {
             return;
         }
 
-        let guiVersion = 'VSCode version ' + vscode.version;
+        console.log("TODO: Fix app.computeSignon for leo-web");
+        let guiVersion = "Browser"; // Temporary set for leo web, fix later.
 
-        const w_LeoJSExtension = vscode.extensions.getExtension(
-            Constants.PUBLISHER + '.' + Constants.NAME
-        )!;
-        const w_leojsPackageJson = w_LeoJSExtension.packageJSON;
-
-        const leoVer: string = w_leojsPackageJson.version;
+        const leoVer: string = "1.0.0"; // TODO : get from package.json or elsewhere
 
         // n1, n2, n3, junk1, junk2 = sys.version_info
         let n1: string = '';
@@ -1117,15 +1114,21 @@ export class LeoApp {
             }
         }
 
+        const w_leoWebPackageJson = {
+            gitBranch: "0.1", // Placeholder
+            gitCommit: "0.1", // Placeholder
+            gitDate: "0.1", // Placeholder
+        };
+
         // branch, junk_commit = g.gitInfo()
-        const branch = w_leojsPackageJson.gitBranch;
+        const branch = w_leoWebPackageJson.gitBranch;
 
         // author, commit, date = g.getGitVersion()
-        const commit = w_leojsPackageJson.gitCommit;
-        const date = w_leojsPackageJson.gitDate;
+        const commit = w_leoWebPackageJson.gitCommit;
+        const date = w_leoWebPackageJson.gitDate;
 
         // Compute g.app.signon.
-        const signon: string[] = [`LeoJS ${leoVer}`];
+        const signon: string[] = [`Leo Web ${leoVer}`];
         if (branch) {
             signon.push(`, ${branch} branch`);
         }
@@ -1157,7 +1160,7 @@ export class LeoApp {
             console.log('');
         }
         */
-        // * Modified for leojs SINGLE log pane
+        // * Modified for leo-web SINGLE log pane
         // g.es_print(app.signon);
         // g.es_print(app.signon1);
 
@@ -1220,7 +1223,7 @@ export class LeoApp {
             }
         }
         if (!this.leoID) {
-            // LeoJS UI will block all commands at startup if LeoID is None/Falsy.
+            // Leo Web UI will block all commands at startup if LeoID is None/Falsy.
             this.leoID = 'None';
         }
 
@@ -1249,7 +1252,7 @@ export class LeoApp {
             id_ = '';
             if (!this.LeoIDWarningShown) {
                 this.LeoIDWarningShown = true;
-                void vscode.window.showInformationMessage(
+                void workspace.view.showInformationMessage(
                     `Invalid Leo ID: ${tag}`,
                     {
                         detail:
@@ -1268,17 +1271,19 @@ export class LeoApp {
     public setIDFromConfigSetting(verbose: boolean): Promise<void> {
         let w_userName = '';
         // 1 - set leoID from configuration settings
-        if (!this.leoID && vscode && vscode.workspace) {
-            w_userName = vscode.workspace
-                .getConfiguration(Constants.CONFIG_NAME)
-                .get(
-                    Constants.CONFIG_NAMES.LEO_ID,
-                    Constants.CONFIG_DEFAULTS.LEO_ID
-                );
-            if (w_userName) {
-                this.leoID = this.cleanLeoID(w_userName, 'config.leoID');
-            }
-        }
+        // if (!this.leoID && vscode && vscode.workspace) {
+        //     w_userName = vscode.workspace
+        //         .getConfiguration(Constants.CONFIG_NAME)
+        //         .get(
+        //             Constants.CONFIG_NAMES.LEO_ID,
+        //             Constants.CONFIG_DEFAULTS.LEO_ID
+        //         );
+        //     if (w_userName) {
+        //         this.leoID = this.cleanLeoID(w_userName, 'config.leoID');
+        //     }
+        // }
+        // TODO : Temporary for leo-web
+        this.leoID = "demoId"; // Temporary for leo-web
         return Promise.resolve();
     }
     //@+node:felix.20251214160339.52: *5* app.setIDFromFile
@@ -1307,7 +1312,7 @@ export class LeoApp {
                 }
                 // #1404: Ensure valid ID.
                 // cleanLeoID raises a warning dialog.
-                const id_ = this.cleanLeoID(s, tag).split('\n')[0].trim(); // get first line
+                const id_ = this.cleanLeoID(s, tag).split('\n')[0]!.trim(); // get first line
                 if (id_.length > 2) {
                     this.leoID = id_;
                     return;
@@ -1356,7 +1361,7 @@ export class LeoApp {
         // Note: For unit tests, leoTest2.py: create_app sets g.app.leoID.
         if (!id_) {
             // g.es_print('Leo can not start without an id.');
-            // * LeoJS will block all commands instead until re-set by user.
+            // * Leo web will block all commands instead until re-set by user.
             // print('Leo will now exit');
             // sys.exit(1) 
         } else {
@@ -1369,64 +1374,12 @@ export class LeoApp {
     }
     //@+node:felix.20251214160339.55: *5* app.setIDFile
     /** 
-     * Create leoID.txt. Also set LeoJS own leoID config setting.
+     * Create leoID.txt. Also set Leo web own leoID config setting.
      */
     public async setIDFile(): Promise<boolean> {
 
-        if (g.isBrowser) {
-            // Set LeoJS vscode config ONLY IF ".leoID.txt" NOT WRITTEN
-            // TODO : SEPARATE VSCODE AND LEO !
-            if (this.leoID && vscode && vscode.workspace) {
-                const w_vscodeConfig = vscode.workspace.getConfiguration(
-                    Constants.CONFIG_NAME
-                );
-
-                if (
-                    w_vscodeConfig.inspect(Constants.CONFIG_NAMES.LEO_ID)!
-                        .defaultValue === this.leoID
-                ) {
-                    // Set as undefined - same as default
-                    await w_vscodeConfig.update(
-                        Constants.CONFIG_NAMES.LEO_ID,
-                        undefined,
-                        true
-                    );
-                } else {
-                    // Set as value which is not default
-                    await w_vscodeConfig.update(
-                        Constants.CONFIG_NAMES.LEO_ID,
-                        this.leoID,
-                        true
-                    );
-                }
-            }
-            return false;
-        }
-        // If desktop (not browser) write to .leoID.txt file
-        const tag = ".leoID.txt";
-        for (const theDir of [this.homeLeoDir, this.globalConfigDir, this.loadDir]) {
-            if (theDir) {
-                try {
-                    const fn = g.os_path_join(theDir, tag);
-
-                    // with open(fn, 'w') as f
-                    //     f.write(self.leoID)
-                    await g.writeFile(this.leoID, 'utf8', fn);
-
-                    const w_exists = await g.os_path_exists(fn);
-                    if (w_exists) {
-                        g.error('', tag, 'created in', theDir);
-                    }
-
-                    return !!w_exists;
-
-                }
-                catch (IOError) {
-                    //pass
-                }
-                g.error('can not create', tag, 'in', theDir);
-            }
-        }
+        // Set Leo web vscode config ONLY IF ".leoID.txt" NOT WRITTEN
+        // TODO: For leo-web, use localstorage methods from the utils module.
 
         return false;
     }
@@ -1458,7 +1411,7 @@ export class LeoApp {
      *
      * Return False if the user veto's the close.
      *
-     * finish_quit - usually True, * FALSE IN LEOJS. USED TO FORCE QUIT ! * 
+     * finish_quit - usually True, * FALSE IN LEO-WEB. USED TO FORCE QUIT ! * 
      *               close Leo when last file closes, but
      *               False when closing an already-open-elsewhere file
      *               during initial load, so UI remains for files
@@ -1480,7 +1433,7 @@ export class LeoApp {
         }
 
         // Make sure .leoRecentFiles.txt is written.
-        // ! IN LEOJS : make sure .leoRecentFiles.txt is written on open and save file instead.
+        // ! IN LEO-WEB : make sure .leoRecentFiles.txt is written on open and save file instead.
         // await g.app.recentFilesManager.writeRecentFilesFile(c);
 
         if (c.changed && !finish_quit) {
@@ -1529,7 +1482,7 @@ export class LeoApp {
         }
 
         if (g.app.windowList.length) {
-            const c2 = new_c || g.app.windowList[0].c;
+            const c2 = new_c || g.app.windowList[0]!.c;
             g.app.selectLeoWindow(c2);
         } else if (finish_quit && !g.unitTesting) {
             // * Does not terminate when last is closed: Present 'new' and 'open' buttons instead!
@@ -1663,11 +1616,6 @@ export class LeoApp {
      */
     public async checkForOpenFile(c: Commands, fn: string): Promise<void> {
 
-        if (g.isBrowserRepo()) {
-            // web
-            return;
-        }
-
         const d = g.app.db;
         const tag: string = 'open-leo-files';
         if (g.app.reverting) {
@@ -1722,11 +1670,6 @@ export class LeoApp {
      */
     public forgetOpenFile(fn: string): void {
 
-        if (g.isBrowserRepo()) {
-            // web
-            return;
-        }
-
         const trace: boolean = g.app.debug.includes('shutdown');
         const d: any = g.app.db;
         const tag: string = 'open-leo-files';
@@ -1755,10 +1698,6 @@ export class LeoApp {
     }
     //@+node:felix.20251214160339.69: *4* app.rememberOpenFile
     public rememberOpenFile(fn: string): void {
-        if (g.isBrowserRepo()) {
-            // web
-            return;
-        }
 
         // Do not call g.trace, etc. here.
         const d = g.app.db;
@@ -1834,7 +1773,7 @@ export class LeoApp {
     /**
      * LeoApp.makeAllBindings:
      *
-     * Modified version for leojs: call leoUI.makeAllBindings
+     * Modified version for leo-web: call leoUI.makeAllBindings
      */
     public makeAllBindings(): void {
         this.gui.makeAllBindings();
@@ -1871,7 +1810,7 @@ export class LeoApp {
     }
     //@+node:felix.20251214160339.74: *3* app.selectLeoWindow
     public selectLeoWindow(c: Commands): void {
-        // * Rewritten for leojs
+        // * Rewritten for leo-web
 
         const frame = c.frame;
 
@@ -1927,14 +1866,9 @@ export class LoadManager {
     // #1374.
     public theme_path: string | undefined;
 
-    private _context: vscode.ExtensionContext | undefined;
-
     //@+others
     //@+node:felix.20251214160339.76: *3*  LM.ctor
-    constructor(p_context?: vscode.ExtensionContext) {
-        if (p_context) {
-            this._context = p_context;
-        }
+    constructor() {
         // this.globalSettingsDict = undefined;
         // this.globalBindingsDict = undefined;
         this.files = [];
@@ -1978,8 +1912,9 @@ export class LoadManager {
      * Return the Uri of this extension's leojsSettings.leojs,
      * the LeoJs equivalent of leoSettings.leo.
      */
-    public computeLeoSettingsUri(): vscode.Uri {
-        return vscode.Uri.joinPath(g.extensionUri, 'leojsSettings.leojs');
+    public computeLeoSettingsUri(): Uri | undefined {
+        // TODO: remove/deprecate because for lwo-web, the settings will be hard coded in a json file. 
+        return;
     }
 
     //@+node:felix.20251214160339.80: *4* LM.computeMyLeoSettingsPath
@@ -2006,9 +1941,7 @@ export class LoadManager {
         let localDir = g.os_path_dirname(lm.files.length ? lm.files[0] : '');
         // IF NO FILES IN lm.files THEN USE WORKSPACE ROOT !
         if (!localDir) {
-            localDir = vscode.workspace.workspaceFolders
-                ? vscode.workspace.workspaceFolders[0].uri.path
-                : '';
+            localDir = '/'; // root
         }
 
         const table = [
@@ -2064,7 +1997,7 @@ export class LoadManager {
         // g.app.leoDir = lm.computeLeoDir(); // * not used in leojs
         // These use g.app.loadDir...
         // g.app.extensionsDir = ''; // join(g.app.loadDir, '..', 'extensions'); // UNSUSED The leo / extensions directory
-        g.app.leoEditorDir = g.extensionUri ? g.os_path_normslashes(g.os_path_fix_drive(g.extensionUri.fsPath)) : ''; // join(g.app.loadDir, '..', '..');
+        g.app.leoEditorDir = ''; // join(g.app.loadDir, '..', '..');
         g.app.testDir = join(g.app.loadDir, '..', 'test');
 
         return;
@@ -2144,17 +2077,9 @@ export class LoadManager {
         }
 
         // const ok = g.makeAllNonExistentDirectories(homeLeoDir);
-        const w_uri = g.makeVscodeUri(homeLeoDir);
-        if (g.isBrowser) {
-            return homeLeoDir;
-        }
+        const w_uri = g.makeUri(homeLeoDir);
+        return homeLeoDir;
 
-        try {
-            await vscode.workspace.fs.createDirectory(w_uri);
-            return homeLeoDir;
-        } catch (exception) {
-            return '';
-        }
     }
     //@+node:felix.20251214160339.85: *5* LM.computeLeoDir
     /* 
@@ -2170,19 +2095,6 @@ export class LoadManager {
      */
     public computeLoadDir(): string {
         let loadDir: string = __dirname || './';
-        let w_uri;
-        if (vscode.workspace.workspaceFolders) {
-            w_uri = vscode.workspace.workspaceFolders[0].uri;
-        }
-
-        // ! TRY TO GET EXTENSION FOLDER WITHOUT REQUIRING CONTEXT ! 
-        const extension = vscode.extensions.getExtension(Constants.PUBLISHER + '.' + Constants.NAME)!;
-        if (extension) {
-            loadDir = extension.extensionUri.fsPath; // ! OVERRIDE WITH REAL EXTENSION PATH !
-        } else {
-            console.log(' -------------- leojs EXTENSION FOLDER NOT FOUND --------------');
-        }
-
         // const loadDir2 = w_uri?.fsPath;
         loadDir = g.finalize(loadDir);
 
@@ -2421,7 +2333,7 @@ export class LoadManager {
             return 'D';
         }
         p_path = p_path.toLowerCase();
-        const table = [
+        const table: [string, string][] = [
             ['M', 'myLeoSettings.leo'],
             [' ', 'leoSettings.leo'],
             ['F', c.shortFileName()],
@@ -2812,8 +2724,9 @@ export class LoadManager {
             );
 
             if (fn === 'leoSettings.leo') {
-                const w_leoSettingsUri = lm.computeLeoSettingsUri();
-                let readData = await vscode.workspace.fs.readFile(w_leoSettingsUri);
+                // const w_leoSettingsUri = lm.computeLeoSettingsUri();
+                // let readData = await workspace.fs.readFile(w_leoSettingsUri);
+                let readData = LEO_SETTINGS;
                 [ok, g_element] = w_fastRead.readWithJsonTree(
                     fn,
                     g.toUnicode(readData)
@@ -2990,7 +2903,7 @@ export class LoadManager {
         if (lm.files.length) {
             try {
                 for (let n = 0; n < lm.files.length; n++) {
-                    const fn = lm.files[n];
+                    const fn = lm.files[n]!;
                     lm.more_cmdline_files = n < lm.files.length - 1;
                     c = await lm.loadLocalFile(fn, g.app.gui);
                     // Returns None if the file is open in another instance of Leo.
@@ -3012,7 +2925,7 @@ export class LoadManager {
                 if (aList && aList.length) {
                     await g.app.sessionManager.load_session(c1, aList);
                     if (g.app.windowList.length) {
-                        c = c1 = g.app.windowList[0].c;
+                        c = c1 = g.app.windowList[0]!.c;
                     } else {
                         c = c1 = undefined;
                     }
@@ -3378,7 +3291,7 @@ export class LoadManager {
 
         const lm: LoadManager = this;
 
-        g.app.gui = new LeoUI(undefined, this._context!); // replaces createDefaultGui
+        g.app.gui = new LeoUI(undefined); // replaces createDefaultGui
 
         /* 
         gui_option = lm.options.get('gui')
@@ -4156,9 +4069,9 @@ export class RecentFilesManager {
             if (theDir) {
                 const fn = g.os_path_join(theDir, '.leoRecentFiles.txt');
                 try {
-                    const w_uri = g.makeVscodeUri(fn);
+                    const w_uri = g.makeUri(fn);
                     const writeData = Buffer.from('', 'utf8');
-                    await vscode.workspace.fs.writeFile(w_uri, writeData);
+                    await workspace.fs.writeFile(w_uri, writeData);
                     g.es('created', fn);
                     return;
                 } catch (err) {
@@ -4172,41 +4085,41 @@ export class RecentFilesManager {
     public async readRecentFilesFile(path: string): Promise<boolean> {
         const fileName = g.os_path_join(path, '.leoRecentFiles.txt');
         let lines: string[] | undefined;
+        // TODO: implement file reading for leoRecentFiles.txt equivalent
+        console.log('TODO: implement file reading for leoRecentFiles.txt equivalent');
+        // try {
+        //     let fileContents;
+        //     if (g.isBrowserRepo()) {
+        //         // * Web
+        //         fileContents = await g.extensionContext.workspaceState.get(fileName);
+        //     } else {
+        //         const exists = await g.os_path_exists(fileName);
+        //         if (!exists) {
+        //             return false;
+        //         }
+        //         // * Desktop
+        //         fileContents = await g.readFileIntoUnicodeString(fileName);
+        //         if (!fileContents) {
+        //             fileContents = "";
+        //         }
+        //     }
 
-        try {
-            let fileContents;
-
-            if (g.isBrowserRepo()) {
-                // * Web
-                fileContents = await g.extensionContext.workspaceState.get(fileName);
-            } else {
-                const exists = await g.os_path_exists(fileName);
-                if (!exists) {
-                    return false;
-                }
-                // * Desktop
-                fileContents = await g.readFileIntoUnicodeString(fileName);
-                if (!fileContents) {
-                    fileContents = "";
-                }
-            }
-
-            try {
-                lines = fileContents?.split('\n');
-            } catch (err) {
-                lines = undefined;
-            }
-        } catch (err) {
-            g.trace('can not open', fileName);
-            return false;
-        }
-        if (lines && lines.length && this.sanitize(lines[0]) === 'readonly') {
-            lines = lines.slice(1);
-        }
-        if (lines && lines.length) {
-            lines = lines.map(line => g.toUnicode(g.os_path_normpath(line)));
-            this.appendToRecentFiles(lines);
-        }
+        //     try {
+        //         lines = fileContents?.split('\n');
+        //     } catch (err) {
+        //         lines = undefined;
+        //     }
+        // } catch (err) {
+        //     g.trace('can not open', fileName);
+        //     return false;
+        // }
+        // if (lines && lines.length && this.sanitize(lines[0]) === 'readonly') {
+        //     lines = lines.slice(1);
+        // }
+        // if (lines && lines.length) {
+        //     lines = lines.map(line => g.toUnicode(g.os_path_normpath(line)));
+        //     this.appendToRecentFiles(lines);
+        // }
 
         return true;
     }
@@ -4346,65 +4259,67 @@ export class RecentFilesManager {
             localPath = g.os_path_split(localFileName)[0];
         }
 
-        let written = false;
-        const seen: string[] = [];
+        // TODO : implement file writing for leoRecentFiles.txt equivalent
+        console.log('TODO: implement file writing for leoRecentFiles.txt equivalent');
+        // let written = false;
+        // const seen: string[] = [];
 
-        for (const w_path of [localPath, g.app.globalConfigDir, g.app.homeLeoDir]) {
-            if (w_path) {
-                const fileName = g.os_path_join(w_path, tag);
-                const w_exists = await g.os_path_exists(fileName);
-                if (w_exists && !seen.includes(fileName.toLowerCase())) {
-                    seen.push(fileName.toLowerCase());
-                    // Only write if different
-                    let fileContents;
+        // for (const w_path of [localPath, g.app.globalConfigDir, g.app.homeLeoDir]) {
+        //     if (w_path) {
+        //         const fileName = g.os_path_join(w_path, tag);
+        //         const w_exists = await g.os_path_exists(fileName);
+        //         if (w_exists && !seen.includes(fileName.toLowerCase())) {
+        //             seen.push(fileName.toLowerCase());
+        //             // Only write if different
+        //             let fileContents;
 
-                    if (g.isBrowserRepo()) {
-                        // * Web
-                        fileContents = await g.extensionContext.workspaceState.get(fileName);
-                    } else {
-                        // * Desktop
-                        fileContents = await g.readFileIntoUnicodeString(fileName);
-                        if (!fileContents) {
-                            fileContents = "";
-                        }
-                    }
-                    const s = this.recentFiles.length ? this.recentFiles.join('\n') : '\n';
-                    if (s === fileContents) {
-                        return; // Exactly the same.
-                    }
-                    const ok = await rf.writeRecentFilesFileHelper(fileName);
-                    if (ok) {
-                        written = true;
-                    }
-                    if (!rf.recentFileMessageWritten && !g.unitTesting && !g.app.silentMode) {
-                        if (ok) {
-                            g.es_print(`wrote recent file: ${fileName}`);
-                        } else {
-                            g.error(`failed to write recent file: ${fileName}`);
-                        }
-                    }
-                }
-            }
-        }
+        //             if (g.isBrowserRepo()) {
+        //                 // * Web
+        //                 fileContents = await g.extensionContext.workspaceState.get(fileName);
+        //             } else {
+        //                 // * Desktop
+        //                 fileContents = await g.readFileIntoUnicodeString(fileName);
+        //                 if (!fileContents) {
+        //                     fileContents = "";
+        //                 }
+        //             }
+        //             const s = this.recentFiles.length ? this.recentFiles.join('\n') : '\n';
+        //             if (s === fileContents) {
+        //                 return; // Exactly the same.
+        //             }
+        //             const ok = await rf.writeRecentFilesFileHelper(fileName);
+        //             if (ok) {
+        //                 written = true;
+        //             }
+        //             if (!rf.recentFileMessageWritten && !g.unitTesting && !g.app.silentMode) {
+        //                 if (ok) {
+        //                     g.es_print(`wrote recent file: ${fileName}`);
+        //                 } else {
+        //                     g.error(`failed to write recent file: ${fileName}`);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        if (written) {
-            rf.recentFileMessageWritten = true;
-        } else {
-            if (g.isBrowserRepo()) {
-                // * Web
-                await this.writeRecentFilesFileHelper(tag);
-            } else {
-                // * Desktop
-                // Attempt to create .leoRecentFiles.txt in the user's home directory.
-                if (g.app.homeLeoDir) {
-                    const fileName = g.finalize_join(g.app.homeLeoDir, tag);
-                    if (!(await g.os_path_exists(fileName))) {
-                        g.red(`creating: ${fileName}`);
-                    }
-                    await rf.writeRecentFilesFileHelper(fileName);
-                }
-            }
-        }
+        // if (written) {
+        //     rf.recentFileMessageWritten = true;
+        // } else {
+        //     if (g.isBrowserRepo()) {
+        //         // * Web
+        //         await this.writeRecentFilesFileHelper(tag);
+        //     } else {
+        //         // * Desktop
+        //         // Attempt to create .leoRecentFiles.txt in the user's home directory.
+        //         if (g.app.homeLeoDir) {
+        //             const fileName = g.finalize_join(g.app.homeLeoDir, tag);
+        //             if (!(await g.os_path_exists(fileName))) {
+        //                 g.red(`creating: ${fileName}`);
+        //             }
+        //             await rf.writeRecentFilesFileHelper(fileName);
+        //         }
+        //     }
+        // }
     }
     //@+node:felix.20251214160339.145: *4* rf.writeRecentFilesFileHelper
     /**
@@ -4414,41 +4329,45 @@ export class RecentFilesManager {
 
         const s = this.recentFiles.length ? this.recentFiles.join('\n') : '\n';
 
-        if (g.isBrowserRepo()) {
-            await g.extensionContext.workspaceState.update(fileName, s);
-            return true;
-        }
+        // TODO: implement file writing for leoRecentFiles.txt equivalent
+        console.log('TODO: implement file writing for leoRecentFiles.txt equivalent');
 
-        let lines: string[] | undefined = undefined;
+        return true;
+        // if (g.isBrowserRepo()) {
+        //     await g.extensionContext.workspaceState.update(fileName, s);
+        //     return true;
+        // }
 
-        // Part 1: Return False if the first line is "readonly".
-        if (await g.os_path_exists(fileName)) {
-            try {
-                const data = await g.readFileIntoUnicodeString(fileName);
-                lines = data?.split('\n');
-            } catch (error) {
-                lines = undefined;
-            }
+        // let lines: string[] | undefined = undefined;
 
-            if (lines && lines.length && this.sanitize(lines[0]) === 'readonly') {
-                return false;
-            }
-        }
+        // // Part 1: Return False if the first line is "readonly".
+        // if (await g.os_path_exists(fileName)) {
+        //     try {
+        //         const data = await g.readFileIntoUnicodeString(fileName);
+        //         lines = data?.split('\n');
+        //     } catch (error) {
+        //         lines = undefined;
+        //     }
 
-        // Part 2: write the files.
-        try {
-            await g.writeFile(g.toUnicode(s), 'utf-8', fileName);
-            return true;
-        } catch (error) {
-            if (error) {
-                g.error('error writing', fileName);
-                g.es_exception(error);
-                if (g.unitTesting) {
-                    throw error;
-                }
-            }
-            return false;
-        }
+        //     if (lines && lines.length && this.sanitize(lines[0]) === 'readonly') {
+        //         return false;
+        //     }
+        // }
+
+        // // Part 2: write the files.
+        // try {
+        //     await g.writeFile(g.toUnicode(s), 'utf-8', fileName);
+        //     return true;
+        // } catch (error) {
+        //     if (error) {
+        //         g.error('error writing', fileName);
+        //         g.es_exception(error);
+        //         if (g.unitTesting) {
+        //             throw error;
+        //         }
+        //     }
+        //     return false;
+        // }
     }
     //@-others
 

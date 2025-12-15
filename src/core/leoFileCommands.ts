@@ -108,7 +108,7 @@ export class FastRead {
 
         let s;
         if (theFile == null) {
-            const w_uri = g.makeVscodeUri(p_path);
+            const w_uri = g.makeUri(p_path);
             const readData = await vscode.workspace.fs.readFile(w_uri);
             s = Buffer.from(readData).toString('utf8');
         } else {
@@ -142,7 +142,7 @@ export class FastRead {
     public async readJsonFile(theFile: string | undefined, p_path: string): Promise<VNode | undefined> {
         let s;
         if (theFile == null) {
-            const w_uri = g.makeVscodeUri(p_path);
+            const w_uri = g.makeUri(p_path);
             const readData = await vscode.workspace.fs.readFile(w_uri);
             s = Buffer.from(readData).toString('utf8');
         } else {
@@ -1057,7 +1057,7 @@ export class FileCommands {
             let n = 1;
             const zip = new JSZip();
 
-            const uri = g.makeVscodeUri(leo_file);
+            const uri = g.makeUri(leo_file);
             const data = await vscode.workspace.fs.readFile(uri);
 
             function preparePath(filePath: string) {
@@ -1080,7 +1080,7 @@ export class FileCommands {
                     const exists = await g.os_path_exists(fn);
                     if (exists) {
                         n += 1;
-                        const atFileUri = g.makeVscodeUri(fn);
+                        const atFileUri = g.makeUri(fn);
                         const atFiledata = await vscode.workspace.fs.readFile(atFileUri);
                         zip.file(preparePath(fn), atFiledata);
                     }
@@ -1088,7 +1088,7 @@ export class FileCommands {
             }
             const content = await zip.generateAsync({ type: "uint8array" });
             const zip_buffer = Buffer.from(content);
-            await vscode.workspace.fs.writeFile(g.makeVscodeUri(archive_name), zip_buffer);
+            await vscode.workspace.fs.writeFile(g.makeUri(archive_name), zip_buffer);
             g.es_print(`Wrote ${archive_name} containing ${n} file${g.plural(n)}`);
 
         } catch (error) {
@@ -1121,12 +1121,12 @@ export class FileCommands {
                 '.tmp';
 
             let s: string;
-            const w_readUri = g.makeVscodeUri(fileName);
+            const w_readUri = g.makeUri(fileName);
             const readData = await vscode.workspace.fs.readFile(w_readUri);
             // s = Buffer.from(readData).toString('utf8'); // * No need to convert if already Uint8Array
 
             try {
-                const w_writeUri = g.makeVscodeUri(backupName);
+                const w_writeUri = g.makeUri(backupName);
                 // const writeData = Buffer.from(s, 'utf8'); // * No need to convert if already Uint8Array
                 await vscode.workspace.fs.writeFile(w_writeUri, readData);
                 ok = true;
@@ -1148,7 +1148,7 @@ export class FileCommands {
     //@+node:felix.20251214160339.912: *4* fc.deleteBackupFile
     public async deleteBackupFile(fileName: string): Promise<void> {
         try {
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             await vscode.workspace.fs.delete(w_uri, { useTrash: false });
         } catch (exception) {
             if (this.read_only) {
@@ -1184,8 +1184,8 @@ export class FileCommands {
             let dst: string;
             [src, dst] = [backupName, fileName];
             try {
-                const w_srcUri = g.makeVscodeUri(src);
-                const w_dstUri = g.makeVscodeUri(dst);
+                const w_srcUri = g.makeUri(src);
+                const w_dstUri = g.makeUri(dst);
                 await vscode.workspace.fs.rename(w_srcUri, w_dstUri, {
                     overwrite: true,
                 });
@@ -1202,7 +1202,7 @@ export class FileCommands {
         // self.read_only is not valid for Save As and Save To commands.
         const w_exists = await g.os_path_exists(fileName);
         if (w_exists) {
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             const fileStat = await vscode.workspace.fs.stat(w_uri);
             if (fileStat.permissions && fileStat.permissions & 1) {
                 g.error('can not write: read only:', fileName);
@@ -1214,7 +1214,7 @@ export class FileCommands {
     //@+node:felix.20251214160339.915: *4* fc.warnOnReadOnlyFiles
     public async warnOnReadOnlyFiles(fileName: string): Promise<boolean> {
         try {
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             const fileStat = await vscode.workspace.fs.stat(w_uri);
             if (fileStat.permissions && fileStat.permissions & 1) {
                 g.error('can not write: read only:', fileName);
@@ -1701,7 +1701,7 @@ export class FileCommands {
 
         const vnodes: VNode[] = [];
 
-        const w_uri = g.makeVscodeUri(fileName);
+        const w_uri = g.makeUri(fileName);
 
         const filebuffer = await vscode.workspace.fs.readFile(w_uri);
 
@@ -2260,7 +2260,7 @@ export class FileCommands {
             conn.close();
             const db_buffer = Buffer.from(db_data);
 
-            const db_uri = g.makeVscodeUri(fileName);
+            const db_uri = g.makeUri(fileName);
             await vscode.workspace.fs.writeFile(db_uri, db_buffer);
             ok = true;
         } catch (e) {
@@ -2537,7 +2537,7 @@ export class FileCommands {
             // Convert the dict to JSON.
             const json_s = JSON.stringify(d, null, 2); // json.dumps(d, indent = 2);
 
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             await vscode.workspace.fs.writeFile(
                 w_uri,
                 Buffer.from(json_s, this.leo_file_encoding)
@@ -2793,7 +2793,7 @@ export class FileCommands {
                 this.leo_file_encoding as BufferEncoding
             );
 
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             await vscode.workspace.fs.writeFile(w_uri, s);
 
             await c.setFileTimeStamp(fileName);

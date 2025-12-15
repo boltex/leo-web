@@ -516,7 +516,7 @@ export class ExternalFilesController {
             td = g.PYTHON_os_path_join(td, ancestors.pop()!);
             const w_exists = await g.os_path_exists(td);
             if (!w_exists) {
-                const w_uri = g.makeVscodeUri(td);
+                const w_uri = g.makeUri(td);
                 await vscode.workspace.fs.createDirectory(w_uri);
                 // os.mkdir(td);
             }
@@ -549,7 +549,7 @@ export class ExternalFilesController {
         const td = g.PYTHON_os_path_join(path.resolve(os.tmpdir()), leoTempDir);
         const w_exists = await g.os_path_exists(td);
         if (!w_exists) {
-            const w_uri = g.makeVscodeUri(td);
+            const w_uri = g.makeUri(td);
             await vscode.workspace.fs.createDirectory(w_uri);
             //os.mkdir(td);
         }
@@ -583,7 +583,7 @@ export class ExternalFilesController {
                 //     f.write(s)
                 //     f.flush()
 
-                const w_uri = g.makeVscodeUri(w_path);
+                const w_uri = g.makeUri(w_path);
                 // s is already Uint8Array buffer
                 await vscode.workspace.fs.writeFile(w_uri, s);
             } catch (IOError) {
@@ -808,7 +808,7 @@ export class ExternalFilesController {
         // with open(path, 'rb') as f
         //     s = f.read()
 
-        const w_uri = g.makeVscodeUri(p_path);
+        const w_uri = g.makeUri(p_path);
         const s = await vscode.workspace.fs.readFile(w_uri);
 
         // return hashlib.md5(s).hexdigest()
@@ -823,7 +823,7 @@ export class ExternalFilesController {
         const w_exists = await g.os_path_exists(ef.path);
         if (ef.path && w_exists) {
             try {
-                const w_uri = g.makeVscodeUri(ef.path);
+                const w_uri = g.makeUri(ef.path);
                 await vscode.workspace.fs.delete(w_uri, { recursive: true });
                 // os.remove(ef.path)
             } catch (exception) {

@@ -5,7 +5,7 @@
  */
 //@+<< imports >>
 //@+node:felix.20251214160339.154: ** << imports >>
-import * as vscode from 'vscode';
+import { workspace } from '../workspace';
 import * as utils from '../utils';
 import * as g from './leoGlobals';
 import { new_cmd_decorator } from './decorators';
@@ -1203,7 +1203,7 @@ export class AtFile {
         const m = pattern.exec(s);
         let valid = !!m;
         if (m && valid) {
-            start = m[1]; // start delim
+            start = m[1]!; // start delim
             valid = !!start;
         }
         if (m && valid) {
@@ -1237,7 +1237,7 @@ export class AtFile {
             }
         }
         if (m && valid) {
-            end = m[8]; // closing delim
+            end = m[8]!; // closing delim
         }
         if (valid) {
             at.encoding = encoding;
@@ -1295,10 +1295,10 @@ export class AtFile {
         // #1798: return None as a flag on any error.
         let s;
         try {
-            const w_uri = g.makeVscodeUri(fileName);
+            const w_uri = g.makeUri(fileName);
             const w_exists = await g.os_path_exists(fileName);
             if (w_exists) {
-                s = await vscode.workspace.fs.readFile(w_uri);
+                s = await workspace.fs.readFile(w_uri);
             } else {
                 at.error(`can not open ${fileName}`);
                 return undefined;
@@ -1345,7 +1345,7 @@ export class AtFile {
         // For now, it's not worth replacing.
         const at = this;
         if (at.read_i < at.read_lines.length) {
-            const s = at.read_lines[at.read_i];
+            const s = at.read_lines[at.read_i]!;
             at.read_i += 1;
             return s;
         }
@@ -2905,7 +2905,7 @@ export class AtFile {
                 return true;
             }
             for (let z = i1; z < i2; z++) {
-                if (![' ', '\t', '\n'].includes(s[z])) {
+                if (![' ', '\t', '\n'].includes(s[z]!)) {
                     return false;
                 }
             }
@@ -3434,13 +3434,13 @@ export class AtFile {
         // ("@end_raw", at.endRawDirective),  // #2276.
         // ("@raw", at.rawDirective),  // #2276
         // Rewritten 6/8/2005.
-        if (i + 1 >= n || [' ', '\t', '\n'].includes(s[i + 1])) {
+        if (i + 1 >= n || [' ', '\t', '\n'].includes(s[i + 1]!)) {
             // Bare '@' not recognized in cweb mode.
             return at.language === 'cweb'
                 ? AtFile.noDirective
                 : AtFile.atDirective;
         }
-        if (!s[i + 1].match(/[a-zA-Z]/)) {
+        if (!s[i + 1]!.match(/[a-zA-Z]/)) {
             return AtFile.noDirective; // Bug fix: do NOT return miscDirective here!
         }
         if (at.language === 'cweb' && g.match_word(s, i, '@c')) {
@@ -3465,13 +3465,13 @@ export class AtFile {
         const m = at_directive_kind_pattern.exec(s2);
         let w_group1EndIndex: number;
         if (m && m.length) {
-            const word = m[1];
+            const word = m[1]!;
             w_group1EndIndex = m.index + word.length + 1;
             if (!g.globalDirectiveList.includes(word)) {
                 return AtFile.noDirective;
             }
             const s3 = s2.substring(w_group1EndIndex);
-            if (s3 && '.('.includes(s3[0])) {
+            if (s3 && '.('.includes(s3[0]!)) {
                 return AtFile.noDirective;
             }
             return AtFile.miscDirective;
@@ -3642,7 +3642,7 @@ export class AtFile {
         const k = j;
         // Scan backwards for @last directives.
         while (j >= 0) {
-            const line = lines[j];
+            const line = lines[j]!;
             if (g.match(line, 0, tag)) {
                 j -= 1;
             } else if (!line.trim()) {
@@ -3721,7 +3721,7 @@ export class AtFile {
         let j = g.skip_ws(s, k + '@delims'.length);
         let i = j;
         // Get the first delim.
-        while (i < s.length && !g.is_ws(s[i]) && !g.is_nl(s, i)) {
+        while (i < s.length && !g.is_ws(s[i]!) && !g.is_nl(s, i)) {
             i += 1;
         }
         if (j < i) {
@@ -3729,7 +3729,7 @@ export class AtFile {
             // Get the optional second delim.
             j = g.skip_ws(s, i);
             i = j;
-            while (i < s.length && !g.is_ws(s[i]) && !g.is_nl(s, i)) {
+            while (i < s.length && !g.is_ws(s[i]!) && !g.is_nl(s, i)) {
                 i += 1;
             }
             at.endSentinelComment = j < i ? s.substring(j, i) : '';
@@ -3936,8 +3936,8 @@ export class AtFile {
             const m = g.g_section_delims_pat.exec(s);
             if (m && m.length) {
                 lines.push(s);
-                at.section_delim1 = m[1];
-                at.section_delim2 = m[2];
+                at.section_delim1 = m[1]!;
+                at.section_delim2 = m[2]!;
             }
         }
         // Disallow multiple directives.
@@ -4098,8 +4098,8 @@ export class AtFile {
         }
         try {
             // os.remove(fileName);
-            const w_uri = g.makeVscodeUri(fileName);
-            await vscode.workspace.fs.delete(w_uri, { recursive: true });
+            const w_uri = g.makeUri(fileName);
+            await workspace.fs.delete(w_uri, { recursive: true });
             return true;
         } catch (exception) {
             if (!g.unitTesting) {
@@ -4115,12 +4115,14 @@ export class AtFile {
      */
     public async stat(
         fileName: string
-    ): Promise<vscode.FilePermission | undefined> {
+    ): Promise<{
+        Readonly?: 1 | undefined;
+    } | undefined> {
         // Do _not_ call self.error here.
         let mode;
         try {
-            const w_uri = g.makeVscodeUri(fileName);
-            const stat = await vscode.workspace.fs.stat(w_uri);
+            const w_uri = g.makeUri(fileName);
+            const stat = await workspace.fs.stat(w_uri);
             mode = stat.permissions; // 0777
         } catch (exception) {
             mode = undefined;
@@ -4309,9 +4311,9 @@ export class AtFile {
         // os.access() may not exist on all platforms.
         let read_only;
         try {
-            const w_uri = g.makeVscodeUri(fn);
-            const w_stats = await vscode.workspace.fs.stat(w_uri);
-            read_only = w_stats.permissions === vscode.FilePermission.Readonly;
+            const w_uri = g.makeUri(fn);
+            const w_stats = await workspace.fs.stat(w_uri);
+            read_only = w_stats.permissions && w_stats.permissions.Readonly;
         } catch (attributeError) {
             read_only = false;
         }
@@ -4455,7 +4457,7 @@ export class FastAtRead {
         for (const [i, line] of lines.entries()) {
             const m = this.header_pattern.exec(line);
             if (m && m.length) {
-                delims = [m[1], m[8] || ''];
+                delims = [m[1]!, m[8] || ''];
                 return [delims, first_lines, i + 1];
             }
             first_lines.push(line);
@@ -4537,7 +4539,7 @@ export class FastAtRead {
                 if (body && body.length) {
                     // a list of lines.
                     body[body.length - 1] =
-                        body[body.length - 1].replace(/\s+$/, '') + line;
+                        body[body.length - 1]!.replace(/\s+$/, '') + line;
                 } else {
                     body = [line];
                 }
@@ -4647,9 +4649,9 @@ export class FastAtRead {
             m = this.node_start_pat!.exec(line);
             if (m && m.length) {
                 in_doc = false;
-                [gnx, head] = [m[2], m[5]];
+                [gnx, head] = [m[2]!, m[5]!];
                 // m[3] is the level number, m[4] is the number of stars.
-                level = m[3] ? Number(m[3]) : 1 + m[4].length;
+                level = m[3] ? Number(m[3]) : 1 + m[4]!.length;
                 let v = gnx2vnode[gnx];
                 // Case 1: The root @file node. Don't change the headline.
                 //         #3931: Always use root_v, but use the gnx from external file!
@@ -4676,7 +4678,7 @@ export class FastAtRead {
                 }
                 //
                 // Case 2: We are scanning the descendants of a clone.
-                [parent_v, clone_v] = level_stack[level - 2];
+                [parent_v, clone_v] = level_stack[level - 2]!;
                 if (v && clone_v) {
                     // The last version of the body and headline wins..
                     body = [];
@@ -4824,7 +4826,7 @@ export class FastAtRead {
             m = this.comment_pat!.exec(line);
             if (m && m.length) {
                 // <1, 2 or 3 comment delims>
-                const delims = m[1].trim();
+                const delims = m[1]!.trim();
                 // Whatever happens, retain the @delims line.
                 body.push(`@comment ${delims}\n`);
                 let [delim1, delim2, delim3] = g.set_delims_from_string(delims);
@@ -4861,7 +4863,7 @@ export class FastAtRead {
             if (m && m.length) {
                 // Get 1 or 2 comment delims
                 // Whatever happens, retain the original @delims line.
-                const delims = m[1].trim();
+                const delims = m[1]!.trim();
                 body.push(`@delims ${delims}\n`);
                 //
                 // Parse the delims.
@@ -4874,7 +4876,7 @@ export class FastAtRead {
                     g.trace(`Ignoring invalid @delims: ${line} `);
                     continue;
                 }
-                comment_delim1 = m2[1];
+                comment_delim1 = m2[1]!;
                 comment_delim2 = m2[2] || '';
                 //
                 // Within these delimiters:
@@ -4907,7 +4909,7 @@ export class FastAtRead {
                     g.es_print('section-delims seen after a section reference');
                 } else {
                     // Carefully update the section reference pattern!
-                    const d1 = m[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const d1 = m[1]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     section_delim1 = d1;
                     const d2 = m[2]
                         ? m[2].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -5011,8 +5013,8 @@ export class FastAtRead {
             // Convert the trailing lines to @last directives.
             let last_lines = tail_lines.map((z) => `@last ${z.trimEnd()}\n`);
             // Add the lines to the dictionary of lines.
-            gnx2body[gnx] = [...gnx2body[gnx]]; // break reference like in original Leo
-            gnx2body[gnx].push(...last_lines);
+            gnx2body[gnx] = [...gnx2body[gnx]!]; // break reference like in original Leo
+            gnx2body[gnx]!.push(...last_lines);
             // Warn if there is an unexpected number of last lines.
             if (n_last_lines !== last_lines.length) {
                 const n1 = n_last_lines;
@@ -5029,8 +5031,8 @@ export class FastAtRead {
         g.assert(gnx2vnode[root_v.gnx], root_v.gnx);
         g.assert(gnx2body[root_v.gnx], root_v.gnx);
         for (const key in gnx2body) {
-            body = gnx2body[key];
-            const v = gnx2vnode[key];
+            body = gnx2body[key]!;
+            const v = gnx2vnode[key]!;
             g.assert(v, key);
             v._bodyString = g.toUnicode(body.join(''));
         }
