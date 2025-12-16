@@ -239,7 +239,7 @@ export class LeoPluginsController {
     public registerOneExclusiveHandler(tag: string, fn: () => any): void {
         let moduleName = '';
         try {
-            moduleName = this.loadingModuleNameStack[this.loadingModuleNameStack.length - 1];
+            moduleName = this.loadingModuleNameStack[this.loadingModuleNameStack.length - 1]!;
         } catch (e) {
             moduleName = '<no module>';
         }
@@ -276,7 +276,7 @@ export class LeoPluginsController {
     public registerOneHandler(tag: string, fn: () => any): void {
         let moduleName = '';
         try {
-            moduleName = this.loadingModuleNameStack[this.loadingModuleNameStack.length - 1];
+            moduleName = this.loadingModuleNameStack[this.loadingModuleNameStack.length - 1]!;
         } catch (e) {
             moduleName = '<no module>';
         }
@@ -301,7 +301,7 @@ export class LeoPluginsController {
         }
     }
     public unregisterOneHandler(tag: string, fn: () => any): void {
-        let bunches = this.handlers[tag];
+        let bunches = this.handlers[tag]!;
         bunches = bunches.filter(bunch => bunch && bunch.fn !== fn);
         this.handlers[tag] = bunches;
     }

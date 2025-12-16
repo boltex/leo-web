@@ -2,14 +2,15 @@
 //@+node:felix.20251214160339.834: * @file src/core/leoExternalFiles.ts
 //@+<< imports >>
 //@+node:felix.20251214160339.835: ** << imports >>
-import * as vscode from 'vscode';
 import * as path from 'path';
-import * as md5 from 'md5';
+import md5 from 'md5';
 import * as os from 'os';
 import * as g from './leoGlobals';
 import { LeoFrame } from './leoFrame';
 import { Position } from './leoNodes';
 import { Commands } from './leoCommands';
+import { workspace } from '../workspace';
+import { FileStat } from '../types';
 //@-<< imports >>
 //@+others
 //@+node:felix.20251214160339.836: ** class ExternalFile
@@ -56,7 +57,7 @@ export class ExternalFile {
     /**
      * Return True if the external file still exists.
      */
-    public exists(): Promise<boolean | vscode.FileStat> {
+    public exists(): Promise<boolean | FileStat> {
         return g.os_path_exists(this.path);
     }
     //@-others
@@ -432,15 +433,15 @@ export class ExternalFilesController {
             // if node is part of @<file> tree, get ext from file name
             for (const p2 of p.self_and_parents(false)) {
                 if (p2.isAnyAtFileNode()) {
-                    const fn = p2.h.split(' ', 1)[1];
-                    ext = g.os_path_splitext(fn)[1];
+                    const fn = p2.h.split(' ', 1)[1]!;
+                    ext = g.os_path_splitext(fn)[1]!;
                     break;
                 }
             }
         }
         if (!ext) {
             const language = c.getLanguage(p);
-            ext = g.app.language_extension_dict[language];
+            ext = g.app.language_extension_dict[language]!;
         }
         if (!ext) {
             ext = '.txt';
@@ -517,7 +518,7 @@ export class ExternalFilesController {
             const w_exists = await g.os_path_exists(td);
             if (!w_exists) {
                 const w_uri = g.makeUri(td);
-                await vscode.workspace.fs.createDirectory(w_uri);
+                await workspace.fs.createDirectory(w_uri);
                 // os.mkdir(td);
             }
         }
@@ -550,7 +551,7 @@ export class ExternalFilesController {
         const w_exists = await g.os_path_exists(td);
         if (!w_exists) {
             const w_uri = g.makeUri(td);
-            await vscode.workspace.fs.createDirectory(w_uri);
+            await workspace.fs.createDirectory(w_uri);
             //os.mkdir(td);
         }
 
@@ -585,7 +586,7 @@ export class ExternalFilesController {
 
                 const w_uri = g.makeUri(w_path);
                 // s is already Uint8Array buffer
-                await vscode.workspace.fs.writeFile(w_uri, s);
+                await workspace.fs.writeFile(w_uri, s);
             } catch (IOError) {
                 g.error(`exception creating temp file: ${w_path}`);
                 g.es_exception(IOError);
@@ -746,12 +747,12 @@ export class ExternalFilesController {
                 if (!checkConfig.includes('none')) {
                     let w_message = 'Changes to external files were detected.';
                     if (checkConfig.includes('yes')) {
-                        void vscode.window.showInformationMessage(
+                        void workspace.view.showInformationMessage(
                             w_message + ' Nodes refreshed.'
                         );
                         return 'yes-all';
                     } else {
-                        void vscode.window.showInformationMessage(
+                        void workspace.view.showInformationMessage(
                             w_message + ' They were ignored.'
                         );
                         return 'no-all';
@@ -809,7 +810,7 @@ export class ExternalFilesController {
         //     s = f.read()
 
         const w_uri = g.makeUri(p_path);
-        const s = await vscode.workspace.fs.readFile(w_uri);
+        const s = await workspace.fs.readFile(w_uri);
 
         // return hashlib.md5(s).hexdigest()
         return md5(s);
@@ -824,7 +825,7 @@ export class ExternalFilesController {
         if (ef.path && w_exists) {
             try {
                 const w_uri = g.makeUri(ef.path);
-                await vscode.workspace.fs.delete(w_uri, { recursive: true });
+                await workspace.fs.delete(w_uri, { recursive: true });
                 // os.remove(ef.path)
             } catch (exception) {
                 // pass
@@ -846,7 +847,7 @@ export class ExternalFilesController {
      * see set_time() for notes
      */
     public get_time(p_path: string): number {
-        return this._time_d[g.os_path_realpath(p_path)];
+        return this._time_d[g.os_path_realpath(p_path)]!;
     }
     //@+node:felix.20251214160339.865: *4* efc.has_changed
     /**
@@ -969,7 +970,7 @@ export class ExternalFilesController {
                 'Proceed with refresh-from-disk only if this is intended.\n';
         }
 
-        void vscode.window.showInformationMessage(message);
+        void workspace.view.showInformationMessage(message);
     }
 
     //@-others

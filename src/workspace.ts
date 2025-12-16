@@ -93,6 +93,21 @@ class Fs {
         await dir.removeEntry(name, opts);
     }
 
+    async rename(src: Uri, dst: Uri, opts: { overwrite?: boolean } = {}): Promise<void> {
+        // Emulate rename with copy+delete (File System Access has no native move/rename).
+        if (!opts.overwrite) {
+            try {
+                await this.stat(dst); // throws if not found
+                throw new Error(`Destination exists: ${dst.fsPath}`);
+            } catch {
+                // Destination does not exist; ok to proceed.
+            }
+        }
+        const data = await this.readFile(src);
+        await this.writeFile(dst, data);
+        await this.delete(src);
+    }
+
     async stat(uri: Uri): Promise<FileStat> {
         const { dir, name } = await this.resolveParentAndName(uri);
         try {

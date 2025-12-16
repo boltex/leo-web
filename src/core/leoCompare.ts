@@ -6,12 +6,12 @@
 //@+<< leoCompare imports & annotations >>
 //@+node:felix.20251214160339.661: ** << leoCompare imports & annotations >>
 
-import * as vscode from 'vscode';
 import * as difflib from 'difflib';
 import * as g from './leoGlobals';
 import { command } from './decorators';
 import { Commands } from './leoCommands';
 import { VNode, Position } from './leoNodes';
+import { workspace } from '../workspace';
 
 //@-<< leoCompare imports & annotations >>
 //@+others
@@ -141,7 +141,7 @@ export class BaseLeoCompare {
         }
         try {
             const w_uri = g.makeUri(dir1);
-            const w_dirInfo = await vscode.workspace.fs.readDirectory(w_uri);
+            const w_dirInfo = await workspace.fs.readDirectory(w_uri);
             list1 = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
         } catch (exception) {
             this.show('invalid directory:' + dir1);
@@ -149,7 +149,7 @@ export class BaseLeoCompare {
         }
         try {
             const w_uri = g.makeUri(dir2);
-            const w_dirInfo = await vscode.workspace.fs.readDirectory(w_uri);
+            const w_dirInfo = await workspace.fs.readDirectory(w_uri);
             list2 = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
         } catch (exception) {
             this.show('invalid directory:' + dir2);
@@ -238,7 +238,7 @@ export class BaseLeoCompare {
             // WRITE WHAT ACCUMULATED IN this.outputFile !
             const w_uri = g.makeUri(this.outputFileName);
             const writeData = Buffer.from(this.outputFile, 'utf8');
-            await vscode.workspace.fs.writeFile(w_uri, writeData);
+            await workspace.fs.writeFile(w_uri, writeData);
 
             // this.outputFile.close()
             this.outputFile = undefined;
@@ -256,7 +256,7 @@ export class BaseLeoCompare {
     public async compare_list_of_files(aList1: string[]): Promise<void> {
         const aList = [...new Set(aList1)];
         while (aList.length > 1) {
-            const path1 = aList[0];
+            const path1 = aList[0]!;
             for (const path2 of aList.slice(1)) {
                 g.trace('COMPARE', path1, path2);
                 await this.compare_two_files(path1, path2);
@@ -514,7 +514,7 @@ export class BaseLeoCompare {
     public async doOpen(name: string): Promise<string[] | undefined> {
         try {
             const w_uri = g.makeUri(name);
-            const content = await vscode.workspace.fs.readFile(w_uri);
+            const content = await workspace.fs.readFile(w_uri);
             const s = g.toUnicode(content);
 
             // .split(/\r?\n/);
@@ -525,11 +525,11 @@ export class BaseLeoCompare {
             for (let i = 0; i < arrWithDelimiters.length; i += 2) {
                 if (i + 1 < arrWithDelimiters.length) {
                     concatenatedArr.push(
-                        arrWithDelimiters[i] + arrWithDelimiters[i + 1]
+                        arrWithDelimiters[i]! + arrWithDelimiters[i + 1]!
                     );
                 } else {
                     // Add the last entry if it doesn't have a pair
-                    concatenatedArr.push(arrWithDelimiters[i]);
+                    concatenatedArr.push(arrWithDelimiters[i]!);
                 }
             }
             return concatenatedArr;
@@ -637,7 +637,7 @@ export class BaseLeoCompare {
                 this.show('appending to ' + this.outputFileName);
                 // this.outputFile = open(this.outputFileName, "ab");
                 const w_uri = g.makeUri(this.outputFileName);
-                const content = await vscode.workspace.fs.readFile(w_uri);
+                const content = await workspace.fs.readFile(w_uri);
                 this.outputFile = g.toUnicode(content);
             } else {
                 this.show('writing to ' + this.outputFileName);
@@ -752,7 +752,7 @@ export class CompareLeoOutlines {
         this.root = this.create_root(aList);
         this.visible = visible;
         while (aList.length > 1) {
-            const path1 = aList[0];
+            const path1 = aList[0]!;
             aList = aList.slice(1);
             for (const path2 of aList) {
                 await this.diff_two_files(path1, path2); // adds to this.root
@@ -818,7 +818,7 @@ export class CompareLeoOutlines {
         const added: { [key: string]: VNode } = Object.keys(d2).reduce(
             (acc: { [key: string]: VNode }, key) => {
                 if (!d1[key]) {
-                    acc[key] = d2[key];
+                    acc[key] = d2[key]!;
                 }
                 return acc;
             },
@@ -827,7 +827,7 @@ export class CompareLeoOutlines {
         const deleted: { [key: string]: VNode } = Object.keys(d1).reduce(
             (acc: { [key: string]: VNode }, key) => {
                 if (!d2[key]) {
-                    acc[key] = d1[key];
+                    acc[key] = d1[key]!;
                 }
                 return acc;
             },
@@ -836,8 +836,8 @@ export class CompareLeoOutlines {
         const changed: { [key: string]: [VNode, VNode] } = {};
         for (const key in d1) {
             if (key in d2) {
-                const v1 = d1[key];
-                const v2 = d2[key];
+                const v1 = d1[key]!;
+                const v2 = d2[key]!;
                 if (v1.context !== v2.context) {
                     if (v1.h !== v2.h || v1.b !== v2.b) {
                         changed[key] = [v1, v2];
@@ -965,7 +965,7 @@ export class CompareLeoOutlines {
         // with open(p_path, 'rb') as f
         //     s = f.read()
         const w_uri = g.makeUri(p_path);
-        const s = await vscode.workspace.fs.readFile(w_uri);
+        const s = await workspace.fs.readFile(w_uri);
 
         return g.toUnicode(s).replace(/\r/g, '');
     }
@@ -1058,7 +1058,7 @@ export class TopLevelCompareCommands {
 
         while (aList.length > 1) {
             n += 1;
-            let [p1, p2] = [aList[0], aList[1]];
+            let [p1, p2] = [aList[0]!, aList[1]!];
             aList = aList.slice(1);
             const lines = new difflib.Differ().compare(
                 g.splitLines(p1.b.trimEnd() + '\n'),

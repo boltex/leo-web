@@ -388,7 +388,7 @@ export class MarkupCommands {
         if (kind === 'adoc') {
             const m = h.match(this.adoc_pattern);
             if (m && m.length) {
-                const prefix = m[1];
+                const prefix = m[1]!;
                 return h.substring(1 + prefix.length).trim();
             }
             return undefined;
@@ -591,7 +591,7 @@ export class MarkupCommands {
             // Hard coded characters. Never use '#' underlining.
             const chars = `=+*^~"'` + "`" + `-:><_`;
             if (chars.length > level) {
-                const ch = chars[level];
+                const ch = chars[level]!;
                 const line = ch.repeat(p.h.length);
                 this.output_file += `${p.h}\n${line}\n\n`;
             }

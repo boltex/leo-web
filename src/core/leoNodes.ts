@@ -13,7 +13,7 @@ import { FileCommands } from './leoFileCommands';
 import { NullBody } from './leoFrame';
 import 'date-format-lite';
 import * as crypto from 'crypto';
-import KSUID = require('ksuid');
+import KSUID from 'ksuid';
 
 //@-<< imports >>
 //@+others
@@ -51,7 +51,7 @@ export class NodeIndices {
             return;
         }
         const fc: FileCommands = c.fileCommands;
-        const v2: VNode = fc.gnxDict[gnx];
+        const v2: VNode = fc.gnxDict[gnx]!;
         if (v2 && v2 !== v) {
             g.error(
                 `getNewIndex: gnx clash ${gnx}\n` +
@@ -350,8 +350,8 @@ export class Position {
             p1.stack.length === p2.stack.length &&
             p1.stack.every((p_value, p_index) => {
                 return (
-                    p_value[1] === p2.stack[p_index][1] &&
-                    p_value[0].fileIndex === p2.stack[p_index][0].fileIndex
+                    p_value[1] === p2.stack[p_index]![1] &&
+                    p_value[0].fileIndex === p2.stack[p_index]![0].fileIndex
                 );
             })
         );
@@ -389,10 +389,10 @@ export class Position {
         const n: number = n1 < n2 ? n1 : n2;
         // Compare the common part of the stacks.
         for (let nx = 0; nx < n; nx++) {
-            if (stack1[nx][1] > stack2[nx][1]) {
+            if (stack1[nx]![1] > stack2[nx]![1]) {
                 return true;
             }
-            if (stack1[nx][1] < stack2[nx][1]) {
+            if (stack1[nx]![1] < stack2[nx]![1]) {
                 return false;
             }
         }
@@ -406,13 +406,13 @@ export class Position {
         }
         if (n1 < n2) {
             x1 = this._childIndex;
-            x2 = other.stack[n][1];
+            x2 = other.stack[n]![1];
             return x1 > x2;
         }
         // n1 > n2
         // 2011/07/28: Bug fix suggested by SegundoBob.
         x1 = other._childIndex;
-        x2 = this.stack[n][1];
+        x2 = this.stack[n]![1];
         return x2 >= x1;
     }
 
@@ -674,7 +674,7 @@ export class Position {
         const lines: string[] = p.b.split('\n');
         for (let s of lines) {
             const i: number = g.skip_ws(s, 0);
-            if (i < s.length && ['+', '-', '\\'].includes(s[i])) {
+            if (i < s.length && ['+', '-', '\\'].includes(s[i]!)) {
                 s = s.slice(0, i) + '\\' + s.slice(i);
             }
             array.push(s);
@@ -1216,12 +1216,12 @@ export class Position {
             let v: VNode;
             let childIndex: number;
             let parent_v: VNode;
-            [v, childIndex] = p.stack[n];
+            [v, childIndex] = p.stack[n]!;
             // See how many children v's parent has.
             if (n === 0) {
                 parent_v = v.context.hiddenRootNode;
             } else {
-                parent_v = p.stack[n - 1][0];
+                parent_v = p.stack[n - 1]![0];
             }
             if (parent_v.children.length > childIndex + 1) {
                 // v has a next sibling.
@@ -1291,7 +1291,7 @@ export class Position {
         }
 
         if (c.hoistStack.length) {
-            const root: Position = c.hoistStack[c.hoistStack.length - 1].p;
+            const root: Position = c.hoistStack[c.hoistStack.length - 1]!.p;
             if (p.__eq__(root)) {
                 // #12.
                 return true;
@@ -1567,8 +1567,8 @@ export class Position {
         let changed: boolean = false;
         let i: number = 0;
         while (i < p.stack.length) {
-            const v: VNode = p.stack[i][0];
-            const childIndex: number = p.stack[i][1];
+            const v: VNode = p.stack[i]![0];
+            const childIndex: number = p.stack[i]![1];
             const p3 = new Position(v, childIndex, stack.slice(0, i)); // stack[:i]
             while (p3.__bool__()) {
                 if (p2.__eq__(p3)) {
@@ -1674,7 +1674,7 @@ export class Position {
         const p: Position = this;
         if (p.v) {
             const data: false | StackEntry =
-                !!p.stack.length && p.stack[p.stack.length - 1];
+                !!p.stack.length && p.stack[p.stack.length - 1]!;
             if (data) {
                 const v: VNode = data[0];
                 return v;
@@ -1698,7 +1698,7 @@ export class Position {
             return;
         }
         // Compare fileIndex instead of v directly
-        if (parent_v.children[p._childIndex].fileIndex === v.fileIndex) {
+        if (parent_v.children[p._childIndex]!.fileIndex === v.fileIndex) {
             parent_v.children[p._childIndex] = v2;
             v2.parents.push(parent_v);
             // p.v no longer truly exists.
@@ -1793,7 +1793,7 @@ export class Position {
         // Do not assume n is in range: this is used by positionExists.
         if (parent_v && p.v && 0 < n && n <= parent_v.children.length) {
             p._childIndex -= 1;
-            p.v = parent_v.children[n - 1];
+            p.v = parent_v.children[n - 1]!;
         } else {
             // * For now, use undefined p.v to signal null/invalid positions
             // @ts-ignore
@@ -1810,7 +1810,7 @@ export class Position {
         const p: Position = this;
         if (p.v && p.v.children.length) {
             p.stack.push([p.v, p._childIndex]);
-            p.v = p.v.children[0];
+            p.v = p.v.children[0]!;
             p._childIndex = 0;
         } else {
             // * For now, use undefined p.v to signal null/invalid positions
@@ -1830,7 +1830,7 @@ export class Position {
         if (p.v && p.v.children.length) {
             p.stack.push([p.v, p._childIndex]);
             n = p.v.children.length;
-            p.v = p.v.children[n - 1];
+            p.v = p.v.children[n - 1]!;
             p._childIndex = n - 1;
         } else {
             // * For now, use undefined p.v to signal null/invalid positions
@@ -1868,7 +1868,7 @@ export class Position {
         }
         if (p.v && parent_v && parent_v.children.length > n + 1) {
             p._childIndex = n + 1;
-            p.v = parent_v.children[n + 1];
+            p.v = parent_v.children[n + 1]!;
         } else {
             // * For now, use undefined p.v to signal null/invalid positions
             // @ts-ignore
@@ -1901,7 +1901,7 @@ export class Position {
         const p: Position = this;
         if (p.v && p.v.children.length > n) {
             p.stack.push([p.v, p._childIndex]);
-            p.v = p.v.children[n];
+            p.v = p.v.children[n]!;
             p._childIndex = n;
         } else {
             // * For now, use undefined p.v to signal null/invalid positions
@@ -3378,7 +3378,7 @@ export class VNode {
             !!children &&
             0 <= n &&
             n < children.length &&
-            children[n].fileIndex === this.fileIndex
+            children[n]!.fileIndex === this.fileIndex
         );
     }
 
@@ -3749,7 +3749,7 @@ export class VNode {
         g.assert(0 <= n && n <= v.children.length);
         const v2: VNode = new VNode(v.context);
         v2._linkAsNthChild(v, n);
-        g.assert(v.children[n].fileIndex === v2.fileIndex);
+        g.assert(v.children[n]!.fileIndex === v2.fileIndex);
         return v2;
     }
 
@@ -3813,13 +3813,13 @@ export class VNode {
         const v: VNode = this;
         v.context.frame.tree.generation += 1;
         parent_v.childrenModified();
-        g.assert(parent_v.children[childIndex].fileIndex === v.fileIndex);
+        g.assert(parent_v.children[childIndex]!.fileIndex === v.fileIndex);
 
         parent_v.children.splice(childIndex, 1);
         if (v.parents.includes(parent_v)) {
             try {
                 for (let i = 0; i < v.parents.length; i++) {
-                    if (v.parents[i].fileIndex === parent_v.fileIndex) {
+                    if (v.parents[i]!.fileIndex === parent_v.fileIndex) {
                         v.parents.splice(i, 1);
                         break;
                     }
@@ -3851,7 +3851,7 @@ export class VNode {
         const v: VNode = this;
 
         for (let i = 0; i < v.parents.length; i++) {
-            if (v.parents[i].fileIndex === parent.fileIndex) {
+            if (v.parents[i]!.fileIndex === parent.fileIndex) {
                 v.parents.splice(i, 1);
                 break;
             }
@@ -3877,7 +3877,7 @@ export class VNode {
         for (let v2 of v.children) {
             try {
                 for (let i = 0; i < v2.parents.length; i++) {
-                    if (v2.parents[i].fileIndex === v.fileIndex) {
+                    if (v2.parents[i]!.fileIndex === v.fileIndex) {
                         v2.parents.splice(i, 1);
                         break;
                     }

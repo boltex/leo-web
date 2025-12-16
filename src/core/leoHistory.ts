@@ -65,9 +65,9 @@ export class NodeHistory {
             return;
         }
         this.beadPointer += 1;
-        let [p, chapter] = this.beadList[this.beadPointer];
+        let [p, chapter] = this.beadList[this.beadPointer]!;
         if (c.positionExists(p)) {
-            [p, chapter] = this.beadList[this.beadPointer];
+            [p, chapter] = this.beadList[this.beadPointer]!;
             this.update(p);
             this.select(p, chapter);
         } else {
@@ -86,7 +86,7 @@ export class NodeHistory {
             return;
         }
         this.beadPointer -= 1;
-        let [p, chapter] = this.beadList[this.beadPointer];
+        let [p, chapter] = this.beadList[this.beadPointer]!;
         if (c.positionExists(p)) {
             [p, chapter] = this.beadList[this.beadPointer];
             this.update(p);
@@ -130,7 +130,7 @@ export class NodeHistory {
         }
 
         // #3800: Do nothing if p is the top of the bead list.
-        const last_p = this.beadList.length > 0 ? this.beadList[this.beadList.length - 1][0] : null;
+        const last_p = this.beadList.length > 0 ? this.beadList[this.beadList.length - 1]![0] : null;
         if (last_p === p) {
             return;
         }

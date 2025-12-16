@@ -105,7 +105,7 @@ export class QuickSearchController {
         let stuff: string;
 
         while (i < n) {
-            c = pat[i];
+            c = pat[i]!;
             i = i + 1;
             if (c === '*') {
                 res = res + '.*';
@@ -193,13 +193,13 @@ export class QuickSearchController {
         let lineMatchHits = 0;
         for (let parent_key in parent_list) {
             // Get key with 'for in'
-            const parent_value = parent_list[parent_key];
+            const parent_value = parent_list[parent_key]!;
 
             const v = this.c.fileCommands.gnxDict[parent_key];
             const h = v ? v.h : parent_key;
             const it = { type: 'parent', label: h };
 
-            if (this.addItem(it, [parent_value[0][0], undefined])) {
+            if (this.addItem(it, [parent_value[0]![0], undefined])) {
                 return lineMatchHits; // Will cap at max number of entries!
             }
 
@@ -404,7 +404,7 @@ export class QuickSearchController {
         const tgt = this.its[index];
         if (!tgt) {
             if (!g.unitTesting) {
-                g.es("onSelectItem: no target found for 'it' as index:" + it);
+                g.es("onSelectItem: no target found for 'it' as index:" + index);
             }
             return;
         }
@@ -590,7 +590,7 @@ export class QuickSearchController {
             while (!found && !hitBase) {
                 h = node.h;
                 if (h) {
-                    h = h.split(/\s+/)[0];
+                    h = h.split(/\s+/)[0]!;
                 }
                 if (h in this.fileDirectives) {
                     found = true;
@@ -610,7 +610,7 @@ export class QuickSearchController {
             while (!found && !hitBase) {
                 h = node.h;
                 if (h) {
-                    h = h.split(/\s+/)[0];
+                    h = h.split(/\s+/)[0]!;
                 }
                 if (h === '@chapter') {
                     found = true;

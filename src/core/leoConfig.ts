@@ -429,7 +429,7 @@ export class ParserBaseClass {
         if (!aList.length) {
             return 'skip';
         }
-        name = aList[0]; // first should be name
+        name = aList[0]!; // first should be name
 
         let env: string | undefined;
         if (process && process.env && process.env[name]) {
@@ -631,14 +631,14 @@ export class ParserBaseClass {
         if (val2 && val2.trim()) {
             val = val2;
         }
-        val = val.split('\n', 1)[0]; // keep first
+        val = val.split('\n', 1)[0]!; // keep first
 
         // for i in "*.-& \t\n":
         //     val = val.replace(i, '')
 
         const str = '*.-& \t\n';
         for (var i = 0; i < str.length; i++) {
-            val = val.split(str[i]).join('');
+            val = val.split(str[i]!).join('');
         }
 
         return val.toLowerCase();
@@ -1239,7 +1239,7 @@ export class ParserBaseClass {
         // Comments must be preceded by whitespace.
         if (val) {
             i = val.indexOf('#');
-            if (i > 0 && [' ', '\t'].includes(val[i - 1])) {
+            if (i > 0 && [' ', '\t'].includes(val[i - 1]!)) {
                 val = val.substring(0, i).trim();
             }
         }
@@ -1439,7 +1439,7 @@ export class ActiveSettingsOutline {
         const lm = g.app.loadManager!;
         await lm.readGlobalSettingsFiles();
         // Make sure to reload the local file.
-        const c = g.app.commanders()[0];
+        const c = g.app.commanders()[0]!;
         const fn = c.fileName();
         if (fn) {
             this.local_c = await lm.openSettingsFile(fn);
@@ -1609,7 +1609,7 @@ export class ActiveSettingsOutline {
                 this.add(p, 'ORG:' + p.h);
                 continue;
             }
-            if (m[2] && valid_list.includes(m[1])) {
+            if (m[2] && valid_list.includes(m[1]!)) {
                 //@+<< handle a real setting >>
                 //@+node:felix.20251214160339.765: *4* << handle a real setting >>
                 const key = g.app.config.munge(m[2].trim())!;
@@ -1634,7 +1634,7 @@ export class ActiveSettingsOutline {
             if (m[1] === '@ignore') {
                 ignore = p.nodeAfterTree();
             }
-            else if (['@data', '@outline-data'].includes(m[1])) {
+            else if (['@data', '@outline-data'].includes(m[1]!)) {
                 outline_data = p.nodeAfterTree();
                 this.add(p);
             } else {
@@ -1667,7 +1667,7 @@ export class ActiveSettingsOutline {
             this.parents.pop();
             this.level -= 1;
         }
-        const parent = this.parents[this.parents.length - 1];
+        const parent = this.parents[this.parents.length - 1]!;
         const child = parent.insertAsLastChild();
         child.h = h || p.h;
         child.b = p.b;
@@ -3124,7 +3124,7 @@ export class SettingsTreeParser extends ParserBaseClass {
     /**
      * Init any settings found in node p.
      */
-    public async visitNode(p: Position): Promise<string | undefined> {
+    public override async visitNode(p: Position): Promise<string | undefined> {
         p = p.copy();
 
         const munge = g.app.config.munge;

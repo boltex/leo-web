@@ -2,9 +2,8 @@
 //@+node:felix.20251214160339.1305: * @file src/core/leoImport.ts
 //@+<< leoImport imports >>
 //@+node:felix.20251214160339.1306: ** << leoImport imports >>
-import * as vscode from 'vscode';
 import * as utils from '../utils';
-import * as csv from 'csvtojson';
+import csv from 'csvtojson';
 import { DOMParser } from '@xmldom/xmldom';
 
 // Leo imports...
@@ -14,6 +13,7 @@ import { Commands } from './leoCommands';
 import { Position } from './leoNodes';
 import { Bead } from './leoUndo';
 import { Block } from '../importers/base_importer';
+import { workspace } from '../workspace';
 //@-<< leoImport imports >>
 //@+others
 //@+node:felix.20251214160339.1307: ** class FreeMindImporter
@@ -189,7 +189,7 @@ export class FreeMindImporter {
             types,
         );
         if (names && names.length) {
-            await g.chdir(names[0]);
+            await g.chdir(names[0]!);
             await this.import_files(names);
         }
     }
@@ -534,7 +534,7 @@ export class LeoImportCommands {
                 s += head + nl;
             }
             const writeData = Buffer.from(s, 'utf8');
-            await vscode.workspace.fs.writeFile(w_uri, writeData);
+            await workspace.fs.writeFile(w_uri, writeData);
         } catch (IOError) {
             g.warning('can not open', fileName);
         }
@@ -573,7 +573,7 @@ export class LeoImportCommands {
 
             const writeData = g.toEncodedString(theFile, this.encoding, true);
 
-            await vscode.workspace.fs.writeFile(w_uri, writeData);
+            await workspace.fs.writeFile(w_uri, writeData);
         } catch (IOError) {
             g.warning('can not open', fileName);
             return;
@@ -607,7 +607,7 @@ export class LeoImportCommands {
             }
 
             const writeData = g.toEncodedString(theFile);
-            await vscode.workspace.fs.writeFile(w_uri, writeData);
+            await workspace.fs.writeFile(w_uri, writeData);
         } catch (IOError) {
             g.warning('can not open', fileName);
             return;
@@ -689,7 +689,7 @@ export class LeoImportCommands {
             try {
                 const w_uri = g.makeUri(newFileName);
                 const writeData = Buffer.from(s, 'utf8');
-                await vscode.workspace.fs.writeFile(w_uri, writeData);
+                await workspace.fs.writeFile(w_uri, writeData);
 
                 if (!g.unitTesting) {
                     g.es('created:', newFileName);
@@ -786,7 +786,7 @@ export class LeoImportCommands {
             }
 
             const writeData = g.toEncodedString(f);
-            await vscode.workspace.fs.writeFile(w_uri, writeData);
+            await workspace.fs.writeFile(w_uri, writeData);
         } catch (exception) {
             g.es('exception opening:', filename);
             g.print_exception(exception);
@@ -946,11 +946,11 @@ export class LeoImportCommands {
         }
         let language;
         if (ext) {
-            const z = g.app.extra_extension_dict[ext];
+            const z = g.app.extra_extension_dict[ext]!;
             if (![undefined, 'undefined', 'none', 'None'].includes(z)) {
                 language = z;
             } else {
-                language = g.app.extension_dict[ext];
+                language = g.app.extension_dict[ext]!;
             }
             if ([undefined, 'undefined', 'none', 'None'].includes(language)) {
                 language = unknown;
@@ -1175,7 +1175,7 @@ export class LeoImportCommands {
         let k = g.skip_line(s, i);
         let name: string | undefined = undefined;
         while (i < k) {
-            if (g.is_c_id(s[i])) {
+            if (g.is_c_id(s[i]!)) {
                 const j = i;
                 i = g.skip_c_id(s, i);
                 name = s.substring(j, i);
@@ -1216,7 +1216,7 @@ export class LeoImportCommands {
                     // Look for a macro name.
                     const directive = s.substring(i, i + 2);
                     i = g.skip_ws(s, i + 2); // skip the @d or @f
-                    if (i < s.length && g.is_c_id(s[i])) {
+                    if (i < s.length && g.is_c_id(s[i]!)) {
                         j = i;
                         i = g.skip_c_id(s, i);
                         return s.substring(j, i);
@@ -1622,13 +1622,13 @@ export class LeoImportCommands {
     public preprocess_blocks(blocks: Block[]): void {
 
         for (let i = 0; i < blocks.length; i++) {
-            const block = blocks[i];
+            const block = blocks[i]!;
             const block2 = blocks[i + 1];
             if (!block2) {
                 break; // No next block, mission complete.
             }
             for (let j = block2.start; j < block2.end; j++) {
-                const s = block2.lines[j];
+                const s = block2.lines[j]!;
                 if (s.trim()) {
                     break; // Found non-blank line, stop transfer.
                 }
@@ -1847,7 +1847,7 @@ export class MindMapImporter {
         try {
             //f = open(p_path)
             const w_uri = g.makeUri(p_path);
-            const readData = await vscode.workspace.fs.readFile(w_uri);
+            const readData = await workspace.fs.readFile(w_uri);
             const s = Buffer.from(readData).toString('utf8');
 
             await this.scan(s, p); // ! leojs: Use string from file content instead
@@ -1893,7 +1893,7 @@ export class MindMapImporter {
             types,
         );
         if (names && names.length) {
-            await g.chdir(names[0]);
+            await g.chdir(names[0]!);
             await this.import_files(names);
         }
     }
@@ -1944,8 +1944,8 @@ export class MindMapImporter {
                 pbSplit.pop();
             }
             if (pbSplit.length === 1) {
-                if (pbSplit[0].length < max_chars_in_header) {
-                    p.h = pbSplit[0];
+                if (pbSplit[0]!.length < max_chars_in_header) {
+                    p.h = pbSplit[0]!;
                     p.b = '';
                 } else {
                     p.h = '@node_with_long_text';
@@ -2015,7 +2015,7 @@ export class MORE_Importer {
             types,
         );
         if (names && names.length) {
-            await g.chdir(names[0]);
+            await g.chdir(names[0]!);
             await this.import_files(names);
         }
     }
@@ -2097,14 +2097,14 @@ export class MORE_Importer {
         if (!this.check_lines(strings)) {
             return undefined;
         }
-        let [firstLevel, junk] = this.headlineLevel(strings[0]);
+        let [firstLevel, junk] = this.headlineLevel(strings[0]!);
         let lastLevel = -1;
         let theRoot: Position | undefined = undefined;
         let last_p: Position | undefined = undefined;
         let index = 0;
         while (index < strings.length) {
             const progress = index;
-            const s = strings[index];
+            const s = strings[index]!;
             let [level, junk2] = this.headlineLevel(s);
             level -= firstLevel;
             if (level >= 0) {
@@ -2147,7 +2147,7 @@ export class MORE_Importer {
                 let bodyLines = 0;
                 index += 1; // Skip the headline.
                 while (index < strings.length) {
-                    const s = strings[index];
+                    const s = strings[index]!;
                     let [level, junk] = this.headlineLevel(s);
                     level -= firstLevel;
                     if (level >= 0) {
@@ -2167,7 +2167,7 @@ export class MORE_Importer {
                     let body = '';
                     let n = index - bodyLines;
                     while (n < index) {
-                        body += strings[n].trimEnd();
+                        body += strings[n]!.trimEnd();
                         if (n !== index - 1) {
                             body += '\n';
                         }
@@ -2196,7 +2196,7 @@ export class MORE_Importer {
     public headlineLevel(s: string): [number, boolean] {
         let level = 0;
         let i = 0;
-        while (i < s.length && ' \t'.includes(s[i])) {
+        while (i < s.length && ' \t'.includes(s[i]!)) {
             // 2016/10/06: allow blanks or tabs.
             level += 1;
             i += 1;
@@ -2219,7 +2219,7 @@ export class MORE_Importer {
         if (!strings || !strings.length) {
             return false;
         }
-        let [level1, plusFlag] = this.headlineLevel(strings[0]);
+        let [level1, plusFlag] = this.headlineLevel(strings[0]!);
         if (level1 === -1) {
             return false;
         }
@@ -2839,7 +2839,7 @@ export class TabImporter {
                     g.setGlobalOpenDir(fn);
                     // s = open(fn).read();
                     const w_uri = g.makeUri(fn);
-                    const readData = await vscode.workspace.fs.readFile(w_uri);
+                    const readData = await workspace.fs.readFile(w_uri);
                     s = Buffer.from(readData).toString('utf8');
                     s = s.replace(/\r/g, '');
                 } catch (exception) {
@@ -2891,7 +2891,7 @@ export class TabImporter {
             types,
         );
         if (names && names.length) {
-            await g.chdir(names[0]);
+            await g.chdir(names[0]!);
             await this.import_files(names);
         }
     }
@@ -2935,7 +2935,7 @@ export class TabImporter {
         let parent: Position | undefined;
         let grand_parent: Position | undefined;
         if (stack && stack.length) {
-            [level, parent] = stack[stack.length - 1];
+            [level, parent] = stack[stack.length - 1]!;
         } else {
             [level, parent] = [0, undefined];
         }
@@ -2949,7 +2949,7 @@ export class TabImporter {
                     stack.pop();
                 }
                 grand_parent =
-                    stack && stack.length ? stack[stack.length - 1][1] : root;
+                    stack && stack.length ? stack[stack.length - 1]![1] : root;
                 parent = grand_parent.insertAsLastChild(); // lws == level
                 parent.h = h;
                 stack.push([level, parent]);
@@ -2969,7 +2969,7 @@ export class TabImporter {
                     if (level2 === lws) {
                         grand_parent =
                             stack && stack.length
-                                ? stack[stack.length - 1][1]
+                                ? stack[stack.length - 1]![1]
                                 : root;
                         parent = grand_parent.insertAsLastChild(); // lws < level
                         parent.h = h;
@@ -2987,10 +2987,10 @@ export class TabImporter {
                 }
             }
         }
-        g.assert(parent && parent.__eq__(stack[stack.length - 1][1])); // An important invariant.
+        g.assert(parent && parent.__eq__(stack[stack.length - 1]![1])); // An important invariant.
         g.assert(
-            level === stack[stack.length - 1][0],
-            JSON.stringify([level, stack[stack.length - 1][0]])
+            level === stack[stack.length - 1]![0],
+            JSON.stringify([level, stack[stack.length - 1]![0]])
         );
         if (!separate && parent) {
             parent.b = parent.b + this.undent(level, s);
@@ -3008,7 +3008,7 @@ export class TabImporter {
         }
         if (s.trim()) {
             const lines = g.splitLines(s);
-            const ch = lines[0][0];
+            const ch = lines[0]![0]!;
             g.assert(' \t'.includes(ch), ch.toString());
             // Check that all lines start with the proper lws.
             const lws = ch.repeat(level);
@@ -3055,7 +3055,7 @@ export class ToDoImporter {
         }
         try {
             const w_uri = g.makeUri(p_path);
-            const readData = await vscode.workspace.fs.readFile(w_uri);
+            const readData = await workspace.fs.readFile(w_uri);
             const contents = Buffer.from(readData).toString('utf8');
 
             // with open(p_path, 'r') as f:
@@ -3087,7 +3087,7 @@ export class ToDoImporter {
                 //     contents = f.read()
 
                 const w_uri = g.makeUri(w_path);
-                const readData = await vscode.workspace.fs.readFile(w_uri);
+                const readData = await workspace.fs.readFile(w_uri);
                 const contents = Buffer.from(readData).toString('utf8');
                 const tasks = this.parse_file_contents(contents);
                 d[w_path] = tasks;
@@ -3121,7 +3121,7 @@ export class ToDoImporter {
             }
             // Groups 1, 2 and 5 are context independent.
             const completed = m[1];
-            const priority = m[2];
+            const priority = m[2]!;
             const task_s = m[5];
             if (!task_s) {
                 console.log(`invalid task: ${line.toString().trimEnd()}`);
@@ -3130,10 +3130,10 @@ export class ToDoImporter {
             // Groups 3 and 4 are context dependent.
             let complete_date, start_date;
             if (m[3] && m[4]) {
-                complete_date = m[3];
-                start_date = m[4];
+                complete_date = m[3]!;
+                start_date = m[4]!;
             } else if (completed) {
-                complete_date = m[3];
+                complete_date = m[3]!;
                 start_date = '';
             } else {
                 start_date = m[3] || '';
@@ -3174,10 +3174,10 @@ export class ToDoImporter {
         if (!names || !names.length) {
             return {};
         }
-        await g.chdir(names[0]);
+        await g.chdir(names[0]!);
         const d = await this.import_files(names);
         for (const key of Object.keys(d).sort()) {
-            const tasks = d[key];
+            const tasks = d[key]!;
             console.log(`tasks in ${g.shortFileName(key)}...\n`);
             for (const task of tasks) {
                 console.log(`    ${task}`);
@@ -3283,13 +3283,12 @@ export class ToDoTask {
             while ((m = pat_global.exec(s)) !== null) {
                 // Check for false key:val match:
                 if (kind === 'key:val') {
-                    let [key, value] = [m[2], m[3]];
+                    let [key, value] = [m[2]!, m[3]!];
                     if (key.includes(':') || value.includes(':')) {
                         break;
                     }
                 }
-                const tag = m[1];
-
+                const tag = m[1]!;
                 // Add the tag.
                 if (aList.includes(tag)) {
                     if (trace) {
@@ -3364,7 +3363,7 @@ export class ZimImportController {
 
         //index = open(pathToIndex).read()
         const w_uri = g.makeUri(pathToIndex);
-        const readData = await vscode.workspace.fs.readFile(w_uri);
+        const readData = await workspace.fs.readFile(w_uri);
         const index = Buffer.from(readData).toString('utf8');
 
         // parse = re.findall(r'(\t*)-\s`(.+)\s<(.+)>`_', index)
@@ -3383,13 +3382,13 @@ export class ZimImportController {
         }
         const results: [number, string, string[]][] = [];
         for (const result of parse) {
-            const level = result[0].length;
-            const name = result[1]; // .decode('utf-8') // already decoded from buffer above in leojs.
+            const level = result[0]!.length;
+            const name = result[1]!; // .decode('utf-8') // already decoded from buffer above in leojs.
             const unquote = decodeURIComponent; // urllib.parse.unquote;
             // mypy: error: "str" has no attribute "decode"; maybe "encode"?  [attr-defined]
             const w_path = [
                 g.os_path_abspath(
-                    g.os_path_join(pathToZim, unquote(result[2]))
+                    g.os_path_join(pathToZim, unquote(result[2]!))
                 ), // already decoded from buffer above in leojs.
             ];
             results.push([level, name, w_path]);
@@ -3465,7 +3464,7 @@ export class ZimImportController {
                 }
             } else if (p.h.startsWith('@rst-no-head')) {
                 const lines = p.b.split('\n');
-                p.h = lines[1];
+                p.h = lines[1]!;
                 p.b = lines.slice(3).join('\n');
             }
         }
@@ -3497,7 +3496,7 @@ export class ZimImportController {
                     name = `${this.rstType} ${name}`;
                 }
                 rstNodes[(level + 1).toString()] = await this.rstToLastChild(
-                    rstNodes[level.toString()],
+                    rstNodes[level.toString()]!,
                     name,
                     rst
                 );
@@ -3557,7 +3556,7 @@ export class LegacyExternalFileImporter {
      */
     public add(line: string, stack: LegacyImportNode[]): void {
         if (stack && stack.length) {
-            const node = stack[stack.length - 1];
+            const node = stack[stack.length - 1]!;
             node.lines.push(line);
         } else {
             console.log('orphan line: ', line.toString());
@@ -3599,7 +3598,7 @@ export class LegacyExternalFileImporter {
         //     s = f.read()
 
         const w_uri = g.makeUri(p_path);
-        const readData = await vscode.workspace.fs.readFile(w_uri);
+        const readData = await workspace.fs.readFile(w_uri);
         let s = Buffer.from(readData).toString('utf8');
 
         // Do nothing if the file is a newer external file.
@@ -3671,7 +3670,7 @@ export class LegacyExternalFileImporter {
                 root.h = root_h;
                 root.b = b;
             } else {
-                const parent = position_stack[level - 1];
+                const parent = position_stack[level - 1]!;
                 const p = parent.insertAsLastChild();
                 p.b = b;
                 p.h = node.h;
@@ -3716,7 +3715,7 @@ export class LegacyExternalFileImporter {
             types,
         );
         if (paths && paths.length) {
-            await g.chdir(paths[0]);
+            await g.chdir(paths[0]!);
             await this.import_files(paths);
         }
     }

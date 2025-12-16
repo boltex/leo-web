@@ -2,18 +2,15 @@
 //@+node:felix.20251214160339.870: * @file src/core/leoFileCommands.ts
 //@+<< imports >>
 //@+node:felix.20251214160339.871: ** << imports >>
-import * as vscode from 'vscode';
 import * as g from './leoGlobals';
 import { VNode, Position, StatusFlags } from './leoNodes';
 import { Commands } from './leoCommands';
 import { new_cmd_decorator } from './decorators';
 import 'date-format-lite';
 import * as et from 'elementtree';
-import * as md5 from 'md5';
 import * as difflib from 'difflib';
-import * as JSZip from 'jszip';
 import * as path from 'path';
-import { Database } from 'sql.js';
+import { workspace } from '../workspace';
 var binascii = require('binascii');
 var pickle = require('./jpicklejs');
 
@@ -52,7 +49,6 @@ function cmd(p_name: string, p_doc: string) {
 }
 //@+node:felix.20251214160339.874: ** class BadLeoFile
 class BadLeoFile extends Error {
-    public message: string;
 
     constructor(message: string) {
         super(message);
@@ -63,7 +59,7 @@ class BadLeoFile extends Error {
     }
 
     // = () : trick for toString as per https://stackoverflow.com/a/35361695/920301
-    public toString = (): string => {
+    public override toString = (): string => {
         return 'Bad Leo File:' + this.message;
     };
 }
@@ -109,7 +105,7 @@ export class FastRead {
         let s;
         if (theFile == null) {
             const w_uri = g.makeUri(p_path);
-            const readData = await vscode.workspace.fs.readFile(w_uri);
+            const readData = await workspace.fs.readFile(w_uri);
             s = Buffer.from(readData).toString('utf8');
         } else {
             s = theFile;
@@ -143,7 +139,7 @@ export class FastRead {
         let s;
         if (theFile == null) {
             const w_uri = g.makeUri(p_path);
-            const readData = await vscode.workspace.fs.readFile(w_uri);
+            const readData = await workspace.fs.readFile(w_uri);
             s = Buffer.from(readData).toString('utf8');
         } else {
             s = theFile;
@@ -547,9 +543,9 @@ export class FastRead {
      */
     public updateBodies(gnx2body: Record<string, string>, gnx2vnode: Record<string, VNode>): void {
         for (const gnx in gnx2body) { // Using 'in' for keys
-            const body = gnx2body[gnx];
+            const body = gnx2body[gnx]!;
             try {
-                const v = gnx2vnode[gnx];
+                const v = gnx2vnode[gnx]!;
                 v.b = body;
             } catch (KeyError) {
                 // pass
@@ -923,7 +919,7 @@ export class FileCommands {
         g.es_print('dump-clone-parents...');
         const d = c.fileCommands.gnxDict;
         for (let gnx in d) {
-            const v: VNode = d[gnx];
+            const v: VNode = d[gnx]!;
             if (v.parents.length > 1) {
                 g.es_print(v.h);
                 g.es_print(v.parents);
@@ -1007,96 +1003,6 @@ export class FileCommands {
         }
         return result;
     }
-    //@+node:felix.20251214160339.909: *4* write-zip-archive
-    /**
-     * Write a .zip file containing this .leo file and all external files.
-     *
-     * Write to os.environ['LEO_ARCHIVE'] or the directory containing this .leo file.
-     */
-    @cmd(
-        'write-zip-archive',
-        'Write a .zip file containing this .leo file and all external files. ' +
-        "Write to os.environ['LEO_ARCHIVE'] or the directory containing this .leo file."
-    )
-    public async writeZipArchive(): Promise<unknown> {
-        const c: Commands = this.c;
-        const leo_file = c.fileName();
-        if (!leo_file) {
-            g.es('Please save this outline first');
-            return;
-        }
-        // Compute the timestamp.
-        const timestamp = new Date().getTime(); // datetime.now().timestamp();
-        const time = new Date(timestamp);
-        const time_s = time.format('YYYY-MM-DD-hh-mm-ss');
-
-        // Compute archive_name.
-        let archive_name: string | null = null;
-        try {
-            const directory = process.env['LEO_ARCHIVE'];
-
-            if (directory) {
-                const dir_exists = await g.os_path_isdir(directory);
-                if (!dir_exists) {
-                    g.es_print(`Not found: ${directory}`);
-                } else {
-                    archive_name = `${directory}${path.sep}${g.shortFileName(leo_file)}-${time_s}.zip`;
-                }
-            }
-
-        } catch (error) {
-            // KeyError handling
-        }
-        if (!archive_name) {
-            archive_name = `${leo_file}-${time_s}.zip`;
-        }
-
-        // Write the archive.
-        try {
-
-            let n = 1;
-            const zip = new JSZip();
-
-            const uri = g.makeUri(leo_file);
-            const data = await vscode.workspace.fs.readFile(uri);
-
-            function preparePath(filePath: string) {
-                // Normalize the path to handle different slashes
-                const normalizedPath = path.normalize(filePath);
-                // Remove the drive letter if present (Windows-specific)
-                const withoutDrive = normalizedPath.replace(/^[a-zA-Z]:/, '');
-                // Remove leading slashes
-                const withoutLeadingSlashes = withoutDrive.replace(/^[/\\]+/, '');
-                // Replace backslashes with forward slashes
-                const unixStylePath = withoutLeadingSlashes.replace(/\\/g, '/');
-                return unixStylePath;
-            }
-
-            zip.file(preparePath(leo_file), data);
-
-            for (const p of c.all_unique_positions()) {
-                if (p.isAnyAtFileNode()) {
-                    const fn = c.fullPath(p);
-                    const exists = await g.os_path_exists(fn);
-                    if (exists) {
-                        n += 1;
-                        const atFileUri = g.makeUri(fn);
-                        const atFiledata = await vscode.workspace.fs.readFile(atFileUri);
-                        zip.file(preparePath(fn), atFiledata);
-                    }
-                }
-            }
-            const content = await zip.generateAsync({ type: "uint8array" });
-            const zip_buffer = Buffer.from(content);
-            await vscode.workspace.fs.writeFile(g.makeUri(archive_name), zip_buffer);
-            g.es_print(`Wrote ${archive_name} containing ${n} file${g.plural(n)}`);
-
-        } catch (error) {
-            g.es_print(`Error writing ${archive_name}`);
-            g.es_exception(error);
-        }
-
-    }
     //@+node:felix.20251214160339.910: *3* fc: File Utils
     //@+node:felix.20251214160339.911: *4* fc.createBackupFile
     /**
@@ -1122,13 +1028,13 @@ export class FileCommands {
 
             let s: string;
             const w_readUri = g.makeUri(fileName);
-            const readData = await vscode.workspace.fs.readFile(w_readUri);
+            const readData = await workspace.fs.readFile(w_readUri);
             // s = Buffer.from(readData).toString('utf8'); // * No need to convert if already Uint8Array
 
             try {
                 const w_writeUri = g.makeUri(backupName);
                 // const writeData = Buffer.from(s, 'utf8'); // * No need to convert if already Uint8Array
-                await vscode.workspace.fs.writeFile(w_writeUri, readData);
+                await workspace.fs.writeFile(w_writeUri, readData);
                 ok = true;
             } catch (exception) {
                 g.error('exception creating backup file');
@@ -1149,7 +1055,7 @@ export class FileCommands {
     public async deleteBackupFile(fileName: string): Promise<void> {
         try {
             const w_uri = g.makeUri(fileName);
-            await vscode.workspace.fs.delete(w_uri, { useTrash: false });
+            await workspace.fs.delete(w_uri);
         } catch (exception) {
             if (this.read_only) {
                 g.error('read only');
@@ -1186,7 +1092,7 @@ export class FileCommands {
             try {
                 const w_srcUri = g.makeUri(src);
                 const w_dstUri = g.makeUri(dst);
-                await vscode.workspace.fs.rename(w_srcUri, w_dstUri, {
+                await workspace.fs.rename(w_srcUri, w_dstUri, {
                     overwrite: true,
                 });
             } catch (exception) {
@@ -1203,7 +1109,7 @@ export class FileCommands {
         const w_exists = await g.os_path_exists(fileName);
         if (w_exists) {
             const w_uri = g.makeUri(fileName);
-            const fileStat = await vscode.workspace.fs.stat(w_uri);
+            const fileStat = await workspace.fs.stat(w_uri);
             if (fileStat.permissions && fileStat.permissions & 1) {
                 g.error('can not write: read only:', fileName);
                 return true;
@@ -1215,7 +1121,7 @@ export class FileCommands {
     public async warnOnReadOnlyFiles(fileName: string): Promise<boolean> {
         try {
             const w_uri = g.makeUri(fileName);
-            const fileStat = await vscode.workspace.fs.stat(w_uri);
+            const fileStat = await workspace.fs.stat(w_uri);
             if (fileStat.permissions && fileStat.permissions & 1) {
                 g.error('can not write: read only:', fileName);
                 this.read_only = true;
@@ -1284,7 +1190,7 @@ export class FileCommands {
             );
         }
 
-        const v = hidden_v!.children[0];
+        const v = hidden_v!.children[0]!;
         v.parents = [];
         if (!v) {
             g.es('the clipboard is not valid');
@@ -1348,7 +1254,7 @@ export class FileCommands {
             );
         }
 
-        const v = hidden_v!.children[0];
+        const v = hidden_v!.children[0]!;
 
         // v.parents.remove(hidden_v);
         if (hidden_v) {
@@ -1435,7 +1341,9 @@ export class FileCommands {
         this.gnxDict = {};  // #1437
         let v: VNode | undefined;
         if (p_path.endsWith('.db')) {
-            v = await fc._getLeoDBFileByName(p_path, readAtFileNodesFlag);
+            // v = await fc._getLeoDBFileByName(p_path, readAtFileNodesFlag);
+            console.error('DB FILES NOT IMPLEMENTED YET');
+            throw new Error('DB FILES NOT IMPLEMENTED YET');
         } else {
             v = await fc._getLeoFileByName(p_path, readAtFileNodesFlag);
         }
@@ -1450,66 +1358,6 @@ export class FileCommands {
             g.app.externalFilesController.files_busy = false;
         }
         return v;
-
-    }
-    //@+node:felix.20251214160339.925: *6* fc._getLeoDBFileByName
-    /**
-     * Open, read, and close a .db file.
-     *
-     * The caller should follow this with a call to c.redraw().
-     */
-    public async _getLeoDBFileByName(p_path: string, readAtFileNodesFlag: boolean): Promise<VNode | undefined> {
-
-        const fc: FileCommands = this;
-        const c: Commands = this.c;
-
-        const t1: [number, number] = process.hrtime();
-
-        c.clearChanged(); // May be set when reading @file nodes.
-        await fc.warnOnReadOnlyFiles(p_path);
-        fc.checking = false;
-        fc.mFileName = c.mFileName;
-        fc.initReadIvars();
-        let recoveryNode: Position | undefined = undefined;
-
-        // let conn;
-        try {
-
-            let v;
-            const w_fromDb = await fc.retrieveVnodesFromDb(p_path);
-            if (w_fromDb) {
-                v = w_fromDb;
-            } else {
-                v = await fc.initNewDb(p_path);
-            }
-            if (!v) {
-                return undefined;
-            }
-            // Set timestamp and recovery node.
-            await c.setFileTimeStamp(p_path);
-            if (readAtFileNodesFlag) {
-                recoveryNode = await fc.readExternalFiles(p_path);
-            }
-            // lastTopLevel is a better fallback, imo.
-            const p = recoveryNode || c.p || c.lastTopLevel();
-            c.selectPosition(p);
-            // Delay the second redraw until idle time.
-            // This causes a slight flash, but corrects a hangnail.
-            c.redraw_later();
-            c.checkOutline();  // Must be called *after* ni.end_holding.
-            if (c.changed) {
-                fc.propagateDirtyNodes();
-            }
-            fc.initReadIvars();
-
-            const t2Hrtime: [number, number] = process.hrtime(t1); // difference from t1
-            const t2 = t2Hrtime[0] * 1000 + t2Hrtime[1] / 1000000; // in ms
-            g.es(`read outline in ${(t2 / 1000).toFixed(2)} seconds`);
-
-            return v;
-        } catch (e) {
-
-        }
 
     }
     //@+node:felix.20251214160339.926: *6* fc._getLeoFileByName
@@ -1681,168 +1529,6 @@ export class FileCommands {
         }
         return root;
     }
-    //@+node:felix.20251214160339.929: *5* fc.retrieveVnodesFromDb & helpers
-    /**
-     * Recreates tree from the data contained in table vnodes.
-     *
-     * This method follows behavior of readSaxFile.
-     */
-    public async retrieveVnodesFromDb(fileName: string): Promise<VNode | undefined> {
-        const c: Commands = this.c;
-        const fc: FileCommands = this;
-
-        const sql: string = `select gnx, head,
-             body,
-             children,
-             parents,
-             iconVal,
-             statusBits,
-             ua from vnodes`;
-
-        const vnodes: VNode[] = [];
-
-        const w_uri = g.makeUri(fileName);
-
-        const filebuffer = await vscode.workspace.fs.readFile(w_uri);
-
-        const conn = new g.SQL.Database(filebuffer);
-
-        try {
-            const resultElements = conn.exec(sql)[0];
-
-            for (const row of resultElements.values) {
-                let [gnx, h, b, children, parents, iconVal, statusBits, ua] = row;
-                try {
-
-                    // ! LEOJS NEED TO CONVERT FROM BINARY PROPERLY !
-                    //ua = pickle.loads(g.toEncodedString(ua));
-                    const string_val = g.toUnicode(ua as Uint8Array);
-                    ua = pickle.loads(string_val);
-
-                } catch (ValueError) {
-                    // @ts-expect-error 
-                    ua = undefined;
-                }
-                const v = new VNode(c, gnx as string);
-                v._headString = h as string;
-                v._bodyString = b as string;
-                if (!children) {
-                    v.children = [];
-                } else {
-                    // @ts-expect-error FORCED CONVERSION BELOW
-                    v.children = (children as string).split(/\s+/);
-                }
-                if (!parents) {
-                    v.parents = [];
-                } else {
-                    // @ts-expect-error FORCED CONVERSION BELOW
-                    v.parents = (parents as string).split(/\s+/);
-                }
-
-                v.iconVal = iconVal as number;
-                v.statusBits = statusBits as number;
-                v.u = ua as { [key: string]: any; };
-                vnodes.push(v);
-            }
-        } catch (er: any) {
-            if (er.toString().indexOf('no such table') < 0) {
-                // there was an error raised but it is not the one we expect
-                g.internalError(er);
-            }
-            // there is no vnodes table
-            conn.close();
-            return undefined;
-        }
-
-        // * as string, will be converted below.
-        const rootChildren = vnodes.filter(x => (x.parents as unknown as string[]).includes('hidden-root-vnode-gnx'));
-        // const rootChildren = [x for x in vnodes if 'hidden-root-vnode-gnx' in x.parents]
-
-        if (!rootChildren.length) {
-            g.trace('there should be at least one top level node!');
-            conn.close();
-            return undefined;
-        }
-
-        const findNode = (x: string) => {
-            return fc.gnxDict[x] || c.hiddenRootNode;
-        };
-
-        // let us replace every gnx with the corresponding vnode
-        for (const v of vnodes) {
-            v.children = v.children.map(x => findNode(x as unknown as string));
-            v.parents = v.parents.map(x => findNode(x as unknown as string));
-        }
-        c.hiddenRootNode.children = rootChildren;
-
-        let [w, h, x, y, r1, r2, encp] = fc.getWindowGeometryFromDb(conn);
-        // Got what we needed 
-        conn.close();
-
-        c.frame.setTopGeometry(w, h, x, y);
-        c.frame.resizePanesToRatio(r1, r2);
-        const p = fc.decodePosition(encp);
-        c.setCurrentPosition(p);
-        return rootChildren[0];
-
-    }
-    //@+node:felix.20251214160339.930: *6* fc.initNewDb
-    /**
-     * Initializes tables and returns None
-     */
-    public async initNewDb(fileName: string): Promise<VNode> {
-
-        const c: Commands = this.c;
-        const fc: FileCommands = this;
-        const v: VNode = new VNode(c);
-        c.hiddenRootNode.children = [v];
-
-        const [w, h, x, y, r1, r2, encp] = [600, 400, 50, 50, 0.5, 0.5, ''];
-        c.frame.setTopGeometry(w, h, x, y);
-        c.frame.resizePanesToRatio(r1, r2);
-
-        // await fc.exportToSqlite(c.mFileName); // ? ? ? Is c.mFileName OR fileName CORRECT ???
-        await fc.exportToSqlite(fileName);
-        return Promise.resolve(v);
-    }
-    //@+node:felix.20251214160339.931: *6* fc.getWindowGeometryFromDb
-
-    public getWindowGeometryFromDb(conn: Database): [number, number, number, number, number, number, string] {
-        let geom: [number, number, number, number, number, number, string] = [600, 400, 50, 50, 0.5, 0.5, '']; // Default geometry.
-        const keys = ['width', 'height', 'left', 'top',
-            'ratio', 'secondary_ratio',
-            'current_position'];
-        try {
-            const a = conn.exec(
-                "select * from extra_infos where name in (?, ?, ?, ?, ?, ?, ?)",
-                keys,
-            );
-
-            // mypy complained that geom must be a tuple, not a generator.
-            // geom = tuple(d.get(* x) for x in zip(keys, geom)) 
-            if (a[0] && a[0].values) {
-                const d = a[0].values.reduce((acc, [key, value]) => {
-                    acc[key as string] = value;
-                    return acc;
-                }, {} as Record<string, any>);
-
-                geom = [
-                    d['width'],
-                    d['height'],
-                    d['left'],
-                    d['top'],
-                    d['ratio'],
-                    d['secondary_ratio'],
-                    d['current_position']
-                ];
-            }
-        }
-        catch (e) {
-            // pass
-        }
-
-        return geom;
-    }
     //@+node:felix.20251214160339.932: *4* fc: Read Utils
     // Methods common to both the sax and non-sax code.
     //@+node:felix.20251214160339.933: *5* fc.archivedPositionToPosition
@@ -2000,7 +1686,7 @@ export class FileCommands {
             n = aList.pop()!;
             children = last_v.children;
             if (n < children.length) {
-                last_v = children[n];
+                last_v = children[n]!;
             } else {
                 oops(`bad index="${n}", children.length=${children.length}`);
                 return undefined;
@@ -2190,225 +1876,6 @@ export class FileCommands {
         g.doHook('save2', { c: c, p: p, fileName: fileName });
     }
     //@+node:felix.20251214160339.947: *4* fc: Writing top-level
-    //@+node:felix.20251214160339.948: *5* fc.exportToSqlite & helpers
-    /**
-     * Dump all vnodes to sqlite database. Returns True on success.
-     */
-    public async exportToSqlite(fileName: string): Promise<boolean> {
-        const c: Commands = this.c;
-        const fc: FileCommands = this;
-
-        const conn = new g.SQL.Database();
-
-        const dump_u = (v: VNode) => {
-            let s = new Uint8Array();
-            try {
-                s = pickle.dumps(v.u, 1);
-            } catch (e) {
-                s = new Uint8Array();  // 2021/06/25: fixed via mypy complaint.
-                g.trace('unpickleable value', v.u.toString());
-            }
-            return s;
-        };
-        // dbrow = lambda v: (
-        //         v.gnx,
-        //         v.h,
-        //         v.b,
-        //         ' '.join(x.gnx for x in v.children),
-        //         ' '.join(x.gnx for x in v.parents),
-        //         v.iconVal,
-        //         v.statusBits,
-        //         dump_u(v)
-        //     )
-
-        function dbrow(v: VNode): sqlDbRow {
-            return [
-                v.gnx,
-                v.h,
-                v.b,
-                v.children.map((x) => x.gnx).join(' '),
-                v.parents.map((x) => x.gnx).join(' '),
-                v.iconVal,
-                // #3550: Clear the dirty bit.
-                v.statusBits & ~StatusFlags.dirtyBit,
-                // v.statusBits,
-                // g.toEncodedString(dump_u(v)),
-                dump_u(v)
-
-                // TODO : maybe JSON stringify instead of pickle? TRY TO DO AS PER LEO !
-                // v.u ? JSON.stringify(v.u) : '',
-            ];
-        }
-
-        let ok: boolean = false;
-
-        try {
-            fc.prepareDbTables(conn);
-            fc.exportDbVersion(conn);
-
-            const w_dbRows: sqlDbRow[] = [];
-            for (let v of c.all_unique_nodes()) {
-                w_dbRows.push(dbrow(v));
-            }
-            fc.exportVnodesToSqlite(conn, w_dbRows);
-
-            fc.exportGeomToSqlite(conn);
-            fc.exportHashesToSqlite(conn);
-
-            const db_data = conn.export();
-            // Got what we needed 
-            conn.close();
-            const db_buffer = Buffer.from(db_data);
-
-            const db_uri = g.makeUri(fileName);
-            await vscode.workspace.fs.writeFile(db_uri, db_buffer);
-            ok = true;
-        } catch (e) {
-            g.internalError(e);
-        }
-        return ok;
-    }
-    //@+node:felix.20251214160339.949: *6* fc.decodePosition
-    /**
-     * Creates position from its string representation encoded by fc.encodePosition.
-     */
-    public decodePosition(s: string): Position {
-        const fc: FileCommands = this;
-
-        if (!s) {
-            return fc.c.rootPosition()!;
-        }
-
-        const sep: string = '<->';
-        const comma: string = ',';
-
-        // const w_stack1: [string, string][] = [x.split(comma) for x in s.split(sep)]
-        const w_stack1: [string, string][] = s
-            .split(sep)
-            .map((x) => x.split(comma) as [string, string]);
-
-        // const stack: [VNode, number][] = [(fc.gnxDict[x], int(y)) for x, y in stack]
-        const stack: [VNode, number][] = w_stack1.map((z) => [
-            fc.gnxDict[z[0]]!,
-            parseInt(z[1]),
-        ]);
-
-        let v: VNode;
-        let ci: any;
-
-        [v, ci] = stack[stack.length - 1]; // last one
-
-        const p: Position = new Position(v, ci, stack.slice(0, -1)); // all but last
-
-        return p;
-    }
-    //@+node:felix.20251214160339.950: *6* fc.encodePosition
-    /**
-     * New schema for encoding current position hopefully simpler one.
-     */
-    public encodePosition(p: Position): string {
-        const jn: string = '<->';
-        const mk: string = '%s,%s';
-        const res: string[] = [];
-
-        // res =  [mk % (x.gnx, y) for x, y in p.stack]
-
-        for (let x of p.stack) {
-            res.push(x[0].gnx + ',' + x[1].toString());
-        }
-
-        res.push(p.gnx + ',' + p._childIndex.toString());
-
-        return res.join(jn);
-    }
-    //@+node:felix.20251214160339.951: *6* fc.prepareDbTables
-    public prepareDbTables(conn: Database): void {
-        conn.run('drop table if exists vnodes;');
-
-        conn.run(
-            `create table if not exists vnodes(
-            gnx primary key,
-            head,
-            body,
-            children,
-            parents,
-            iconVal,
-            statusBits,
-            ua); `
-        );
-
-        conn.run(
-            `create table if not exists extra_infos(name primary key, value)`
-        );
-    }
-
-    //@+node:felix.20251214160339.952: *6* fc.exportVnodesToSqlite
-    /**
-     * Called only from fc.exportToSqlite.
-     */
-    public exportVnodesToSqlite(conn: Database, rows: sqlDbRow[]): void {
-        for (let row of rows) {
-            conn.run(
-                `insert into vnodes
-                (gnx, head, body, children, parents,
-                iconVal, statusBits, ua)
-                values(?,?,?,?,?,?,?,?); `,
-                row
-            );
-        }
-    }
-    //@+node:felix.20251214160339.953: *6* fc.exportGeomToSqlite
-    public exportGeomToSqlite(conn: Database): void {
-        const c: Commands = this.c;
-
-        const [width, height, left, top] = c.frame.get_window_info(); // Destructuring the return array
-        const data = [
-            { name: 'width', value: width },
-            { name: 'height', value: height },
-            { name: 'left', value: left },
-            { name: 'top', value: top },
-            { name: 'ratio', value: c.frame.ratio },
-            { name: 'secondary_ratio', value: c.frame.secondary_ratio },
-            { name: 'current_position', value: this.encodePosition(c.p) }
-        ];
-
-        for (const item of data) {
-            conn.run('replace into extra_infos(name, value) values(?, ?)', [item.name, item.value]);
-        }
-
-    }
-    //@+node:felix.20251214160339.954: *6* fc.exportDbVersion
-    public exportDbVersion(conn: Database): void {
-        conn.run(
-            "replace into extra_infos(name, value) values('dbversion', ?)",
-            ['1.0']
-        );
-    }
-    //@+node:felix.20251214160339.955: *6* fc.exportHashesToSqlite
-    public exportHashesToSqlite(conn: Database): void {
-        const c: Commands = this.c;
-
-        const files: [string, string][] = [];
-
-        const p: Position = c.rootPosition()!;
-
-        while (p && p.__bool__()) {
-            if (p.isAtIgnoreNode()) {
-                p.moveToNodeAfterTree();
-            } else if (p.isAtAutoNode() || p.isAtFileNode()) {
-                const w_path = c.getPath(p);
-                files.push([w_path, 'md5_' + p.gnx]);
-                p.moveToNodeAfterTree();
-            } else {
-                p.moveToThreadNext();
-            }
-        }
-
-        for (let file of files) {
-            conn.run('replace into extra_infos(name, value) values(?,?)', file);
-        }
-
-    }
     //@+node:felix.20251214160339.956: *5* fc.outline_to_clipboard_string
     public outline_to_clipboard_string(p?: Position): string | undefined {
         // Save
@@ -2538,7 +2005,7 @@ export class FileCommands {
             const json_s = JSON.stringify(d, null, 2); // json.dumps(d, indent = 2);
 
             const w_uri = g.makeUri(fileName);
-            await vscode.workspace.fs.writeFile(
+            await workspace.fs.writeFile(
                 w_uri,
                 Buffer.from(json_s, this.leo_file_encoding)
             );
@@ -2794,7 +2261,7 @@ export class FileCommands {
             );
 
             const w_uri = g.makeUri(fileName);
-            await vscode.workspace.fs.writeFile(w_uri, s);
+            await workspace.fs.writeFile(w_uri, s);
 
             await c.setFileTimeStamp(fileName);
             // Delete backup file.
@@ -2853,8 +2320,11 @@ export class FileCommands {
             return false;
         }
         if (fileName.endsWith('.db')) {
-            return this.exportToSqlite(fileName);
+            // return this.exportToSqlite(fileName);
+            console.error('TODO: exportToSqlite not implemented yet !');
+            throw new Error('TODO: exportToSqlite not implemented yet !');
         }
+
         if (fileName.endsWith('.leojs')) {
             return this.write_leojs(fileName);
         }
@@ -2964,7 +2434,7 @@ export class FileCommands {
             [v, d2] = p_a;
 
             const aList2: string[] = [];
-            for (let z of pDict[v.gnx]) {
+            for (let z of pDict[v.gnx]!) {
                 aList2.push(z.toString());
             }
 
@@ -3177,7 +2647,7 @@ export class FileCommands {
         // for index in sorted(vnodes)
         // Object.keys(object1)
         for (let index of Object.keys(vnodes).sort()) {
-            const v: VNode = vnodes[index];
+            const v: VNode = vnodes[index]!;
             if (v) {
                 // Write only those vnodes whose vnodes were written.
                 // **Note**: @<file> trees are not written unless they contain clones.

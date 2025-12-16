@@ -189,7 +189,7 @@ export class ChapterController {
         const sel_name = cc.selectedChapter ? cc.selectedChapter.name : 'main';
         let i = names.indexOf(sel_name);
 
-        const new_name = names[i > 0 ? i - 1 : names.length - 1];
+        const new_name = names[i > 0 ? i - 1 : names.length - 1]!;
 
         cc.selectChapterByName(new_name);
     }
@@ -202,7 +202,7 @@ export class ChapterController {
         const sel_name = cc.selectedChapter ? cc.selectedChapter.name : 'main';
         let i = names.indexOf(sel_name);
 
-        const new_name = names[i + 1 < names.length ? i + 1 : 0];
+        const new_name = names[i + 1 < names.length ? i + 1 : 0]!;
 
         cc.selectChapterByName(new_name);
     }
@@ -326,7 +326,7 @@ export class ChapterController {
         }
         for (let name in cc.chaptersDict) {
             if (name !== 'main') {
-                const theChapter = cc.chaptersDict[name];
+                const theChapter = cc.chaptersDict[name]!;
                 if (theChapter.positionIsInChapter(p)) {
                     return name;
                 }
@@ -360,7 +360,7 @@ export class ChapterController {
     //@+node:felix.20251214160339.388: *4* cc.getChapter
     public getChapter(name: string): Chapter {
         const cc = this;
-        return cc.chaptersDict[name];
+        return cc.chaptersDict[name]!;
     }
     //@+node:felix.20251214160339.389: *4* cc.getSelectedChapter
     public getSelectedChapter(): Chapter | undefined {
@@ -468,7 +468,7 @@ export class ChapterController {
         let noBreak = true;
         for (let name in cc.chaptersDict) {
             if (![firstName, 'main'].includes(name)) {
-                const theChapter = cc.chaptersDict[name];
+                const theChapter = cc.chaptersDict[name]!;
                 if (theChapter.positionIsInChapter(p)) {
                     cc.selectChapterByName(name);
                     noBreak = false;
@@ -754,7 +754,7 @@ export class Chapter {
 
         // Re-institute the previous hoist.
         if (c.hoistStack.length) {
-            const p = c.hoistStack[c.hoistStack.length - 1].p;
+            const p = c.hoistStack[c.hoistStack.length - 1]!.p;
             // Careful: c.selectPosition would pop the hoist stack.
             c.setCurrentPosition(p);
         } else {

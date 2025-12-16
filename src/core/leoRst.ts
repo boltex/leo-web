@@ -13,7 +13,6 @@
 
 import { new_cmd_decorator } from './decorators';
 import * as utils from '../utils';
-import * as vscode from 'vscode';
 
 // import io
 // import os
@@ -45,6 +44,7 @@ import * as g from './leoGlobals';
 //@+node:felix.20251214160339.1763: ** << leoRst annotations >>
 import { Commands } from './leoCommands';
 import { Position, VNode } from './leoNodes';
+import { workspace } from '../workspace';
 //@-<< leoRst annotations >>
 
 //@+others
@@ -242,7 +242,7 @@ export class RstCommands {
             m2.index &&
             m2.index > m1.index
         ) {
-            const fn = m2[1].trim();
+            const fn = m2[1]!.trim();
             if (fn) {
                 const old_h = p.h;
                 p.h = `@path ${fn}`;
@@ -534,7 +534,7 @@ export class RstCommands {
         } else {
             // TODO : FIX THIS !
             g.es("LeoJS : docutils not available, only the intermediate file was written.");
-            void vscode.window.showWarningMessage("LeoJS: docutils not available, only the intermediate file was written.");
+            void workspace.view.showInformationMessage("LeoJS: docutils not available, only the intermediate file was written.");
             return;
         }
 
@@ -707,7 +707,7 @@ export class RstCommands {
         } else {
             writer = undefined;
             let w_found = false;
-            for ([ext2, writer_name] of [
+            const table: Array<[string, string]> = [
                 // noqa: writer_name used below.
                 ['.html', 'html'],
                 ['.htm', 'html'],
@@ -716,7 +716,8 @@ export class RstCommands {
                 // ['.pdf', 'leo.plugins.leo_pdf'],
                 // ['.s5', 's5'],
                 // ['.odt', 'odt'],
-            ]) {
+            ]
+            for ([ext2, writer_name] of table) {
                 if (ext2 === ext) {
                     w_found = true;
                     break;
@@ -1136,9 +1137,9 @@ export class RstCommands {
                 n = level - 1;
             }
             if (0 <= n && n < u.length) {
-                ch = u[n];
+                ch = u[n]!;
             } else if (u) {
-                ch = u[u.length - 1];
+                ch = u[u.length - 1]!;
             } else {
                 g.trace('can not happen: no u');
                 ch = '#';
@@ -1157,7 +1158,7 @@ export class RstCommands {
         u = this.underline_characters; //  '''#=+*^~"'`-:><_'''
         level = Math.max(0, p.level() - this.root!.level());
         level = Math.min(level + 1, u.length - 1); // Reserve the first character for explicit titles.
-        ch = u[level];
+        ch = u[level]!;
         n = Math.max(4, encoded_s.length);
         return `${s.trim()}\n${ch.repeat(n)}`;
     }

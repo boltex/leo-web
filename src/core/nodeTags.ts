@@ -166,7 +166,7 @@ export class TagController {
         // Print all tags.
         if (Object.keys(d).length) {
             for (let key of Object.keys(d).sort()) {
-                aList = d[key];
+                aList = d[key]!;
                 for (let h of Object.keys(aList).sort()) {
                     g.es(`${key} ${h}`);
                 }

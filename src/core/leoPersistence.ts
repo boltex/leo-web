@@ -212,7 +212,7 @@ export class PersistenceDataController {
         if (gnxs.length === unls.length) {
             const d = this.create_outer_gnx_dict(root);
             for (let [gnx, unl] of g.zip(gnxs, unls)) {
-                this.restore_gnx(d, gnx, root, unl);
+                this.restore_gnx(d, gnx!, root, unl!);
             }
         } else {
             g.trace('bad @gnxs contents', gnxs, unls);
@@ -294,7 +294,8 @@ export class PersistenceDataController {
                 const p = d[gnx];
                 if (p && p.__bool__()) {
                     // Handle all recent variants of the node.
-                    let unl, ua;
+                    let unl: string | undefined;
+                    let ua: string | undefined;
                     const lines = g.splitLines(b);
                     if (b.startsWith('unl:') && lines.length === 2) {
                         // pylint: disable=unbalanced-tuple-unpacking
@@ -302,12 +303,11 @@ export class PersistenceDataController {
                     } else {
                         [unl, ua] = [undefined, b];
                     }
-                    if (ua.startsWith('ua:')) {
+                    if (ua && ua.startsWith('ua:')) {
                         ua = ua.substring(3);
                     }
                     if (ua) {
-                        ua = this.unpickle(ua);
-                        p.v.u = ua;
+                        p.v.u = this.unpickle(ua);
                     } else {
                         g.trace('Can not unpickle uA in', p.h);
                     }
@@ -481,8 +481,8 @@ export class PersistenceDataController {
         }
         if (matches.length) {
             // Take the match with the greatest number of parents.
-            let numParents = matches[0][0];
-            let p = matches[0][1];
+            let numParents = matches[0]![0];
+            let p = matches[0]![1];
             for (const p_item of matches) {
                 if (p_item[0] > numParents) {
                     numParents = p_item[0];
@@ -762,7 +762,7 @@ export class PersistenceDataController {
      * Return the last part of a unl.
      */
     public unl_tail(unl: string): string {
-        return unl.split('-->').slice(0, -1)[0];
+        return unl.split('-->').slice(0, -1)[0]!;
     }
     //@-others
 }

@@ -116,7 +116,7 @@ export class Undoer {
     public newParent!: Position;
     public newParent_v!: VNode;
     public newRecentFiles!: string[];
-    public newSel!: number[];
+    public newSel!: [number, number];
     public newTree!: TreeData[];
     public newUA!: Record<string, any>;
     public newYScroll!: number;
@@ -130,12 +130,12 @@ export class Undoer {
     public oldParent!: Position;
     public oldParent_v!: VNode;
     public oldRecentFiles!: string[];
-    public oldSel!: number[];
+    public oldSel!: [number, number];
     public oldTree!: TreeData[];
     public oldUA!: Record<string, any>;
     public oldYScroll!: number;
     public pasteAsClone!: boolean;
-    public prevSel!: number[];
+    public prevSel!: [number, number];
     public sortChildren!: boolean;
     public verboseUndoGroup!: boolean;
     public changeGroupWarning = false;
@@ -185,7 +185,7 @@ export class Undoer {
             // Do nothing if we are in the middle of creating a group.
             let i = u.beads.length - 1;
             while (i >= 0) {
-                const bunch: Bead = u.beads[i];
+                const bunch: Bead = u.beads[i]!;
                 if (bunch.kind && bunch.kind === 'beforeGroup') {
                     return;
                 }
@@ -238,7 +238,7 @@ export class Undoer {
         if (n < 0 || n >= u.beads.length) {
             return undefined;
         }
-        const bunch = u.beads[n];
+        const bunch = u.beads[n]!;
         u.setIvarsFromBunch(bunch);
         if (g.app.debug.includes('undo')) {
             console.log(` u.getBead: ${n} of ${u.beads.length}`);
@@ -259,7 +259,7 @@ export class Undoer {
         // New in 4.4b2:  Add this to the group if it is being accumulated.
         let bunch2: Bead | boolean = u.bead >= 0 && u.bead < u.beads.length;
         if (bunch2) {
-            bunch2 = u.beads[u.bead];
+            bunch2 = u.beads[u.bead]!;
         }
         if (
             bunch2 &&
@@ -596,7 +596,7 @@ export class Undoer {
             g.trace('oops: empty undo stack.');
             return;
         }
-        const bunch = u.beads[u.bead];
+        const bunch = u.beads[u.bead]!;
         if (bunch.kind === 'beforeGroup') {
             bunch.kind = 'afterGroup';
         } else {
@@ -1304,13 +1304,13 @@ export class Undoer {
             p.v.insertSpot = w.getInsertPoint();
             const ins: number = p.v.insertSpot;
             // From u.doTyping.
-            const newSel: number[] = w.getSelectionRange();
+            const newSel: [number, number] = w.getSelectionRange();
             if (newSel === undefined) {
                 p.v.selectionStart = ins;
                 p.v.selectionLength = 0;
             } else {
                 let i, j;
-                [i, j] = newSel;
+                [i, j] = newSel!;
                 p.v.selectionStart = i;
                 p.v.selectionLength = j - i;
             }
@@ -1386,7 +1386,7 @@ export class Undoer {
             return;
         }
         // The big switcharoo: change v in place.
-        const new_v = hidden_v.children[0];
+        const new_v = hidden_v.children[0]!;
         new_v.parents = old_parents;  // restore v.parents.
         g.assert(v.gnx === new_v.gnx);
         v = new_v;  // Experimental.
@@ -1466,13 +1466,13 @@ export class Undoer {
                 w.setAllText(u.newBody);
             }
             if (w.setSelectionRange) {
-                w.setSelectionRange(u.newSel[0], u.newSel[1], u.newIns);
+                w.setSelectionRange(u.newSel[0]!, u.newSel[1]!, u.newIns);
             }
             if (w.setYScrollPosition) {
                 w.setYScrollPosition(u.newYScroll);
             }
             let i, j;
-            [i, j] = u.newSel;
+            [i, j] = u.newSel!;
             w.setSelectionRange(i, j, u.newIns);
             w.setYScrollPosition(u.newYScroll);
             // c.frame.body.recolor(u.p);
@@ -1504,7 +1504,7 @@ export class Undoer {
         // c.frame.body.recolor(u.p);
         // Swap the ones from the 'bunch.headline' dict
         for (const [gnx, oldNewTuple] of Object.entries(u.headlines)) {
-            const v = c.fileCommands.gnxDict[gnx];
+            const v = c.fileCommands.gnxDict[gnx]!;
             v.initHeadString(oldNewTuple[1]!);
             if (u.p && v.gnx === u.p.gnx) {
                 u.p.setDirty();
@@ -1617,7 +1617,7 @@ export class Undoer {
         const u: Undoer = this;
         const c: Commands = u.c;
         // Remember these values.
-        const newSel: number[] = u.newSel;
+        const newSel: [number, number] = u.newSel;
 
         const p: Position = u.p!.copy();  // u.p must exist now.
         // #4373: u.newP might not exist now.
@@ -1629,7 +1629,7 @@ export class Undoer {
         }
 
         u.groupCount += 1;
-        const bunch: Bead = u.beads[u.bead + 1];
+        const bunch: Bead = u.beads[u.bead + 1]!;
         let count: number = 0;
         if (!bunch['items']) {
             g.trace(
@@ -1661,7 +1661,7 @@ export class Undoer {
         // Set the selection, independently of helpers.
         if (newSel && newSel.length) {
             let i, j;
-            [i, j] = newSel;
+            [i, j] = newSel!;
             c.frame.body.wrapper.setSelectionRange(i, j);
         }
     }
@@ -1849,7 +1849,7 @@ export class Undoer {
             parent_v.children = [...u.newChildren];
             // Only the child index of new position changes!
             for (var _i = 0; _i < parent_v.children.length; _i++) {
-                const v = parent_v.children[_i];
+                const v = parent_v.children[_i]!;
                 if (v.gnx === p.v.gnx) {
                     p._childIndex = _i;
                     break;
@@ -1987,8 +1987,8 @@ export class Undoer {
         // c.frame.body.recolor(u.p)
         // Swap the ones from the 'bunch.headline' dict
         for (const [gnx, oldNewTuple] of Object.entries(u.headlines)) {
-            const v = c.fileCommands.gnxDict[gnx];
-            v.initHeadString(oldNewTuple[0]);
+            const v = c.fileCommands.gnxDict[gnx]!;
+            v.initHeadString(oldNewTuple[0]!);
             if (u.p && v.gnx === u.p.gnx) {
                 u.p.setDirty();
                 // This is required.  Otherwise redraw will revert the change!
@@ -2058,7 +2058,7 @@ export class Undoer {
         let parent_v: VNode;
         for (let p of aList) {
             if (p.stack.length) {
-                parent_v = p.stack[p.stack.length - 1][0];
+                parent_v = p.stack[p.stack.length - 1]![0];
             } else {
                 parent_v = c.hiddenRootNode;
             }
@@ -2115,7 +2115,7 @@ export class Undoer {
         const u: Undoer = this;
         const c: Commands = u.c;
         // Remember these values.
-        const oldSel: number[] = u.oldSel;
+        const oldSel: [number, number] = u.oldSel;
 
         // #4373: u.p might not exist now.
         let p: Position;
@@ -2126,7 +2126,7 @@ export class Undoer {
         }
 
         u.groupCount += 1;
-        const bunch: Bead = u.beads[u.bead];
+        const bunch: Bead = u.beads[u.bead]!;
         let count: number = 0;
         if (!bunch['items']) {
             g.trace(
@@ -2383,7 +2383,7 @@ export class Undoer {
         p.setBodyString(result);
         p.setDirty();
         w.setAllText(result);
-        const sel: number[] = tag === 'undo' ? u.oldSel : u.newSel;
+        const sel: [number, number] = tag === 'undo' ? u.oldSel : u.newSel;
         if (sel && sel.length) {
             let i, j;
             [i, j] = sel;
@@ -2425,7 +2425,7 @@ export class Undoer {
             parent_v.children = [...u.oldChildren];
             // Only the child index of new position changes!
             for (var _i = 0; _i < parent_v.children.length; _i++) {
-                const v = parent_v.children[_i];
+                const v = parent_v.children[_i]!;
                 if (v.gnx === p.v.gnx) {
                     p._childIndex = _i;
                     break;

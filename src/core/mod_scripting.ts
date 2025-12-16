@@ -572,8 +572,8 @@ export class ScriptingController {
                 this.seen.add(gnx);
                 const m = pattern.exec(p.h);
                 if (m) {
-                    const w_key: string = m[1];
-                    const func = d[w_key];
+                    const w_key: string = m[1]!;
+                    const func = d[w_key]!;
                     await Promise.resolve(func.bind(this)(p));
                 }
                 p.moveToThreadNext();

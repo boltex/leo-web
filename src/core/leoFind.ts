@@ -792,8 +792,8 @@ export class LeoFind {
         }
         // Put the first match in the Nav pane's edit widget and update.
         const scon: QuickSearchController = c.quicksearchController;
-        scon.navText = unique_matches[0];
-        scon.qsc_search(unique_matches[0]);
+        scon.navText = unique_matches[0]!;
+        scon.qsc_search(unique_matches[0]!);
         g.app.gui.showNavResults();
         g.app.gui.loadSearchSettings();
     }
@@ -1114,7 +1114,7 @@ export class LeoFind {
             while (!found && !hitBase) {
                 let h = node.h;
                 if (h) {
-                    h = h.split(' ')[0];
+                    h = h.split(' ')[0]!;
                 }
 
                 if (
@@ -1380,7 +1380,7 @@ export class LeoFind {
             placeHolder: "Find pattern here",
             value: w_searchString === "<find pattern here>" ? '' : w_searchString
         })
-            .then((p_findString: string) => {
+            .then((p_findString: string | undefined) => {
                 if (!p_findString) {
                     return true; // Cancelled with escape or empty string.
                 }
@@ -1756,7 +1756,7 @@ export class LeoFind {
             placeHolder: "Find pattern here",
             value: w_searchString === "<find pattern here>" ? '' : w_searchString
         })
-            .then((p_findString: string) => {
+            .then((p_findString: string | undefined) => {
                 if (!p_findString) {
                     return; // Cancelled with escape or empty string.
                 }
@@ -1868,7 +1868,7 @@ export class LeoFind {
             placeHolder: "Find pattern here",
             value: w_searchString === "<find pattern here>" ? '' : w_searchString
         })
-            .then((p_findString: string) => {
+            .then((p_findString: string | undefined) => {
                 if (!p_findString) {
                     return; // Cancelled with escape or empty string.
                 }
@@ -2070,7 +2070,7 @@ export class LeoFind {
             placeHolder: "Find pattern here",
             value: w_searchString === "<find pattern here>" ? '' : w_searchString
         })
-            .then((p_findString: string) => {
+            .then((p_findString: string | undefined) => {
                 if (!p_findString) {
                     return; // Cancelled with escape or empty string.
                 }
@@ -3281,7 +3281,7 @@ export class LeoFind {
             }
         }
         if (c.hoistStack && c.hoistStack.length) {
-            const bunch = c.hoistStack[c.hoistStack.length - 1];
+            const bunch = c.hoistStack[c.hoistStack.length - 1]!;
             if (!bunch.p.isAncestorOf(p)) {
                 g.trace('outside hoist', p.h);
                 g.warning('found match outside of hoisted outline');
