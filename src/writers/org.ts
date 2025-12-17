@@ -41,7 +41,7 @@ export class OrgModeWriter extends BaseWriter {
     /**
      * Write all the *descendants* of an @auto-org-mode node.
      */
-    public write(root: Position): void {
+    public override write(root: Position): void {
         const root_level = root.level();
         this.write_root(root);
         for (const p of root.subtree()) {

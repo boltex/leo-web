@@ -20,7 +20,7 @@ export class DartWriter extends BaseWriter {
     /**
      * Write all the *descendants* of an .dart node.
      */
-    public write(root: Position): void {
+    public override write(root: Position): void {
         const root_level = root.level();
         for (const p of root.subtree()) {
             const indent = p.level() - root_level;

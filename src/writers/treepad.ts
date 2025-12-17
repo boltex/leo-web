@@ -19,7 +19,7 @@ export class TreePad_Writer extends BaseWriter {
     /**
      * Write the entire @auto tree.
      */
-    public write(root: Position): void {
+    public override write(root: Position): void {
         this.put("<Treepad version 3.0>");
         const root_level = root.level();
         for (const p of root.self_and_subtree()) {

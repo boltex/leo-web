@@ -33,14 +33,14 @@ export class RstWriter extends BaseWriter {
         //  '#' is reserved.
 
         const i = p.level() - root_level;
-        return underlines[Math.min(i, underlines.length - 1)];
+        return underlines[Math.min(i, underlines.length - 1)]!;
     }
 
     //@+node:felix.20251214160938.12: *3* rstw.write
     /**
      * Write an @auto tree containing imported rST code.
      */
-    public write(root: Position): void {
+    public override write(root: Position): void {
         const root_level = root.level();
         this.write_root(root);
         for (const p of root.subtree()) {
@@ -60,7 +60,7 @@ export class RstWriter extends BaseWriter {
             if (lines.length && lines[lines.length - 1] === '') {
                 lines.pop();
             }
-            if (lines.length > 0 && lines[0].trim() !== '') {
+            if (lines.length && lines[0]!.trim() !== '') {
                 this.put('');
             }
             for (const line of lines) {

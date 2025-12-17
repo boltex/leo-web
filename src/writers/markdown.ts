@@ -22,7 +22,7 @@ export class MarkdownWriter extends BaseWriter {
     /**
      * Write all the *descendants* of an @auto-markdown node.
      */
-    public write(root: Position): void {
+    public override write(root: Position): void {
         const placeholder_regex = /placeholder level [0-9]+/;
         this.root = root;
         this.write_root(root);

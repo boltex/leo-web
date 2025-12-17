@@ -20,7 +20,7 @@ export class OtlWriter extends BaseWriter {
     /**
      * Write all the *descendants* of an @auto-otl node.
      */
-    public write(root: Position): void {
+    public override write(root: Position): void {
         this.write_root(root);
         for (const child of root.children()) {
             const n = child.level();
