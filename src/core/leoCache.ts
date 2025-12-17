@@ -6,10 +6,12 @@
 //@+<< leoCache imports & annotations >>
 //@+node:felix.20251214160339.334: ** << leoCache imports & annotations >>
 import * as pako from 'pako';
-import { Database } from 'sql.js';
 import * as g from './leoGlobals';
 import { Commands } from './leoCommands';
 import * as fs from 'fs';
+import { Uri } from '../workspace';
+
+type Database = any; // Placeholder for the actual Database type from sql.js
 
 var pickle = require('./jpicklejs');
 
@@ -231,7 +233,7 @@ export class SqlitePickleShare {
     public init: Promise<Database>;
     public cache: Record<string, any>;
     public commitTimeout: NodeJS.Timeout | undefined;
-    public watcher: vscode.FileSystemWatcher | undefined;
+    public watcher: any | undefined;
     private _needWatchSetup = false;
     private _selfChanged = false;
     private _refreshTimeout: NodeJS.Timeout | undefined;
@@ -592,7 +594,7 @@ export class SqlitePickleShare {
         if (this.conn) {
             let db_data: Uint8Array;
             let db_buffer: Buffer;
-            let db_uri: vscode.Uri;
+            let db_uri: Uri;
 
             try {
                 db_data = this.conn.export();
@@ -771,7 +773,7 @@ export class SqlitePickleShare {
                     this.conn!.exec('update cachevalues set data=? where key=?', itm);
                 }
                 // await this.commit(); // ! LEOJS : COMMIT AT END OF reset_protocol_in_values
-                return itms[itms.length - 1][1];
+                return itms[itms.length - 1]![1];
             }
 
             return undefined;
@@ -826,13 +828,13 @@ function dump_cache(db: SqlitePickleShare, tag: string): void {
     // Create a dict, sorted by file prefixes.
     const d: Record<string, any> = {};
     for (const x_key of db.keys()) {
-        const key = x_key[0];
+        const key = x_key[0]!;
         const val = db[key];
         const data = key.split(':::');
-        let fn;
-        let key2;
+        let fn: string;
+        let key2: string;
         if (data.length === 2) {
-            [fn, key2] = data;
+            [fn, key2] = data as [string, string];
         } else {
             [fn, key2] = ['None', key];
         }

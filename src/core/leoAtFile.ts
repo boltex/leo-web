@@ -14,6 +14,7 @@ import { FileCommands } from './leoFileCommands';
 import { Commands } from './leoCommands';
 import { BaseWriter } from '../writers/basewriter';
 import * as difflib from 'difflib';
+import { FilePermission } from '../types';
 //@-<< imports >>
 //@+others
 //@+node:felix.20251214160339.155: ** atFile.cmd
@@ -4115,9 +4116,7 @@ export class AtFile {
      */
     public async stat(
         fileName: string
-    ): Promise<{
-        Readonly?: 1 | undefined;
-    } | undefined> {
+    ): Promise<FilePermission | undefined> {
         // Do _not_ call self.error here.
         let mode;
         try {
@@ -4313,7 +4312,7 @@ export class AtFile {
         try {
             const w_uri = g.makeUri(fn);
             const w_stats = await workspace.fs.stat(w_uri);
-            read_only = w_stats.permissions && w_stats.permissions.Readonly;
+            read_only = w_stats.permissions && FilePermission.Readonly;
         } catch (attributeError) {
             read_only = false;
         }
