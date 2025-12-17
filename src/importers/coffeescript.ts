@@ -13,9 +13,9 @@ import { Python_Importer } from './python';
 //@+node:felix.20251214160933.34: ** class Coffeescript_Importer(Python_Importer)
 export class Coffeescript_Importer extends Python_Importer {
 
-  public language = 'coffeescript';
+  public override language = 'coffeescript';
 
-  public block_patterns: [string, RegExp][] = [
+  public override block_patterns: [string, RegExp][] = [
     ['class', /^\s*class\s+([\w]+)/],
     ['def', /^\s*(.+?):.*?->/],
     ['def', /^\s*(.+?)=.*?->/],

@@ -11,9 +11,9 @@ import { Block, Importer } from './base_importer';
 //@+others
 //@+node:felix.20251214160933.83: ** class Pascal_Importer(Importer)
 export class Pascal_Importer extends Importer {
-    public language: string = 'pascal';
+    public override language: string = 'pascal';
 
-    public block_patterns: [string, RegExp][] = [
+    public override block_patterns: [string, RegExp][] = [
         ['constructor', /^\s*\bconstructor\s+([\w_\.]+)/],
         ['destructor', /^\s*\bdestructor\s+([\w_\.]+)/],
         ['function', /^\s*\bfunction\s+([\w_\.]+)/],
@@ -35,10 +35,10 @@ export class Pascal_Importer extends Importer {
      *
      * Return the index of the start of the next block.
      */
-    public find_end_of_block(i1: number, i2: number): number {
+    public override find_end_of_block(i1: number, i2: number): number {
         let i: number = i1;
         while (i < i2) {
-            const line: string = this.guide_lines[i];
+            const line: string = this.guide_lines[i]!;
             if (this.patterns.some((pattern) => pattern.test(line))) {
                 return i;
             }

@@ -16,17 +16,17 @@ import { Python_Importer } from './python';
  */
 export class Cython_Importer extends Python_Importer {
 
-  public language: string = 'cython';
+  public override language: string = 'cython';
 
   // Override the Python patterns.
   // Group 1 matches the name of the class/cdef/cpdef/def.
   public async_class_pat = /\s*async\s+class\s+([\w_]+)\s*(\(.*?\))?(.*?):/;
-  public class_pat = /\s*class\s+([\w_]+)\s*(\(.*?\))?(.*?):/;
+  public override class_pat = /\s*class\s+([\w_]+)\s*(\(.*?\))?(.*?):/;
   public cdef_pat = /\s*cdef\s+([\w_ ]+)/;
   public cpdef_pat = /\s*cpdef\s+([\w_ ]+)/;
-  public def_pat = /\s*def\s+([\w_ ]+)/;
+  public override def_pat = /\s*def\s+([\w_ ]+)/;
 
-  public block_patterns: [string, RegExp][] = [
+  public override block_patterns: [string, RegExp][] = [
     ['async class', this.async_class_pat],
     ['class', this.class_pat],
     ['cdef', this.cdef_pat],

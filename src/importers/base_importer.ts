@@ -253,7 +253,7 @@ export class Importer {
         if (tab_width < 0) {
             // Convert tabs to blanks.
             for (let n = 0; n < lines.length; n++) {
-                const line = lines[n];
+                const line = lines[n]!;
                 const [i, w] = g.skip_leading_ws_with_indent(line, 0, tab_width);
                 // Use negative width.
                 const s = g.computeLeadingWhitespace(w, -Math.abs(tab_width)) + line.slice(i);
@@ -265,7 +265,7 @@ export class Importer {
         } else if (tab_width > 0) {
             // Convert blanks to tabs.
             for (let n = 0; n < lines.length; n++) {
-                const line = lines[n];
+                const line = lines[n]!;
                 // Use positive width.
                 const s = g.optimizeLeadingWhitespace(line, Math.abs(tab_width));
                 if (s !== line) {
@@ -326,7 +326,7 @@ export class Importer {
             const result_line: string[] = [];
             let skip_count: number = 0;
             for (let i = 0; i < line.length; i++) {
-                const ch: string = line[i];
+                const ch: string = line[i]!;
                 if (ch === '\n') {
                     break; // Terminate. No double newlines allowed.
                 } else if (skip_count > 0) {
@@ -455,7 +455,7 @@ export class Importer {
 
         while (i < i2) {
             let progress: number = i;
-            const s: string = this.guide_lines[i];
+            const s: string = this.guide_lines[i]!;
             i++;
 
             // Assume that no pattern matches a compound statement.
@@ -469,7 +469,7 @@ export class Importer {
 
                 if (m) {
                     // cython may include trailing whitespace.
-                    const name: string = m[1].trim();
+                    const name: string = m[1]!.trim();
                     const end: number = this.find_end_of_block(i, i2);
                     g.assert(i1 + 1 <= end && end <= i2, `${i1}, ${end}, ${i2}`);
 
@@ -503,10 +503,10 @@ export class Importer {
     public find_end_of_block(i: number, i2: number): number {
 
         // Determine the starting block level based on the previous line.
-        let level = this.guide_lines[i - 1].includes('{') ? 1 : 0;
+        let level = this.guide_lines[i - 1]!.includes('{') ? 1 : 0;
 
         while (i < i2) {
-            const line = this.guide_lines[i];
+            const line = this.guide_lines[i]!;
             i++;
             for (const ch of line) {
                 if (ch === '{') {
@@ -610,7 +610,7 @@ export class Importer {
             throw new Error(`Block has no child_blocks: ${block}`);
         }
 
-        const block0 = block.child_blocks[0];
+        const block0 = block.child_blocks[0]!;
         let start = block0.start;
         let end = block0.end;
 
@@ -705,7 +705,7 @@ export class Importer {
         }
         while (p.b) {
             const lines = g.splitLines(p.b);
-            if (lines[0].trim()) {
+            if (lines[0]!.trim()) {
                 break;
             }
             back.b = back.b + '\n';
@@ -768,7 +768,7 @@ export class Importer {
         while (n > 0) {
             n--;
 
-            const parent: Position = parents[parents.length - 1];
+            const parent: Position = parents[parents.length - 1]!;
             const child: Position = parent.insertAsLastChild();
             child.h = `placeholder level ${parents.length}`;
             parents.push(child);

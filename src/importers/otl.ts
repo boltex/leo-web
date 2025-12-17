@@ -15,7 +15,7 @@ import { Importer } from './base_importer';
  */
 export class Otl_Importer extends Importer {
 
-    public language = 'otl';
+    public override language = 'otl';
 
     // Must match body pattern first.
     public otl_body_pattern: RegExp = /^: (.*)$/;
@@ -35,7 +35,7 @@ export class Otl_Importer extends Importer {
      *
      * Tabs are part of the otl format. Never complain.
      */
-    check_blanks_and_tabs(lines: string[]): boolean {
+    public override check_blanks_and_tabs(lines: string[]): boolean {
         return true;
     }
     //@+node:felix.20251214160933.80: *3* otl_i.gen_block
@@ -50,7 +50,7 @@ export class Otl_Importer extends Importer {
      *
      * i.gen_lines adds the @language and @tabwidth directives.
     */
-    public gen_block(parent: Position): void {
+    public override gen_block(parent: Position): void {
         const lines: string[] = this.lines;
         g.assert(parent.__eq__(this.root));
 
@@ -64,19 +64,19 @@ export class Otl_Importer extends Importer {
             }
             const bodyMatch: RegExpMatchArray | null = line.match(this.otl_body_pattern);
             if (bodyMatch) {
-                const top: Position = parents[parents.length - 1];
-                lines_dict[top.v.gnx].push(bodyMatch[1] + '\n');
+                const top: Position = parents[parents.length - 1]!;
+                lines_dict[top.v.gnx]!.push(bodyMatch[1] + '\n');
                 continue;
             }
             const nodeMatch: RegExpMatchArray | null = line.match(this.otl_node_pattern);
             if (nodeMatch) {
                 // Cut back the stack, then allocate a new node.
-                const level: number = 1 + nodeMatch[1].length;
+                const level: number = 1 + nodeMatch[1]!.length;
                 parents.length = level;
                 this.create_placeholders(level, lines_dict, parents);
-                const top: Position = parents[parents.length - 1] || this.root;
+                const top: Position = parents[parents.length - 1]! || this.root;
                 const child: Position = top.insertAsLastChild();
-                child.h = nodeMatch[2];
+                child.h = nodeMatch[2]!;
                 parents.push(child);
                 lines_dict[child.v.gnx] = [];
             } else {  // pragma: no cover
@@ -88,7 +88,7 @@ export class Otl_Importer extends Importer {
         g.assert(parent.__eq__(this.root));
 
         for (const p of this.root!.self_and_subtree()) {
-            p.b = lines_dict[p.v.gnx].join('');
+            p.b = lines_dict[p.v.gnx]!.join('');
         }
     }
     //@+node:felix.20251214160933.81: *3* otl_i.regularize_whitespace
@@ -98,7 +98,7 @@ export class Otl_Importer extends Importer {
      * Tabs are part of the otl format. Leave them alone.
      * Convert tabs to blanks or vice versa depending on the @tabwidth in effect.
      */
-    public regularize_whitespace(lines: string[]): string[] {
+    public override  regularize_whitespace(lines: string[]): string[] {
         // Should never be called: otl.checkBlanksAndTabs always returns true
         return lines;  // pragma: no cover
     }

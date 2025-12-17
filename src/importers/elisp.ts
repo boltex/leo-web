@@ -11,9 +11,9 @@ import { Block, Importer } from './base_importer';
 //@+others
 //@+node:felix.20251214160933.42: ** class Elisp_Importer(Importer)
 export class Elisp_Importer extends Importer {
-  public language = 'lisp';
+  public override language = 'lisp';
 
-  public block_patterns: [string, RegExp][] = [
+  public override block_patterns: [string, RegExp][] = [
     // ( defun name
     ['defun', /\s*\(\s*\bdefun\s+([\w_-]+)/],
   ];
@@ -32,14 +32,14 @@ export class Elisp_Importer extends Importer {
    *
    * Return the index of the last line of the block.
    */
-  public find_end_of_block(i: number, i2: number): number {
+  public override find_end_of_block(i: number, i2: number): number {
     // Rescan the previous line to get an accurate count of parents.
 
     g.assert(i > 0, new Error().stack || '');
     i -= 1;
     let level = 0;
     while (i < i2) {
-      const line = this.guide_lines[i];
+      const line = this.guide_lines[i]!;
       i += 1;
       for (const ch of line) {
         if (ch === '(') {

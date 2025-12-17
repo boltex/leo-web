@@ -14,9 +14,9 @@ import { Block, Importer } from './base_importer';
  * A scanner for the perl language.
  */
 export class Perl_Importer extends Importer {
-    public language: string = 'perl';
+    public override language: string = 'perl';
 
-    public block_patterns: [string, RegExp][] = [
+    public override block_patterns: [string, RegExp][] = [
         ['sub', /^\s*sub\s+(\w+)/],
     ];
 
@@ -34,7 +34,7 @@ export class Perl_Importer extends Importer {
      *
      * Return a list of **guide lines** that simplify the detection of blocks.
      */
-    public make_guide_lines(lines: string[]): string[] {
+    public override make_guide_lines(lines: string[]): string[] {
         const aList: string[] = this.delete_comments_and_strings([...lines]);
         return this.delete_regexes(aList);
     }

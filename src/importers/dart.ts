@@ -15,9 +15,9 @@ import { Block, Importer } from './base_importer';
  */
 export class Dart_Importer extends Importer {
 
-  public language = 'dart';
+  public override language = 'dart';
 
-  public block_patterns: [string, RegExp][] = [
+  public override block_patterns: [string, RegExp][] = [
     ['function', /^\s*([\w\s]+)\s*\(.*?\)\s*\{/],
   ];
 

@@ -12,11 +12,11 @@ import { Block, Importer } from './base_importer';
 //@+node:felix.20251214160933.31: ** class C_Importer(Importer)
 export class C_Importer extends Importer {
 
-  public language = 'c';
+  public override language = 'c';
 
-  public string_list = ['"'];  // Not single quotes.
+  public override string_list = ['"'];  // Not single quotes.
 
-  public block_patterns: [string, RegExp][] = [
+  public override block_patterns: [string, RegExp][] = [
     ['class', /.*?\bclass\s+(\w+)\s*\{/],
     ['func', /.*?\b(\w+)\s*\(.*?\)\s*(const)?\s*{/],
     ['namespace', /.*?\bnamespace\s+(\w+)?\s*\{/],
@@ -47,7 +47,7 @@ export class C_Importer extends Importer {
    *
    * Return a list of Blocks, that is, tuples(name, start, start_body, end).
    */
-  public find_blocks(i1: number, i2: number): Block[] {
+  public override find_blocks(i1: number, i2: number): Block[] {
 
     const lines: string[] = this.guide_lines;
     let i: number = i1;
@@ -55,7 +55,7 @@ export class C_Importer extends Importer {
     const results: Block[] = [];
 
     while (i < i2) {
-      const s: string = lines[i];
+      const s: string = lines[i]!;
       i++;
 
       for (const [kind, pattern] of this.block_patterns) {
@@ -82,7 +82,7 @@ export class C_Importer extends Importer {
           const name: string = m2[1] || '';
           if (
             // The next line must start with '{'
-            lines[i].trim().startsWith('{')
+            lines[i]!.trim().startsWith('{')
             // Don't match compound statements.
             && !this.compound_statements_pat.test(name)
           ) {

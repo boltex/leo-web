@@ -16,7 +16,7 @@ import { C_Importer } from './c';
  */
 export class Csharp_Importer extends C_Importer {
 
-    public language = 'csharp';
+    public override language = 'csharp';
 
     constructor(c: Commands) {
         super(c);

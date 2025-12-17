@@ -15,8 +15,8 @@ import { Block, Importer } from './base_importer';
  * Leo's Python importer
  */
 export class Python_Importer extends Importer {
-  public language: string = 'python';
-  public string_list: string[] = ['"""', "'''", '"', "'"]; // longest first.
+  public override language: string = 'python';
+  public override string_list: string[] = ['"""', "'''", '"', "'"]; // longest first.
 
   /**
    * Patterns. Initialized. Overridden in the Cython_Importer class.
@@ -27,7 +27,7 @@ export class Python_Importer extends Importer {
   public def_pat = /^\s*def\s+(\w+)\s*\(/;
   public class_pat = /^\s*class\s+(\w+)/;
 
-  public block_patterns: [string, RegExp][] = [
+  public override  block_patterns: [string, RegExp][] = [
     ['class', this.class_pat],
     ['async def', this.async_def_pat],
     ['def', this.def_pat]
@@ -45,7 +45,7 @@ export class Python_Importer extends Importer {
    * @param lines Array of strings.
    * @returns Array of sanitized strings with comments and strings removed.
    */
-  public delete_comments_and_strings(lines: string[]): string[] {
+  public override delete_comments_and_strings(lines: string[]): string[] {
     /**
      * Skip the remainder of a string.
      * @param delim The open string delimiter.
@@ -84,13 +84,13 @@ export class Python_Importer extends Importer {
           [delim, i] = skip_string(delim, i, line);
           continue;
         }
-        const ch = line[i];
+        const ch = line[i]!;
         if (ch === "#" || ch === "\n") {
           break;
         }
         let m = this.string_pat1.exec(line.substring(i)) || this.string_pat2.exec(line.substring(i));
         if (m) {
-          [prefix, delim] = [m[1], m[2]];
+          [prefix, delim] = [m[1]!, m[2]!];
           i += prefix.length;
           i += delim.length;
           if (i < line.length) {
@@ -126,22 +126,22 @@ export class Python_Importer extends Importer {
    * **Important**: An @others directive will refer to the returned blocks,
    *                so there must be *no gaps* between blocks!
    */
-  public find_blocks(i1: number, i2: number): Block[] {
+  public override find_blocks(i1: number, i2: number): Block[] {
     let i = i1;
     let prev_i = i1;
     const results: Block[] = [];
 
     //  Look behind to see what the previous block was.
-    let prev_block_line = i1 > 0 ? this.guide_lines[i1 - 1] : '';
+    let prev_block_line = i1 > 0 ? this.guide_lines[i1 - 1]! : '';
     while (i < i2) {
       let progress = i;
-      let s = this.guide_lines[i];
+      let s = this.guide_lines[i]!;
       i += 1;
       for (const [kind, pattern] of this.block_patterns) {
         const m = pattern.exec(s);
         if (m) {
           // cython may include trailing whitespace.
-          let name = m[1].trim();
+          let name = m[1]!.trim();
           const end = this.find_end_of_block(i, i2);
           g.assert(i1 + 1 <= end && end <= i2, `${i1}, ${end}, ${i2}`);
 
@@ -170,9 +170,9 @@ export class Python_Importer extends Importer {
    *
    * Return the index of the line *following* the entire class/def.
    */
-  public find_end_of_block(i: number, i2: number): number {
+  public override find_end_of_block(i: number, i2: number): number {
 
-    const def_line = this.guide_lines[i - 1];
+    const def_line = this.guide_lines[i - 1]!;
     const kinds = ['class', 'def', '->']; //  '->' denotes a coffeescript function.
     g.assert(
       kinds.some((z) => def_line.includes(z)),
@@ -183,14 +183,14 @@ export class Python_Importer extends Importer {
     if (def_line.trim().startsWith('def ') && !def_line.includes(')')) {
       // First, scan for ')'
       while (i < i2) {
-        if (this.guide_lines[i].includes(')')) {
+        if (this.guide_lines[i]!.includes(')')) {
           break;
         }
         i += 1;
       }
       // Next, scan for ':'
       while (i < i2) {
-        if (this.guide_lines[i].endsWith(':\n')) {
+        if (this.guide_lines[i]!.endsWith(':\n')) {
           break;
         }
         i += 1;
@@ -208,7 +208,7 @@ export class Python_Importer extends Importer {
 
     const lws1 = this.lws_n(def_line);
     while (i < i2) {
-      let s = this.guide_lines[i];
+      let s = this.guide_lines[i]!;
       if (s.trim()) {
         // A code line. Test the bracket state at the *start* of the line.
         if (this.lws_n(s) <= lws1 && curlies === 0 && parens === 0 && squares === 0) {
@@ -230,7 +230,7 @@ export class Python_Importer extends Importer {
       }
 
       // A blank, comment or docstring line.
-      s = this.lines[i];
+      s = this.lines[i]!;
       const s_strip = s.trim();
       if (!s_strip) {
         // A blank line.
@@ -256,7 +256,7 @@ export class Python_Importer extends Importer {
   /**
    * Python_Importer.postprocess.
    */
-  public postprocess(parent: Position): void {
+  public override postprocess(parent: Position): void {
 
     // Base-class method.
     this.move_blank_lines(parent);
@@ -278,7 +278,7 @@ export class Python_Importer extends Importer {
         const child = p.firstChild();
         const lines = g.splitLines(p.b);
         for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
+          const line = lines[i]!;
           if (line.trim().startsWith('@others') && child.b.startsWith('\n')) {
             p.b = lines.slice(0, i).join('') + '\n' + lines.slice(i).join('');
             child.b = child.b.substring(1);
@@ -332,14 +332,14 @@ export class Python_Importer extends Importer {
     if (!s_strip) {
       return undefined;
     }
-    if (!s_strip.startsWith(delims[0]) && !s_strip.startsWith(delims[1])) {
+    if (!s_strip.startsWith(delims[0]!) && !s_strip.startsWith(delims[1]!)) {
       return undefined;
     }
-    const delim = s_strip.startsWith(delims[0]) ? delims[0] : delims[1];
+    const delim = s_strip.startsWith(delims[0]!) ? delims[0]! : delims[1]!;
     const lines = g.splitLines(p.b);
 
     // Check for one-line docstring exactly
-    const count = (lines[0].match(new RegExp(delim, 'g')) || []).length;
+    const count = (lines[0]!.match(new RegExp(delim, 'g')) || []).length;
     if (count === 2) {
       return lines[0];
     }
@@ -347,10 +347,10 @@ export class Python_Importer extends Importer {
     // Multi-line docstring
     let i = 1;
     while (i < lines.length) {
-      if (lines[i].includes(delim)) {
+      if (lines[i]!.includes(delim)) {
         // Add trailing blank lines
         i += 1;
-        while (i < lines.length && !lines[i].trim()) {
+        while (i < lines.length && !lines[i]!.trim()) {
           i += 1;
         }
         return lines.slice(0, i).join('');
@@ -374,7 +374,7 @@ export class Python_Importer extends Importer {
     // Count the number of lines before the class line.
     let n = 0;
     while (n < class_lines.length) {
-      const line = class_lines[n];
+      const line = class_lines[n]!;
       n += 1;
       if (line.trim().startsWith('class ')) {
         break;
@@ -449,7 +449,7 @@ export class Python_Importer extends Importer {
     // The preamble is everything up to the line that first matches a block
     const lines = g.splitLines(child1.b);
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i]!;
       if (match(line)) {
         // Adjust the bodies.
         const preamble_s = lines.slice(0, i).join('');

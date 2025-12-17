@@ -14,7 +14,7 @@ import { Importer } from './base_importer';
  * The importer for the org language.
  */
 export class Org_Importer extends Importer {
-    public language: string = 'org';
+    public override language: string = 'org';
     public section_pat: RegExp = /^(\*+)\s(.*)/; // Added caret for start of line
 
     constructor(c: Commands) {
@@ -33,7 +33,7 @@ export class Org_Importer extends Importer {
      *
      * i.gen_lines adds the @language and @tabwidth directives.
      */
-    public gen_block(parent: Position): void {
+    public override gen_block(parent: Position): void {
         const lines: string[] = this.lines;
         g.assert(parent.__eq__(this.root));
         const parents: Position[] = [parent];
@@ -42,33 +42,33 @@ export class Org_Importer extends Importer {
         let i: number = 0;
         let top: Position;
         while (i < lines.length) {
-            const line: string = lines[i];
+            const line: string = lines[i]!;
             i += 1;
             const match: RegExpMatchArray | null = line.match(this.section_pat);
 
             if (match) {
-                const level: number = match[1].length;
-                const headline: string = match[2];
+                const level: number = match[1]!.length;
+                const headline: string = match[2]!;
                 // Cut back the stack.
                 parents.splice(level);
                 // Create any needed placeholders.
                 this.create_placeholders(level, lines_dict, parents);
                 // Create the child.
-                top = parents[parents.length - 1];
+                top = parents[parents.length - 1]!;
                 const child: Position = top.insertAsLastChild();
                 parents.push(child);
                 child.h = headline;
                 lines_dict[child.v.gnx] = [];
             } else {
-                top = parents[parents.length - 1];
-                lines_dict[top.v.gnx].push(line);
+                top = parents[parents.length - 1]!;
+                lines_dict[top.v.gnx]!.push(line);
             }
         }
 
         // Set p.b from the lines_dict.
         g.assert(parent.__eq__(this.root));
         for (const p of parent.self_and_subtree()) {
-            p.b = lines_dict[p.v.gnx].join('');
+            p.b = lines_dict[p.v.gnx]!.join('');
         }
     }
     //@-others

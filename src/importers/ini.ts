@@ -10,10 +10,10 @@ import { Importer } from './base_importer';
 //@+others
 //@+node:felix.20251214160933.47: ** class Ini_Importer(Importer)
 export class Ini_Importer extends Importer {
-    public language = 'ini';
+    public override language = 'ini';
 
     public section_pat = /^\s*(\[.*\])/;
-    public block_patterns: [string, RegExp][] = [['section', this.section_pat]];
+    public override  block_patterns: [string, RegExp][] = [['section', this.section_pat]];
 
     constructor(c: Commands) {
         super(c);
@@ -29,10 +29,10 @@ export class Ini_Importer extends Importer {
      * 
      * Return the index of the start of the next section.
      */
-    find_end_of_block(i: number, i2: number): number {
+    public override find_end_of_block(i: number, i2: number): number {
 
         while (i < i2) {
-            const line = this.guide_lines[i];
+            const line = this.guide_lines[i]!;
             if (this.section_pat.test(line)) {
                 return i;
             }

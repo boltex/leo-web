@@ -12,12 +12,12 @@ import { Block, Importer } from './base_importer';
 //@+node:felix.20251214160933.52: ** class JS_Importer(Importer)
 export class JS_Importer extends Importer {
 
-  public language: string = 'javascript';
+  public override language: string = 'javascript';
 
   // These patterns won't find all functions, but they are a reasonable start.
 
   // Group 1 must be the block name.
-  public block_patterns: [string, RegExp][] = [
+  public override block_patterns: [string, RegExp][] = [
     // (? function name ( .*? {
     ['function', /\s*?\(?function\b\s*([\w\.]*)\s*\(.*?\{/],
 
@@ -47,7 +47,7 @@ export class JS_Importer extends Importer {
    * In general, tokenizing Javascript is context dependent(!!), but it
    * would be unbearable to include a full JS tokenizer.
    */
-  public delete_comments_and_strings(lines: string[]): string[] {
+  public override delete_comments_and_strings(lines: string[]): string[] {
     const string_delims: string[] = this.string_list;
     let [line_comment, start_comment, end_comment] = g.set_delims_from_language(this.language);
     let target: string = '';
@@ -57,7 +57,7 @@ export class JS_Importer extends Importer {
     for (const line of lines) {
       let result_line: string[] = [], skip_count: number = 0;
       for (let i = 0; i < line.length; i++) {
-        const ch: string = line[i];
+        const ch: string = line[i]!;
         if (ch === '\n') {
           break;
         } else if (skip_count > 0) {

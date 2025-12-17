@@ -16,8 +16,8 @@ import { Block, Importer } from './base_importer';
  */
 export class Xml_Importer extends Importer {
 
-  public language = 'xml';
-  public minimum_block_size = 2; // Helps handle one-line elements.
+  public override language = 'xml';
+  public override minimum_block_size = 2; // Helps handle one-line elements.
 
   // xml_i.add_tags defines all patterns.
   public end_patterns: RegExp[] | null = null;
@@ -58,9 +58,9 @@ export class Xml_Importer extends Importer {
   /**
    * Xml_Importer.compute_headline.
    */
-  public compute_headline(block: Block): string {
+  public override compute_headline(block: Block): string {
     const n = Math.max(block.start, block.start_body - 1);
-    const s = block.lines[n].trim();
+    const s = block.lines[n]!.trim();
 
     // Truncate the headline if necessary.
     return g.truncate(s, 120);
@@ -71,17 +71,17 @@ export class Xml_Importer extends Importer {
    *
    * Return the index of the start of next block.
    */
-  public find_end_of_block(i1: number, i2: number): number {
+  public override find_end_of_block(i1: number, i2: number): number {
     // Get the tag that started the block
     const tag_stack: string[] = [];
     let tag1: string | null = null;
     let i = i1;
-    let line = this.guide_lines[i1 - 1];
+    let line = this.guide_lines[i1 - 1]!;
     for (const pattern of this.start_patterns!) {
       // const m = pattern.exec(line);
       const m = line.match(pattern);
       if (m) {
-        tag1 = m[1].toLowerCase();
+        tag1 = m[1]!.toLowerCase();
         tag_stack.push(tag1);
         break;
       }
@@ -91,7 +91,7 @@ export class Xml_Importer extends Importer {
     }
 
     while (i < i2) {
-      line = this.guide_lines[i];
+      line = this.guide_lines[i]!;
       i += 1;
 
       // Push start patterns.
@@ -99,7 +99,7 @@ export class Xml_Importer extends Importer {
         // const m = pattern.exec(line);
         const m = line.match(pattern);
         if (m) {
-          const tag = m[1].toLowerCase();
+          const tag = m[1]!.toLowerCase();
           tag_stack.push(tag);
           break;
         }
@@ -109,7 +109,7 @@ export class Xml_Importer extends Importer {
         // const m = pattern.exec(line);
         const m = line.match(pattern);
         if (m) {
-          const endTag = m[1].toLowerCase();
+          const endTag = m[1]!.toLowerCase();
           let w_found = false;
           while (tag_stack.length) {
             const tag = tag_stack.pop();
@@ -131,10 +131,10 @@ export class Xml_Importer extends Importer {
     return i1; // Don't create a block.
   }
   //@+node:felix.20251214160933.133: *3* xml_i.preprocess_lines
-  public preprocess_lines(lines: string[]): string[] {
+  public override preprocess_lines(lines: string[]): string[] {
     const result_lines: string[] = [];
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i]!;
       const s = line.replace(this.adjacent_tags_pat, (match: string, group1: string, group2: string, group3: string) => {
         const m2 = group2.match(this.tag_name_pat);
         const m3 = group3.match(this.tag_name_pat);

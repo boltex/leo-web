@@ -15,7 +15,7 @@ import { Block, Importer } from './base_importer';
  */
 export class Markdown_Importer extends Importer {
 
-    public language = 'md';
+    public override language = 'md';
 
     public lines_dict: Record<string, string[]> = {};  // Lines for each vnode.
     public stack: Position[] = [];
@@ -38,7 +38,7 @@ export class Markdown_Importer extends Importer {
      *
      * i.gen_lines adds the @language and @tabwidth directives.
      */
-    public gen_block(parent: Position): void {
+    public override gen_block(parent: Position): void {
         g.assert(parent.__eq__(this.root));
         const lines: string[] = this.lines;
         this.lines_dict[parent.v.gnx] = [];  // Initialize lines_dict for the parent vnode.
@@ -46,13 +46,13 @@ export class Markdown_Importer extends Importer {
         let in_code: boolean = false;
         let skip: number = 0;
         for (let i: number = 0; i < lines.length; i++) {
-            const line: string = lines[i];
-            const top: Position = this.stack[this.stack.length - 1];
+            const line: string = lines[i]!;
+            const top: Position = this.stack[this.stack.length - 1]!;
             let [level, name]: [number | null, string | null] = this.is_hash(line);
             if (skip > 0) {
                 skip -= 1;
             } else if (!in_code && this.lookahead_underline(i)) {
-                level = lines[i + 1].startsWith('=') ? 1 : 2;
+                level = lines[i + 1]!.startsWith('=') ? 1 : 2;
                 this.make_markdown_node(level, line);
                 skip = 1;
             } else if (!in_code && name && level != null) {
@@ -63,19 +63,19 @@ export class Markdown_Importer extends Importer {
                 if (line.startsWith('```')) {
                     in_code = false;
                 }
-                this.lines_dict[top.v.gnx].push(line);
+                this.lines_dict[top.v.gnx]!.push(line);
             } else if (line.startsWith('```')) {
                 in_code = true;
-                this.lines_dict[top.v.gnx].push(line);
+                this.lines_dict[top.v.gnx]!.push(line);
             } else {
-                this.lines_dict[top.v.gnx].push(line);
+                this.lines_dict[top.v.gnx]!.push(line);
             }
         }
 
         // Set p.b from the lines_dict.
         g.assert(parent.__eq__(this.root));
         for (const p of parent.self_and_subtree()) {
-            p.b = this.lines_dict[p.v.gnx].join('');
+            p.b = this.lines_dict[p.v.gnx]!.join('');
         }
     }
     //@+node:felix.20251214160933.69: *4* md_i.is_hash
@@ -86,8 +86,8 @@ export class Markdown_Importer extends Importer {
     public is_hash(line: string): [number | null, string | null] {
         const m: RegExpMatchArray | null = line.match(this.md_hash_pattern);
         if (m !== null) {
-            const level: number = m[1].length;
-            const name: string = m[2].trim();
+            const level: number = m[1]!.length;
+            const name: string = m[2]!.trim();
             if (name !== '') {
                 return [level, name];
             }
@@ -101,7 +101,7 @@ export class Markdown_Importer extends Importer {
     public is_underline(line: string): boolean {
         for (const pattern of this.md_pattern_table) {
             const m: RegExpMatchArray | null = line.match(pattern);
-            if (m !== null && m[1].length >= 4) {
+            if (m !== null && m[1]!.length >= 4) {
                 return true;
             }
         }
@@ -114,8 +114,8 @@ export class Markdown_Importer extends Importer {
     public lookahead_underline(i: number): boolean {
         const lines: string[] = this.lines;
         if (i + 1 < lines.length) {
-            const line0: string = lines[i];
-            const line1: string = lines[i + 1];
+            const line0: string = lines[i]!;
+            const line1: string = lines[i + 1]!;
             const ch0: boolean = this.is_underline(line0);
             const ch1: boolean = this.is_underline(line1);
             return !ch0 && !!line0.trim().length && ch1 && line1.length >= 4;
@@ -128,7 +128,7 @@ export class Markdown_Importer extends Importer {
      */
     public make_decls_node(line: string): void {
         const lines_dict: Record<string, string[]> = this.lines_dict;
-        const parent: Position = this.stack[this.stack.length - 1];
+        const parent: Position = this.stack[this.stack.length - 1]!;
         const child: Position = parent.insertAsLastChild();
         child.h = '!Declarations';
         lines_dict[child.v.gnx] = [line];
@@ -147,7 +147,7 @@ export class Markdown_Importer extends Importer {
         this.create_placeholders(level, lines_dict, this.stack);
         g.assert(level === this.stack.length);
 
-        const parent: Position = this.stack[this.stack.length - 1];
+        const parent: Position = this.stack[this.stack.length - 1]!;
         const child: Position = parent.insertAsLastChild();
         child.h = name;
         lines_dict[child.v.gnx] = [];
@@ -155,7 +155,7 @@ export class Markdown_Importer extends Importer {
         g.assert(this.stack.length);
         g.assert(0 <= level && level < this.stack.length);
 
-        return this.stack[level];
+        return this.stack[level]!;
     }
     //@-others
 

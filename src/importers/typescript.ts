@@ -12,7 +12,7 @@ import { Block, Importer } from './base_importer';
 //@+node:felix.20251214160933.125: ** class TS_Importer(Importer)
 export class TS_Importer extends Importer {
 
-    public language: string = 'typescript';
+    public override language: string = 'typescript';
 
     //@+<< define non-function patterns >>
     //@+node:felix.20251214160933.126: *3* << define non-function patterns >>
@@ -40,7 +40,7 @@ export class TS_Importer extends Importer {
         ['2', /(\b(async|public|private|static)\b)\s+(\w+)\s*\(.*\).*{/], // kind name (...) {
         // Add other function patterns as needed
     ];
-    public block_patterns = this.function_patterns;
+    public override block_patterns = this.function_patterns;
     //@-<< define function patterns >>
 
     constructor(c: Commands) {

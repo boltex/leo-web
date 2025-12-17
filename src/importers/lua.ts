@@ -16,10 +16,10 @@ import { Block, Importer } from './base_importer';
  * The importer for the lua language.
  */
 export class Lua_Importer extends Importer {
-    public language = 'lua';
+    public override language = 'lua';
     public end_pat = new RegExp('.*?\\bend\\b');
 
-    public block_patterns: [string, RegExp][] = [
+    public override block_patterns: [string, RegExp][] = [
         ['function', /\s*function\s+([\w\.]+)\s*\(/],
         ['function', /.*?([\w\.]+)\s*\(function\b\s*\(/],
     ];
@@ -38,10 +38,10 @@ export class Lua_Importer extends Importer {
      *
      * Return the index of end of the block.
      */
-    public find_end_of_block(i: number, i2: number): number {
+    public override find_end_of_block(i: number, i2: number): number {
         let level = 1;  // The previous line starts the function.
         while (i < i2) {
-            const line = this.guide_lines[i];
+            const line = this.guide_lines[i]!;
             i += 1;
             let found = false;
             for (let [kind, pat] of this.block_patterns) {

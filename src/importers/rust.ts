@@ -11,13 +11,13 @@ import { Block, Importer } from './base_importer';
 //@+others
 //@+node:felix.20251214160933.104: ** class Rust_Importer(Importer)
 export class Rust_Importer extends Importer {
-    public language: string = 'rust';
-    public string_list: string[] = []; //  Not used.
-    public minimum_block_size = 0;
+    public override language: string = 'rust';
+    public override string_list: string[] = []; //  Not used.
+    public override minimum_block_size = 0;
     //@+<< define rust block patterns >>
     //@+node:felix.20251214160933.105: *3* << define rust block patterns >>
 
-    public block_patterns: [string, RegExp][] = [
+    public override block_patterns: [string, RegExp][] = [
 
         // Patterns that *do* require '{' on the same line...
 
@@ -69,7 +69,7 @@ export class Rust_Importer extends Importer {
      *
      * Ruff uses intermixed blanks and tabs.
      */
-    public check_blanks_and_tabs(lines: string[]): boolean {
+    public override check_blanks_and_tabs(lines: string[]): boolean {
         return true;
     }
 
@@ -77,7 +77,7 @@ export class Rust_Importer extends Importer {
     /**
      * Rust_Importer.compute_headline: Return the headline for the given block.
      */
-    public compute_headline(block: Block): string {
+    public override compute_headline(block: Block): string {
         let name_s;
         if (block.name) {
             let s = block.name.replace(/{/g, '');
@@ -114,7 +114,7 @@ export class Rust_Importer extends Importer {
      * - Block comments may be nested.
      * - Raw string literals, lifetimes and characters.
      */
-    public delete_comments_and_strings(lines: string[]): string[] {
+    public override delete_comments_and_strings(lines: string[]): string[] {
 
         let i = 0;
         const s = lines.join('');
@@ -138,7 +138,7 @@ export class Rust_Importer extends Importer {
          * Skip over a raw string literal or add a single 'r' character.
          */
         const skip_r = (): void => {
-            g.assert(s[i] === 'r', s[i].toString());
+            g.assert(s[i] === 'r', s[i]!.toString());
             const i0 = i;
             let j = 0;
 
@@ -198,7 +198,7 @@ export class Rust_Importer extends Importer {
             }
             const lifetime_match = lifetime_pat.exec(s.slice(i));
             if (lifetime_match) {
-                skip_n(lifetime_match[1].length);
+                skip_n(lifetime_match[1]!.length);
                 return;
             }
             add();
@@ -252,7 +252,7 @@ export class Rust_Importer extends Importer {
 
         //@+node:felix.20251214160933.113: *4* rust_i function: skip_string_constant
         const skip_string_constant = (): void => {
-            g.assert(s[i] === '"', s[i].toString());
+            g.assert(s[i] === '"', s[i]!.toString());
             const j = i;
             skip();
             let whileBreak = false;
@@ -278,7 +278,7 @@ export class Rust_Importer extends Importer {
         //@+node:felix.20251214160933.114: *4* rust_i functions: scanning
         const add = (): void => {
             if (i < s.length) {
-                result.push(s[i]);
+                result.push(s[i]!);
                 i += 1;
             }
         };
@@ -289,7 +289,7 @@ export class Rust_Importer extends Importer {
         };
 
         const next = (): string => {
-            return i < s.length ? s[i] : '';
+            return i < s.length ? s[i]! : '';
         };
 
         const skip = (): void => {
@@ -373,14 +373,14 @@ export class Rust_Importer extends Importer {
      * **Important**: An @others directive will refer to the returned blocks,
      *                so there must be *no gaps* between blocks!
      */
-    find_blocks(i1: number, i2: number): Block[] {
+    public override find_blocks(i1: number, i2: number): Block[] {
 
         /**
          * Scan guide_lines from line i, hunting for a line ending with '{'.
          */
         const find_curly_bracket_line = (i: number): number | null => {
             while (i < i2) {
-                const line = this.guide_lines[i].trim();
+                const line = this.guide_lines[i]!.trim();
                 if (line.endsWith(';') || line.endsWith('}')) {
                     return null; // One-line definition.
                 }
@@ -399,7 +399,7 @@ export class Rust_Importer extends Importer {
 
         while (i < i2) {
             const progress = i;
-            const line = this.guide_lines[i];
+            const line = this.guide_lines[i]!;
             i++;
 
             // Assume that no pattern matches a compound statement.
@@ -448,7 +448,7 @@ export class Rust_Importer extends Importer {
      * **Note**: The RecursiveImportController class contains a postpass that
      *            adjusts headlines of *all* imported nodes.
      */
-    postprocess(parent: Position): void {
+    public override postprocess(parent: Position): void {
 
         //@+others  // Define helper functions.
         //@+node:felix.20251214160933.117: *4* function: convert_docstring
@@ -464,7 +464,7 @@ export class Rust_Importer extends Importer {
             // Find all leading comment lines.
             let i = 0;
             for (; i < lines.length; i++) {
-                if (lines[i].trim() && !lines[i].startsWith('///')) {
+                if (lines[i]!.trim() && !lines[i]!.startsWith('///')) {
                     break;
                 }
             }
@@ -516,7 +516,7 @@ export class Rust_Importer extends Importer {
             let found_use = false;
             let i = 0;
             for (; i < preamble_lines.length; i++) {
-                const stripped_line = preamble_lines[i].trim();
+                const stripped_line = preamble_lines[i]!.trim();
                 if (stripped_line.startsWith('use')) {
                     found_use = true;
                 } else if (stripped_line.startsWith('///')) {

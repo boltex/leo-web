@@ -14,9 +14,9 @@ import { Block, Importer } from './base_importer';
  * The importer for the tcl language.
  */
 export class Tcl_Importer extends Importer {
-    public language: string = 'tcl';
+    public override language: string = 'tcl';
 
-    public block_patterns: [string, RegExp][] = [
+    public override block_patterns: [string, RegExp][] = [
         ['proc', /\s*\bproc\s+(\w+)/],
     ];
 

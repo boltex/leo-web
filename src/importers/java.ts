@@ -14,9 +14,9 @@ import { Importer } from './base_importer';
  */
 export class Java_Importer extends Importer {
 
-  public language = 'java';
+  public override language = 'java';
 
-  public block_patterns: [string, RegExp][] = [
+  public override block_patterns: [string, RegExp][] = [
     ['class', /.*?\bclass\s+(\w+)/],
     ['func', /.*?\b(\w+)\s*\(.*?\)\s*{/],
     ['interface', /^.*?\binterface\s+(\w*)\s*{/], // Added caret to be used as in python to match at start of string

@@ -21,7 +21,7 @@ export const underlines = '*=-^~"\'+!$%&(),./:;<>?@[\\]_`{|}#';
  */
 export class Rst_Importer extends Importer {
 
-    public language = 'rest';
+    public override language = 'rest';
 
     public lines_dict: Record<string, string[]> = {};
     public stack: Position[] = [];
@@ -47,7 +47,7 @@ export class Rst_Importer extends Importer {
      *
      * i.gen_lines adds the @language and @tabwidth directives.
      */
-    public gen_block(parent: Position): void {
+    public override gen_block(parent: Position): void {
         const lines: string[] = this.lines;
         g.assert(parent.__eq__(this.root));
         this.lines_dict = {};
@@ -60,26 +60,26 @@ export class Rst_Importer extends Importer {
             if (skip > 0) {
                 skip -= 1;
             } else if (this.is_lookahead_overline(i)) {
-                const level: number = this.ch_level(lines[i][0]);
-                this.make_rst_node(level, lines[i + 1]);
+                const level: number = this.ch_level(lines[i]![0]!);
+                this.make_rst_node(level, lines[i + 1]!);
                 skip = 2;
             } else if (this.is_lookahead_underline(i)) {
-                const level: number = this.ch_level(lines[i + 1][0]);
-                this.make_rst_node(level, lines[i]);
+                const level: number = this.ch_level(lines[i + 1]![0]!);
+                this.make_rst_node(level, lines[i]!);
                 skip = 1;
             } else if (i === 0) {
                 const top: Position = this.make_dummy_node('!Dummy chapter');
-                this.lines_dict[top.v.gnx].push(lines[i]);
+                this.lines_dict[top.v.gnx]!.push(lines[i]!);
             } else {
-                const top: Position = this.stack[this.stack.length - 1];
-                this.lines_dict[top.v.gnx].push(lines[i]);
+                const top: Position = this.stack[this.stack.length - 1]!;
+                this.lines_dict[top.v.gnx]!.push(lines[i]!);
             }
         }
 
         // Set p.b from the lines_dict.
         g.assert(parent.__eq__(this.root));
         for (const p of this.root!.self_and_subtree()) {
-            p.b = this.lines_dict[p.v.gnx].join('');
+            p.b = this.lines_dict[p.v.gnx]!.join('');
         }
     }
     //@+node:felix.20251214160933.57: *4* rst_i.ch_level
@@ -91,7 +91,7 @@ export class Rst_Importer extends Importer {
 
         const d = this.rst_seen;
         if (ch in d) {
-            return d[ch];
+            return d[ch]!;
         }
         this.rst_level += 1;
         d[ch] = this.rst_level;
@@ -108,9 +108,9 @@ export class Rst_Importer extends Importer {
             return false;
         }
 
-        const line0 = lines[i];
-        const line1 = lines[i + 1];
-        const line2 = lines[i + 2];
+        const line0 = lines[i]!;
+        const line1 = lines[i + 1]!;
+        const line2 = lines[i + 2]!;
         const ch0 = this.is_underline(line0, '#');
         const ch1 = this.is_underline(line1);
         const ch2 = this.is_underline(line2, '#');
@@ -128,8 +128,8 @@ export class Rst_Importer extends Importer {
         if (i + 1 >= lines.length) {
             return false;
         }
-        const line0 = lines[i];
-        const line1 = lines[i + 1];
+        const line0 = lines[i]!;
+        const line1 = lines[i + 1]!;
         return (
             !line0.trimStart().length &&
             line1.length >= 4 &&
@@ -149,7 +149,7 @@ export class Rst_Importer extends Importer {
         if (extra) {
             chars += extra;
         }
-        const ch1 = line[0];
+        const ch1 = line[0]!;
         if (chars.indexOf(ch1) === -1) {
             return false;
         }
@@ -165,7 +165,7 @@ export class Rst_Importer extends Importer {
      * Make a decls node.
      */
     public make_dummy_node(headline: string): Position {
-        const parent: Position = this.stack[this.stack.length - 1];
+        const parent: Position = this.stack[this.stack.length - 1]!;
         g.assert(parent.__eq__(this.root));
         const child: Position = parent.insertAsLastChild();
         child.h = headline;
@@ -187,12 +187,12 @@ export class Rst_Importer extends Importer {
         this.create_placeholders(level, this.lines_dict, this.stack);
 
         // Create the node.
-        const top: Position = this.stack[this.stack.length - 1];
+        const top: Position = this.stack[this.stack.length - 1]!;
         const child: Position = top.insertAsLastChild();
         child.h = headline;
         this.lines_dict[child.v.gnx] = [];
         this.stack.push(child);
-        return this.stack[level];
+        return this.stack[level]!;
     }
     //@-others
 

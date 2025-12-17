@@ -16,7 +16,7 @@ import { Block, Importer } from './base_importer';
  */
 export class Php_Importer extends Importer {
 
-    public language = 'php';
+    public override language = 'php';
 
     constructor(c: Commands) {
         super(c);

@@ -13,7 +13,7 @@ import { Xml_Importer } from './xml';
 //@+node:felix.20251214160933.45: ** class Html_Importer(Xml_Importer)
 export class Html_Importer extends Xml_Importer {
 
-    public language = 'html';
+    public override language = 'html';
 
     /**
      * Html_Importer.__init__

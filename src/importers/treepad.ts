@@ -17,7 +17,7 @@ import { Importer } from './base_importer';
  */
 export class Treepad_Importer extends Importer {
 
-    public language: string = 'plain'; // A reasonable default.
+    public override language: string = 'plain'; // A reasonable default.
 
     constructor(c: Commands) {
         super(c);
@@ -36,7 +36,7 @@ export class Treepad_Importer extends Importer {
      *
      * i.gen_lines adds the @language and @tabwidth directives.
      */
-    public gen_block(parent: Position): void {
+    public override gen_block(parent: Position): void {
         const header_pat = /^<Treepad version.*?>\s*$/m; // Added caret to match at start of string
         const start1_pat = /^\s*dt\=\w+\s*$/m;  // type line.
         const start2_pat = /^\s*<node>(\s*5P9i0s8y19Z)?$/m;
@@ -48,9 +48,9 @@ export class Treepad_Importer extends Importer {
         const lines_dict: { [key: string]: string[] } = {};  // Lines for each vnode.
         let i = 0;
 
-        if (lines[0].match(header_pat)) {
+        if (lines[0]!.match(header_pat)) {
             i += 1;
-            lines_dict[parent.v.gnx] = [lines[0], '@others\n'];
+            lines_dict[parent.v.gnx] = [lines[0]!, '@others\n'];
         } else {
             // pragma: no cover (user error)
             console.error('No header line');
@@ -58,7 +58,7 @@ export class Treepad_Importer extends Importer {
         }
 
         while (i < lines.length) {
-            const line = lines[i];
+            const line = lines[i]!;
             i += 1;
 
             if (line.match(end_pat)) {
@@ -67,17 +67,17 @@ export class Treepad_Importer extends Importer {
 
             if (i + 3 >= lines.length) {
                 // Assume the line is a body line.
-                const p = parents[parents.length - 1];
-                lines_dict[p.v.gnx].push(line);
+                const p = parents[parents.length - 1]!;
+                lines_dict[p.v.gnx]!.push(line);
                 continue;
             }
 
-            const start1_m = lines[i - 1].match(start1_pat);  // dt line.
-            const start2_m = lines[i].match(start2_pat);  // type line.
+            const start1_m = lines[i - 1]!.match(start1_pat);  // dt line.
+            const start2_m = lines[i]!.match(start2_pat);  // type line.
 
             if (start1_m && start2_m) {
-                const headline = lines[i + 1].trim();
-                const level_s = lines[i + 2].trim();
+                const headline = lines[i + 1]!.trim();
+                const level_s = lines[i + 2]!.trim();
                 i += 3;  // Skip 3 more lines.
 
                 let level = 1;
@@ -95,22 +95,22 @@ export class Treepad_Importer extends Importer {
                 this.create_placeholders(level, lines_dict, parents);
 
                 // Create the child.
-                const top = parents[parents.length - 1];
+                const top = parents[parents.length - 1]!;
                 const child = top.insertAsLastChild();
                 parents.push(child);
                 child.h = headline;
                 lines_dict[child.v.gnx] = [];
             } else {
                 // Append the body line.
-                const top = parents[parents.length - 1];
-                lines_dict[top.v.gnx].push(line);
+                const top = parents[parents.length - 1]!;
+                lines_dict[top.v.gnx]!.push(line);
             }
         }
 
         // Set p.b from the lines_dict.
         g.assert(parent.__eq__(this.root));
         for (const p of parent.self_and_subtree()) {
-            p.b = lines_dict[p.v.gnx].join('');
+            p.b = lines_dict[p.v.gnx]!.join('');
         }
     }
     //@-others
