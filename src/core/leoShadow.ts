@@ -27,13 +27,13 @@
 //@-<< leoShadow docstring >>
 //@+<< leoShadow imports & annotations >>
 //@+node:felix.20251214160339.1825: ** << leoShadow imports & annotations >>
-import * as vscode from 'vscode';
 import * as difflib from 'difflib';
 import * as g from './leoGlobals';
 import * as path from 'path';
 
 import { Position, VNode } from './leoNodes';
 import { Commands } from './leoCommands';
+import { workspace } from '../workspace';
 
 type DispatchKeys = 'delete' | 'equal' | 'insert' | 'replace';
 
@@ -199,7 +199,7 @@ export class ShadowController {
             const w_writeUri = g.makeUri(fileName);
             const writeData = g.toEncodedString(s, encoding);
 
-            await vscode.workspace.fs.writeFile(w_writeUri, writeData);
+            await workspace.fs.writeFile(w_writeUri, writeData);
 
             await c.setFileTimeStamp(fileName); // Fix #1053.  This is an *ancient* bug.
             if (!g.unitTesting) {
@@ -339,12 +339,12 @@ export class ShadowController {
         let i = 0;
         let line: string;
         while (i < lines.length) {
-            line = lines[i];
+            line = lines[i]!;
             i += 1;
             if (x.marker!.isVerbatimSentinel(line)) {
                 // Do *not* include the @verbatim sentinel.
                 if (i < lines.length) {
-                    line = lines[i];
+                    line = lines[i]!;
                     i += 1;
                     x.sentinels.push(sentinels);
                     sentinels = [];
@@ -436,7 +436,7 @@ export class ShadowController {
         for (let i = ai; i < aj; i++) {
             x.put_sentinels(i);
             // works because x.lines[ai:aj] == x.lines[bi:bj]
-            x.put_plain_line(x.a[i]);
+            x.put_plain_line(x.a[i]!);
         }
     }
     //@+node:felix.20251214160339.1845: *5* x.op_insert
@@ -452,7 +452,7 @@ export class ShadowController {
     ): void {
         const x = this;
         for (let i = bi; i < bj; i++) {
-            x.put_plain_line(x.b[i]);
+            x.put_plain_line(x.b[i]!);
         }
         // Prefer to put sentinels after inserted nodes.
         // Requires a call to x.put_sentinels(0) before the main loop.
@@ -488,7 +488,7 @@ export class ShadowController {
                 x.put_sentinels(i);
             }
             for (let i = bi; i < bj; i++) {
-                x.put_plain_line(x.b[i]);
+                x.put_plain_line(x.b[i]!);
             }
         }
     }
@@ -525,7 +525,7 @@ export class ShadowController {
     public put_sentinels(i: number): void {
         const x = this;
         if (0 <= i && i < x.sentinels.length) {
-            const sentinels = x.sentinels[i];
+            const sentinels = x.sentinels[i]!;
             x.results.push(...sentinels);
         }
     }
@@ -688,7 +688,7 @@ export class ShadowController {
         const sentinel_lines: string[] = [];
         let i = 0;
         while (i < lines.length) {
-            let line = lines[i];
+            let line = lines[i]!;
             if (marker.isVerbatimSentinel(line)) {
                 // Add the plain line that *looks* like a sentinel,
                 // but *not* the preceding @verbatim sentinel itself.
@@ -696,7 +696,7 @@ export class ShadowController {
                 // the user adds or deletes a line requiring an @verbatim line.
                 i += 1;
                 if (i < lines.length) {
-                    line = lines[i];
+                    line = lines[i]!;
                     regular_lines.push(line);
                 } else {
                     x.verbatim_error();
@@ -752,13 +752,15 @@ export class Marker {
      * Ctor for Marker class.
      */
     constructor(delims: [string, string, string]) {
-        let delim1, delim2, delim3;
+        let delim1: string;
+        let delim2: string;
+        let delim3: string;
         [delim1, delim2, delim3] = delims;
         this.delim1 = delim1; // Single-line comment delim.
         this.delim2 = delim2; // Block comment starting delim.
         this.delim3 = delim3; // Block comment ending delim.
         if (!delim1 && !delim2) {
-            this.delim1 = g.app.language_delims_dict['unknown_language'];
+            this.delim1 = g.app.language_delims_dict['unknown_language']!;
         }
     }
     public toString(): string {

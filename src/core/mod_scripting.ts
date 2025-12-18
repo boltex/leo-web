@@ -376,6 +376,7 @@ export class AtButtonCallback {
             );
             return result;
         }
+        return undefined;
     }
     //@+node:felix.20251214160339.2001: *4* AtButtonCallback.find_script
     public async find_script(): Promise<string> {
