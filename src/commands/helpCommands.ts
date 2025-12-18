@@ -6,7 +6,6 @@
 
 //@+<< helpCommands imports & annotations >>
 //@+node:felix.20251214160853.465: ** << helpCommands imports & annotations >>
-import * as vscode from 'vscode';
 import * as g from '../core/leoGlobals';
 import { new_cmd_decorator } from '../core/decorators';
 import { BaseEditCommandsClass } from './baseCommands';
@@ -467,36 +466,6 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
         //@-<< define s >>
         this.c.putHelpFor(s);
-    }
-    //@+node:felix.20251214160853.479: *3* helpForKeystroke
-    @cmd('help-for-keystroke', 'Prompts for any key and prints the bindings for that key.')
-    public helpForKeystroke(): void {
-        setTimeout(() => {
-            void vscode.commands.executeCommand('workbench.action.openGlobalKeybindings');
-        }, 150);
-
-        // workbench.action.openGlobalKeybindings
-
-
-        // c, k = self.c, self.c.k
-        // state_name = 'help-for-keystroke'
-        // state = k.getState(state_name)
-        // if state == 0:
-        //     k.setLabelBlue('Enter any key: ')
-        //     k.setState(state_name, 1, self.helpForKeystroke)
-        //     c.minibufferWantsFocus()
-        // else:
-        //     d = k.bindingsDict
-        //     k.clearState()
-        //     result = []
-        //     for bi in d.get(event.stroke, []):  # a list of BindingInfo objects.
-        //         pane, cmd = bi.pane, bi.commandName
-        //         result.append(cmd if pane == 'all' else f"{pane}: {cmd}")
-        //     s = f"{event.stroke.s}: {','.join(result)}"
-        //     k.showStateAndMode()
-        //     c.frame.putStatusLine(s, bg='blue', fg='white')
-        //     c.bodyWantsFocus()
-
     }
     //@+node:felix.20251214160853.480: *3* helpForMinibuffer
     @cmd('help-for-minibuffer', 'Print a messages telling you how to get started with Leo.')

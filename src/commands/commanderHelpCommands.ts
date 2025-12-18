@@ -3,13 +3,14 @@
 /**
  * Help commands that used to be defined in leoCommands.py
  */
-import * as vscode from 'vscode';
 import * as g from '../core/leoGlobals';
 import { commander_command } from '../core/decorators';
 import { VNode } from '../core/leoNodes';
 import { FastRead } from '../core/leoFileCommands';
 import { Commands } from '../core/leoCommands';
 import { ScriptingController } from '../core/mod_scripting';
+import { workspace } from '../workspace';
+import { LEO_SETTINGS } from '../leoSettings';
 
 //@+others
 //@+node:felix.20251214160853.114: ** Class CommanderHelpCommands
@@ -155,8 +156,7 @@ export class CommanderHelpCommands {
 
             let ok: VNode | undefined;
 
-            const w_leoSettingsUri = lm.computeLeoSettingsUri();
-            let readData = await vscode.workspace.fs.readFile(w_leoSettingsUri);
+            let readData = LEO_SETTINGS;
 
             let g_element;
             [ok, g_element] = w_fastRead.readWithJsonTree(
@@ -253,9 +253,7 @@ export class CommanderHelpCommands {
                 );
                 // IF NO FILES IN lm.files THEN USE WORKSPACE ROOT !
                 if (!localDir) {
-                    localDir = vscode.workspace.workspaceFolders
-                        ? vscode.workspace.workspaceFolders[0].uri.path
-                        : '';
+                    localDir = '/';
                 }
                 fileName = g.os_path_join(localDir, name);
             }
@@ -316,9 +314,12 @@ export class CommanderHelpCommands {
         "Open the LeoJS Home page in a web browser."
     )
     public leoHome(this: Commands): void {
-        void vscode.env.openExternal(
-            vscode.Uri.parse('https://boltex.github.io/leojs/')
-        );
+        const url = 'https://boltex.github.io/leojs/';
+        if (typeof window !== 'undefined' && typeof window.open === 'function') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            g.es(`Unable to open URL in this environment: ${url}`);
+        }
     }
 
     //@+node:felix.20251214160853.124: *4* c_help.openLeoTutorials
@@ -327,11 +328,13 @@ export class CommanderHelpCommands {
         "Open the LeoJS tutorials page in a web browser."
     )
     public openLeoTutorials(this: Commands): void {
-        void vscode.env.openExternal(
-            vscode.Uri.parse(
-                'https://boltex.github.io/leojs/docs/getting-started/tutorial-basics'
-            )
-        );
+        const url =
+            'https://boltex.github.io/leojs/docs/getting-started/tutorial-basics';
+        if (typeof window !== 'undefined' && typeof window.open === 'function') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            g.es(`Unable to open URL in this environment: ${url}`);
+        }
     }
 
     //@+node:felix.20251214160853.125: *4* c_help.openLeoUsersGuide
@@ -340,11 +343,12 @@ export class CommanderHelpCommands {
         "Open the LeoJS users guide in a web browser."
     )
     public openLeoUsersGuide(this: Commands): void {
-        void vscode.env.openExternal(
-            vscode.Uri.parse(
-                'https://boltex.github.io/leojs/docs/users-guide/leomarkup'
-            )
-        );
+        const url = 'https://boltex.github.io/leojs/docs/users-guide/leomarkup';
+        if (typeof window !== 'undefined' && typeof window.open === 'function') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            g.es(`Unable to open URL in this environment: ${url}`);
+        }
     }
 
     //@+node:felix.20251214160853.126: *4* c_help.openLeoVideos
@@ -353,11 +357,13 @@ export class CommanderHelpCommands {
         "Open LeoJS video playlist in a web browser."
     )
     public openLeoVideos(this: Commands): void {
-        void vscode.env.openExternal(
-            vscode.Uri.parse(
-                'https://www.youtube.com/playlist?list=PLLILWxKl5dBXmdSZqhYEBlK_5AQYNW2xa'
-            )
-        );
+        const url =
+            'https://www.youtube.com/playlist?list=PLLILWxKl5dBXmdSZqhYEBlK_5AQYNW2xa';
+        if (typeof window !== 'undefined' && typeof window.open === 'function') {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            g.es(`Unable to open URL in this environment: ${url}`);
+        }
     }
 
     //@+node:felix.20251214160853.127: *3* c_help.selectAtSettingsNode

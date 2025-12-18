@@ -61,7 +61,7 @@ function computeCopiedBunchList(
     // Use string keys instead of v keys like original Leo
     for (let v in vnodeInfoDict) {
         if (d[v]) {
-            const bunch: Bead = vnodeInfoDict[v];
+            const bunch: Bead = vnodeInfoDict[v]!;
             aList.push(bunch);
         }
     }
@@ -429,10 +429,10 @@ export class CommanderOutlineCommands {
             }
             const b: string = bodies[chgnx]!;
 
-            const gnx: string = translation[chgnx];
+            const gnx: string = translation[chgnx]!;
 
             if (seen.includes(gnx)) {
-                yield [parent_gnx, gnx, heads[gnx], b];
+                yield [parent_gnx, gnx, heads[gnx]!, b];
             } else {
                 seen.push(gnx);
                 let h: string; //  = xv.getchildren()[0].text!.toString();
@@ -533,7 +533,7 @@ export class CommanderOutlineCommands {
         }
         //@+node:felix.20251214160853.148: *5* undoHelper
         function undoHelper(): void {
-            const v: VNode = vpar.children.splice(index, 1)[0];
+            const v: VNode = vpar.children.splice(index, 1)[0]!;
 
             const i_vpar = v.parents.indexOf(vpar);
             if (i_vpar > -1) {
@@ -618,7 +618,7 @@ export class CommanderOutlineCommands {
             // paste after the current position
             parStack = p.stack;
             if (p.stack && p.stack.length) {
-                vpar = p.stack[p.stack.length - 1][0];
+                vpar = p.stack[p.stack.length - 1]![0];
             } else {
                 vpar = c.hiddenRootNode;
             }
@@ -1362,7 +1362,7 @@ export class CommanderOutlineCommands {
             return;
         }
         const siblings: Position[] = [...parent.children()];
-        const firstSibling = siblings[0];
+        const firstSibling = siblings[0]!;
         if (firstSibling.__eq__(c.p)) {
             c.selectVisBack(); // already first sibling
         } else {
@@ -1379,7 +1379,7 @@ export class CommanderOutlineCommands {
             return;
         }
         const siblings: Position[] = [...parent.children()];
-        const lastSibling = siblings[siblings.length - 1];
+        const lastSibling = siblings[siblings.length - 1]!;
         if (lastSibling.__eq__(c.p)) {
             c.selectVisNext(); // already last sibling
         } else {
@@ -1400,7 +1400,7 @@ export class CommanderOutlineCommands {
         // #2718: de-hoisting an @chapter node is equivalent to selecting the main chapter.
         if (
             c.p.h.startsWith(tag) ||
-            c.hoistStack[c.hoistStack.length - 1].p.h.startsWith(tag)
+            c.hoistStack[c.hoistStack.length - 1]!.p.h.startsWith(tag)
         ) {
             c.hoistStack = [];
             cc.selectChapterByName('main');
@@ -1692,7 +1692,7 @@ export class CommanderOutlineCommands {
             as_child ||
             (current.hasChildren() && current.isExpanded()) ||
             (c.hoistStack.length &&
-                current.__eq__(c.hoistStack[c.hoistStack.length - 1].p))
+                current.__eq__(c.hoistStack[c.hoistStack.length - 1]!.p))
         ) {
             // Make sure the new node is visible when hoisting.
             if (c.config.getBool('insert-new-nodes-at-end')) {
@@ -1765,7 +1765,7 @@ export class CommanderOutlineCommands {
         // Can not insert before the base of a hoist.
         if (
             c.hoistStack.length &&
-            current.__eq__(c.hoistStack[c.hoistStack.length - 1].p)
+            current.__eq__(c.hoistStack[c.hoistStack.length - 1]!.p)
         ) {
             g.warning('can not insert a node before the base of a hoist');
             return;
@@ -1799,7 +1799,7 @@ export class CommanderOutlineCommands {
         // Can not insert before the base of a hoist.
         if (
             c.hoistStack.length &&
-            current.__eq__(c.hoistStack[c.hoistStack.length - 1].p)
+            current.__eq__(c.hoistStack[c.hoistStack.length - 1]!.p)
         ) {
             g.warning('can not insert a node before the base of a hoist');
             return Promise.resolve(undefined);
@@ -2620,7 +2620,7 @@ export class CommanderOutlineCommands {
         // Compare those arrays to see if sort was needed
         let same: boolean = true;
         for (var _i = 0; _i < oldChildren.length; _i++) {
-            if (oldChildren[_i].gnx !== newChildren[_i].gnx) {
+            if (oldChildren[_i]!.gnx !== newChildren[_i]!.gnx) {
                 same = false;
                 break;
             }
@@ -2642,7 +2642,7 @@ export class CommanderOutlineCommands {
         // Sorting destroys position p, and possibly the root position.
         // Only the child index of new position changes!
         for (var _i = 0; _i < newChildren.length; _i++) {
-            const v = newChildren[_i];
+            const v = newChildren[_i]!;
             if (v.gnx === oldP.v.gnx) {
                 newP._childIndex = _i;
                 break;

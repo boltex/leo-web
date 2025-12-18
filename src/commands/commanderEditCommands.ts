@@ -342,7 +342,7 @@ export class CommanderEditCommands {
                     const pat = new RegExp(p_pat);
                     const m = pat.exec(s);
                     if (m && m.length) {
-                        return m[1];
+                        return m[1]!;
                     }
                 } catch (e) {
                     g.es_print('bad regex in @data extract-patterns');
@@ -352,7 +352,7 @@ export class CommanderEditCommands {
             for (const p_pat of extractDef_patterns) {
                 const m = p_pat.exec(s);
                 if (m && m.length) {
-                    return m[1];
+                    return m[1]!;
                 }
             }
             return '';
@@ -405,7 +405,7 @@ export class CommanderEditCommands {
         // Remove leading whitespace.
         let junk: number;
         let ws: number;
-        [junk, ws] = g.skip_leading_ws_with_indent(lines[0], 0, c.tab_width);
+        [junk, ws] = g.skip_leading_ws_with_indent(lines[0]!, 0, c.tab_width);
 
         // lines = [g.removeLeadingWhitespace(s, ws, c.tab_width) for s in lines];
         const lines2 = [];
@@ -414,7 +414,7 @@ export class CommanderEditCommands {
         }
         lines = lines2;
 
-        let h = lines[0].trim();
+        let h = lines[0]!.trim();
         let b: string[];
         let middle: string;
         const ref_h = extractRef(c, h).trim();
@@ -424,7 +424,7 @@ export class CommanderEditCommands {
         } else if (def_h) {
             [h, b, middle] = [def_h, lines, ''];
         } else {
-            [h, b, middle] = [lines[0].trim(), lines.slice(1), ''];
+            [h, b, middle] = [lines[0]!.trim(), lines.slice(1), ''];
         }
         //
         // Start the outer undo group.
@@ -619,7 +619,7 @@ export class CommanderEditCommands {
         // Calculate the proper selection range (i, j, ins).
         let i, j;
         if (sel_1 === sel_2) {
-            const line = result[0];
+            const line = result[0]!;
             const [iStart, width] = g.skip_leading_ws_with_indent(line, 0, tab_width);
             i = j = head.length + iStart;
         } else {
@@ -821,7 +821,7 @@ export class CommanderEditCommands {
 
         // If the present line doesn't start a paragraph,
         // scan backward, adding trailing lines of head to ins.
-        if (insert_lines.length && !this.startsParagraph(insert_lines[0])) {
+        if (insert_lines.length && !this.startsParagraph(insert_lines[0]!)) {
             let n = 0;  // number of moved lines.
             // Create a reversed copy of the array for iteration, preserving the original array.
             const reversedHeadLines = [...head_lines].reverse();
@@ -843,7 +843,7 @@ export class CommanderEditCommands {
 
         let ended = false, started = false;
         for (let i = 0; i < para_lines.length; i++) {
-            let s = para_lines[i];
+            let s = para_lines[i]!;
             if (started) {
                 if (this.ends_paragraph(s) || this.startsParagraph(s)) {
                     ended = true;
@@ -902,13 +902,13 @@ export class CommanderEditCommands {
         for (let i = 0; i < 2; i++) {
             if (i < lines.length) {
                 // Use the original, non-optimized leading whitespace.
-                leading_ws[i] = g.get_leading_ws(lines[i]);
-                indents[i] = g.computeWidth(leading_ws[i], tabWidth);
+                leading_ws[i] = g.get_leading_ws(lines[i]!);
+                indents[i] = g.computeWidth(leading_ws[i]!, tabWidth);
             }
         }
         indents[1] = Math.max(...indents);
         if (lines.length === 1) {
-            leading_ws[1] = leading_ws[0];
+            leading_ws[1] = leading_ws[0]!;
         }
         return [indents, leading_ws];
     }
@@ -971,23 +971,23 @@ export class CommanderEditCommands {
         pageWidth: number
     ): string {
         /** Compute the result of wrapping all lines. */
-        const trailingNL = lines.length && lines[lines.length - 1].endsWith('\n');
+        const trailingNL = lines.length && lines[lines.length - 1]!.endsWith('\n');
         lines = lines.map(z => z.endsWith('\n') ? z.slice(0, -1) : z);
 
         if (lines.length) {  // Bug fix: 2013/12/22.
-            let s = lines[0];
+            let s = lines[0]!;
             if (this.startsParagraph(s)) {
                 // Adjust indents[1]
                 // Similar to code in startsParagraph(s)
                 let i = 0;
-                if (s[0].match(/\d/)) {
-                    while (i < s.length && s[i].match(/\d/)) {
+                if (s[0]!.match(/\d/)) {
+                    while (i < s.length && s[i]!.match(/\d/)) {
                         i += 1;
                     }
                     if (g.match(s, i, ')') || g.match(s, i, '.')) {
                         i += 1;
                     }
-                } else if (s[0].match(/[a-zA-Z]/)) {
+                } else if (s[0]!.match(/[a-zA-Z]/)) {
                     if (g.match(s, 1, ')') || g.match(s, 1, '.')) {
                         i = 2;
                     }
@@ -996,7 +996,7 @@ export class CommanderEditCommands {
                 }
                 // Never decrease indentation.
                 i = g.skip_ws(s, i + 1);
-                if (i > indents[1]) {
+                if (i > indents[1]!) {
                     indents[1] = i;
                     leading_ws[1] = ' '.repeat(i);
                 }
@@ -1005,14 +1005,14 @@ export class CommanderEditCommands {
 
         // Wrap the lines, decreasing the page width by indent.
         const result_list = g.wrap_lines(lines,
-            pageWidth - indents[1],
-            pageWidth - indents[0]);
+            pageWidth - indents[1]!,
+            pageWidth - indents[0]!);
 
         // Prefix with the leading whitespace, if any
         const paddedResult = [];
-        paddedResult.push(leading_ws[0] + result_list[0]);
+        paddedResult.push(leading_ws[0]! + result_list[0]);
         for (let line of result_list.slice(1)) {
-            paddedResult.push(leading_ws[1] + line);
+            paddedResult.push(leading_ws[1]! + line);
         }
 
         // Convert the result to a string.
@@ -1031,18 +1031,18 @@ export class CommanderEditCommands {
             return false;
         } else if (s.trim() === '"""' || s.trim() === "'''") {
             return true;
-        } else if (s[0].match(/\d/)) {
+        } else if (s[0]!.match(/\d/)) {
             let i = 0;
-            while (i < s.length && s[i].match(/\d/)) {
+            while (i < s.length && s[i]!.match(/\d/)) {
                 i += 1;
             }
             return g.match(s, i, ')') || g.match(s, i, '.');
-        } else if (s[0].match(/[a-zA-Z]/)) {
+        } else if (s[0]!.match(/[a-zA-Z]/)) {
             // Careful: single characters only.
             // This could cause problems in some situations.
             return (
                 (g.match(s, 1, ')') || g.match(s, 1, '.')) &&
-                (s.length < 2 || ' \t\n'.includes(s[2]))
+                (s.length < 2 || ' \t\n'.includes(s[2]!))
             );
         } else {
             return s.startsWith('@') || s.startsWith('-');
@@ -1280,7 +1280,7 @@ export class CommanderEditCommands {
                 } else {
                     stack = stack.slice(0, level);
                 }
-                const n = stack[stack.length - 1];
+                const n = stack[stack.length - 1]!;
                 stack[stack.length - 1] = n + 1;
 
                 const title = clean_headline(p.h);

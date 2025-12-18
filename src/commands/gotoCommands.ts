@@ -676,7 +676,7 @@ export class GoToCommands {
             i += 1;
         }
         // Remove optional level number.
-        while (i < s.length && s[i] >= '0' && s[i] <= '9') {
+        while (i < s.length && s[i]! >= '0' && s[i]! <= '9') {
             i += 1;
         }
         // Remove trailing stars.

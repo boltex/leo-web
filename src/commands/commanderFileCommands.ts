@@ -3,7 +3,6 @@
 /**
  * File commands that used to be defined in leoCommands.py
  */
-import * as vscode from 'vscode';
 import * as utils from '../utils';
 import * as g from '../core/leoGlobals';
 import { commander_command } from '../core/decorators';
@@ -14,6 +13,7 @@ import { PreviousSettings } from '../core/leoApp';
 import { NullGui } from '../core/leoGui';
 import { LeoImportCommands, MORE_Importer } from '../core/leoImport';
 import { ScriptingController } from '../core/mod_scripting';
+import { Uri, workspace } from '../workspace';
 
 //@+others
 //@+node:felix.20251214160853.69: ** Class CommanderFileCommands
@@ -135,7 +135,7 @@ export class CommanderFileCommands {
         }
         c.bringToFront();
         if (names && names.length) {
-            await g.chdir(names[0]);
+            await g.chdir(names[0]!);
         } else {
             names = [];
         }
@@ -309,7 +309,7 @@ export class CommanderFileCommands {
     )
     public async open_outline(
         this: Commands,
-        p_uri?: vscode.Uri
+        p_uri?: Uri
     ): Promise<unknown> {
         const c: Commands = this;
 
@@ -998,7 +998,7 @@ export class CommanderFileCommands {
         );
         c.bringToFront();
         if (names && names.length) {
-            await g.chdir(names[0]);
+            await g.chdir(names[0]!);
             return c.importCommands.removeSentinelsCommand(names);
         }
     }
@@ -1169,7 +1169,7 @@ export class CommanderFileCommands {
                 }
                 const w_uri = g.makeUri(fileName);
                 const writeData = Buffer.from(s, 'utf8');
-                await vscode.workspace.fs.writeFile(w_uri, writeData);
+                await workspace.fs.writeFile(w_uri, writeData);
                 return g.blue('wrote:', fileName);
             } catch (iOError) {
                 g.error('can not write %s', fileName);
@@ -1221,7 +1221,7 @@ export class CommanderFileCommands {
                 // f.flush()
                 const w_uri = g.makeUri(fileName);
                 const writeData = Buffer.from(s, 'utf8');
-                await vscode.workspace.fs.writeFile(w_uri, writeData);
+                await workspace.fs.writeFile(w_uri, writeData);
                 g.blue('wrote:', fileName);
             } catch (IOError) {
                 g.error('can not write %s', fileName);

@@ -1886,37 +1886,6 @@ export class LoadManager {
         // 2011/10/12: don't add .leo to *any* file.
         return fileName;
     }
-    //@+node:felix.20251214160339.79: *4* LM.computeLeoSettingsUri
-    /* 
-    def computeLeoSettingsPath(self):
-        """Return the full path to leoSettings.leo."""
-        # lm = self
-        join = g.finalize_join
-        settings_fn = 'leoSettings.leo'
-        table = (
-            # First, leoSettings.leo in the home directories.
-            join(g.app.homeDir, settings_fn),
-            join(g.app.homeLeoDir, settings_fn),
-            # Last, leoSettings.leo in leo/config directory.
-            join(g.app.globalConfigDir, settings_fn)
-        )
-        for path in table:
-            if g.os_path_exists(path):
-                break
-        else:
-            path = None
-        return path
-     */
-
-    /**
-     * Return the Uri of this extension's leojsSettings.leojs,
-     * the LeoJs equivalent of leoSettings.leo.
-     */
-    public computeLeoSettingsUri(): Uri | undefined {
-        // TODO: remove/deprecate because for lwo-web, the settings will be hard coded in a json file. 
-        return;
-    }
-
     //@+node:felix.20251214160339.80: *4* LM.computeMyLeoSettingsPath
 
     /**

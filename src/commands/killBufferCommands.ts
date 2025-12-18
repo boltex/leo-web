@@ -64,7 +64,7 @@ class KillBufferIterClass {
             i = 0;
         }
 
-        const val = aList[i];
+        const val = aList[i]!;
         this.index = i + 1;
 
         return { value: val, done: false };

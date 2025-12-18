@@ -561,7 +561,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
 
         function atfile(p: Position): boolean {
             /** return True if p is an @<file> node *of any kind* */
-            const word0 = p.h.split(' ')[0];
+            const word0 = p.h.split(' ')[0]!;
             return (
                 g.app.atFileNames.includes(word0) ||
                 word0 === '@auto' ||
@@ -1661,12 +1661,12 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         const ins = w.getInsertPoint();
         const [i, j] = g.getLine(s, ins);
         let w1 = ins - 1;
-        while (w1 >= i && /\s/.test(s[w1])) {
+        while (w1 >= i && /\s/.test(s[w1]!)) {
             w1 -= 1;
         }
         w1 += 1;
         let w2 = ins;
-        while (w2 <= j && /\s/.test(s[w2])) {
+        while (w2 <= j && /\s/.test(s[w2]!)) {
             w2 += 1;
         }
         const spaces = s.slice(w1, w2);
@@ -1951,7 +1951,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
             const bracketWidths = [indentWidth];
             let tabex = 0;
             for (let i = 0; i < s.length; i++) {
-                const ch = s[i];
+                const ch = s[i]!;
                 if (ch === '\t') {
                     tabex += tab_width - 1;
                 }
@@ -2232,14 +2232,14 @@ export class EditCommandsClass extends BaseEditCommandsClass {
                 if (g.match(s, j - 1, '\n')) {
                     j -= 1;
                 }
-                while (j >= 0 && s[j].trim().length === 0) {
+                while (j >= 0 && s[j]!.trim().length === 0) {
                     j -= 1;
                 }
             }
             this.moveToHelper(j, extend);
         } else if (spot === 'start-line') {  // new
             if (line.trim().length) {
-                while (i < j && s[i].trim().length === 0) {
+                while (i < j && s[i]!.trim().length === 0) {
                     i += 1;
                 }
             }
@@ -2295,7 +2295,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         }
 
         function seek_until_changed(i: number, match_function: (ch: string) => boolean, step: number): number {
-            while (0 <= i && i < n && match_function(s[i])) {
+            while (0 <= i && i < n && match_function(s[i]!)) {
                 i += step;
             }
             return i;
@@ -2328,12 +2328,12 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         if (smart) {
             if (forward) {
                 if (0 <= i && i < n) {
-                    if (is_alphanumeric(s[i])) {
+                    if (is_alphanumeric(s[i]!)) {
                         i = seek_word_end(i);
                         i = seek_simple_whitespace_end(i);
-                    } else if (is_simple_whitespace(s[i])) {
+                    } else if (is_simple_whitespace(s[i]!)) {
                         i = seek_simple_whitespace_end(i);
-                    } else if (is_special(s[i])) {
+                    } else if (is_special(s[i]!)) {
                         i = seek_special_end(i);
                         i = seek_simple_whitespace_end(i);
                     } else {
@@ -2343,12 +2343,12 @@ export class EditCommandsClass extends BaseEditCommandsClass {
             } else {
                 i -= 1;  // Shift cursor temporarily by -1 to get easy read access to the prev. char
                 if (0 <= i && i < n) {
-                    if (is_alphanumeric(s[i])) {
+                    if (is_alphanumeric(s[i]!)) {
                         i = seek_word_start(i);
                         // Do not seek further whitespace here
-                    } else if (is_simple_whitespace(s[i])) {
+                    } else if (is_simple_whitespace(s[i]!)) {
                         i = seek_simple_whitespace_start(i);
-                    } else if (is_special(s[i])) {
+                    } else if (is_special(s[i]!)) {
                         i = seek_special_start(i);
                         // Do not seek further whitespace here
                     } else {
@@ -2361,27 +2361,27 @@ export class EditCommandsClass extends BaseEditCommandsClass {
             if (forward) {
                 // Unlike backward-word moves, there are two options...
                 if (end) {
-                    while (0 <= i && i < n && !g.isWordChar(s[i])) {
+                    while (0 <= i && i < n && !g.isWordChar(s[i]!)) {
                         i += 1;
                     }
-                    while (0 <= i && i < n && g.isWordChar(s[i])) {
+                    while (0 <= i && i < n && g.isWordChar(s[i]!)) {
                         i += 1;
                     }
                 } else {
                     // #1653. Scan for non-words *first*.
-                    while (0 <= i && i < n && !g.isWordChar(s[i])) {
+                    while (0 <= i && i < n && !g.isWordChar(s[i]!)) {
                         i += 1;
                     }
-                    while (0 <= i && i < n && g.isWordChar(s[i])) {
+                    while (0 <= i && i < n && g.isWordChar(s[i]!)) {
                         i += 1;
                     }
                 }
             } else {
                 i -= 1;
-                while (0 <= i && i < n && !g.isWordChar(s[i])) {
+                while (0 <= i && i < n && !g.isWordChar(s[i]!)) {
                     i -= 1;
                 }
-                while (0 <= i && i < n && g.isWordChar(s[i])) {
+                while (0 <= i && i < n && g.isWordChar(s[i]!)) {
                     i -= 1;
                 }
                 i += 1;  // 2015/04/30
@@ -2702,34 +2702,34 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         let i = w.getInsertPoint();
         let i1 = i;
         // Find a word char on the present line if one isn't at the cursor.
-        if (!(0 <= i && i < n && g.isWordChar(s[i]))) {
+        if (!(0 <= i && i < n && g.isWordChar(s[i]!))) {
             // First, look forward
-            while (i < n && !g.isWordChar(s[i]) && s[i] !== '\n') {
+            while (i < n && !g.isWordChar(s[i]!) && s[i] !== '\n') {
                 i += 1;
             }
             // Next, look backward.
-            if (!(0 <= i && i < n && g.isWordChar(s[i]))) {
+            if (!(0 <= i && i < n && g.isWordChar(s[i]!))) {
                 if (i >= n || s[i] === '\n') {
                     i = i1 - 1;
                 } else {
                     i = i1;
                 }
-                while (i >= 0 && !g.isWordChar(s[i]) && s[i] !== '\n') {
+                while (i >= 0 && !g.isWordChar(s[i]!) && s[i] !== '\n') {
                     i -= 1;
                 }
             }
         }
         // Make sure s[i] is a word char.
-        if (0 <= i && i < n && g.isWordChar(s[i])) {
+        if (0 <= i && i < n && g.isWordChar(s[i]!)) {
             // Find the start of the word.
-            while (0 <= i && i < n && g.isWordChar(s[i])) {
+            while (0 <= i && i < n && g.isWordChar(s[i]!)) {
                 i -= 1;
             }
             i += 1;
             i1 = i;
 
             // Find the end of the word.
-            while (0 <= i && i < n && g.isWordChar(s[i])) {
+            while (0 <= i && i < n && g.isWordChar(s[i]!)) {
                 i += 1;
             }
             if (select) {
@@ -3075,7 +3075,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
             const progress = i;
             if (s[i] === '.') {
                 // Skip periods surrounded by letters/numbers
-                if (i > 0 && s[i - 1].match(/[\w\d]/) && s[i + 1].match(/[\w\d]/)) {
+                if (i > 0 && s[i - 1]!.match(/[\w\d]/) && s[i + 1]!.match(/[\w\d]/)) {
                     i -= 1;
                 } else {
                     i += 1;
@@ -3153,7 +3153,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
             const progress = i;
             if (s[i] === '.') {
                 // Skip periods surrounded by letters/numbers
-                if (i > 0 && s[i - 1].match(/[\w\d]/) && s[i + 1].match(/[\w\d]/)) {
+                if (i > 0 && s[i - 1]!.match(/[\w\d]/) && s[i + 1]!.match(/[\w\d]/)) {
                     i += 1;
                 } else {
                     i += 1;
@@ -3680,7 +3680,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         }
         // Search for the next word.
         let k = j1 + 1;
-        while (k < s.length && s[k] !== '\n' && !g.isWordChar1(s[k])) {
+        while (k < s.length && s[k] !== '\n' && !g.isWordChar1(s[k]!)) {
             k += 1;
         }
         const changed = k < s.length;

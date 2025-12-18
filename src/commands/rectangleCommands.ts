@@ -255,11 +255,11 @@ export class RectangleCommandsClass extends BaseEditCommandsClass {
                 break;
             }
             w.delete(toInt(`${r}.${r2}`), toInt(`${r}.${r4}`));
-            w.insert(toInt(`${r}.${r2}`), killRect[n]);
+            w.insert(toInt(`${r}.${r2}`), killRect[n]!);
             n++;
         }
         const i = toInt(`${r1}.${r2}`);
-        const j = toInt(`${r3}.${r2 + killRect[n - 1].length}`);
+        const j = toInt(`${r3}.${r2 + killRect[n - 1]!.length}`);
         w.setSelectionRange(i, j, j);
         this.endCommand();
     }
