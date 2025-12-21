@@ -1188,7 +1188,7 @@ export class LeoView {
      * Will return a string only if something was typed but no item selected because of filtering out all items.
      */
     public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | string | null> {
-        // todo
+        // todo : use the QUICKPICK_DIALOG_INPUT and QUICKPICK_DIALOG_LIST elements to implement this. Also use this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'true'); to show it, etc.
         return null; // temporary
     }
 }

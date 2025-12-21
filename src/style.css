@@ -59,6 +59,8 @@
   --file-dialog-display: none;
   /* input-dialog */
   --input-dialog-display: none;
+  /* quickpick-dialog */
+  --quickpick-dialog-display: none;
 }
 
 [data-active-tab="log"] {
@@ -177,6 +179,10 @@
 
 [data-show-input-dialog="true"] {
   --input-dialog-display: flex;
+}
+
+[data-show-quickpick-dialog="true"] {
+  --quickpick-dialog-display: flex;
 }
 
 html {
