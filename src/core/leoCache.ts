@@ -263,35 +263,23 @@ export class SqlitePickleShare {
         this.init = new Promise((resolve, reject) => {
 
             void (async () => {
+
+                // That was code from LeoJS. Uncomment and replace below with indexedDB instead of g.SQL Database for this web version.
+                /*
                 try {
-                    if (g.isBrowserRepo()) {
-                        // PASS no need to create folders for web version: Saved in workspaceStorage.
-                    } else {
-                        const w_isdir = await isdir(this.root);
-                        if (!w_isdir && !g.unitTesting) {
-                            await this._makedirs(this.root);
-                        }
-                    }
 
                     if (g.unitTesting) {
                         this.conn = new g.SQL.Database();
                     } else {
-                        // TODO : CHECK IF RUNNING AS WEB EXTENSION!
                         // TODO : USE WORKSPACE TO GET INSTEAD OF READFILE !
 
                         // Open empty if not exist.
                         let w_exists;
-                        if (g.isBrowserRepo()) {
-                            // web
-                            w_exists = g.extensionContext.workspaceState.get<string>(
-                                g.makeUri(this.dbfile).fsPath
-                            );
-                        } else {
-                            // Desktop
-                            w_exists = await g.os_path_exists(this.dbfile);
-                        }
+                        // web
+                        w_exists = g.extensionContext.workspaceState.get<string>(
+                            g.makeUri(this.dbfile).fsPath
+                        );
                         if (w_exists) {
-                            // this.conn = await sqlite3.connect(dbfile);
                             const filebuffer = await this.readFileBuffer(
                                 g.makeUri(this.dbfile)
                             );
@@ -304,16 +292,16 @@ export class SqlitePickleShare {
                         }
 
                     }
-
                     const sql = 'create table if not exists cachevalues(key text primary key, data blob);';
                     this.conn.exec(sql);
-
                     await this.reset_protocol_in_values();
                     resolve(this.conn);
+
                 } catch (e) {
                     console.log('SqlitePickleShare failed init Error:', e);
                     reject('LEOJS: SqlitePickleShare failed init');
                 }
+                */
 
             })();
 
@@ -457,50 +445,35 @@ export class SqlitePickleShare {
 
     }
     //@+node:felix.20251214160339.350: *3* readFileBuffer
-    public readFileBuffer(db_uri: vscode.Uri): Thenable<Uint8Array | null> {
+    public readFileBuffer(db_uri: Uri): Thenable<Uint8Array | null> {
 
-        if (g.isBrowserRepo()) {
-            // web
-            const encodedData = g.extensionContext.workspaceState.get<string>(db_uri.fsPath);
-            if (encodedData) {
+        // That was code from LeoJS. Uncomment and replace below with indexedDB instead of g.SQL Database for this web version.
+        /*
+        const encodedData = g.extensionContext.workspaceState.get<string>(db_uri.fsPath);
+        if (encodedData) {
 
-                const binaryString = atob(encodedData);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-
-                return Promise.resolve(bytes);
+            const binaryString = atob(encodedData);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
             }
-            return Promise.resolve(null);
-        } else {
-            // desktop
-            return vscode.workspace.fs.readFile(db_uri);
+
+            return Promise.resolve(bytes);
         }
+        */
+        return Promise.resolve(null);
     }
 
     //@+node:felix.20251214160339.351: *3* writeFileBuffer
-    public writeFileBuffer(db_uri: vscode.Uri, db_buffer: Uint8Array): Thenable<void> {
-        if (g.isBrowserRepo()) {
-            // web
-            const encodedData = this.bufferToBase64(db_buffer); // Convert Uint8Array to Base64
-            return g.extensionContext.workspaceState.update(db_uri.fsPath, encodedData); // Store Base64 string
-        } else {
-            // desktop
-            // return vscode.workspace.fs.writeFile(db_uri, db_buffer);
-            return new Promise((resolve, reject) => {
-                const filePath = db_uri.fsPath;
-                fs.writeFile(filePath, db_buffer, (err) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-
-        }
+    public writeFileBuffer(db_uri: Uri, db_buffer: Uint8Array): Thenable<void> {
+        // web
+        const encodedData = this.bufferToBase64(db_buffer); // Convert Uint8Array to Base64
+        // That was code from LeoJS. Uncomment and replace below with indexedDB instead of g.SQL Database for this web version.
+        /*
+        return g.extensionContext.workspaceState.update(db_uri.fsPath, encodedData); // Store Base64 string
+        */
+        return Promise.resolve();
     }
 
     //@+node:felix.20251214160339.352: *3* bufferToBase64
@@ -510,50 +483,15 @@ export class SqlitePickleShare {
 
     //@+node:felix.20251214160339.353: *3* saveDatabase
     public async saveDatabase(): Promise<void> {
+        // That was code from LeoJS. Uncomment and replace below with indexedDB instead of g.SQL Database for this web version.
+        /*
         if (this.conn) {
             const data = this.conn.export(); // Export SQLite database to Uint8Array
             const encodedData = this.bufferToBase64(data); // Convert Uint8Array to Base64
             await g.extensionContext.workspaceState.update('database', encodedData); // Store Base64 string
         }
-    }
-
-    //@+node:felix.20251214160339.354: *3* watchSetup
-    public watchSetup(databaseFilePath: string): void {
-        if (g.isBrowserRepo()) {
-            // web NO NEED TO WATCH IF WEB EXTENSION!
-            return;
-        }
-        // No backslashes in glob pattern for watching a file pattern. (single file in this case)
-        const watcher = vscode.workspace.createFileSystemWatcher(
-            // don't use string!
-            // databaseFilePath.replace(/\\/g, '/')
-            new vscode.RelativePattern(
-                g.makeUri(this.root),
-                'cache.sqlite'
-            )
-        );
-
-        // Handle file changes
-        watcher.onDidChange(uri => {
-            this.refreshFromFile();
-            // Implement debounce logic and database reconnection here
-        });
-
-        // Handle file creation (if necessary)
-        watcher.onDidCreate(uri => {
-            this.refreshFromFile();
-            // Handle file creation
-        });
-
-        g.extensionContext.subscriptions.push(watcher);
-        // Handle file deletion (if necessary)
-        // watcher.onDidDelete(uri => {
-        //     console.log(`Database file deleted: ${uri.fsPath}`);
-        //     // Handle file deletion
-        // });
-
-        // Remember to dispose of the watcher when no longer needed
-        return;
+        */
+        return Promise.resolve();
 
     }
 
@@ -565,6 +503,10 @@ export class SqlitePickleShare {
             if (this._refreshTimeout) {
                 clearTimeout(this._refreshTimeout);
             }
+
+            // That was code from LeoJS. Uncomment and replace below with indexedDB instead of g.SQL Database for this web version.
+            /*
+
             // 100 millisecond debounce
             setTimeout(() => {
                 // REFRESH
@@ -580,6 +522,9 @@ export class SqlitePickleShare {
                     throw (p_reason);
                 });
             }, 100);
+
+            */
+
         }
     }
 

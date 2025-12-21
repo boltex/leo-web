@@ -11,6 +11,8 @@ import { new_cmd_decorator } from '../core/decorators';
 import { BaseEditCommandsClass } from './baseCommands';
 import { Constants } from '../constants';
 import { Position } from '../core/leoNodes';
+import { QuickPickItem } from '../types';
+import { workspace } from '../workspace';
 //@-<< helpCommands imports & annotations >>
 
 //@+others
@@ -70,7 +72,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         // Type the name of the command, followed by Return.
         // `;
         const c = this.c;
-        const commands: vscode.QuickPickItem[] = [];
+        const commands: QuickPickItem[] = [];
         const cDict = c.commandsDict;
         for (let key in cDict) {
             const command = cDict[key];
@@ -83,7 +85,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
                 });
             }
         }
-        const w_noDetails: vscode.QuickPickItem[] = [];
+        const w_noDetails: QuickPickItem[] = [];
         const stash_button: string[] = [];
         const stash_rclick: string[] = [];
         const stash_command: string[] = [];
@@ -120,67 +122,25 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
             return a.label < b.label ? -1 : (a.label === b.label ? 0 : 1);
         });
 
-        const w_choices: vscode.QuickPickItem[] = [];
+        const w_choices: QuickPickItem[] = [];
 
         w_choices.push(...w_withDetails);
-        const w_disposables: vscode.Disposable[] = [];
-        const q_minibufferQuickPick: Promise<vscode.QuickPickItem | undefined> = new Promise((resolve, reject) => {
-            const quickPick = vscode.window.createQuickPick();
-            quickPick.items = w_choices;
-            quickPick.placeholder = Constants.USER_MESSAGES.MINIBUFFER_PROMPT;
-            quickPick.matchOnDetail = true;
 
-            w_disposables.push(
-                quickPick.onDidChangeSelection(selection => {
-                    if (selection[0]) {
-                        resolve(selection[0]);
-                        quickPick.hide();
-                    }
-                }),
-                quickPick.onDidChangeValue(changed => {
-                    if (/^\d+$/.test(changed)) {
-                        if (quickPick.items.length) {
-                            quickPick.items = [];
-                        }
-                    } else if (quickPick.items !== w_choices) {
-                        quickPick.items = w_choices;
-                    }
-                }),
-                quickPick.onDidHide(() => {
-                    resolve(undefined);
-                }),
-                quickPick
-            );
-            quickPick.show();
+        // const q_minibufferQuickPick: Promise<QuickPickItem | undefined> = new Promise((resolve, reject) => {
+        //     const quickPick = vscode.window.createQuickPick();
+        //     quickPick.items = w_choices;
+        //     quickPick.placeholder = Constants.USER_MESSAGES.MINIBUFFER_PROMPT;
+        // });
 
+        const w_picked = await workspace.view.showQuickPick(w_choices, {
+            placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
         });
 
-        const w_picked: vscode.QuickPickItem | undefined = await q_minibufferQuickPick;
 
-        w_disposables.forEach(d => d.dispose());
 
-        if (w_picked) {
+        if (w_picked && typeof w_picked !== 'string') {
             this.helpForCommandFinisher(w_picked.label);
         }
-
-        // -------------------------------------------
-
-        // const command = await g.app.gui.get1Arg(
-        //     {
-        //         title: 'Help for Command',
-        //         prompt: 'Type the name of the command',
-        //         placeHolder: '<command>',
-        //     }
-        // );
-        // if (command) {
-        //     this.helpForCommandFinisher(command);
-        // }
-
-        // -------------------------------------------
-
-        // c.putHelpFor(s);
-        // c.minibufferWantsFocusNow();
-        // k.fullCommand(event, help=True, helpHandler=this.helpForCommandFinisher)
     }
     //@+node:felix.20251214160853.471: *4* getBindingsForCommand
     public getBindingsForCommand(commandName: string): string {

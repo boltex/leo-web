@@ -28,7 +28,11 @@ import { Constants } from '../constants';
 import { ExternalFilesController } from './leoExternalFiles';
 import { LeoFrame } from './leoFrame';
 import { SettingsDict } from './leoGlobals';
-import { LeoUI } from '../leoUI';
+// import { LeoUI } from '../leoUI';
+// TEMPORARY LeoUI while developping, replace when implemented
+class LeoUI {
+    constructor(guiName = 'leoWebGui') { }
+}
 import { GlobalCacher, SqlitePickleShare } from './leoCache';
 // importers
 import * as importer_c from '../importers/c';
@@ -3260,7 +3264,7 @@ export class LoadManager {
 
         const lm: LoadManager = this;
 
-        g.app.gui = new LeoUI(undefined); // replaces createDefaultGui
+        g.app.gui = new LeoUI(undefined) as any; // replaces createDefaultGui
 
         /* 
         gui_option = lm.options.get('gui')

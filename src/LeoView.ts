@@ -1188,6 +1188,9 @@ export class LeoView {
      * Will return a string only if something was typed but no item selected because of filtering out all items.
      */
     public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | string | null> {
+        if (!items || items.length === 0) {
+            return Promise.resolve(null);
+        }
         return new Promise((resolve) => {
             // Show the dialog
             this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'true');
@@ -1202,14 +1205,14 @@ export class LeoView {
 
             // Find first initially picked item or first non-separator
             for (let i = 0; i < items.length; i++) {
-                if (items[i].picked) {
+                if (items[i]!.picked) {
                     selectedIndex = i;
                     break;
                 }
             }
             if (selectedIndex === -1) {
                 for (let i = 0; i < items.length; i++) {
-                    if (items[i].kind !== -1) {
+                    if (items[i]!.kind !== -1) {
                         selectedIndex = i;
                         break;
                     }
@@ -1307,7 +1310,7 @@ export class LeoView {
                 // Reset selection to first non-separator item
                 selectedIndex = -1;
                 for (let i = 0; i < filteredItems.length; i++) {
-                    if (filteredItems[i].kind !== -1) {
+                    if (filteredItems[i]!.kind !== -1) {
                         selectedIndex = i;
                         break;
                     }
@@ -1348,7 +1351,7 @@ export class LeoView {
                     e.preventDefault();
                     // Move to next non-separator item
                     for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
-                        if (filteredItems[i].kind !== -1) {
+                        if (filteredItems[i]!.kind !== -1) {
                             selectedIndex = i;
                             break;
                         }
@@ -1358,7 +1361,7 @@ export class LeoView {
                     e.preventDefault();
                     // Move to previous non-separator item
                     for (let i = selectedIndex - 1; i >= 0; i--) {
-                        if (filteredItems[i].kind !== -1) {
+                        if (filteredItems[i]!.kind !== -1) {
                             selectedIndex = i;
                             break;
                         }
