@@ -1512,3 +1512,91 @@ a:hover {
 #input-dialog-btn:hover {
   background: var(--hover-bg);
 }
+
+/* QuickPick dialog */
+#quickpick-dialog {
+  display: var(--quickpick-dialog-display);
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+#quickpick-dialog .modal-content {
+  max-width: 600px;
+  padding: 0;
+  overflow: hidden;
+}
+
+#quickpick-dialog-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 1px solid var(--find-border-color);
+  background: var(--body-pane-color);
+  color: var(--text-color);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+#quickpick-dialog-input::placeholder {
+  color: var(--find-placeholder-color);
+}
+
+#quickpick-dialog-input:focus {
+  outline: none;
+  border-bottom-color: var(--find-selection);
+}
+
+.quick-pick-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.quick-pick-list li {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--find-border-color);
+}
+
+.quick-pick-list li:last-child {
+  border-bottom: none;
+}
+
+.quick-pick-list li:hover {
+  background: var(--hover-bg);
+}
+
+.quick-pick-list li.selected {
+  background: var(--selected-bg);
+  color: var(--selected-text);
+}
+
+.quick-pick-list li.separator {
+  padding: 4px 16px;
+  font-weight: bold;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--find-placeholder-color);
+  cursor: default;
+  pointer-events: none;
+}
+
+.quick-pick-list li .quick-pick-label {
+  display: block;
+  font-weight: 500;
+}
+
+.quick-pick-list li .quick-pick-description {
+  display: inline;
+  margin-left: 8px;
+  color: var(--find-placeholder-color);
+  font-size: 12px;
+}
+
+.quick-pick-list li .quick-pick-detail {
+  display: block;
+  margin-top: 4px;
+  color: var(--find-placeholder-color);
+  font-size: 12px;
+}
