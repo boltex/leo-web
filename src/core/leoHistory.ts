@@ -88,7 +88,7 @@ export class NodeHistory {
         this.beadPointer -= 1;
         let [p, chapter] = this.beadList[this.beadPointer]!;
         if (c.positionExists(p)) {
-            [p, chapter] = this.beadList[this.beadPointer];
+            [p, chapter] = this.beadList[this.beadPointer]!;
             this.update(p);
             this.select(p, chapter);
         } else {

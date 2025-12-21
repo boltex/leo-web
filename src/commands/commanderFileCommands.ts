@@ -199,6 +199,7 @@ export class CommanderFileCommands {
             c.redraw();
         }
         await c.raise_error_dialogs('read');
+        return;
     }
     // * LEOJS NOT USED : Not referenced in Leo's codebase either
     /*
@@ -561,6 +562,7 @@ export class CommanderFileCommands {
         } finally {
             await this.do_error_dialogs(c);
         }
+        return
 
     }
     //@+node:felix.20251214160853.84: *4* c_file.saveAll
@@ -644,7 +646,7 @@ export class CommanderFileCommands {
         } finally {
             await this.do_error_dialogs(c);
         }
-
+        return;
     }
     //@+node:felix.20251214160853.86: *4* c_file.saveTo
     @commander_command(
@@ -686,8 +688,6 @@ export class CommanderFileCommands {
 
         c.init_error_dialogs();
 
-
-
         try {
 
             // Handle the kwarg first.
@@ -710,6 +710,7 @@ export class CommanderFileCommands {
         } finally {
             await this.do_error_dialogs(c);
         }
+        return;
 
     }
     //@+node:felix.20251214160853.87: *4* c_file.revert
@@ -739,6 +740,7 @@ export class CommanderFileCommands {
             u.clearUndoState();
             return g.app.loadManager!.revertCommander(c);
         }
+        return;
     }
     //@+node:felix.20251214160853.88: *4* c_file.save-as-leojs
     @commander_command(
@@ -849,6 +851,7 @@ export class CommanderFileCommands {
             await g.chdir(fileName);
             return c.importCommands.exportHeadlines(fileName);
         }
+        return;
     }
     //@+node:felix.20251214160853.93: *4* c_file.flattenOutline
     @commander_command(
@@ -872,6 +875,7 @@ export class CommanderFileCommands {
             await g.chdir(fileName);
             return c.importCommands.flattenOutline(fileName);
         }
+        return;
     }
     //@+node:felix.20251214160853.94: *4* c_file.flattenOutlineToNode
     @commander_command(
@@ -941,6 +945,7 @@ export class CommanderFileCommands {
             await g.chdir(fileName);
             return c.importCommands.outlineToWeb(fileName, 'cweb');
         }
+        return;
     }
     //@+node:felix.20251214160853.96: *4* c_file.outlineToNoweb
     @commander_command(
@@ -1001,6 +1006,7 @@ export class CommanderFileCommands {
             await g.chdir(names[0]!);
             return c.importCommands.removeSentinelsCommand(names);
         }
+        return;
     }
     //@+node:felix.20251214160853.98: *4* c_file.weave
     @commander_command(
@@ -1024,6 +1030,7 @@ export class CommanderFileCommands {
             await g.chdir(fileName);
             return c.importCommands.weave(fileName);
         }
+        return;
     }
     //@+node:felix.20251214160853.99: *3* Read/Write
     //@+node:felix.20251214160853.100: *4* c_file.readAtAutoNodes
@@ -1175,6 +1182,7 @@ export class CommanderFileCommands {
                 g.error('can not write %s', fileName);
             }
         }
+        return;
     }
     //@+node:felix.20251214160853.105: *4* c_file.writeFileFromSubtree
     @commander_command(

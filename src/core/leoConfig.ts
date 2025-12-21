@@ -2922,12 +2922,13 @@ export class LocalConfigManager {
 
         // assert isinstance(gs, g.GeneralSetting), repr(gs)
         let w_path: string = gs.path!.toLowerCase();
+        let result = true;
         ['myLeoSettings.leo', 'leoSettings.leo'].forEach((fn) => {
             if (w_path.endsWith(fn.toLowerCase())) {
-                return false;
+                result = false;
             }
         });
-        return true;
+        return result;
     }
     //@+node:felix.20251214160339.825: *4* c.config.isLocalSettingsFile
     /**
@@ -2938,13 +2939,14 @@ export class LocalConfigManager {
         const c = this.c;
 
         const fn = c.shortFileName().toLowerCase();
+        let result = true;
         ['leoSettings.leo', 'myLeoSettings.leo'].forEach((fn2) => {
             if (fn.endsWith(fn2.toLowerCase())) {
-                return false;
+                result = false;
             }
         });
 
-        return true;
+        return result;
     }
     //@+node:felix.20251214160339.826: *4* c.exists
     /**

@@ -485,7 +485,7 @@ export class EditFileCommandsClass extends BaseEditCommandsClass {
         }
         // The inserted, deleted and changed dicts may come from c2, a differenct Commander.
         c.recreateGnxDict();  // So update c.fileCommands.gnxDict.
-
+        return;
     }
     //@+node:felix.20251214160853.410: *4* efc.computeChangeDicts
     /**

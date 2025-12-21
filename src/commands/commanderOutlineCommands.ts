@@ -2019,6 +2019,7 @@ export class CommanderOutlineCommands {
         }
         // Calling c.contractAllHeadlines() causes problems when in a chapter.
         c.redraw(parent);
+        return;
     }
 
     //@+node:felix.20251214160853.214: *4* c_oc.markChangedHeadlines

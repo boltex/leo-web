@@ -1431,6 +1431,7 @@ export class FileCommands {
         } catch (e) {
 
         }
+        return;
 
     }
     //@+node:felix.20251214160339.927: *5* fc.readExternalFiles & helper

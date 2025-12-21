@@ -25,7 +25,7 @@ class LeoWebApp {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.setupApp());
         } else {
-            this.setupApp();
+            this.setupApp(); // 
         }
     }
 

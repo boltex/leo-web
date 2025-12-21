@@ -37,7 +37,7 @@ import {
     TopLevelEditCommands,
 } from '../commands/editCommands';
 import { BufferCommandsClass } from '../commands/bufferCommands';
-import { EditFileCommandsClass, GitDiffController } from '../commands/editFileCommands';
+import { EditFileCommandsClass } from '../commands/editFileCommands';
 import { TopLevelCompareCommands } from './leoCompare';
 import { GoToCommands, TopLevelGoToCommands } from '../commands/gotoCommands';
 import { LeoFrame, StringTextWrapper } from './leoFrame';
@@ -4129,42 +4129,6 @@ export class Commands {
         }
         c.fileCommands.gnxDict = d;
     }
-    //@+node:felix.20251214160339.569: *3* c.Git
-    //@+node:felix.20251214160339.570: *4* c.diff_file
-    /**
-     * Create an outline describing the git diffs for all files changed
-     * between rev1 and rev2.
-     */
-    public async diff_file(fn: string, rev1 = 'HEAD', rev2 = ''): Promise<void> {
-        const x = new GitDiffController(this);
-        await x.diff_file(fn, rev1, rev2);
-    }
-    //@+node:felix.20251214160339.571: *4* c.diff_two_revs
-    /**
-     * Create an outline describing the git diffs for all files changed
-     * between rev1 and rev2.
-     */
-    public async diff_two_revs(directory?: string, rev1 = '', rev2 = ''): Promise<void> {
-        await new GitDiffController(this).diff_two_revs(rev1, rev2);
-    }
-    //@+node:felix.20251214160339.572: *4* c.diff_two_branches
-    /**
-     * Create an outline describing the git diffs for all files changed
-     * between rev1 and rev2.
-     */
-    public async diff_two_branches(branch1: any, branch2: any, fn: string): Promise<void> {
-        await new GitDiffController(this).diff_two_branches(
-            branch1, branch2, fn
-        );
-    }
-    //@+node:felix.20251214160339.573: *4* c.git_diff
-    public async git_diff(rev1 = 'HEAD', rev2 = ''): Promise<void> {
-        await new GitDiffController(this).git_diff(rev1, rev2);
-    }
-    //@+node:felix.20251214160339.574: *4* c.git_node_history
-    public async git_node_history(file_name: string, gnx: string): Promise<void> {
-        await new GitDiffController(this).node_history(file_name, [gnx]);
-    }
     //@+node:felix.20251214160339.575: *3* c.Gui
     //@+node:felix.20251214160339.576: *4* c.Dialogs & messages
     //@+node:felix.20251214160339.577: *5* c.alert
@@ -4282,6 +4246,7 @@ export class Commands {
         // Restore the root position's body.
         c.rootPosition()!.v.b = saved_body; // #1007: just set v.b.
         c.init_error_dialogs();
+        return;
     }
     //@+node:felix.20251214160339.582: *5* c.syntaxErrorDialog
     /**
