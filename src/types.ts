@@ -417,3 +417,80 @@ export interface MinibufferCommand {
 
 export type UnlType = 'shortGnx' | 'fullGnx' | 'shortLegacy' | 'fullLegacy';
 
+
+/**
+    * Represents an item that can be selected from
+    * a list of items.
+    */
+export interface QuickPickItem {
+
+    /**
+        * A human-readable string which is rendered prominent. 
+        */
+    label: string;
+
+    /**
+        * The kind of QuickPickItem that will determine how this item is rendered in the quick pick. When not specified,
+        * the default is QuickPickItemKind.Default.
+        */
+    kind?: QuickPickItemKind;
+
+    /**
+        * A human-readable string which is rendered less prominent in the same line.
+        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+        */
+    description?: string;
+
+    /**
+        * A human-readable string which is rendered less prominent in a separate line. 
+        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+        */
+    detail?: string;
+
+    /**
+        * Optional flag indicating if this item is picked initially. 
+        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+        */
+    picked?: boolean;
+
+    /**
+        * Always show this item.
+        *
+        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+        */
+    alwaysShow?: boolean;
+
+}
+
+export enum QuickPickItemKind {
+    /**
+        * The item is just a visual separator and does not represent a real item.
+        */
+    Separator = -1,
+    /**
+        * The default is an item that can be selected in the quick pick.
+        */
+    Default = 0,
+}
+
+
+/**
+    * Options to configure the behavior of the quick pick UI.
+    */
+export interface QuickPickOptions {
+
+    /**
+        * An optional string that represents the title of the quick pick.
+        */
+    title?: string;
+
+    /**
+        * An optional string to show as placeholder in the input box to guide the user what to pick on.
+        */
+    placeHolder?: string;
+
+    /**
+        * An optional function that is invoked whenever an item is selected.
+        */
+    onDidSelectItem?(item: QuickPickItem | string): any;
+}

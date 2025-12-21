@@ -1,4 +1,4 @@
-import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions } from './types';
+import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions } from './types';
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
 
@@ -79,6 +79,9 @@ export class LeoView {
     private INPUT_DIALOG_DESCRIPTION: HTMLElement;
     private INPUT_DIALOG_INPUT: HTMLInputElement;
     private INPUT_DIALOG_BTN: HTMLButtonElement;
+
+    private QUICKPICK_DIALOG_INPUT: HTMLInputElement;
+    private QUICKPICK_DIALOG_LIST: HTMLElement;
 
     public HTML_ELEMENT: HTMLElement;
 
@@ -189,6 +192,9 @@ export class LeoView {
         this.INPUT_DIALOG_DESCRIPTION = document.getElementById('input-dialog-description')!;
         this.INPUT_DIALOG_INPUT = document.getElementById('input-dialog-input')! as HTMLInputElement;
         this.INPUT_DIALOG_BTN = document.getElementById('input-dialog-btn')! as HTMLButtonElement;
+
+        this.QUICKPICK_DIALOG_INPUT = document.getElementById('quickpick-dialog-input')! as HTMLInputElement;
+        this.QUICKPICK_DIALOG_LIST = document.getElementById('quickpick-dialog-list')!;
 
         this.HTML_ELEMENT = document.documentElement;
 
@@ -1136,11 +1142,8 @@ export class LeoView {
 
 
     public showTextDocument(uri: Uri): void {
-
-        console.log('TODO: Test this method -> showTextDocument! Trying to show', uri);
-
         // Read the file, and open in a new tab or window
-        const content = workspace.fs.readFile(uri).then(data => {
+        workspace.fs.readFile(uri).then(data => {
             const text = new TextDecoder().decode(data);
             const newWindow = window.open();
             if (newWindow) {
@@ -1149,6 +1152,8 @@ export class LeoView {
                 pre.textContent = text;
                 newWindow.document.body.appendChild(pre);
             }
+        }).catch(err => {
+            console.error('Error reading file for showTextDocument:', err);
         });
     }
 
@@ -1157,7 +1162,7 @@ export class LeoView {
      */
     public showInformationMessage(message: string, options?: MessageOptions): void {
         // if modal is true, use showMessageDialog, if false, use toast
-        // TODO: improve showToast and showMessageDialog to support 'details' option of the MessageOptions interface
+        // TODO: improve showToast to support 'details' option of the MessageOptions interface
         if (options?.modal) {
             if (options.detail) {
                 this.showMessageDialog({
@@ -1174,9 +1179,16 @@ export class LeoView {
         } else {
             this.showToast(message, 2000);
         }
-
     }
 
-
-
+    /**
+     * Method that mimics a subset of VSCode's showQuickPick API.
+     * If a string was used in the input box to restrict choices, filter items accordingly.
+     * Returns the selected QuickPickItem, or null if cancelled.
+     * Will return a string only if something was typed but no item selected because of filtering out all items.
+     */
+    public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | string | null> {
+        // todo
+        return null; // temporary
+    }
 }
