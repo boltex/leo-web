@@ -1521,7 +1521,7 @@ a:hover {
 
 #quickpick-dialog .modal-content {
   max-width: 600px;
-  padding: 0;
+  padding: 10px;
   overflow: hidden;
 }
 
@@ -1529,7 +1529,7 @@ a:hover {
   width: 100%;
   padding: 12px 16px;
   border: none;
-  border-bottom: 1px solid var(--find-border-color);
+  border: 1px solid var(--find-border-color);
   background: var(--body-pane-color);
   color: var(--text-color);
   font-size: 14px;
@@ -1548,7 +1548,7 @@ a:hover {
 .quick-pick-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 -10px 0 0;
   max-height: 400px;
   overflow-y: auto;
 }
@@ -1556,7 +1556,6 @@ a:hover {
 .quick-pick-list li {
   padding: 8px 16px;
   cursor: pointer;
-  border-bottom: 1px solid var(--find-border-color);
 }
 
 .quick-pick-list li:last-child {
@@ -1573,13 +1572,14 @@ a:hover {
 }
 
 .quick-pick-list li.separator {
-  padding: 4px 16px;
+  padding: 0px 16px;
   font-weight: bold;
   font-size: 11px;
   text-transform: uppercase;
   color: var(--find-placeholder-color);
   cursor: default;
   pointer-events: none;
+  border-bottom: 1px solid var(--find-border-color);
 }
 
 .quick-pick-list li .quick-pick-label {

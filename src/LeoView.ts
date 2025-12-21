@@ -1269,6 +1269,10 @@ export class LeoView {
                     // Mark as selected if it matches selectedIndex
                     if (index === selectedIndex) {
                         li.classList.add('selected');
+                        // Selected should scroll into view if needed
+                        setTimeout(() => {
+                            li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        }, 0);
                     }
 
                     // Handle click
@@ -1291,9 +1295,9 @@ export class LeoView {
                     filteredItems = [...items];
                 } else {
                     filteredItems = items.filter(item => {
-                        // Always show separators
+                        // When filtered, dont show separators
                         if (item.kind === -1) {
-                            return true;
+                            return false;
                         }
                         // Show items that should always be shown
                         if (item.alwaysShow) {
@@ -1367,6 +1371,33 @@ export class LeoView {
                         }
                     }
                     renderList();
+                } else if (e.key === 'PageDown') {
+                    e.preventDefault();
+                    // Move down by 5 non-separator items
+                    let count = 0;
+                    for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
+                        if (filteredItems[i]!.kind !== -1) {
+                            selectedIndex = i;
+                            count++;
+                            if (count >= 5) break;
+                        }
+                    }
+                    renderList();
+                } else if (e.key === 'PageUp') {
+                    e.preventDefault();
+                    // Move up by 5 non-separator items
+                    let count = 0;
+                    for (let i = selectedIndex - 1; i >= 0; i--) {
+                        if (filteredItems[i]!.kind !== -1) {
+                            selectedIndex = i;
+                            count++;
+                            if (count >= 5) break;
+                        }
+                    }
+                    renderList();
+                } else if (e.key === 'Tab') {
+                    // Just prevent tabbing out of input.
+                    e.preventDefault();
                 }
             };
 

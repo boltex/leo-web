@@ -1,6 +1,6 @@
 import { LeoModel } from "./LeoModel";
 import { LeoView } from "./LeoView";
-import { TreeNode, FlatRow } from "./types";
+import { TreeNode, FlatRow, QuickPickItem, QuickPickItemKind } from "./types";
 import * as utils from './utils';
 import { workspace } from "./workspace";
 
@@ -340,38 +340,62 @@ export class LeoController {
         // Continue bootstrapping: Initialize controller after workspace is set
         this.initializeInteractions();
 
-        // TEST OPEN / SAVE FILE DIALOG
-        const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();
-        console.log('Chosen OPEN FILE handle:', chosenFileHandle);
-        if (chosenFileHandle) {
-            const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
-            console.log('Resolves to:', resolveResult);
-        } else {
-            console.log('No file chosen in OPEN dialog');
-        }
+        // // TEST OPEN / SAVE FILE DIALOG
+        // const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();
+        // console.log('Chosen OPEN FILE handle:', chosenFileHandle);
+        // if (chosenFileHandle) {
+        //     const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
+        //     console.log('Resolves to:', resolveResult);
+        // } else {
+        //     console.log('No file chosen in OPEN dialog');
+        // }
 
-        // test workspace singleton
-        workspace.test();
+        // // test workspace singleton
+        // workspace.test();
 
-        // Now test the save dialog
-        const saveFileHandle: FileSystemFileHandle | null = await view.showSaveDialog();
-        console.log('Chosen SAVE FILE handle:', saveFileHandle);
-        if (saveFileHandle) {
-            const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(saveFileHandle!);
-            console.log('Resolves to:', resolveResult);
-        } else {
-            console.log('No file chosen in SAVE dialog');
-        }
+        // // Now test the save dialog
+        // const saveFileHandle: FileSystemFileHandle | null = await view.showSaveDialog();
+        // console.log('Chosen SAVE FILE handle:', saveFileHandle);
+        // if (saveFileHandle) {
+        //     const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(saveFileHandle!);
+        //     console.log('Resolves to:', resolveResult);
+        // } else {
+        //     console.log('No file chosen in SAVE dialog');
+        // }
 
-        // Time to try the input dialog with "view.showInputDialog"
-        const inputResult = await view.showInputDialog({
-            title: "Input Dialog Test",
-            prompt: "Please enter some text:",
-            value: "Default value",
-            placeholder: "Type here..."
+        // // Time to try the input dialog with "view.showInputDialog"
+        // const inputResult = await view.showInputDialog({
+        //     title: "Input Dialog Test",
+        //     prompt: "Please enter some text:",
+        //     value: "Default value",
+        //     placeholder: "Type here..."
+        // });
+        // console.log("Input dialog result:", inputResult);
+
+        // And now, let's try out the quick pick dialog with "view.showQuickPickDialog"
+        const items: QuickPickItem[] = [
+            { label: "Option 1", description: "The first option" },
+            { label: "Option 2", description: "The second option" },
+            { label: "", kind: QuickPickItemKind.Separator },
+            { label: "Option 3", description: "The third option after a separator" },
+            { label: "Option 4", description: "some other option" },
+            { label: "Option 5", description: "some other option with a longer descriptions blablabla blabla, blablabla..." },
+            { label: "Option 6 with longer title", description: "some other option" },
+            { label: "Option 7", description: "some other option" },
+            { label: "Option 8", description: "some other option" },
+            { label: "Option 9", description: "some other option" },
+            { label: "Option 10", description: "some other option" },
+            { label: "Option 11", description: "some other option" },
+            { label: "Option 12", description: "some other option" },
+        ];
+        const result = await view.showQuickPick(items, {
+            title: "Quick Pick Dialog Test",
+            placeHolder: "Select an option",
+            onDidSelectItem: (item) => {
+                console.log("Highlighted item:", item);
+            }
         });
-        console.log("Input dialog result:", inputResult);
-
+        console.log("Quick pick result:", result);
 
     }
 
