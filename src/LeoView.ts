@@ -1188,7 +1188,197 @@ export class LeoView {
      * Will return a string only if something was typed but no item selected because of filtering out all items.
      */
     public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | string | null> {
-        // todo : use the QUICKPICK_DIALOG_INPUT and QUICKPICK_DIALOG_LIST elements to implement this. Also use this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'true'); to show it, etc.
-        return null; // temporary
+        return new Promise((resolve) => {
+            // Show the dialog
+            this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'true');
+
+            // Set placeholder if provided
+            this.QUICKPICK_DIALOG_INPUT.placeholder = options?.placeHolder || '';
+            this.QUICKPICK_DIALOG_INPUT.value = '';
+
+            // Keep track of current selection and filtered items
+            let filteredItems: QuickPickItem[] = [...items];
+            let selectedIndex = -1;
+
+            // Find first initially picked item or first non-separator
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].picked) {
+                    selectedIndex = i;
+                    break;
+                }
+            }
+            if (selectedIndex === -1) {
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].kind !== -1) {
+                        selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            const renderList = () => {
+                this.QUICKPICK_DIALOG_LIST.innerHTML = '';
+
+                if (filteredItems.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No results';
+                    li.style.fontStyle = 'italic';
+                    li.style.color = 'var(--find-placeholder-color)';
+                    li.style.cursor = 'default';
+                    li.style.pointerEvents = 'none';
+                    this.QUICKPICK_DIALOG_LIST.appendChild(li);
+                    return;
+                }
+
+                filteredItems.forEach((item, index) => {
+                    const li = document.createElement('li');
+
+                    // Handle separators
+                    if (item.kind === -1) {
+                        li.classList.add('separator');
+                        li.textContent = item.label;
+                        this.QUICKPICK_DIALOG_LIST.appendChild(li);
+                        return;
+                    }
+
+                    // Create label
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'quick-pick-label';
+                    labelSpan.textContent = item.label;
+                    li.appendChild(labelSpan);
+
+                    // Add description if present
+                    if (item.description) {
+                        const descSpan = document.createElement('span');
+                        descSpan.className = 'quick-pick-description';
+                        descSpan.textContent = item.description;
+                        li.appendChild(descSpan);
+                    }
+
+                    // Add detail if present
+                    if (item.detail) {
+                        const detailDiv = document.createElement('div');
+                        detailDiv.className = 'quick-pick-detail';
+                        detailDiv.textContent = item.detail;
+                        li.appendChild(detailDiv);
+                    }
+
+                    // Mark as selected if it matches selectedIndex
+                    if (index === selectedIndex) {
+                        li.classList.add('selected');
+                    }
+
+                    // Handle click
+                    li.onclick = () => {
+                        this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
+                        if (options?.onDidSelectItem) {
+                            options.onDidSelectItem(item);
+                        }
+                        resolve(item);
+                    };
+
+                    this.QUICKPICK_DIALOG_LIST.appendChild(li);
+                });
+            };
+
+            const filterItems = () => {
+                const filterText = this.QUICKPICK_DIALOG_INPUT.value.toLowerCase().trim();
+
+                if (!filterText) {
+                    filteredItems = [...items];
+                } else {
+                    filteredItems = items.filter(item => {
+                        // Always show separators
+                        if (item.kind === -1) {
+                            return true;
+                        }
+                        // Show items that should always be shown
+                        if (item.alwaysShow) {
+                            return true;
+                        }
+                        // Filter by label, description, or detail
+                        const labelMatch = item.label.toLowerCase().includes(filterText);
+                        const descMatch = item.description?.toLowerCase().includes(filterText) || false;
+                        const detailMatch = item.detail?.toLowerCase().includes(filterText) || false;
+                        return labelMatch || descMatch || detailMatch;
+                    });
+                }
+
+                // Reset selection to first non-separator item
+                selectedIndex = -1;
+                for (let i = 0; i < filteredItems.length; i++) {
+                    if (filteredItems[i].kind !== -1) {
+                        selectedIndex = i;
+                        break;
+                    }
+                }
+
+                renderList();
+            };
+
+            const closeDialog = (returnValue: QuickPickItem | string | null) => {
+                this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
+                this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
+                this.QUICKPICK_DIALOG_INPUT.oninput = null;
+                resolve(returnValue);
+            };
+
+            // Handle keyboard navigation
+            this.QUICKPICK_DIALOG_INPUT.onkeydown = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeDialog(null);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (selectedIndex >= 0 && selectedIndex < filteredItems.length) {
+                        const selectedItem = filteredItems[selectedIndex];
+                        if (selectedItem && selectedItem.kind !== -1) {
+                            if (options?.onDidSelectItem) {
+                                options.onDidSelectItem(selectedItem);
+                            }
+                            closeDialog(selectedItem);
+                        }
+                    } else if (this.QUICKPICK_DIALOG_INPUT.value) {
+                        // Return the typed string if no item matches
+                        closeDialog(this.QUICKPICK_DIALOG_INPUT.value);
+                    } else {
+                        closeDialog(null);
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    // Move to next non-separator item
+                    for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
+                        if (filteredItems[i].kind !== -1) {
+                            selectedIndex = i;
+                            break;
+                        }
+                    }
+                    renderList();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    // Move to previous non-separator item
+                    for (let i = selectedIndex - 1; i >= 0; i--) {
+                        if (filteredItems[i].kind !== -1) {
+                            selectedIndex = i;
+                            break;
+                        }
+                    }
+                    renderList();
+                }
+            };
+
+            // Handle filtering on input
+            this.QUICKPICK_DIALOG_INPUT.oninput = () => {
+                filterItems();
+            };
+
+            // Initial render
+            renderList();
+
+            // Focus the input
+            setTimeout(() => {
+                this.QUICKPICK_DIALOG_INPUT.focus();
+            }, 0);
+        });
     }
 }
