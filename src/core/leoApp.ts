@@ -20,7 +20,6 @@ import { TopLevelEditCommands } from '../commands/editCommands';
 import { TopLevelGoToCommands } from '../commands/gotoCommands';
 import { TopLevelCompareCommands } from './leoCompare';
 import { TopLevelImportCommands } from './leoImport';
-import { TopLevelMarkupCommands } from './leoMarkup';
 import { TopLevelPersistanceCommands } from './leoPersistence';
 import { FastRead } from './leoFileCommands';
 import { GlobalConfigManager, SettingsTreeParser } from './leoConfig';
@@ -4474,7 +4473,6 @@ applyMixins(Commands, [
     TopLevelCompareCommands,
     TopLevelGoToCommands,
     TopLevelImportCommands,
-    TopLevelMarkupCommands,
     TopLevelPersistanceCommands,
     TopLevelSessionsCommands,
     TopLevelEditCommands,

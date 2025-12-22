@@ -9,7 +9,6 @@ import { new_cmd_decorator } from './decorators';
 import 'date-format-lite';
 import * as et from 'elementtree';
 import * as difflib from 'difflib';
-import * as path from 'path';
 import { workspace } from '../workspace';
 var binascii = require('binascii');
 var pickle = require('./jpicklejs');

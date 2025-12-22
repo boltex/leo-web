@@ -5,10 +5,15 @@
 
 import './style.css';
 
+import * as g from './core/leoGlobals';
+import { LeoApp, LoadManager } from './core/leoApp';
+
 import { LeoModel } from './LeoModel';
 import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 import { workspace } from "./workspace";
+import * as utils from "./utils";
+
 
 class LeoWebApp {
 
@@ -32,7 +37,8 @@ class LeoWebApp {
     private async setupApp(): Promise<void> {
 
         // Initialize the MVC components
-        this.model = new LeoModel();
+        this.model = new LeoModel(); // The model will ultimately be the same core as LeoJS
+
         this.view = new LeoView();
         this.controller = new LeoController(this.model, this.view);
         workspace.setView(this.view);
@@ -40,6 +46,13 @@ class LeoWebApp {
         await this.controller.initialize();
 
         console.log('Leo Web App initialized.');
+
+        (g.app as LeoApp) = new LeoApp();
+        const w_start = process.hrtime(); // For calculating total startup time duration
+        g.app.loadManager = new LoadManager();
+        await g.app.loadManager.load();
+        console.log(`leojs startup launched in ${utils.getDurationMs(w_start)} ms`);
+
     }
 
 }
