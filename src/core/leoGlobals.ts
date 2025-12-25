@@ -32,13 +32,8 @@ import { LeoGui } from './leoGui';
 //@-<< leoGlobals: annotations >>
 //@+<< leoGlobals: global constants >>
 //@+node:felix.20251207215313.4: ** << leoGlobals: global constants >>
-export let isNewLeoJSVersion = false; // Used to show messages if first/new versions. Set by client-UI at startup.
-export const isBrowser: boolean = !!(process as any)?.browser; // coerced to boolean
-export const isMac: boolean = process.platform?.startsWith('darwin');
-export const isWindows: boolean = process.platform?.startsWith('win');
 /** For accessing files in the current workspace */
 export let workspaceUri: Uri;
-
 export let pako: typeof pakoObj = pakoObj;
 export let showdown: typeof showdownObj = showdownObj;
 export let dayjs: typeof dayjsObj = dayjsObj;
@@ -1466,8 +1461,9 @@ export async function chdir(p_path: string): Promise<void> {
     w_isDir = await os_path_isdir(p_path);
     const w_exist = await os_path_exists(p_path);
 
-    if (!isBrowser && w_isDir && w_exist) {
-        process.chdir?.(p_path);
+    if (w_isDir && w_exist) {
+        // process.chdir?.(p_path);
+        console.warn('Browser environment: chdir not implemented.');
     }
 }
 //@+node:felix.20251207215313.73: *3* g.mkdir
@@ -1639,29 +1635,6 @@ export function is_binary_string(s: Uint8Array): boolean {
         }
     }
     return false; // No binary bytes found
-}
-//@+node:felix.20251207215313.82: *3* g.isExecutableInPath
-export async function isExecutableInPath(executableName: string): Promise<string> {
-
-    const pathDelimiter = isWindows ? ';' : ':';
-    const directories = process.env.PATH?.split(pathDelimiter) || [];
-    const fileExtensions = isWindows ? ['.exe', '.cmd', '.bat'] : [''];
-
-    for (const directory of directories) {
-        for (const extension of fileExtensions) {
-            let fullPath;
-            if (isWindows && !executableName.endsWith(extension)) {
-                fullPath = path.join(directory, `${executableName}${extension}`);
-            } else {
-                fullPath = path.join(directory, executableName); // Already ends with that extension.
-            }
-            const w_exists = await os_path_exists(fullPath);
-            if (w_exists && w_exists.type !== 'directory') {
-                return fullPath;
-            }
-        }
-    }
-    return '';
 }
 //@+node:felix.20251207215313.83: *3* g.makeAllNonExistentDirectories
 /**
@@ -2008,20 +1981,16 @@ export function relativeDirectory(commander: Commands, importedFilename: string)
     if (!commander.fileName()) {
 
         es_print_unique_message('Imported using absolute path (unsaved outline).\n Save the outline to enable relative paths.');
-        if (isBrowser) {
-            // Make sure the uri starts with a slash instead of the vscode workspace path.
-            importedFilename = os_path_normslashes(importedFilename);
-            const workspacePath = workspaceUri.fsPath.replace(/\\/g, "/");
+        // Make sure the uri starts with a slash instead of the vscode workspace path.
+        importedFilename = os_path_normslashes(importedFilename);
+        const workspacePath = workspaceUri.fsPath.replace(/\\/g, "/");
 
-            if (importedFilename.startsWith(workspacePath)) {
-                // Remove the workspace path from the importedFilename.
-                importedFilename = importedFilename.slice(workspacePath.length);
-            }
-            return importedFilename;
-
-        } else {
-            return importedFilename; // No commander, return the absolute path.
+        if (importedFilename.startsWith(workspacePath)) {
+            // Remove the workspace path from the importedFilename.
+            importedFilename = importedFilename.slice(workspacePath.length);
         }
+        return importedFilename;
+
     }
 
     // Try to set fileName to a relative path if possible.
@@ -4424,9 +4393,7 @@ export function os_path_abspath(p_path: string): string {
     p_path = path.resolve(p_path);
 
     // os.path.normpath does the *reverse* of what we want.
-    if (isWindows || isBrowser) {
-        p_path = p_path.split('\\').join('/');
-    }
+    p_path = p_path.split('\\').join('/');
     return p_path;
 }
 
@@ -4525,12 +4492,6 @@ export function os_path_expanduser(p_path: string): string {
             return homeDir;
         } else if (p_path.startsWith('~/')) {
             p_path = p_path.replace('~', homeDir);
-        }
-        if (isWindows) {
-            if (p_path.startsWith('~\\')) {
-                p_path = p_path.replace('~', homeDir);
-            }
-            p_path = p_path.replace(/\\\\/g, '\\');
         }
         p_path = p_path.replace(/\/\//g, '/');
     }
@@ -4754,9 +4715,7 @@ export function os_path_normcase(p_path: string): string {
     if (!p_path) {
         return '';
     }
-    if (isWindows || isBrowser) {
-        p_path = p_path.toLowerCase();
-    }
+    p_path = p_path.toLowerCase();
     p_path = os_path_fix_drive(p_path);
     p_path = os_path_normslashes(p_path);
     return p_path;
@@ -4907,9 +4866,8 @@ export function os_path_split(p_path: string): [string, string] {
     }
 
     let testPath = p_path;
-    if (isWindows || isBrowser) {
-        testPath = testPath.split('\\').join('/');
-    }
+
+    testPath = testPath.split('\\').join('/');
 
     if (testPath.includes('/')) {
         // at least a slash
@@ -4970,7 +4928,7 @@ export function os_path_splitext(p_path: string): [string, string] {
                 if (w_parsed.ext && !w_parsed.dir.endsWith('.')) {
                     return [
                         w_parsed.dir +
-                        (isWindows && p_path.includes('\\') ? '\\' : '/') +
+                        '/' +
                         w_parsed.name,
                         w_parsed.ext,
                     ];
@@ -5641,9 +5599,7 @@ export function computeFileUrl(fn: string, c: Commands, p: Position): string {
     } else {
         const tag = 'file://';
         const tag2 = 'file:///';
-        if (isWindows && url.startsWith(tag2)) {
-            w_path = url.slice(tag2.length).trimStart();
-        } else if (url.startsWith(tag)) {
+        if (url.startsWith(tag)) {
             w_path = url.slice(tag.length).trimStart();
         } else {
             w_path = url;
@@ -6575,11 +6531,7 @@ export async function openUNLFile(c: Commands, s: string): Promise<Commands | un
      * Standardize the path for easy comparison.
      */
     function standard(p_path: string): string {
-        if (isWindows) {
-            return norm(p_path).toLowerCase();
-        } else {
-            return norm(p_path);
-        }
+        return norm(p_path);
     }
 
     if (!s.trim()) {
@@ -6606,10 +6558,6 @@ export async function openUNLFile(c: Commands, s: string): Promise<Commands | un
     if (isabs(s)) {
         w_exists = await exists(s);
         return w_exists ? openWithFileName(s) : undefined;
-    }
-
-    if (isWindows) {
-        s = s.replace(/\//g, '\\');
     }
 
     const is_relative = s.includes(path.sep);

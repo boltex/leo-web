@@ -244,7 +244,6 @@ export class LeoApp {
 
     public globalKillBuffer: string[] = []; // The global kill buffer.
     public globalRegisters: any = {}; // The global register list.
-    public initial_cwd: string = process.cwd(); // For restart-leo.
     public leoID: string = ''; // The id part of gnx's, using empty for falsy.
     public LeoIDWarningShown = false; // LEO-WEB to prevent second warning. (Original would have exited before)
     public loadedThemes: any[] = []; // List of loaded theme.leo files.
@@ -1211,7 +1210,7 @@ export class LeoApp {
         g.assert(this === g.app);
         verbose = verbose && !g.unitTesting && !this.silentMode;
 
-        const table = [this.setIDFromConfigSetting, this.setIDFromFile, this.setIDFromEnv];
+        const table = [this.setIDFromConfigSetting, this.setIDFromEnv];
 
         for (const func of table) {
             await func.bind(this)(verbose);
@@ -1288,44 +1287,6 @@ export class LeoApp {
         // TODO : Temporary for leo-web
         this.leoID = "demoId"; // Temporary for leo-web
         return Promise.resolve();
-    }
-    //@+node:felix.20251214160339.52: *5* app.setIDFromFile
-    /** 
-     * Attempt to set g.app.leoID from leoID.txt.
-     */
-    public async setIDFromFile(verbose: boolean): Promise<void> {
-        if (g.isBrowser) {
-            return;
-        }
-        const tag = ".leoID.txt";
-        for (const theDir of [this.homeLeoDir, this.globalConfigDir, this.loadDir]) {
-            if (!theDir) {
-                continue;  // Do not use the current directory!
-            }
-            const fn = g.os_path_join(theDir, tag);
-            try {
-                const exists = await g.os_path_exists(fn);
-                if (!exists) {
-                    continue;
-                }
-                // * Desktop
-                let s = await g.readFileIntoUnicodeString(fn);
-                if (!s) {
-                    continue;
-                }
-                // #1404: Ensure valid ID.
-                // cleanLeoID raises a warning dialog.
-                const id_ = this.cleanLeoID(s, tag).split('\n')[0]!.trim(); // get first line
-                if (id_.length > 2) {
-                    this.leoID = id_;
-                    return;
-                }
-
-            } catch (exception) {
-                g.error('unexpected exception in app.setLeoID');
-                g.es_exception(exception);
-            }
-        }
     }
     //@+node:felix.20251214160339.53: *5* app.setIDFromEnv
     public setIDFromEnv(verbose: boolean): Promise<void> {
@@ -2013,10 +1974,7 @@ export class LoadManager {
         if (os) {
             home = os.homedir();
         }
-        if (g.isBrowser) {
-            // BROWSER: Root of repo
-            home = g.workspaceUri!.fsPath;
-        }
+        home = g.workspaceUri!.fsPath;
 
         if (home) {
             // Important: This returns the _working_ directory if home is None!
@@ -2278,19 +2236,9 @@ export class LoadManager {
 
         // The cwd changes later, so it would be misleading to report it here.
         // ! SKIP FOR BROWSER: NO 'HOME' & NO 'LEO-EDITOR' FOLDERS !
-        if (g.isBrowser) {
-            directories = [
-                { kind: 'repository', theDir: g.app.homeDir },
-            ];
-        } else {
-            // ! LOAD AND CONFIG HAVE NO USE IN LEOJS !
-            directories = [
-                { kind: 'home', theDir: g.app.homeDir },
-                { kind: 'leo-editor', theDir: g.app.leoEditorDir },
-                // { kind: 'load', theDir: g.app.loadDir },
-                // { kind: 'config', theDir: g.app.globalConfigDir },
-            ];
-        }
+        directories = [
+            { kind: 'repository', theDir: g.app.homeDir },
+        ];
 
         for (const { kind, theDir } of directories) {
             // g.blue calls g.es_print, and that's annoying.
@@ -4129,7 +4077,7 @@ export class RecentFilesManager {
         const key = (path: string): string => {
             // Sort only the base name. That's what will appear in the menu.
             const s = g.os_path_basename(path);
-            return g.isWindows ? s.toLowerCase() : s;
+            return s;
         };
 
         const aList = rf.recentFiles.sort((a, b) => key(a).localeCompare(key(b)));

@@ -1585,12 +1585,13 @@ export class LeoFind {
         s: string
     ): [number | false, string | undefined] {
         // This hack would be dangerous on MacOs: it uses '\r' instead of '\n' (!)
-        if (g.isWindows) {
-            // Ignore '\r' characters, which may appear in @edit nodes.
-            // Fixes this bug: https://groups.google.com/forum/#!topic/leo-editor/yR8eL5cZpi4
-            //s = s.replace('\r', '')
-            s = s.replace(/\r/g, '');
-        }
+        // if (g.isWindows) {
+        //     // Ignore '\r' characters, which may appear in @edit nodes.
+        //     // Fixes this bug: https://groups.google.com/forum/#!topic/leo-editor/yR8eL5cZpi4
+        //     //s = s.replace('\r', '')
+        //     s = s.replace(/\r/g, '');
+        // }
+        // TODO : LEO-WEB : Check the above if really needed.
         if (!s) {
             return [false, undefined];
         }
@@ -2394,11 +2395,12 @@ export class LeoFind {
      */
     private find_all_matches_in_string(s: string): number[] {
         // This hack would be dangerous on MacOs: it uses '\r' instead of '\n' (!)
-        if (g.isWindows) {
-            // Ignore '\r' characters, which may appear in @edit nodes.
-            // Fixes this bug: https://groups.google.com/forum/#!topic/leo-editor/yR8eL5cZpi4
-            s = s.replace(/(\r)/gm, '');
-        }
+        // if (g.isWindows) {
+        //     // Ignore '\r' characters, which may appear in @edit nodes.
+        //     // Fixes this bug: https://groups.google.com/forum/#!topic/leo-editor/yR8eL5cZpi4
+        //     s = s.replace(/(\r)/gm, '');
+        // }
+        // TODO : LEO-WEB : Is the above still needed ?
         if (!s.trim()) {
             return [];
         }
@@ -3324,11 +3326,12 @@ export class LeoFind {
         let s = this.work_s;
 
         // This hack would be dangerous on MacOs: it uses '\r' instead of '\n' (!)
-        if (g.isWindows) {
-            // Ignore '\r' characters, which may appear in @edit nodes.
-            // Fixes this bug: https://groups.google.com/forum/#!topic/leo-editor/yR8eL5cZpi4
-            s = s.replace(/\r/g, '');
-        }
+        // if (g.isWindows) {
+        //     // Ignore '\r' characters, which may appear in @edit nodes.
+        //     // Fixes this bug: https://groups.google.com/forum/#!topic/leo-editor/yR8eL5cZpi4
+        //     s = s.replace(/\r/g, '');
+        // }
+        // TODO : LEO-WEB : Check if this is still necessary.
         if (!s) {
             return [undefined, undefined];
         }

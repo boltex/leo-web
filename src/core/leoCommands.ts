@@ -54,12 +54,10 @@ import KSUID from 'ksuid';
 import { Uri, workspace } from '../workspace';
 import { OutlineViewerHtml } from '../OutlineViewerHtml';
 
-if (g.isBrowser) {
-    // @ts-expect-error
-    crypto.randomUUID = globalThis.crypto.randomUUID;
-    // @ts-expect-error
-    crypto.getRandomValues = globalThis.crypto.getRandomValues;
-}
+// @ts-expect-error
+crypto.randomUUID = globalThis.crypto.randomUUID;
+// @ts-expect-error
+crypto.getRandomValues = globalThis.crypto.getRandomValues;
 
 //@-<< imports >>
 //@+others
@@ -749,9 +747,10 @@ export class Commands {
         const c: Commands = this;
         const w_path = c.getPath(p);
         const curDir = g.os_path_abspath(process.cwd());
-        if (!g.isBrowser && w_path && w_path !== curDir) {
+        if (w_path && w_path !== curDir) {
             try {
-                process.chdir?.(w_path);
+                console.warn(`chdir (not implemented) to ${w_path}`);
+                //process.chdir?.(w_path);
             }
             catch (e) {
                 // pass
@@ -1144,10 +1143,8 @@ export class Commands {
 
     public fileName(): string {
         let s: string = this.mFileName || '';
-        if (g.isWindows || g.isBrowser) {
-            s = g.os_path_fix_drive(s);
-            s = s.split('\\').join('/');
-        }
+        s = g.os_path_fix_drive(s);
+        s = s.split('\\').join('/');
         return s;
     }
 

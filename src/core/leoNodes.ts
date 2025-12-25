@@ -151,11 +151,7 @@ export class NodeIndices {
         let gnx;
         try {
             if (uuid_kind === 'uuid') {
-                if (g.isBrowser) {
-                    gnx = globalThis.crypto.randomUUID();
-                } else {
-                    gnx = crypto.randomUUID();
-                }
+                gnx = globalThis.crypto.randomUUID();
             } else if (KSUID && uuid_kind === 'ksuid') {
                 gnx = KSUID.randomSync().string;
             }

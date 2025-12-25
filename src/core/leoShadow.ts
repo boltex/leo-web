@@ -238,10 +238,13 @@ export class ShadowController {
                 g.os_path_splitext(path.basename(c.mFileName))[0],
                 'shadow_cache',
             ].join('_');
+
             // On Windows incorporate the drive letter to the private file path
-            if (g.isWindows) {
-                fileDir = fileDir.replace(':', '%');
-            }
+            // if (g.isWindows) {
+            //     fileDir = fileDir.replace(':', '%');
+            // }
+            // TODO : LEO-WEB : check if that 'windows' code is needed
+
             // build the cache path as a subdir of the base dir
             fileDir = [baseDir, fname, fileDir].join('/');
         }

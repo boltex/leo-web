@@ -2478,7 +2478,7 @@ export class RecursiveImportController {
 
         // A hack to handle Windows drive names.
         const norm = (path: string): string => {
-            return g.isWindows ? path.toLowerCase() : path;
+            return path;
         };
 
         const rel_path = (path: string): string => {
