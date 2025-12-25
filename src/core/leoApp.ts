@@ -1058,9 +1058,7 @@ export class LeoApp {
         let n1: string = '';
         if (process.version) {
             n1 = 'Node.js ' + process.version;
-            // // @ts-expect-error
         } else if (location.hostname) {
-            // // @ts-expect-error
             n1 = location.hostname;
             // if dots take 2 last parts
             if (n1.includes('.')) {
@@ -1076,42 +1074,21 @@ export class LeoApp {
         }
 
         let sysVersion: string = 'Browser';
-        let arch = "";
-        let version = "";
-        let release = "";
-        if (process.platform) {
-            sysVersion = process.platform;
-            if (sysVersion.toLowerCase().startsWith("win") && os.version) {
-                version = os.version();
-            } else {
-                version = sysVersion;
-            }
-            if (os.arch) {
-                arch = os.arch();
-            }
-            if (os.release) {
-                release = os.release();
-            }
-            if (arch && version) {
-                sysVersion = version + " " + arch + (release ? ` (build ${release})` : "");
+
+        let browserResult: any;
+        if (navigator.userAgent) {
+            browserResult = Bowser.parse(navigator.userAgent);
+            sysVersion = browserResult.browser.name;
+            if (browserResult.browser.version) {
+                sysVersion += ' ' + browserResult.browser.version;
             }
 
-        } else {
-            let browserResult: any;
-            if (navigator.userAgent) {
-                browserResult = Bowser.parse(navigator.userAgent);
-                sysVersion = browserResult.browser.name;
-                if (browserResult.browser.version) {
-                    sysVersion += ' ' + browserResult.browser.version;
+            if (browserResult.os) {
+                if (browserResult.os.name) {
+                    sysVersion += ' on ' + browserResult.os.name;
                 }
-
-                if (browserResult.os) {
-                    if (browserResult.os.name) {
-                        sysVersion += ' on ' + browserResult.os.name;
-                    }
-                    if (browserResult.os.version) {
-                        sysVersion += ' ' + browserResult.os.version;
-                    }
+                if (browserResult.os.version) {
+                    sysVersion += ' ' + browserResult.os.version;
                 }
             }
         }
@@ -1290,15 +1267,6 @@ export class LeoApp {
     }
     //@+node:felix.20251214160339.53: *5* app.setIDFromEnv
     public setIDFromEnv(verbose: boolean): Promise<void> {
-        if (os && os.userInfo) {
-            const userName = os.userInfo().username;
-            if (userName) {
-                this.leoID = this.cleanLeoID(
-                    userName,
-                    'os.userInfo().username'
-                );
-            }
-        }
         return Promise.resolve();
     }
     //@+node:felix.20251214160339.54: *5* app.setIdFromDialog

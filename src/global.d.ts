@@ -8,4 +8,5 @@ declare global {
      * and others.
      */
     interface Thenable<T> extends PromiseLike<T> { }
+
 }

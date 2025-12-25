@@ -4,7 +4,7 @@
 //@+node:felix.20251214160339.406: ** << imports >>
 import * as path from 'path';
 import * as os from 'os';
-import * as crypto from 'crypto';
+// import * as crypto from 'crypto';
 import * as et from 'elementtree';
 import * as g from './leoGlobals';
 import { LeoGui } from './leoGui';
@@ -54,10 +54,9 @@ import KSUID from 'ksuid';
 import { Uri, workspace } from '../workspace';
 import { OutlineViewerHtml } from '../OutlineViewerHtml';
 
-// @ts-expect-error
-crypto.randomUUID = globalThis.crypto.randomUUID;
-// @ts-expect-error
-crypto.getRandomValues = globalThis.crypto.getRandomValues;
+// Make sure crypto functions are available.
+// (crypto as any).randomUUID = globalThis.crypto.randomUUID;
+// (crypto as any).getRandomValues = globalThis.crypto.getRandomValues;
 
 //@-<< imports >>
 //@+others
