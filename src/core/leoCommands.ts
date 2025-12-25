@@ -55,8 +55,8 @@ import { Uri, workspace } from '../workspace';
 import { OutlineViewerHtml } from '../OutlineViewerHtml';
 
 // Make sure crypto functions are available.
-// (crypto as any).randomUUID = globalThis.crypto.randomUUID;
-// (crypto as any).getRandomValues = globalThis.crypto.getRandomValues;
+// crypto.randomUUID = globalThis.crypto.randomUUID;
+// crypto.getRandomValues = globalThis.crypto.getRandomValues;
 
 //@-<< imports >>
 //@+others
