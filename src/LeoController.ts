@@ -397,6 +397,9 @@ export class LeoController {
         });
         console.log("Quick pick result:", result);
 
+        // Set focus on outline pane to end initialization
+        view.OUTLINE_PANE.focus();
+
     }
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {

@@ -11,7 +11,7 @@ import { LeoApp, LoadManager } from './core/leoApp';
 import { LeoModel } from './LeoModel';
 import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
-import { workspace } from "./workspace";
+import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
@@ -44,6 +44,8 @@ class LeoWebApp {
         workspace.setView(this.view);
 
         await this.controller.initialize();
+
+        (g.workspaceUri as Uri) = new Uri('/');
 
         console.log('Leo Web App initialized.');
 
