@@ -9,7 +9,7 @@ import { VNode } from '../core/leoNodes';
 import { FastRead } from '../core/leoFileCommands';
 import { Commands } from '../core/leoCommands';
 import { ScriptingController } from '../core/mod_scripting';
-import { workspace } from '../workspace';
+// import { workspace } from '../workspace';
 import { LEO_SETTINGS } from '../leoSettings';
 
 //@+others

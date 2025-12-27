@@ -12,8 +12,9 @@ import { Bead } from './leoUndo';
 import { FileCommands } from './leoFileCommands';
 import { NullBody } from './leoFrame';
 import 'date-format-lite';
-import * as crypto from 'crypto';
-import KSUID from 'ksuid';
+// import * as crypto from 'crypto';
+// import KSUID from 'ksuid';
+import KSUID = require('ksuid');
 
 //@-<< imports >>
 //@+others

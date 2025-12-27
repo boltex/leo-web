@@ -13,7 +13,7 @@ import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 import { workspace } from "./workspace";
 import * as utils from "./utils";
-
+process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
 

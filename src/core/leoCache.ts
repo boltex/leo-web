@@ -8,7 +8,7 @@
 import * as pako from 'pako';
 import * as g from './leoGlobals';
 import { Commands } from './leoCommands';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 import { Uri } from '../workspace';
 
 type Database = any; // Placeholder for the actual Database type from sql.js
