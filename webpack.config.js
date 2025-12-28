@@ -106,8 +106,6 @@ const webConfig = /** @type WebpackConfig */ {
     devServer: {
         static: './dist',
         hot: true,
-        client: { overlay: { warnings: false, errors: true } },
-        // open: true,
     },
 };
 

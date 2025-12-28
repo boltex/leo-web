@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
-        "jsx": "react",
+        // "moduleResolution": "Bundler",
+        "moduleResolution": "node",
+        "jsx": "react-jsx",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "module": "commonjs",
@@ -14,7 +16,8 @@
         "rootDir": "src",
         "strict": true, /* enable all strict type-checking options */
         "esModuleInterop": true, // This is standard for browser + webpack setups.
-        "allowSyntheticDefaultImports": true, // This is standard for browser + webpack setups.
+        "skipLibCheck": true,
+        // "resolveJsonModule": true,
     },
     "exclude": [
         "node_modules",

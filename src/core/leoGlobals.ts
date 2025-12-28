@@ -107,7 +107,7 @@ export let global_commands_dict: {
     ) => any & { __doc__: string } & { __func_name__: string } & {
         __name__: string;
     } & { __ivars__: string[] };
-};
+} = {};
 
 /**
  * Keys are class names, values are attribute chains.

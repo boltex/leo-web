@@ -50,8 +50,8 @@ import { RectangleCommandsClass } from '../commands/rectangleCommands';
 import * as typescript from 'typescript';
 import * as difflib from 'difflib';
 import * as csv from 'csvtojson';
-// import KSUID from 'ksuid';
-import KSUID = require('ksuid');
+import KSUID from 'ksuid';
+// import KSUID = require('ksuid');
 import { Uri, workspace } from '../workspace';
 import { OutlineViewerHtml } from '../OutlineViewerHtml';
 

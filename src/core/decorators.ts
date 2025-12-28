@@ -26,10 +26,10 @@ export function commander_command(p_name: string, p_doc: string) {
             { command_name: p_name }
         );
 
-        if (!g.global_commands_dict) {
-            // @ts-expect-error
-            g.global_commands_dict = {};
-        }
+        // if (!g.global_commands_dict) {
+        //     // @ts-expect-error
+        //     g.global_commands_dict = {};
+        // }
         g.global_commands_dict[p_name] = commander_command_wrapper;
     };
 }
@@ -54,10 +54,10 @@ export function command(p_name: string, p_doc: string) {
             { command_name: p_name }
         );
 
-        if (!g.global_commands_dict) {
-            // @ts-expect-error
-            g.global_commands_dict = {};
-        }
+        // if (!g.global_commands_dict) {
+        //     // @ts-expect-error
+        //     g.global_commands_dict = {};
+        // }
         g.global_commands_dict[p_name] = commander_command_wrapper;
     };
 }
@@ -91,10 +91,10 @@ export function new_cmd_decorator(
             { __ivars__: ivars }
         );
 
-        if (!g.global_commands_dict) {
-            // @ts-expect-error
-            g.global_commands_dict = {};
-        }
+        // if (!g.global_commands_dict) {
+        //     // @ts-expect-error
+        //     g.global_commands_dict = {};
+        // }
         g.global_commands_dict[p_name] = commander_command_wrapper;
     };
 }
