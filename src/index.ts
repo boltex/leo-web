@@ -26,7 +26,12 @@ class LeoWebApp {
     }
 
     private init(): void {
-        // Wait for DOM to be ready
+        // Wait for all resources to be loaded before removing the loading screen
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+            document.documentElement.classList.add('loaded');
+        });
+        // Wait for DOM to be ready to setup the app
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.setupApp());
         } else {

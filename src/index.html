@@ -7,11 +7,8 @@
     <title>Leo Web Editor</title>
     <style>
         /* Inline critical CSS to prevent FOUC */
-        :root {
-            --loading-overlay-color: rgba(128, 128, 128, 0.5);
-        }
         html {
-            background-color: var(--loading-overlay-color);
+            background-color: rgba(128, 128, 128, 0.5);
             transition: background-color 0.3s ease-in;
         }
         body {
@@ -25,13 +22,6 @@
             background-color: transparent;
         }
     </style>
-    <script>
-        /* Add loaded class when all resources are loaded */
-        window.addEventListener('load', function() {
-            document.body.classList.add('loaded');
-            document.documentElement.classList.add('loaded');
-        });
-    </script>
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/favicon.ico" sizes="32x32">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
