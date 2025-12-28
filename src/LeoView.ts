@@ -810,7 +810,6 @@ export class LeoView {
             this.CROSS_RESIZER.style.left = (paneWidth) + 'px';
             this.CROSS_RESIZER.style.top = (outlineHeight) + 'px';
         }
-
     }
 
     public requestWorkspaceDirectory(): Promise<FileSystemDirectoryHandle> {
