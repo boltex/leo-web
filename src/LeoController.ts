@@ -334,9 +334,6 @@ export class LeoController {
         console.log('Workspace directory selected:', dirHandle);
         workspace.setWorkspaceDirHandle(dirHandle);
 
-        // Finish startup by setting focus to outline pane
-        view.OUTLINE_PANE.focus();
-
         // Continue bootstrapping: Initialize controller after workspace is set
         this.initializeInteractions();
 
@@ -373,31 +370,31 @@ export class LeoController {
         // console.log("Input dialog result:", inputResult);
 
         // And now, let's try out the quick pick dialog with "view.showQuickPickDialog"
-        const items: QuickPickItem[] = [
-            { label: "Option 1", description: "The first option" },
-            { label: "Option 2", description: "The second option", detail: "Additional details about option 2" },
-            { label: "", kind: QuickPickItemKind.Separator },
-            { label: "Option 3", description: "The third option after a separator", detail: "More details here but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
-            { label: "Option 4", description: "some other option", detail: "Detailed description for option 4 goes here." },
-            { label: "Option 5", description: "some other option with a longer descriptions blablabla blabla, blablabla..." },
-            { label: "Option 6 with longer title", description: "some other option" },
-            { label: "Option 7 with extra long title to make sure it does not wrap and end with ellipsis", description: "some other option" },
-            { label: "Option 8", description: "some other option" },
-            { label: "Option 9", description: "some other option but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
-            { label: "Option 10", description: "some other option" },
-            { label: "Option 11", description: "some other option" },
-            { label: "Option 12", description: "some other option" },
-        ];
-        const result = await view.showQuickPick(items, {
-            title: "Quick Pick Dialog Test",
-            placeHolder: "Select an option",
-            onDidSelectItem: (item) => {
-                console.log("Highlighted item:", item);
-            }
-        });
-        console.log("Quick pick result:", result);
+        // const items: QuickPickItem[] = [
+        //     { label: "Option 1", description: "The first option" },
+        //     { label: "Option 2", description: "The second option", detail: "Additional details about option 2" },
+        //     { label: "", kind: QuickPickItemKind.Separator },
+        //     { label: "Option 3", description: "The third option after a separator", detail: "More details here but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
+        //     { label: "Option 4", description: "some other option", detail: "Detailed description for option 4 goes here." },
+        //     { label: "Option 5", description: "some other option with a longer descriptions blablabla blabla, blablabla..." },
+        //     { label: "Option 6 with longer title", description: "some other option" },
+        //     { label: "Option 7 with extra long title to make sure it does not wrap and end with ellipsis", description: "some other option" },
+        //     { label: "Option 8", description: "some other option" },
+        //     { label: "Option 9", description: "some other option but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
+        //     { label: "Option 10", description: "some other option" },
+        //     { label: "Option 11", description: "some other option" },
+        //     { label: "Option 12", description: "some other option" },
+        // ];
+        // const result = await view.showQuickPick(items, {
+        //     title: "Quick Pick Dialog Test",
+        //     placeHolder: "Select an option",
+        //     onDidSelectItem: (item) => {
+        //         console.log("Highlighted item:", item);
+        //     }
+        // });
+        // console.log("Quick pick result:", result);
 
-        // Set focus on outline pane to end initialization
+        // Finish startup by setting focus to outline pane
         view.OUTLINE_PANE.focus();
 
     }
