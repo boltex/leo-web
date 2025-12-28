@@ -5,6 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leo Web Editor</title>
+    <style>
+        /* Inline critical CSS to prevent FOUC */
+        html {
+            background-color: rgba(128, 128, 128, 0.5);
+            transition: background-color 0.3s ease-in;
+        }
+        body {
+            opacity: 0;
+            transition: opacity 0.3s ease-in;
+        }
+        body.loaded {
+            opacity: 1;
+        }
+        html.loaded {
+            background-color: transparent;
+        }
+    </style>
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/favicon.ico" sizes="32x32">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
