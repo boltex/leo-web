@@ -810,26 +810,47 @@ export class LeoView {
             this.CROSS_RESIZER.style.left = (paneWidth) + 'px';
             this.CROSS_RESIZER.style.top = (outlineHeight) + 'px';
         }
-
     }
 
     public requestWorkspaceDirectory(): Promise<FileSystemDirectoryHandle> {
-        return new Promise((resolve, reject) => {
-            this.showMessageDialog({
-                title: '📁 Choose a Workspace',
-                description: 'Leo-Web needs permission to read and write files in a folder of your choice.',
-                primaryLabel: 'Choose Folder',
-                onPrimaryClick: async (setPrimaryLabel) => {
-                    setPrimaryLabel('Choosing...');
-                    try {
-                        const dir = await window.showDirectoryPicker({ mode: 'readwrite' });
-                        resolve(dir);
-                    } catch (e) {
-                        reject(e);
-                    }
-                },
+        // First, check if window.showDirectoryPicker is available to adapt the message in the dialog, and just reject if not.
+        if (!('showDirectoryPicker' in window)) {
+            return new Promise((resolve, reject) => {
+                this.showMessageDialog({
+                    title: '⚠️ Opening Local folders is Unsupported',
+                    description: 'Your browser does not support opening local folders.',
+                    primaryLabel: 'View Specification',
+                    onPrimaryClick: async () => {
+                        try {
+                            window.location.href =
+                                'https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker';
+                            reject('Browser does not support showDirectoryPicker API.');
+                        } catch (e) {
+                            reject(e);
+                        }
+                    },
+                });
             });
-        });
+        } else {
+            // ok, continue with the normal flow
+            return new Promise((resolve, reject) => {
+                this.showMessageDialog({
+                    title: '📁 Choose a Workspace',
+                    description: 'Leo-Web needs permission to read and write files in a folder of your choice.',
+                    primaryLabel: 'Choose Folder',
+                    onPrimaryClick: async (setPrimaryLabel) => {
+                        setPrimaryLabel('Choosing...');
+                        try {
+                            const dir = await window.showDirectoryPicker({ mode: 'readwrite' });
+                            resolve(dir);
+                        } catch (e) {
+                            reject(e);
+                        }
+                    },
+                });
+            });
+        }
+
     }
 
     public showMessageDialog(options: {
