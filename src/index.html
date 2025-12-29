@@ -11,13 +11,17 @@
             background-color: rgba(128, 128, 128, 0.5);
             transition: background-color 0.3s ease-in;
         }
+
         body {
             opacity: 0;
             transition: opacity 0.3s ease-in;
+            overflow-y: hidden;
         }
+
         body.loaded {
             opacity: 1;
         }
+
         html.loaded {
             background-color: transparent;
         }

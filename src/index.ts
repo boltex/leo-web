@@ -53,13 +53,13 @@ class LeoWebApp {
 
         await this.controller.initialize();
 
+        console.log('Leo Web UI initialized.');
+
+        const w_start = process.hrtime(); // For calculating total startup time duration
         (g.workspaceUri as Uri) = new Uri('/');
-
-        console.log('Leo Web App initialized.');
-
         // #1472: bind to g immediately.
         (g.app as LeoApp) = new LeoApp();
-        const w_start = process.hrtime(); // For calculating total startup time duration
+
         g.app.loadManager = new LoadManager();
         await g.app.loadManager.load();
         console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
