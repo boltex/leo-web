@@ -53,8 +53,12 @@ class LeoWebApp {
 
         await this.controller.initialize();
 
+        // Test out UI experiments (if any)
+        await this.uiExperiments();
+
         console.log('Leo Web UI initialized.');
 
+        // Ok, now properly start the app
         const w_start = process.hrtime(); // For calculating total startup time duration
         (g.workspaceUri as Uri) = new Uri('/');
         // #1472: bind to g immediately.
@@ -63,6 +67,67 @@ class LeoWebApp {
         g.app.loadManager = new LoadManager();
         await g.app.loadManager.load();
         console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
+
+    }
+
+    private async uiExperiments(): Promise<void> {
+
+        // // TEST OPEN / SAVE FILE DIALOG
+        // const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();
+        // console.log('Chosen OPEN FILE handle:', chosenFileHandle);
+        // if (chosenFileHandle) {
+        //     const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
+        //     console.log('Resolves to:', resolveResult);
+        // } else {
+        //     console.log('No file chosen in OPEN dialog');
+        // }
+
+        // // test workspace singleton
+        // workspace.test();
+
+        // // Now test the save dialog
+        // const saveFileHandle: FileSystemFileHandle | null = await view.showSaveDialog();
+        // console.log('Chosen SAVE FILE handle:', saveFileHandle);
+        // if (saveFileHandle) {
+        //     const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(saveFileHandle!);
+        //     console.log('Resolves to:', resolveResult);
+        // } else {
+        //     console.log('No file chosen in SAVE dialog');
+        // }
+
+        // // Time to try the input dialog with "view.showInputDialog"
+        // const inputResult = await view.showInputDialog({
+        //     title: "Input Dialog Test",
+        //     prompt: "Please enter some text:",
+        //     value: "Default value",
+        //     placeholder: "Type here..."
+        // });
+        // console.log("Input dialog result:", inputResult);
+
+        // And now, let's try out the quick pick dialog with "view.showQuickPickDialog"
+        // const items: QuickPickItem[] = [
+        //     { label: "Option 1", description: "The first option" },
+        //     { label: "Option 2", description: "The second option", detail: "Additional details about option 2" },
+        //     { label: "", kind: QuickPickItemKind.Separator },
+        //     { label: "Option 3", description: "The third option after a separator", detail: "More details here but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
+        //     { label: "Option 4", description: "some other option", detail: "Detailed description for option 4 goes here." },
+        //     { label: "Option 5", description: "some other option with a longer descriptions blablabla blabla, blablabla..." },
+        //     { label: "Option 6 with longer title", description: "some other option" },
+        //     { label: "Option 7 with extra long title to make sure it does not wrap and end with ellipsis", description: "some other option" },
+        //     { label: "Option 8", description: "some other option" },
+        //     { label: "Option 9", description: "some other option but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
+        //     { label: "Option 10", description: "some other option" },
+        //     { label: "Option 11", description: "some other option" },
+        //     { label: "Option 12", description: "some other option" },
+        // ];
+        // const result = await view.showQuickPick(items, {
+        //     title: "Quick Pick Dialog Test",
+        //     placeHolder: "Select an option",
+        //     onDidSelectItem: (item) => {
+        //         console.log("Highlighted item:", item);
+        //     }
+        // });
+        // console.log("Quick pick result:", result);
 
     }
 
