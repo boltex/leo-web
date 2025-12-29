@@ -860,7 +860,6 @@ export class LeoView {
         onPrimaryClick?: (setPrimaryLabel: (text: string) => void) => void | Promise<void>;
         autoShow?: boolean; // default true
     }) {
-        console.log('Showing message dialog with options:', options);
         const { title, description, primaryLabel = 'OK', onPrimaryClick, autoShow = true } = options;
 
         // Show dialog
@@ -877,7 +876,6 @@ export class LeoView {
         const setPrimaryLabel = (text: string) => this.MODAL_DIALOG_BTN.textContent = text;
         this.MODAL_DIALOG_BTN.onclick = () => {
             if (!onPrimaryClick) {
-                console.log('closing!', 1)
                 this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
                 return;
             }
@@ -886,12 +884,10 @@ export class LeoView {
                 // Optional: prevent double clicks while async op runs
                 this.MODAL_DIALOG_BTN.disabled = true;
                 (maybePromise as Promise<void>).finally(() => {
-                    console.log('closing!', 2)
                     this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
                     this.MODAL_DIALOG_BTN.disabled = false;
                 });
             } else {
-                console.log('closing!', 3)
                 this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
             }
         };

@@ -326,7 +326,7 @@ export class LeoController {
         while (!dirHandle) {
             // Retry until a valid directory is selected
             dirHandle = await view.requestWorkspaceDirectory().catch(e => {
-                console.error('Error selecting workspace directory:', e);
+                console.warn('Error selecting workspace directory:', e);
                 return null;
             });
         }
