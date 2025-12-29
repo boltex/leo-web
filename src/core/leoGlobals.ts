@@ -147,7 +147,7 @@ export const python_pat = new RegExp(/^\s*File\s+"(.*?)",\s*line\s*([0-9]+)\s*$/
 //@-<< define global error regexes >>
 //@+<< define g.Decorators >>
 //@+node:felix.20251207215313.8: ** << define g.Decorators >>
-// * Other Decorators used in leojs are in /src/core/decorators.ts
+// * Other Decorators used in leo-web are in /src/core/decorators.ts
 
 /**
  * Return the instance of c given by ivars.
@@ -228,7 +228,7 @@ export const url_regex = new RegExp(`\\b${url_kinds}://[^\\s'"]+`, 'g');
 export const tree_popup_handlers: ((...args: any[]) => any)[] = []; // Set later.
 export const user_dict: { [key: string]: any } = {}; // Non-persistent dictionary for free use
 
-// The singleton app object. Was set by runLeo.py. Leojs sets it in the runLeo method of extension.ts.
+// The singleton app object. Was set by runLeo.py. Leo-web sets it in the runLeo method of extension.ts.
 export let app: LeoApp;
 
 // Global status vars.
@@ -1794,7 +1794,7 @@ export function readlineForceUnixNewline(
     f: string[],
     fileName?: string
 ): string {
-    // Addapted for leojs : receives array of string with their newline endings intact
+    // Addapted for leo-web : receives array of string with their newline endings intact
     let s = f.shift();
     if (s == null) {
         s = '';
@@ -3744,7 +3744,7 @@ export function es(...args: any[]): void {
     });
 
     if (app && app.gui) {
-        // Make sure the log pane is visible with 'show Log Pane' command (LeoJS only)
+        // Make sure the log pane is visible with 'show Log Pane' command (Leo-Web only)
         if (app.inScript && !app.hasScriptShownlog) {
             app.gui.showLogPane();
             app.hasScriptShownlog = true;
@@ -3850,7 +3850,7 @@ export function internalError(...args: any[]): void {
     es_print(...args);
     // es_print('Called from', ', '.join(callers[:-1]))
     // es_print('Please report this error to Leo\'s developers', 'red');
-    es_print('Please report this error to LeoJS developers');
+    es_print('Please report this error to Leo-Web developers');
 }
 //@+node:felix.20251207215313.198: *3* g.pr
 /**
@@ -5205,7 +5205,7 @@ export async function getScript(
     c: Commands,
     p: Position | undefined,
     useSelectedText: boolean = true,
-    forceJavascriptSentinels: boolean = true, // ! LEOJS HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
+    forceJavascriptSentinels: boolean = true, // ! LEO-WEB HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
     useSentinels: boolean = true
 ): Promise<string> {
     let script: string = '';
@@ -5231,7 +5231,7 @@ export async function getScript(
             c,
             p,
             s,
-            forceJavascriptSentinels, // ! LEOJS HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
+            forceJavascriptSentinels, // ! LEO-WEB HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
             useSentinels
         );
     } catch (exception) {
@@ -5249,7 +5249,7 @@ export async function composeScript(
     c: Commands,
     p: Position,
     s: string,
-    forceJavascriptSentinels: boolean = true, // ! LEOJS HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
+    forceJavascriptSentinels: boolean = true, // ! LEO-WEB HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
     useSentinels: boolean = true
 ): Promise<string> {
     // This causes too many special cases.
@@ -5272,7 +5272,7 @@ export async function composeScript(
         script = await at.stringToString(
             p.copy(),
             s,
-            forceJavascriptSentinels, // ! LEOJS HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
+            forceJavascriptSentinels, // ! LEO-WEB HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
             useSentinels
         );
         // Important, the script is an **encoded string**, not a unicode string.

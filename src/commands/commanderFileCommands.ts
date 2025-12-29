@@ -201,7 +201,7 @@ export class CommanderFileCommands {
         await c.raise_error_dialogs('read');
         return;
     }
-    // * LEOJS NOT USED : Not referenced in Leo's codebase either
+    // * LEO-WEB NOT USED : Not referenced in Leo's codebase either
     /*
     g.command_alias('importAtFile', importAnyFile)
     g.command_alias('importAtRoot', importAnyFile)
@@ -257,7 +257,7 @@ export class CommanderFileCommands {
             new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict)
         );
 
-        // ! LEOJS : SET c.openDirectory to the g.app.vscodeWorkspaceUri !
+        // ! LEO-WEB : SET c.openDirectory to the g.app.vscodeWorkspaceUri !
         // c.openDirectory = g.app.vscodeWorkspaceUri?.fsPath;
         // if (c.openDirectory) {
         //     c.frame.openDirectory = c.openDirectory;
@@ -348,7 +348,7 @@ export class CommanderFileCommands {
                     }
                     if (c2 && closeFlag) {
                         await g.app.destroyWindow(p_c.frame);
-                        // ! Need to remove here in leojs !
+                        // ! Need to remove here in leo-web !
                         let index = g.app.windowList.indexOf(p_c.frame, 0);
                         if (index > -1) {
                             g.app.windowList.splice(index, 1);
@@ -556,7 +556,7 @@ export class CommanderFileCommands {
                 let final_file_name = this.set_name_and_title(c, new_file_name);
                 await do_save(c, final_file_name);
 
-                await g.app.saveSession(); // IN LEOJS: To skip saving session on program exit.
+                await g.app.saveSession(); // IN LEO-WEB: To skip saving session on program exit.
             }
 
         } finally {
@@ -615,7 +615,7 @@ export class CommanderFileCommands {
 
             await g.chdir(new_file_name);
 
-            await g.app.saveSession(); // IN LEOJS: To skip saving session on program exit.
+            await g.app.saveSession(); // IN LEO-WEB: To skip saving session on program exit.
 
             return new_file_name;
         };

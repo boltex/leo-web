@@ -91,7 +91,7 @@ export class LeoFrame {
         const ftm = new StringFindTabManager(c);
         c.findCommands.ftm = ftm;
         this.ftm = ftm;
-        // this.createFindTab(); // unused in leojs
+        // this.createFindTab(); // unused in LEO-WEB
         this.createFirstTreeNode();
     }
     //@+node:felix.20251213133753.140: *3* LeoFrame.getTitle & setTitle
@@ -125,7 +125,7 @@ export class LeoFrame {
     //@+node:felix.20251213133753.143: *3* LeoFrame.setTopGeometry
     public setTopGeometry(w: number, h: number, x: number, y: number): void {
 
-        // Kept as-is in LeoJS.
+        // Kept as-is in Leo-Web.
         if (isNaN(w)) {
             console.log("ERROR setTopGeometry!!");
         }
@@ -140,7 +140,7 @@ export class LeoFrame {
      * Resize splitter1 and splitter2 using the given ratios.
      */
     public resizePanesToRatio(ratio: number, ratio2: number): void {
-        // Kept as-is in LeoJS.
+        // Kept as-is in Leo-Web.
         this.ratio = ratio;
         this.secondary_ratio = ratio2;
     }
@@ -244,7 +244,7 @@ export class LeoFrame {
         this.toggle_unl_view = !this.toggle_unl_view;
 
         // Redraw
-        // ! LEOJS WILL REDRAW !    
+        // ! LEO-WEB WILL REDRAW !    
         // const s = this.computeStatusUnl(c.p);
         // this.put(s);
         // this.update();
@@ -672,7 +672,7 @@ export class NullTree {
     public endEditLabel(): void {
         // Important: this will redraw if necessary.
         this.onHeadChanged(this.c.p);
-        // ! LEOJS: Mimic qt_tree
+        // ! LEO-WEB: Mimic qt_tree
         const d = this.editWidgetsDict;
         if (d[this.c.p.v.gnx]) {
             delete d[this.c.p.v.gnx];
@@ -732,7 +732,7 @@ export class NullTree {
         // New in Leo 4.4.5: we must recolor the body because
         // the headline may contain directives.
         c.frame.scanForTabWidth(p);
-        // c.recolor(p); // ? Not Needed with leojs/vscode ?
+        // c.recolor(p); // ? Not Needed with leo-web ?
         p.setDirty();
         u.afterChangeHeadline(p, undoType, undoData);
         // Fix bug 1280689: don't call the non-existent c.treeEditFocusHelper
@@ -776,7 +776,7 @@ export class NullTree {
                     c.redraw_later(); // This *does* happen sometimes.
                 } else {
                     c.outerUpdate(); // Bring the tree up to date.
-                    // ! NOT USED IN LEOJS
+                    // ! NOT USED IN LEO-WEB
                     // if (this.setItemForCurrentPosition){
                     //     // pylint: disable=no-member
                     //     this.setItemForCurrentPosition();
@@ -910,7 +910,7 @@ export class NullTree {
             return;
         }
 
-        // c.frame.setWrap(p);  // Not that expensive  // THIS SETS BODY WRAP STATE, NOT USED IN LEOJS 
+        // c.frame.setWrap(p);  // Not that expensive  // THIS SETS BODY WRAP STATE, NOT USED IN LEO-WEB 
         this.set_body_text_after_select(p, old_p);
         c.nodeHistory.update(p);
     }
@@ -974,16 +974,16 @@ export class NullTree {
     //@+node:felix.20251213133753.182: *5* 5. LeoTree.set_status_line
     /**
      * Update the status line.
-     * deprecated in LeoJS
+     * deprecated in LEO-WEB
      */
     public set_status_line(p: Position): void {
         const c = this.c;
         // 
-        // ! LEOJS ! STATUS LINE IS UNL ONLY SET ON SELECTION BY leoUI.ts.
+        // ! LEO-WEB ! STATUS LINE IS UNL ONLY SET ON SELECTION BY leoUI.ts.
         //
-        // c.frame.body.assignPositionToEditor(p); // NOT USED IN LEOJS
-        // c.frame.updateStatusLine();  // NOT USED IN LEOJS
-        // c.frame.clearStatusLine(); // NOT USED IN LEOJS
+        // c.frame.body.assignPositionToEditor(p); // NOT USED IN LEO-WEB
+        // c.frame.updateStatusLine();  // NOT USED IN LEO-WEB
+        // c.frame.clearStatusLine(); // NOT USED IN LEO-WEB
         // if (p && p.__bool__() && p.v) {
         //     const kind = c.config.getString('unl-status-kind') || '';
         //     const method = kind.toLowerCase() === 'legacy' ? p.get_legacy_UNL : p.get_UNL;
@@ -998,7 +998,7 @@ export class NullTree {
             return undefined;
         }
         let w = d[p.v.gnx];
-        // ! LEOJS : Mimic from qt_tree
+        // ! LEO-WEB : Mimic from qt_tree
         // ! Dont return if not already in dict as an active headline editor
         // if (!w) {
         //     w = new StringTextWrapper(
@@ -1021,7 +1021,7 @@ export class NullTree {
     ): [undefined, StringTextWrapper | undefined] {
         this.endEditLabel();
         if (p && p.__bool__()) {
-            // ! LEOJS : Mimic from qt_tree
+            // ! LEO-WEB : Mimic from qt_tree
 
             const d = this.editWidgetsDict;
 
@@ -1086,7 +1086,7 @@ export class NullTree {
             }
             w.insert(0, s);
         } else {
-            // * LEOJS : Not currently editing the headline
+            // * LEO-WEB : Not currently editing the headline
             // g.trace('-------------------- oops');
         }
     }

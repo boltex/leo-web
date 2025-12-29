@@ -731,7 +731,7 @@ export class AtFile {
             await at.readOneAtEditNode(p);
         } else if (p.isAtFileNode() || p.isAtThinFileNode()) {
             await at.read(p);
-            // ! LEOJS does not support jupytext nodes yet.
+            // ! LEO-WEB does not support jupytext nodes yet.
             // } else if (p.isAtJupytextNode()) {
             //     await at.readOneAtJupytextNode(p);
         } else if (p.isAtNoSentFileNode()) {
@@ -2601,7 +2601,7 @@ export class AtFile {
     public async stringToString(
         root: Position,
         s: string,
-        forceJavascriptSentinels = true, // ! LEOJS HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
+        forceJavascriptSentinels = true, // ! LEO-WEB HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
         sentinels = true
     ): Promise<string> {
         const at = this;
@@ -2611,8 +2611,8 @@ export class AtFile {
             await at.initWriteIvars(root);
             if (forceJavascriptSentinels) {
                 at.endSentinelComment = undefined;
-                at.startSentinelComment = '//'; // ! LEOJS HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
-                at.language = 'javascript'; // ! LEOJS HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
+                at.startSentinelComment = '//'; // ! LEO-WEB HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
+                at.language = 'javascript'; // ! LEO-WEB HAS JAVASCRIPT AS DEFAULT SCRIPT LANGUAGE
             }
             at.sentinels = sentinels;
             at.outputList = [];

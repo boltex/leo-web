@@ -23,7 +23,7 @@ import { QuickSearchController } from './quicksearch';
 //@@nosearch
 //@+at
 //
-// NOTE: LEOJS DOES NOT RESPECT THE GUI-INDEPENDENCE
+// NOTE: LEO-WEB DOES NOT RESPECT THE GUI-INDEPENDENCE PERFECTLY YET.
 // TODO: Call those via g.app.gui as LeoUi to respect GUI-independence!)
 //
 // LeoFind.py contains the gui-independent part of all of Leo's
@@ -2363,7 +2363,7 @@ export class LeoFind {
      */
     private put_link(line: string, line_number: number, v: VNode): void {
         const c = this.c;
-        // const log = c.frame.log // UNAVAILABLE IN LEOJS
+        // const log = c.frame.log // UNAVAILABLE IN leo-web
         this.total_links += 1;
         if (this.total_links > 100) {
             return;
@@ -3886,7 +3886,7 @@ export class LeoFind {
     // public add_change_string_to_label(): void {
     //     const c = this.c;
     //     let s: string = this.ftm.get_change_text();
-    //     // c.minibufferWantsFocus(); // No use in LeoJS
+    //     // c.minibufferWantsFocus(); // No use in leo-web
     //     while (s.endsWith('\n') || s.endsWith('\r')) {
     //         s = s.substring(0, s.length - 1);
     //     }
@@ -3899,7 +3899,7 @@ export class LeoFind {
     //     // const k = this.c.k;
     //     const ftm = c.findCommands.ftm;
     //     let s = ftm.get_find_text();
-    //     // c.minibufferWantsFocus(); // No use in LeoJS
+    //     // c.minibufferWantsFocus(); // No use in leo-web
     //     while (s.endsWith('\n') || s.endsWith('\r')) {
     //         s = s.substring(0, s.length - 1);
     //     }
@@ -4007,7 +4007,7 @@ export class LeoFind {
     }
     //@+node:felix.20251213133753.130: *5* find.compute_find_options_in_status_area
     public compute_find_options_in_status_area(): string {
-        // TODO : REDO WITH APPROPRIATE GETTERS FROM VSCODE/LEOJS
+        // TODO : REDO WITH APPROPRIATE GETTERS FROM LEO-WEB
         const c = this.c;
         const ftm = c.findCommands.ftm;
         const table: [string, StringCheckBox][] = [

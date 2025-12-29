@@ -1895,7 +1895,7 @@ export class LoadManager {
         g.app.globalConfigDir = lm.computeGlobalConfigDir(); // UNUSED leo / config directory
         g.app.homeDir = await lm.computeHomeDir(); // * The user's home directory.
         g.app.homeLeoDir = await lm.computeHomeLeoDir(); // * The user's home/.leo directory.
-        // g.app.leoDir = lm.computeLeoDir(); // * not used in leojs
+        // g.app.leoDir = lm.computeLeoDir(); // * not used in leo-web
         // These use g.app.loadDir...
         // g.app.extensionsDir = ''; // join(g.app.loadDir, '..', 'extensions'); // UNSUSED The leo / extensions directory
         g.app.leoEditorDir = ''; // join(g.app.loadDir, '..', '..');
@@ -2536,7 +2536,7 @@ export class LoadManager {
      * returning a dict whose keys are command names.
      */
     public uninvert(d: g.SettingsDict): SettingsDict {
-        // ! LEOJS : NO KEYSTROKES HANDLING
+        // ! LEO-WEB : NO KEYSTROKES HANDLING
         // g.assert(d.keyType === g.KeyStroke, d.keyType);
         const result = new SettingsDict(`uninverted ${d.name()}`);
 
@@ -2562,7 +2562,7 @@ export class LoadManager {
         if (!fn) {
             return undefined;
         }
-        if (fn !== 'leoSettings.leo') { // ! HACK FOR LEOJS special case for internal leoSettings.leo
+        if (fn !== 'leoSettings.leo') { // ! HACK FOR LEO-WEB special case for internal leoSettings.leo
             const w_exists = await g.os_path_exists(fn);
             if (!w_exists || !lm.isLeoFile(fn)) {
                 g.es_print("ERROR: open settings file cannot open :", fn);
@@ -2605,7 +2605,7 @@ export class LoadManager {
         let ok: VNode | undefined;
         let g_element;
         try {
-            // ! HACK FOR LEOJS: MAKE COMMANDER FROM FAKE leoSettings.leo STRING !
+            // ! HACK FOR LEO-WEB: MAKE COMMANDER FROM FAKE leoSettings.leo STRING !
             const w_fastRead: FastRead = new FastRead(
                 c,
                 c.fileCommands.gnxDict
@@ -2678,7 +2678,7 @@ export class LoadManager {
         lm.globalSettingsDict = settings_d;
         lm.globalBindingsDict = bindings_d;
 
-        // ! LEOJS : THEMES NOT NEEDED !
+        // ! LEO-WEB : THEMES NOT NEEDED !
         /* 
         // Add settings from --theme or @string theme-name files.
         // This must be done *after* reading myLeoSettings.leo.
@@ -2753,7 +2753,7 @@ export class LoadManager {
             // --screen-shot causes an immediate exit.
             if (g.app.debug.includes('shutdown') || g.app.debug.includes('startup')) {
                 g.es_print('Can not create a commander');
-                // g.app.forceShutdown() // ! LEOJS NEEDED ? ?
+                // g.app.forceShutdown() // ! LEO-WEB NEEDED ? ?
             }
             return;
         }
@@ -3289,7 +3289,7 @@ export class LoadManager {
         c = await lm.openFileByName(fn, gui, old_c, previousSettings);
 
         if (!skipSaveSession) {
-            await g.app.saveSession(); // IN LEOJS: Save sessions here to skip saving session on program exit.
+            await g.app.saveSession(); // IN LEO-WEB: Save sessions here to skip saving session on program exit.
         }
 
         return c;
@@ -3307,7 +3307,7 @@ export class LoadManager {
         // Create the commander for the .leo  file.
         const c: Commands = g.app.newCommander('', gui, w_previousSettings);
 
-        // ! LEOJS : SET c.openDirectory to the g.vscodeWorkspaceUri !
+        // ! LEO-WEB : SET c.openDirectory to the g.vscodeWorkspaceUri !
         // c.openDirectory = g.vscodeWorkspaceUri?.fsPath;
         // if (c.openDirectory) {
         //     c.frame.openDirectory = c.openDirectory;
@@ -3415,7 +3415,7 @@ export class LoadManager {
         await c.theScriptingController.createAllButtons();
 
         complete_inits(c);
-        // ! IN LEOJS : make sure .leoRecentFiles.txt is written on open and save file instead.
+        // ! IN LEO-WEB : make sure .leoRecentFiles.txt is written on open and save file instead.
         if (g.app.recentFilesManager) {
             const oldFiles = JSON.stringify(g.app.recentFilesManager.recentFiles);
             g.app.recentFilesManager.updateRecentFiles(fn);
@@ -3433,7 +3433,7 @@ export class LoadManager {
         // lm = self
         // Create the menu as late as possible so it can use user commands.
         if (!g.doHook("menu1", { c: c, p: c.p, v: c.p })) {
-            // c.frame.menu.createMenuBar(c.frame); // LEOJS : NOT USED
+            // c.frame.menu.createMenuBar(c.frame); // LEO-WEB : NOT USED
             // g.app.recentFilesManager.updateRecentFiles(fn);
             g.doHook("menu2", { c: c, p: c.p, v: c.p });
             g.doHook("after-create-leo-frame", { c: c });
@@ -4130,7 +4130,7 @@ export class RecentFilesManager {
      */
     public async writeRecentFilesFile(c: Commands): Promise<void> {
 
-        // LeoJS tries to save the recent files list on open, so skip if starting up.
+        // Leo-Web tries to save the recent files list on open, so skip if starting up.
         if (!g.app.initComplete) {
             return;
         }

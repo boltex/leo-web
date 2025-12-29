@@ -1331,7 +1331,7 @@ export class Undoer {
         }
 
         // Update editors.
-        // c.frame.body.updateEditors(); // ! LEOJS will refresh !
+        // c.frame.body.updateEditors(); // ! LEO-WEB will refresh !
 
         // Update icons.
         const val: number = p.computeIcon();
@@ -2483,7 +2483,7 @@ export class Undoer {
         // c.recolor();
 
         if (u.inHead) {
-            // ! LEOJS has no editing headline features nor wrapper around tree.editLabel
+            // ! LEO-WEB has no editing headline features nor wrapper around tree.editLabel
             // c.editHeadline();
 
             u.inHead = false;

@@ -41,7 +41,7 @@ export class BaseLeoCompare {
     public fileName1: string;
     public fileName2: string;
     // Open files...
-    public outputFile: string | undefined; // originally BinaryIO, the starting string in leojs
+    public outputFile: string | undefined; // originally BinaryIO, the starting string in leo-web
 
     //@+others
     //@+node:felix.20251214160339.663: *3* compare.__init__
@@ -119,7 +119,7 @@ export class BaseLeoCompare {
         this.fileName1 = '';
         this.fileName2 = '';
         // Open files...
-        this.outputFile = undefined; // BinaryIO in leo but intitial string in leojs
+        this.outputFile = undefined; // BinaryIO in leo but intitial string in leo-web
     }
     //@+node:felix.20251214160339.664: *3* compare_directories (entry)
     // We ignore the filename portion of path1 and path2 if it exists.

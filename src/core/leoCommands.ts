@@ -166,7 +166,7 @@ export class Commands {
     // Command history for minibuffer (duplicate-free & re-ordered)
     public commandHistory: string[] = []; // * ORIGINALLY IN leoKeys.py FROM LEO.
 
-    // * USED AS STRING IN LEOJS - ONLY USED AS A FLAG ANYWAYS IN LEO.
+    // * USED AS STRING IN LEO-WEB - ONLY USED AS A FLAG ANYWAYS IN LEO.
     // public sqlite_connection: string | undefined = undefined;
 
     //@+node:felix.20251214160339.413: *4* c.initDebugIvars
@@ -231,7 +231,7 @@ export class Commands {
     public smart_tab: boolean = false;
     public tab_width: number = -4;
     public tangle_batch_flag: boolean = false;
-    public target_language: string = 'python'; // TODO : switch to js for Leojs?
+    public target_language: string = 'python'; // TODO : switch to js for Leo-web?
     public untangle_batch_flag: boolean = false;
     // # self.use_body_focus_border = True
     // # self.use_focus_border = False
@@ -419,7 +419,7 @@ export class Commands {
     public computeWindowTitle(fileName?: string): string {
         const c: Commands = this;
 
-        // NO USE FOR BRANCHES IN LEOJS TITLES
+        // NO USE FOR BRANCHES IN LEO-WEB TITLES
         // const branch = g.gitBranchName(fileName || c.fileName());
         // const branch_s = branch ? `${branch}: ` : '';
         // const name_s = fileName || c.fileName() || 'untitled';
@@ -523,7 +523,7 @@ export class Commands {
         silent=False            No longer used.
         namespace=None          Not None: execute the script in this namespace.
         raiseFlag=False         True: reraise any exceptions.
-        runPyflakes=True        True: (Not used in LeoJS) run pyflakes if allowed by setting.
+        runPyflakes=True        True: (Not used in Leo-Web) run pyflakes if allowed by setting.
         */
         const c: Commands = this;
 
@@ -686,7 +686,7 @@ export class Commands {
         // This does not prevent zombie windows if the script puts up a dialog...
         try {
             c.inCommand = false;
-            g.app.hasScriptShownlog = false; // Reset this flag. (LeoJS only)
+            g.app.hasScriptShownlog = false; // Reset this flag. (Leo-Web only)
             g.app.inScript = true;
             (g.inScript as boolean) = g.app.inScript; // g.inScript is a synonym for g.app.inScript.
 
@@ -736,7 +736,7 @@ export class Commands {
             c.config.getBool('redirect-execute-script-output-to-log-pane')
         ) {
             // TODO : FIND A WAY TO OVERRIDE CONSOLE !
-            g.es("LeoJS Warning: 'redirect-execute-script-output-to-log-pane' option is not yet supported.");
+            g.es("Leo-Web Warning: 'redirect-execute-script-output-to-log-pane' option is not yet supported.");
             return;
             g.redirectStdout();  // Redirect stdout
             g.redirectStderr();  // Redirect stderr
@@ -791,7 +791,7 @@ export class Commands {
         return g.app.gui.openAside();
     }
     //@+node:felix.20251214160339.454: *3* @cmd showWelcomeSettings
-    @cmd('show-welcome-settings', 'Open the LeoJS welcome and settings screen.')
+    @cmd('show-welcome-settings', 'Open the Leo-Web welcome and settings screen.')
     public showSettings(): Thenable<unknown> {
         return g.app.gui.showSettings();
     }
@@ -3317,7 +3317,7 @@ export class Commands {
      *
      * See ExternalFilesController.open_with for details about d.
      */
-    // ! LEOJS DOES NOT OFFER TO OPEN IN EXTERNAL EDITOR !
+    // ! LEO-WEB DOES NOT OFFER TO OPEN IN EXTERNAL EDITOR !
     // public openWith(d?: any): void {
     //     const c: Commands = this;
 
@@ -3894,7 +3894,7 @@ export class Commands {
         // const log = c.frame.log;
         // c.request_focus(log && log.logCtrl);
     }
-    // * No use in LeoJS
+    // * No use in Leo-Web
     // public minibufferWantsFocus(): void {
     //     const c = this;
     //     c.request_focus(c.miniBufferWidget);
@@ -3934,7 +3934,7 @@ export class Commands {
         g.app.gui.showLogPane(true);
     }
 
-    // * No use in LeoJS
+    // * No use in Leo-Web
     // public minibufferWantsFocusNow(): void {
     //     const c = this;
     //     c.widgetWantsFocusNow(c.miniBufferWidget);
@@ -4825,7 +4825,7 @@ export class Commands {
     public reloadConfigurableSettings(): void {
         const c = this;
 
-        // * LEOJS: some are non-existant
+        // * LEO-WEB: some are non-existant
         const table = [
             g.app.gui,
             g.app.pluginsController,

@@ -74,7 +74,7 @@ export function new_cmd_decorator(
         // Like commander_command but the ivars array (base object and sub object/subcommander)
         // are also added to the func itself.
         // So this original 'new_cmd_decorator' is implemented at run time with c.commandsDict.
-        // (For an example, see leojs source code in the 'command' method of leoUI.ts )
+        // (For an example, see leo-web source code in the 'command' method of leoUI.ts )
         const commander_command_wrapper = Object.assign(
             descriptor.value, // the "func itself"
             { __doc__: p_doc },

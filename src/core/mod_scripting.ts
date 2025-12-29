@@ -419,7 +419,7 @@ export class ScriptingController {
     public c: Commands;  // Replace with the actual type of Cmdr
     public gui: any; // Replace with the actual type of the GUI
     public scanned: boolean;
-    public buttonsArray: nullButtonWidget[]; // ! LEOJS : ARRAY INSTEAD OF DICT ! 
+    public buttonsArray: nullButtonWidget[]; // ! LEO-WEB : ARRAY INSTEAD OF DICT ! 
     public debuggerKind: string;
     public atButtonNodes: boolean;
     public atCommandsNodes: boolean;
@@ -445,11 +445,11 @@ export class ScriptingController {
         this.debuggerKind = kind.toLowerCase();
 
         // True: adds a button for every @button node.
-        this.atButtonNodes = getBool('scripting-at-button-nodes'); // ! UNUSED IN LEOJS AND ORIGINAL LEO !
+        this.atButtonNodes = getBool('scripting-at-button-nodes'); // ! UNUSED IN LEO-WEB AND ORIGINAL LEO !
         // True: define a minibuffer command for every @command node.
-        this.atCommandsNodes = getBool('scripting-at-commands-nodes'); // ! UNUSED IN LEOJS AND ORIGINAL LEO !
+        this.atCommandsNodes = getBool('scripting-at-commands-nodes'); // ! UNUSED IN LEO-WEB AND ORIGINAL LEO !
         // True: define a minibuffer command for every @rclick node.
-        this.atRclickNodes = getBool('scripting-at-rclick-nodes'); // ! UNUSED IN LEOJS AND ORIGINAL LEO !
+        this.atRclickNodes = getBool('scripting-at-rclick-nodes'); // ! UNUSED IN LEO-WEB AND ORIGINAL LEO !
         // True: dynamically loads plugins in @plugin nodes when a window is created.
         this.atPluginNodes = getBool('scripting-at-plugin-nodes');
         // # DANGEROUS! True: dynamically executes script in @script nodes when a window is created.
@@ -810,7 +810,7 @@ export class ScriptingController {
                 await c2.close();
             }
         }
-        // * TODO : UNUSED IN LEOJS ?
+        // * TODO : UNUSED IN LEO-WEB ?
         // Fix bug 92: restore the previously selected tab.
         // if (c.frame && (c.frame as any)['top']) {
         //     (c.frame as any).leo_master.select(c);
@@ -1045,7 +1045,7 @@ export class ScriptingController {
         //   } else if (g.pluginIsLoaded(moduleOrFileName)) {
         //     g.warning(`plugin already loaded: ${moduleOrFileName}`);
         //   } else {
-        //     g.loadOnewPlugin(moduleOrFileName); // * TODO : LEOJS PLUGIN SYSTEM
+        //     g.loadOnewPlugin(moduleOrFileName); // * TODO : LEO-WEB PLUGIN SYSTEM
         //   }
     }
     //@+node:felix.20251214160339.2022: *4* sc.handleAtRclickNode @rclick
@@ -1217,7 +1217,7 @@ export class ScriptingController {
         const index = this.buttonsArray.indexOf(button);
         if (index > -1) {
             this.buttonsArray.splice(index, 1);
-            // this.iconBar.deleteButton(w); // * UNUSED IN LEOJS 
+            // this.iconBar.deleteButton(w); // * UNUSED IN LEO-WEB 
             this.c.bodyWantsFocus();
         }
 
@@ -1365,7 +1365,7 @@ export class ScriptingController {
             if (commandName.startsWith(prefix)) {
                 const commandName2 = commandName.slice(prefix.length).trim();
 
-                // * Unused in LeoJS *
+                // * Unused in Leo-Web *
                 // // Create a *second* function, to avoid collision in c.commandsDict.
                 // const registerAllCommandsCallback = (p_func: (...args: any[]) => void = func.bind(this)) => {
                 //     return p_func();
@@ -1398,7 +1398,7 @@ export class ScriptingController {
      * Set the background color of Qt button b to bg
      */
     public setButtonColor(b: Wrapper, bg?: string): void {
-        // * IGNORED IN LEOJS
+        // * IGNORED IN LEO-WEB
         //   if (!bg) {
         //     return;
         //   }

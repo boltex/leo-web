@@ -278,7 +278,7 @@ export class ExternalFilesController {
                 const old_p = c.p;  // To restore selection if refresh option set to yes-all & is descendant of at-file
                 await c.refreshFromDisk(p);
 
-                // ! LEOJS : KEEP SELECTION ON CURRENT NODE IF CHILD OF AT-ANY-FILE REFRESHED !
+                // ! LEO-WEB : KEEP SELECTION ON CURRENT NODE IF CHILD OF AT-ANY-FILE REFRESHED !
                 // TODO : Add config option in Leo for this!
                 if (true) {
                     if (c.positionExists(old_p) && c.p.isAncestorOf(old_p)) {
@@ -286,7 +286,7 @@ export class ExternalFilesController {
                     }
                 }
 
-                // ! LEOJS : FORCE GUI REFRESH AFTER A refreshFromDisk COMMAND !
+                // ! LEO-WEB : FORCE GUI REFRESH AFTER A refreshFromDisk COMMAND !
                 g.app.gui.fullRefresh(true);
             }
         }
@@ -308,7 +308,7 @@ export class ExternalFilesController {
         if (['yes', 'yes-all'].includes(val)) {
             // Do a complete restart of Leo.
             await g.app.loadManager!.revertCommander(c);
-            // ! LEOJS : FORCE GUI REFRESH AFTER A Change of opened document!
+            // ! LEO-WEB : FORCE GUI REFRESH AFTER A Change of opened document!
             g.app.gui.fullRefresh(true);
             g.es_print(`reloaded ${w_path}`);
         }
@@ -539,7 +539,7 @@ export class ExternalFilesController {
         let leoTempDir;
         try {
             // leoTempDir = getpass.getuser() + "_" + "Leo";
-            // ! LEOJS -> use g.app.leoID instead
+            // ! LEO-WEB -> use g.app.leoID instead
             leoTempDir = g.app.leoID + '_' + 'Leo';
         } catch (exception) {
             leoTempDir = 'LeoTemp';

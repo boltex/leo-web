@@ -1470,7 +1470,7 @@ export class ActiveSettingsOutline {
         g.es(fileName);
         const c = g.app.newCommander(fileName);
 
-        // NOT NEEDED IN LEOJS
+        // NOT NEEDED IN LEO-WEB
         // Restore the layout, if we have ever saved this file.
         // if (!old_c) {
         //     c.frame.setInitialWindowGeometry();
@@ -2115,7 +2115,7 @@ export class GlobalConfigManager {
         return undefined;
     }
     //@+node:felix.20251214160339.785: *4* gcm.getEnabledPlugins
-    // * LEOJS : UNUSED FOR NOW
+    // * LEO-WEB : UNUSED FOR NOW
     /* def getEnabledPlugins(self):
         """Return the body text of the @enabled-plugins node."""
         return g.app.config.enabledPluginsString
@@ -2134,7 +2134,7 @@ export class GlobalConfigManager {
         }
     }
     //@+node:felix.20251214160339.787: *4* gcm.getFontFromParams
-    // * LEOJS : UNUSED FOR NOW
+    // * LEO-WEB : UNUSED FOR NOW
     /* def getFontFromParams(self, family, size, slant, weight, defaultSize=12):
         """Compute a font from font parameters.
 

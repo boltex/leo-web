@@ -468,7 +468,7 @@ export class GoToCommands {
                 g.warning('line', n, 'not found');
             }
         }
-        // c.frame.clearStatusLine(); // LEOJS : UNUSED
+        // c.frame.clearStatusLine(); // LEO-WEB : UNUSED
         c.frame.putStatusLine(`goto-global-line not found: ${n}`);
         // Put the cursor on the last line of body text.
         w.setInsertPoint(root.b.length);
@@ -702,7 +702,7 @@ export class GoToCommands {
         // Put the cursor on line n2 of the body text.
         const s = w.getAllText();
         const ins = g.convertRowColToPythonIndex(s, n2 - 1, 0);
-        // c.frame.clearStatusLine(); // LEOJS : UNUSED
+        // c.frame.clearStatusLine(); // LEO-WEB : UNUSED
         c.frame.putStatusLine(`goto-global-line found: ${n2}`);
         w.setInsertPoint(ins);
         c.bodyWantsFocus();

@@ -1850,7 +1850,7 @@ export class MindMapImporter {
             const readData = await workspace.fs.readFile(w_uri);
             const s = Buffer.from(readData).toString('utf8');
 
-            await this.scan(s, p); // ! leojs: Use string from file content instead
+            await this.scan(s, p); // ! leo-web: Use string from file content instead
             // f.close()
             c.redraw();
         } catch (exception) {
@@ -1910,7 +1910,7 @@ export class MindMapImporter {
         const n1 = target.level();
         let n = n1;
         let p = target.copy();
-        // reader = reader.slice(1); // ! NO NEED TO REMOVE TOP ROW IN LEOJS !
+        // reader = reader.slice(1); // ! NO NEED TO REMOVE TOP ROW IN LEO-WEB !
         for (const row of reader) {
             // Row is a List of fields.
             const new_level = this.csv_level(row) + n1;
@@ -3383,13 +3383,13 @@ export class ZimImportController {
         const results: [number, string, string[]][] = [];
         for (const result of parse) {
             const level = result[0]!.length;
-            const name = result[1]!; // .decode('utf-8') // already decoded from buffer above in leojs.
+            const name = result[1]!; // .decode('utf-8') // already decoded from buffer above in leo-web.
             const unquote = decodeURIComponent; // urllib.parse.unquote;
             // mypy: error: "str" has no attribute "decode"; maybe "encode"?  [attr-defined]
             const w_path = [
                 g.os_path_abspath(
                     g.os_path_join(pathToZim, unquote(result[2]!))
-                ), // already decoded from buffer above in leojs.
+                ), // already decoded from buffer above in leo-web.
             ];
             results.push([level, name, w_path]);
         }

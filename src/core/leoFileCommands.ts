@@ -1347,7 +1347,7 @@ export class FileCommands {
             v = await fc._getLeoFileByName(p_path, readAtFileNodesFlag);
         }
         if (v) {
-            // LEOJS: This would apply last opened file ratio to this new one. Let it be.
+            // LEO-WEB: This would apply last opened file ratio to this new one. Let it be.
             // c.frame.resizePanesToRatio(c.frame.ratio, c.frame.secondary_ratio);
             if (checkOpenFiles) {
                 await g.app.checkForOpenFile(c, p_path);

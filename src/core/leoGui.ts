@@ -40,14 +40,14 @@ export class LeoGui {
     public script: string | undefined;
     public scriptFileName: string | undefined;
 
-    // * For LeoJS
+    // * For Leo-Web
     // the index of current document frame in g.app.windowList, mostly to get c, and the title, openDirectory, etc.
     public frameIndex: number = 0;
 
     public splashScreen: any;
     public utils: any;
 
-    // public ScriptingControllerClass: any; // ? UNEEDED IN LEOJS ?
+    // public ScriptingControllerClass: any; // ? UNEEDED IN LEO-WEB ?
     //
     //  Define special keys that may be overridden is subclasses.
     public ignoreChars: string[]; //  Keys that should always be ignored.
@@ -78,7 +78,7 @@ export class LeoGui {
         this.splashScreen = undefined;
         this.utils = undefined;
 
-        // this.ScriptingControllerClass = NullScriptingControllerClass; // ? UNEEDED IN LEOJS ?
+        // this.ScriptingControllerClass = NullScriptingControllerClass; // ? UNEEDED IN LEO-WEB ?
         //
         //  Define special keys that may be overridden is subclasses.
         this.ignoreChars = []; //  Keys that should always be ignored.
@@ -310,22 +310,22 @@ export class LeoGui {
         this.oops();
         return Promise.resolve();
     }
-    //@+node:felix.20251213133753.222: *4* LeoGui.addLogPaneEntry (LeoJs)
+    //@+node:felix.20251213133753.222: *4* LeoGui.addLogPaneEntry (Leo-Web)
     public addLogPaneEntry(...args: any[]): void {
         this.oops();
-        // Adds a message string to LeoJS log pane. See LeoUi.ts
+        // Adds a message string to Leo-Web log pane. See LeoUi.ts
     }
-    //@+node:felix.20251213133753.223: *4* LeoGui.focusLogPane (LeoJs)
+    //@+node:felix.20251213133753.223: *4* LeoGui.focusLogPane (Leo-Web)
     public showLogPane(p_focus?: boolean): void {
         // Shows and optionally puts focus on the log pane
     }
-    //@+node:felix.20251213133753.224: *4* LeoGui.finishStartup (LeoJs)
+    //@+node:felix.20251213133753.224: *4* LeoGui.finishStartup (Leo-Web)
     public finishStartup(): void {
-        // * LeoJS GUI needs this method to finish it's startup
+        // * Leo-Web GUI needs this method to finish it's startup
         // Set all remaining local objects, set ready flag(s) and refresh all panels
         // pass
     }
-    //@+node:felix.20251213133753.225: *4* LeoGui.get1Arg (LeoJs)
+    //@+node:felix.20251213133753.225: *4* LeoGui.get1Arg (Leo-Web)
     public get1Arg(
         options?: any,
         token?: any,
@@ -333,7 +333,7 @@ export class LeoGui {
     ): Thenable<string | undefined> {
         return Promise.resolve('');
     }
-    //@+node:felix.20251213133753.226: *4* LeoGui.get1Char (LeoJs)
+    //@+node:felix.20251213133753.226: *4* LeoGui.get1Char (Leo-Web)
     public get1Char(
         options?: any,
         token?: any
@@ -357,9 +357,9 @@ export class LeoGui {
         return Promise.resolve();
     }
 
-    //@+node:felix.20251213133753.229: *4* LeoGui.makeAllBindings (LeoJs)
+    //@+node:felix.20251213133753.229: *4* LeoGui.makeAllBindings (Leo-Web)
     public makeAllBindings(): void {
-        // Make all command/key bindings : see LeoJS commadBindings
+        // Make all command/key bindings : see Leo-Web commadBindings
     }
     //@+node:felix.20251213133753.230: *4* LeoGui.panels
 
@@ -552,7 +552,7 @@ export class LeoGui {
 export class NullGui extends LeoGui {
     public clipboardContents: string = '';
     public focusWidget: StringTextWrapper | undefined;
-    public config: any; // configuration service singleton for a specific external UI (e.g.: leojs)
+    public config: any; // configuration service singleton for a specific external UI (e.g.: leo-web)
 
     /**
      * ctor for the NullGui class.
@@ -588,7 +588,7 @@ export class NullGui extends LeoGui {
     }
 
     public override getFullVersion(): string {
-        return 'LeoJS NullGui';
+        return 'Leo-Web NullGui';
     }
 
     public override addLogPaneEntry(...args: any[]): void {
@@ -607,7 +607,7 @@ export class NullGui extends LeoGui {
 
     public override widget_name(widget: any): string {
         if (g.unitTesting) {
-            return 'body'; // ! LEOJS : Edit Commands Always happen in body.
+            return 'body'; // ! LEO-WEB : Edit Commands Always happen in body.
         }
         return '';
     }

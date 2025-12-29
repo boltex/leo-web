@@ -28,7 +28,7 @@ import * as utils from '../utils';
 // except Exception:
 //     docutils = None  // type:ignore
 
-//import * as docutils from "docutils-ts"; // LeoJS: docutils will soon be available as a package. (when docutils-ts is ready)
+//import * as docutils from "docutils-ts"; // docutils will soon be available as a package. (when docutils-ts is ready)
 const docutils = true; // Replace with suitable import if available.
 
 import * as g from './leoGlobals';
@@ -533,8 +533,8 @@ export class RstCommands {
             return;
         } else {
             // TODO : FIX THIS !
-            g.es("LeoJS : docutils not available, only the intermediate file was written.");
-            void workspace.view.showInformationMessage("LeoJS: docutils not available, only the intermediate file was written.");
+            g.es("Leo-Web : docutils not available, only the intermediate file was written.");
+            void workspace.view.showInformationMessage("Leo-Web: docutils not available, only the intermediate file was written.");
             return;
         }
 
@@ -682,7 +682,7 @@ export class RstCommands {
         }
         const c = this.c;
 
-        // const join = g.finalize_join; // leojs : use g.finalize_join directly!
+        // const join = g.finalize_join; // leo-web : use g.finalize_join directly!
         const openDirectory = g.os_path_dirname(c.fileName());
         const overrides: { [key: string]: any } = {
             output_encoding: this.encoding,

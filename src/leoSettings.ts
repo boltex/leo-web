@@ -1077,7 +1077,7 @@ export const LEO_SETTINGS = String.raw`{
     }
   ],
   "tnodes": {
-    "ekr.20041119035137": "@language rest\n@wrap\n@pagewidth 80\n\nThis is the LeoJS main settings file.  It specifies settings used to customize LeoJS.\n\n@settings trees are composed of various kinds of nodes.\n\nThe headline of each node indicates its type.\n\nThe body text of most nodes contain comments. However, the body text of @data, @font and @shortcuts nodes contain settings. See the children of this node for details.\n",
+    "ekr.20041119035137": "@language rest\n@wrap\n@pagewidth 80\n\nThis is the Leo-Web main settings file.  It specifies settings used to customize Leo-Web.\n\n@settings trees are composed of various kinds of nodes.\n\nThe headline of each node indicates its type.\n\nThe body text of most nodes contain comments. However, the body text of @data, @font and @shortcuts nodes contain settings. See the children of this node for details.\n",
     "ekr.20041122163623": "When looking for @whatever, Leo converts whatever to lower case and removes\nminus signs. For example, the following are equivalent::\n\n    @if-platform\n    @ifPlatform\n    @ifplatform\n",
     "ekr.20041119035704": "These nodes describe the type, name and value of a single setting. Their\nheadlines have the form::\n\n    @type-name setting-name = value\n\nThe basic types are: @bool, @color, @directory, @encoding, @font, @int, @path,\nand @string.\n\nNone is a valid value for all types, indicating that the setting node has no\neffect.\n",
     "ekr.20041119042929.1": "Value must be Qt color name or value, such as 'red' or 'xf2fddff' (without the quotes).\n\nUnlike in @data qt-gui-plugin-style-sheet, @values are not allowed as color values.",

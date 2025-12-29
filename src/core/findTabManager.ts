@@ -180,7 +180,7 @@ export class StringFindTabManager {
     //@+node:felix.20251213133753.10: *3* sftm.clear_focus & init_focus & set_entry_focus
     public clear_focus(): void {
         this.entry_focus = undefined;
-        // this.find_findbox.clearFocus(); // UNUSED IN LEOJS
+        // this.find_findbox.clearFocus(); // UNUSED IN LEO-WEB
     }
     public init_focus(): void {
         this.set_entry_focus();
@@ -265,7 +265,7 @@ export class StringFindTabManager {
             // setattr(find, setting_name, val)
             (find[setting_name as keyof LeoFind] as any) = val;
             if (val !== w.isChecked()) {
-                // Support LeoJS. :)
+                // Support Leo-Web. :)
                 w.toggle();
             }
         }
@@ -339,7 +339,7 @@ export class StringFindTabManager {
             // setattr(find, setting_name, val)
             (find[setting_name as keyof LeoFind] as any) = val;
             if (val !== w.isChecked()) {
-                // Support LeoJS. :)
+                // Support Leo-Web. :)
                 w.toggle();
             }
         }

@@ -717,7 +717,7 @@ export class SqlitePickleShare {
 
                     this.conn!.exec('update cachevalues set data=? where key=?', itm);
                 }
-                // await this.commit(); // ! LEOJS : COMMIT AT END OF reset_protocol_in_values
+                // await this.commit(); // ! LEO-WEB : COMMIT AT END OF reset_protocol_in_values
                 return itms[itms.length - 1]![1];
             }
 
@@ -727,7 +727,7 @@ export class SqlitePickleShare {
 
         //@-others
 
-        // Unused in leojs
+        // Unused in leo-web
         // this.conn.isolation_level = 'DEFERRED';
 
         const sql0 = 'select key, data from cachevalues order by key limit 50';
@@ -743,7 +743,7 @@ export class SqlitePickleShare {
         this.__setitem__(PROTOCOLKEY, 2);
         await this.commit();
 
-        // Unused in leojs
+        // Unused in leo-web
         // this.conn.isolation_level = None;
 
     }

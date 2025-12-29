@@ -110,7 +110,7 @@ export class SessionManager {
   public load_snapshot(): string[] | undefined {
     try {
       let session: string[];
-      // if LeoJS sessionPerWorkspace is true, use it instead!
+      // if Leo-Web sessionPerWorkspace is true, use it instead!
       const workspaceSession = g.app.gui.getWorkspaceSession();
       if (workspaceSession) {
         session = workspaceSession;
@@ -144,12 +144,12 @@ export class SessionManager {
         g.printObj(session, 'save_snapshot: session data');
       }
 
-      // ! LeoJS: Empty Sessions are allowed. The Leo Issue #2433 does not apply.
+      // ! Leo-Web: Empty Sessions are allowed. The Leo Issue #2433 does not apply.
       // if (!g.app.gui.config.sessionPerWorkspace && !session || !session.length) {
       //   return; // #2433: don't save an empty session.
       // }
 
-      // if LeoJS sessionPerWorkspace is true, use it instead!
+      // if Leo-Web sessionPerWorkspace is true, use it instead!
       if (g.app.gui.getWorkspaceSession()) {
         // No need to wait for this promise.
         void g.app.gui.setWorkspaceSession(session);

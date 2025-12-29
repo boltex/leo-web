@@ -737,7 +737,7 @@ export class CommanderOutlineCommands {
         let p = c.p;
         c.endEditing();
         p.contract();
-        c.redraw_after_contract(p); // not in leojs
+        c.redraw_after_contract(p);
         c.selectPosition(p);
     }
     //@+node:felix.20251214160853.158: *4* c_oc.contractNodeOrGoToParent

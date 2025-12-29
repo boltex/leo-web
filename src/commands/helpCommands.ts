@@ -678,13 +678,6 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         may contain data. For more information about the format of \@settings
         trees, see leoSettings.leo.
 
-        An internal leojsSettings.leojs is LeoJS\'s main settings file. myLeoSettings.leo contains
-        your personal settings. 
-
-        Settings in myLeoSettings.leo override the settings in leojsSettings.leojs.
-
-        Put myLeoSettings.leo in your home \'\~\' directory or in the \'\~/.leo\' directory. 
-
         Any other .leo file may contain an \@settings tree. Such settings apply only to that file.
 
         `;

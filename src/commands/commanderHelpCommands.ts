@@ -27,7 +27,7 @@ export class CommanderHelpCommands {
         const theCopyright =
             `Copyright 1999-${g.dayjs().year()} by Edward K. Ream and Félix Malboeuf\n` +
             'All Rights Reserved\n' +
-            'Leo and LeoJS are distributed under the MIT License';
+            'Leo, LeoJS and Leo-Web are distributed under the MIT License';
         const url = 'https://leo-editor.github.io/leo-editor/'; // unused for now
         const email = 'edreamleo@gmail.com'; // unused for now
         return g.app.gui.runAboutLeoDialog(
@@ -143,7 +143,7 @@ export class CommanderHelpCommands {
 
             const c: Commands = g.app.newCommander('', g.app.gui);
 
-            // ! LEOJS : SET c.openDirectory to the g.app.vscodeWorkspaceUri !
+            // ! LEO-WEB : SET c.openDirectory to the g.app.vscodeWorkspaceUri !
             // c.openDirectory = g.app.vscodeWorkspaceUri?.fsPath;
             // if (c.openDirectory) {
             //     c.frame.openDirectory = c.openDirectory;
@@ -231,7 +231,7 @@ export class CommanderHelpCommands {
                 return undefined;
             }
 
-            // get '@enabled-plugins' from g.app.globalConfigDir ! SKIPPED IN LEOJS !
+            // get '@enabled-plugins' from g.app.globalConfigDir ! SKIPPED IN LEO-WEB !
             // fileName = g.os_path_join(configDir, "leoSettings.leo");
             // const leosettings = await g.openWithFileName(fileName, c, g.app.gui);
             // const enabledplugins = g.findNodeAnywhere(leosettings!, '@enabled-plugins');
@@ -244,7 +244,7 @@ export class CommanderHelpCommands {
             //     leosettings.close();
             // }
 
-            // now create "~/.leo/myLeoSettings.leo" OR /myLeoSettings if leojs runs in browser!
+            // now create "~/.leo/myLeoSettings.leo" OR /myLeoSettings if leo-web runs in browser!
             if (homeLeoDir) {
                 fileName = g.os_path_join(homeLeoDir, name);
             } else {

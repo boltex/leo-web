@@ -212,7 +212,7 @@ export class LeoPluginsController {
             return undefined;
         }
         if (['start1', 'open0'].includes(tag)) {
-            // TODO : Needed in LEOJS ?
+            // TODO : Needed in LEO-WEB ?
             // this.loadHandlers(tag, keywords);
         }
         return this.doHandlersForTag(tag, keywords);

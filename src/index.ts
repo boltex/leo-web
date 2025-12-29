@@ -57,11 +57,12 @@ class LeoWebApp {
 
         console.log('Leo Web App initialized.');
 
+        // #1472: bind to g immediately.
         (g.app as LeoApp) = new LeoApp();
         const w_start = process.hrtime(); // For calculating total startup time duration
         g.app.loadManager = new LoadManager();
         await g.app.loadManager.load();
-        console.log(`leojs startup launched in ${utils.getDurationMs(w_start)} ms`);
+        console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
 
     }
 
