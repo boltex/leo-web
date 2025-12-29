@@ -1261,4 +1261,4 @@ export const LEO_SETTINGS = String.raw`{
     "jlunz.20151120072157.1": "True: Wrap body text.\n\n",
     "ekr.20041119034357.42": "The format string used when creating the Time/Date string for the Insert Time/Date command.\nSee the Python documentation for time.strftime for full details.\n\nExamples:\n\n1/30/2003 8:31:55\n%m/%d/%y %H:%M:%S\n\nThu, 30 Jan 2003 16:57:12\n%a, %d %b %Y %H:%M:%S"
   }
-}`;
+}`.replace(/\\`/g, '`'); // Replace all \\` with single `

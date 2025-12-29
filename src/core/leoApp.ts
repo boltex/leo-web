@@ -2718,6 +2718,8 @@ export class LoadManager {
 
         const t1 = process.hrtime();
 
+        console.log("in load manager load");
+
         // sets lm.options and lm.files
         await lm.doPrePluginsInit();
         g.app.printSignon();
@@ -3179,7 +3181,9 @@ export class LoadManager {
 
         const lm: LoadManager = this;
 
-        g.app.gui = new LeoUI(undefined) as any; // replaces createDefaultGui
+        // g.app.gui = new LeoUI(undefined) as any; // replaces createDefaultGui
+        // TODO: Implement LeoUI class properly, Use a NullGui for now.
+        g.app.gui = new NullGui(undefined) as any; // replaces createDefaultGui
 
         /* 
         gui_option = lm.options.get('gui')

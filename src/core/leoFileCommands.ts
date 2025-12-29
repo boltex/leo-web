@@ -578,6 +578,7 @@ export class FastRead {
     ): [VNode | undefined, any] {
         let d: any;
         try {
+            console.log("PARSING JSON FROM .leojs FILE");
             d = JSON.parse(s);
         } catch (exception) {
             g.trace(`Error converting JSON from .leojs file: ${p_path}`);

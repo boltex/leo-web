@@ -152,6 +152,9 @@ export class GlobalCacher {
             if (trace) {
                 g.es_print('path for g.app.db:', w_path.toString());
             }
+            // Force a plain dict for leo-web for now.
+            throw new Error("LEO-WEB: SqlitePickleShare not implemented yet");
+
             this.db = new SqlitePickleShare(w_path);
             if (trace && !(this.db == null)) {
                 this.dump('Startup');
@@ -302,7 +305,6 @@ export class SqlitePickleShare {
                     reject('LEOJS: SqlitePickleShare failed init');
                 }
                 */
-
             })();
 
         });
