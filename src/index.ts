@@ -6,13 +6,14 @@
 import './style.css';
 
 import * as g from './core/leoGlobals';
-import { LeoApp, LoadManager } from './core/leoApp';
+import { LeoApp, LoadManager, PreviousSettings } from './core/leoApp';
 
 import { LeoModel } from './LeoModel';
 import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
+import { ScriptingController } from './core/mod_scripting';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
@@ -67,6 +68,22 @@ class LeoWebApp {
         g.app.loadManager = new LoadManager();
         await g.app.loadManager.load();
         console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
+
+        // Now test the Leo code itself by creating a new commander, inserting a node, change its headeline/body, and printing the outline to console.
+        // TODO.
+        // For now, check if the startup created any commanders (windows).
+        g.app.disable_redraw = true;
+        const lm = g.app.loadManager;
+        const c = g.app.newCommander('', g.app.gui, new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict));
+        lm.createMenu(c);
+        lm.finishOpen(c);
+        g.doHook('new', { old_c: undefined, c: c, new_c: c });
+        c.theScriptingController = new ScriptingController(c);
+        await c.theScriptingController.createAllButtons();
+        // c.setLog();
+        c.clearChanged(); // Fix #387: Clear all dirty bits.
+        g.app.disable_redraw = false;
+        console.log('Done creating first commander.', c);
 
     }
 
