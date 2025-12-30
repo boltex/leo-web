@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require("webpack");
 const TerserPlugin = require('terser-webpack-plugin');
+const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -35,7 +36,7 @@ module.exports = (env, argv) => {
         },
         resolve: {
             mainFields: ["browser", "module", "main"], // look for `browser` entry point in imported node modules
-            extensions: [".ts", ".js"], // support ts-files and js-files
+            extensions: [".ts", ".js", ".json"], // support ts-files and js-files
             alias: {
                 // Point explicitly to TypeScript's library file; services variant not present in TS 5.x
                 typescript: require.resolve('typescript/lib/typescript.js'),
@@ -80,6 +81,18 @@ module.exports = (env, argv) => {
                 process: "process/browser", // provide a shim for the global `process` variable
                 Buffer: ['buffer', 'Buffer'],
                 // "process.hrtime": "browser-process-hrtime" // * 'hrtime' part of process only overriden in extension.ts
+            }),
+            new WebpackShellPluginNext({
+                onBuildStart: {
+                    scripts: ['echo "Webpack onBuildStart"', 'node ./prepare.js'],
+                    blocking: true,
+                    parallel: false
+                },
+                onWatchRun: {
+                    scripts: ['echo "Webpack onWatchRun"', 'node ./prepare.js'],
+                    blocking: true,
+                    parallel: false
+                }
             }),
             new HtmlWebpackPlugin({
                 template: './src/index.html',

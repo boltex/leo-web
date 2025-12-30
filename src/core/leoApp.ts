@@ -69,7 +69,7 @@ import { ScriptingController } from './mod_scripting';
 import { SessionManager, TopLevelSessionsCommands } from './leoSessions';
 import { BaseWriter } from '../writers/basewriter';
 import * as leoPlugins from './leoPlugins';
-import { LEO_SETTINGS } from '../leoSettings';
+import leoSettings from '../../leoSettings.json';
 
 //@-<< imports >>
 //@+others
@@ -2614,7 +2614,7 @@ export class LoadManager {
             if (fn === 'leoSettings.leo') {
                 // const w_leoSettingsUri = lm.computeLeoSettingsUri();
                 // let readData = await workspace.fs.readFile(w_leoSettingsUri);
-                let readData = LEO_SETTINGS;
+                let readData = JSON.stringify(leoSettings);
                 [ok, g_element] = w_fastRead.readWithJsonTree(
                     fn,
                     g.toUnicode(readData)

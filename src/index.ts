@@ -4,7 +4,7 @@
  */
 
 import './style.css';
-
+import pkg from '../package.json'; // note the .json extension
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager, PreviousSettings } from './core/leoApp';
 
@@ -84,10 +84,15 @@ class LeoWebApp {
         c.clearChanged(); // Fix #387: Clear all dirty bits.
         g.app.disable_redraw = false;
         console.log('Done creating first commander.', c);
+        g.es('Trying out g.es call from leo-web...');
 
     }
 
     private async uiExperiments(): Promise<void> {
+
+        // Test out the json import path and package info
+        console.log(' IN UI EXPERIMENTS ');
+        console.log('Leo Web pkg:', pkg.name, pkg.version);
 
         // // 1 - TEST OPEN FILE DIALOG
         // const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();

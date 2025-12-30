@@ -10,7 +10,7 @@ import { FastRead } from '../core/leoFileCommands';
 import { Commands } from '../core/leoCommands';
 import { ScriptingController } from '../core/mod_scripting';
 // import { workspace } from '../workspace';
-import { LEO_SETTINGS } from '../leoSettings';
+import leoSettings from '../../leoSettings.json';
 
 //@+others
 //@+node:felix.20251214160853.114: ** Class CommanderHelpCommands
@@ -156,7 +156,7 @@ export class CommanderHelpCommands {
 
             let ok: VNode | undefined;
 
-            let readData = LEO_SETTINGS;
+            let readData = JSON.stringify(leoSettings);
 
             let g_element;
             [ok, g_element] = w_fastRead.readWithJsonTree(

@@ -2,6 +2,7 @@
     "compilerOptions": {
         // "moduleResolution": "Bundler",
         "moduleResolution": "node",
+        "resolveJsonModule": true,
         "jsx": "react-jsx",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
@@ -17,7 +18,6 @@
         "strict": true, /* enable all strict type-checking options */
         "esModuleInterop": true, // This is standard for browser + webpack setups.
         "skipLibCheck": true,
-        // "resolveJsonModule": true,
     },
     "exclude": [
         "node_modules",
