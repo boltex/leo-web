@@ -72,7 +72,7 @@ class LeoWebApp {
 
     private async uiExperiments(): Promise<void> {
 
-        // // TEST OPEN / SAVE FILE DIALOG
+        // // 1 - TEST OPEN FILE DIALOG
         // const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();
         // console.log('Chosen OPEN FILE handle:', chosenFileHandle);
         // if (chosenFileHandle) {
@@ -82,10 +82,7 @@ class LeoWebApp {
         //     console.log('No file chosen in OPEN dialog');
         // }
 
-        // // test workspace singleton
-        // workspace.test();
-
-        // // Now test the save dialog
+        // // 2 - TEST THE SAVE DIALOG
         // const saveFileHandle: FileSystemFileHandle | null = await view.showSaveDialog();
         // console.log('Chosen SAVE FILE handle:', saveFileHandle);
         // if (saveFileHandle) {
@@ -95,7 +92,7 @@ class LeoWebApp {
         //     console.log('No file chosen in SAVE dialog');
         // }
 
-        // // Time to try the input dialog with "view.showInputDialog"
+        // // 3 - TEST INPUT DIALOG
         // const inputResult = await view.showInputDialog({
         //     title: "Input Dialog Test",
         //     prompt: "Please enter some text:",
@@ -104,7 +101,7 @@ class LeoWebApp {
         // });
         // console.log("Input dialog result:", inputResult);
 
-        // And now, let's try out the quick pick dialog with "view.showQuickPickDialog"
+        // // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
         // const items: QuickPickItem[] = [
         //     { label: "Option 1", description: "The first option" },
         //     { label: "Option 2", description: "The second option", detail: "Additional details about option 2" },

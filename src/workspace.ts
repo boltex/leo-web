@@ -144,10 +144,6 @@ class Workspace {
 
     constructor() { }
 
-    test() {
-        console.log("Workspace test method called");
-    }
-
     public setView(view: LeoView) {
         this.view = view;
     }
