@@ -2,6 +2,7 @@
 //@+node:felix.20251214160339.15: * @file src/core/leoApp.ts
 //@+<< imports >>
 //@+node:felix.20251214160339.16: ** << imports >>
+import pkg from '../../package.json'; // note the .json extension
 import { Uri, workspace } from '../workspace';
 import * as Bowser from 'bowser';
 import * as os from 'os';
@@ -27,11 +28,7 @@ import { Constants } from '../constants';
 import { ExternalFilesController } from './leoExternalFiles';
 import { LeoFrame } from './leoFrame';
 import { SettingsDict } from './leoGlobals';
-// import { LeoUI } from '../leoUI';
-// TEMPORARY LeoUI while developping, replace when implemented
-class LeoUI {
-    constructor(guiName = 'leoWebGui') { }
-}
+import { LeoUI } from '../leoUI';
 import { GlobalCacher, SqlitePickleShare } from './leoCache';
 // importers
 import * as importer_c from '../importers/c';
@@ -1049,10 +1046,11 @@ export class LeoApp {
             return;
         }
 
-        console.log("TODO: Fix app.computeSignon for leo-web");
         let guiVersion = "Browser"; // Temporary set for leo web, fix later.
 
-        const leoVer: string = "1.0.0"; // TODO : get from package.json or elsewhere
+        const w_leoWebPackageJson = pkg;
+
+        const leoVer: string = w_leoWebPackageJson.version;
 
         // n1, n2, n3, junk1, junk2 = sys.version_info
         let n1: string = '';
@@ -1092,12 +1090,6 @@ export class LeoApp {
                 }
             }
         }
-
-        const w_leoWebPackageJson = {
-            gitBranch: "0.1", // Placeholder
-            gitCommit: "0.1", // Placeholder
-            gitDate: "0.1", // Placeholder
-        };
 
         // branch, junk_commit = g.gitInfo()
         const branch = w_leoWebPackageJson.gitBranch;
@@ -2205,7 +2197,9 @@ export class LoadManager {
         // The cwd changes later, so it would be misleading to report it here.
         // ! SKIP FOR BROWSER: NO 'HOME' & NO 'LEO-EDITOR' FOLDERS !
         directories = [
-            { kind: 'repository', theDir: g.app.homeDir },
+            //  { kind: 'repository', theDir: g.app.homeDir },
+            { kind: 'leo-editor', theDir: location.toString() },
+
         ];
 
         for (const { kind, theDir } of directories) {
@@ -2718,8 +2712,6 @@ export class LoadManager {
 
         const t1 = process.hrtime();
 
-        console.log("in load manager load");
-
         // sets lm.options and lm.files
         await lm.doPrePluginsInit();
         g.app.printSignon();
@@ -3178,35 +3170,7 @@ export class LoadManager {
 
     //@+node:felix.20251214160339.115: *5* LM.createGui
     public createGui(): void {
-
-        const lm: LoadManager = this;
-
-        // g.app.gui = new LeoUI(undefined) as any; // replaces createDefaultGui
-        // TODO: Implement LeoUI class properly, Use a NullGui for now.
-        g.app.gui = new NullGui(undefined) as any; // replaces createDefaultGui
-
-        /* 
-        gui_option = lm.options.get('gui')
-        windowFlag = lm.options.get('windowFlag')
-        script = lm.options.get('script')
-        if g.app.gui:
-            if g.app.gui == g.app.nullGui:
-                g.app.gui = None  # Enable g.app.createDefaultGui
-                g.app.createDefaultGui(__file__)
-            else:
-                pass
-                # This can also happen when leoID does not exist.
-        elif gui_option is None:
-            if script and not windowFlag:
-                # Always use null gui for scripts.
-                g.app.createNullGuiWithScript(script)
-            else:
-                g.app.createDefaultGui(__file__)
-        else:
-            lm.createSpecialGui(gui_option, pymacs, script, windowFlag)
-
-        */
-
+        g.app.gui = new LeoUI(undefined) as any; // replaces createDefaultGui
     }
 
     //@+node:felix.20251214160339.116: *5* LM.initApp

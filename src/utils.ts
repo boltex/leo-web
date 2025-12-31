@@ -269,3 +269,14 @@ export function isHexColor(p_hexString: string): boolean {
         && !isNaN(Number('0x' + p_hexString));
 }
 
+/**
+ * * Sets a context variable to be used by the UI (e.g. enabling/disabling commands, etc.)
+ * @param p_key Key string name such as constants 'leoReady' or 'treeOpened', etc.
+ * @param p_value Value to be assigned to the p_key 'key'
+ */
+export function setContext(p_key: string, p_value: any): Thenable<unknown> {
+
+    // return vscode.commands.executeCommand(Constants.VSCODE_COMMANDS.SET_CONTEXT, p_key, p_value);
+    return Promise.resolve(); // TODO : implement setContext
+}
+

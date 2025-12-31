@@ -19,6 +19,9 @@ export class Constants {
     public static DB_FILE_EXTENSION: string = "db";
     public static JS_FILE_EXTENSION: string = "leojs";
 
+    public static UNTITLED_FILE_NAME: string = "untitled";
+
+
     /**
      * Supported Languages
      */

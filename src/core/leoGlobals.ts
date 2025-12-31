@@ -3749,7 +3749,6 @@ export function es(...args: any[]): void {
             app.gui.showLogPane();
             app.hasScriptShownlog = true;
         }
-
         app.gui.addLogPaneEntry(s);
     } else {
         logBuffer.push(s);

@@ -47,6 +47,8 @@ export class LeoView {
     public OPT_REGEXP: HTMLInputElement;
     public OPT_MARK: HTMLInputElement;
 
+    public LOG_CONTENT: HTMLElement;
+
     public LOG_TAB: HTMLDivElement;
     public FIND_TAB: HTMLDivElement;
     public UNDO_TAB: HTMLDivElement;
@@ -158,6 +160,9 @@ export class LeoView {
         this.OPT_IGNORECASE = document.getElementById('opt-ignorecase')! as HTMLInputElement;
         this.OPT_REGEXP = document.getElementById('opt-regexp')! as HTMLInputElement;
         this.OPT_MARK = document.getElementById('opt-mark')! as HTMLInputElement;
+
+        // this.LOG_CONTENT = document.getElementById('log-content')!;
+        this.LOG_CONTENT = document.getElementById('log-controls')!;
 
         this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
         this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
@@ -913,6 +918,22 @@ export class LeoView {
     public showBody(text: string, wrap: boolean) {
         this.HTML_ELEMENT.setAttribute('data-body-wrap', wrap ? 'true' : 'false');
         this.BODY_PANE.innerHTML = text;
+    }
+
+    public addToLogPane(message: string, replace = false) {
+        // const p = document.createElement('p');
+        // p.textContent = message;
+        // this.LOG_CONTENT.appendChild(p);
+        // this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
+
+        // * Add to text content instead of creating elements for performance
+        if (replace) {
+            this.LOG_CONTENT.textContent = message + (message ? '\n' : '');
+        } else {
+            this.LOG_CONTENT.textContent += message + '\n';
+        }
+        this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
+
     }
 
     // * Getters 

@@ -4,7 +4,6 @@
  */
 
 import './style.css';
-import pkg from '../package.json'; // note the .json extension
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager, PreviousSettings } from './core/leoApp';
 
@@ -76,10 +75,6 @@ class LeoWebApp {
 
     private async uiExperiments(): Promise<void> {
 
-        // Test out the json import path and package info
-        console.log(' IN UI EXPERIMENTS ');
-        console.log('Leo Web pkg:', pkg.name, pkg.version);
-
         // // 1 - TEST OPEN FILE DIALOG
         // const chosenFileHandle: FileSystemFileHandle | null = await view.showOpenDialog();
         // console.log('Chosen OPEN FILE handle:', chosenFileHandle);
@@ -137,10 +132,11 @@ class LeoWebApp {
     }
 
     private async leoCoreExperiments(): Promise<void> {
-        // For now, check if the startup created any commanders (windows).
+
+        // For now, create a commander.
         g.app.disable_redraw = true;
         const lm = g.app.loadManager!;
-        const c = g.app.newCommander('', g.app.gui, new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict));
+        let c = g.app.newCommander('', g.app.gui, new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict));
         lm.createMenu(c);
         lm.finishOpen(c);
         g.doHook('new', { old_c: undefined, c: c, new_c: c });
@@ -149,11 +145,14 @@ class LeoWebApp {
         // c.setLog();
         c.clearChanged(); // Fix #387: Clear all dirty bits.
         g.app.disable_redraw = false;
-        console.log('Done creating first commander.', c);
+        g.es('Done creating first commander.', c);
 
-        const p = c.p; // c.lastTopLevel().insertAfter();
-        p.h = 'renamed node';
-        // Make sure to double escape newlines in template literals.
+        // Ok, now create a new top-level node under the default 'newHeadline' node.
+        const p = c.lastTopLevel().insertAfter();
+        p.h = 'New node with script';
+
+        // Put a script INSIDE the body of the new node.
+        // Double escape newlines in template literals for this sample script.
         p.b = `
         g.es("Some script running from inside a new node");
         g.es("Another line from the script body.");
@@ -178,12 +177,24 @@ class LeoWebApp {
 
         // Now going to execute the script in the body of the new node.
         await c.executeScript(p);
-        console.log('Done executing script in new node, outline is now:');
+        g.es('Done executing script in new node, outline is now:');
 
         // Check the console or the log pane of the commander to see the output.
         for (const p of c.all_positions()) {
             g.es(' '.repeat(p.level()) + p.h);
         }
+
+        // ok, now maybe offer the 'open dialog' and actually load a file?
+        // TODO : show open file dialog...
+        // TODO : open it and put in in 'c'...
+        // ... 
+
+        g.es('Have opened a file, outline is now:');
+        // Check the console or the log pane of the commander to see the output.
+        for (const p of c.all_positions()) {
+            g.es(' '.repeat(p.level()) + p.h);
+        }
+
     }
 
 }
