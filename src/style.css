@@ -973,11 +973,13 @@ body.dragging-secondary .node {
 /* Log content area editable with contenteditable, no wrap */
 #log-controls {
   display: var(--log-display);
-  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
   overflow-y: auto;
   overflow-x: auto;
   white-space: pre;
   outline: none;
+  flex-grow: 1;
+  max-height: 100%;
 }
 
 #find-tab {

@@ -186,6 +186,17 @@ class LeoWebApp {
 
         // ok, now maybe offer the 'open dialog' and actually load a file?
         // TODO : show open file dialog...
+        const file = await this.view.showOpenDialog();
+        if (!file) {
+            g.es('No file chosen, skipping file open test.');
+            return;
+        }
+
+        // Show state of windowlist, frames,  etc...
+        console.log('g.app.windowList: ', g.app.windowList);
+        console.log('g.app.windowList.length: ', g.app.windowList.length);
+        console.log('g.app.gui.frameIndex: ', g.app.gui.frameIndex);
+
         // TODO : open it and put in in 'c'...
         // ... 
 

@@ -130,6 +130,8 @@ export class LeoUI extends NullGui {
      */
     private _setupNoOpenedLeoDocument(): void {
 
+        console.log('in _setupNoOpenedLeoDocument');
+
         this.leoStates.fileOpenedReady = false;
 
     }
@@ -138,7 +140,7 @@ export class LeoUI extends NullGui {
      * * A Leo file was opened: setup UI accordingly.
      */
     private _setupOpenedLeoDocument(): void {
-
+        console.log('in _setupOpenedLeoDocument');
         const c = g.app.windowList[this.frameIndex].c;
         this.leoStates.leoOpenedFileName = c.fileName();
         this.leoStates.leoChanged = c.changed;
