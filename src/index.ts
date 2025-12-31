@@ -55,7 +55,7 @@ class LeoWebApp {
         await this.controller.initialize();
 
         // Test out UI experiments (if any)
-        await this.uiExperiments();
+        await this.uiExperiments(); // * Remove when done *
 
         console.log('Leo Web UI initialized.');
 
@@ -70,21 +70,7 @@ class LeoWebApp {
         console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
 
         // Now test the Leo code itself by creating a new commander, inserting a node, change its headeline/body, and printing the outline to console.
-        // TODO.
-        // For now, check if the startup created any commanders (windows).
-        g.app.disable_redraw = true;
-        const lm = g.app.loadManager;
-        const c = g.app.newCommander('', g.app.gui, new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict));
-        lm.createMenu(c);
-        lm.finishOpen(c);
-        g.doHook('new', { old_c: undefined, c: c, new_c: c });
-        c.theScriptingController = new ScriptingController(c);
-        await c.theScriptingController.createAllButtons();
-        // c.setLog();
-        c.clearChanged(); // Fix #387: Clear all dirty bits.
-        g.app.disable_redraw = false;
-        console.log('Done creating first commander.', c);
-        g.es('Trying out g.es call from leo-web...');
+        await this.leoCoreExperiments(); // * Remove when done *
 
     }
 
@@ -148,6 +134,56 @@ class LeoWebApp {
         // });
         // console.log("Quick pick result:", result);
 
+    }
+
+    private async leoCoreExperiments(): Promise<void> {
+        // For now, check if the startup created any commanders (windows).
+        g.app.disable_redraw = true;
+        const lm = g.app.loadManager!;
+        const c = g.app.newCommander('', g.app.gui, new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict));
+        lm.createMenu(c);
+        lm.finishOpen(c);
+        g.doHook('new', { old_c: undefined, c: c, new_c: c });
+        c.theScriptingController = new ScriptingController(c);
+        await c.theScriptingController.createAllButtons();
+        // c.setLog();
+        c.clearChanged(); // Fix #387: Clear all dirty bits.
+        g.app.disable_redraw = false;
+        console.log('Done creating first commander.', c);
+
+        const p = c.p; // c.lastTopLevel().insertAfter();
+        p.h = 'renamed node';
+        // Make sure to double escape newlines in template literals.
+        p.b = `
+        g.es("Some script running from inside a new node");
+        g.es("Another line from the script body.");
+        const parent = c.lastTopLevel().insertAfter();
+        parent.h = 'New nodes';
+        const table = [
+            ['First node', 'Body text for first node'],
+           ['Node 2', 'Body text for node 2'],
+           ['Last Node', 'Body text for last node\\nLine 2'],
+        ];
+
+        for (const [headline, body] of table) {
+            let child = parent.insertAsLastChild();
+            child.b = body.trimEnd() + '\\n'; // Ensure exactly one trailing newline.
+            child.h = headline;
+        }
+
+        g.es("a last line from the script body.");
+        `;
+        c.redraw(p); // Selects the new node.
+
+
+        // Now going to execute the script in the body of the new node.
+        await c.executeScript(p);
+        console.log('Done executing script in new node, outline is now:');
+
+        // Check the console or the log pane of the commander to see the output.
+        for (const p of c.all_positions()) {
+            g.es(' '.repeat(p.level()) + p.h);
+        }
     }
 
 }
