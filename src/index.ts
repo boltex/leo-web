@@ -186,16 +186,29 @@ class LeoWebApp {
 
         // ok, now maybe offer the 'open dialog' and actually load a file?
         // TODO : show open file dialog...
-        const file = await this.view.showOpenDialog();
-        if (!file) {
+        const chosenFileHandle = await this.view.showOpenDialog();
+        if (!chosenFileHandle || chosenFileHandle.name === '') {
             g.es('No file chosen, skipping file open test.');
             return;
         }
+        console.log('kind and name', chosenFileHandle.kind, chosenFileHandle.name);
+        const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
+        console.log('Resolves to:', resolveResult);
+        const filename = resolveResult ? '/' + resolveResult.join('/') : chosenFileHandle.name;
+
+        g.es(`Opening file: ${filename} ...`);
+        const file_URI = new Uri(filename);
+        console.log('   file_URI: ', file_URI);
+        // for now, try g.readFileIntoString
+        const result = await g.readFileIntoString(file_URI.fsPath); // readFileIntoString will turn it back into an Uri, etc.
+        console.log('Result of readFileIntoString: ', result);
 
         // Show state of windowlist, frames,  etc...
         console.log('g.app.windowList: ', g.app.windowList);
         console.log('g.app.windowList.length: ', g.app.windowList.length);
         console.log('g.app.gui.frameIndex: ', g.app.gui.frameIndex);
+
+
 
         // TODO : open it and put in in 'c'...
         // ... 
