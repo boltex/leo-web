@@ -13,6 +13,7 @@ import { LeoController } from './LeoController';
 import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
 import { ScriptingController } from './core/mod_scripting';
+import { Constants } from './constants';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
@@ -200,18 +201,28 @@ class LeoWebApp {
         const file_URI = new Uri(filename);
         console.log('   file_URI: ', file_URI);
         // for now, try g.readFileIntoString
-        const result = await g.readFileIntoString(file_URI.fsPath); // readFileIntoString will turn it back into an Uri, etc.
+        const fileString = file_URI.fsPath;
+        const result = await g.readFileIntoString(fileString); // readFileIntoString will turn it back into an Uri, etc.
         console.log('Result of readFileIntoString: ', result);
 
         // Show state of windowlist, frames,  etc...
-        console.log('g.app.windowList: ', g.app.windowList);
-        console.log('g.app.windowList.length: ', g.app.windowList.length);
-        console.log('g.app.gui.frameIndex: ', g.app.gui.frameIndex);
+        console.log('g.app.windowList.length BEFORE: ', g.app.windowList.length);
+        console.log('g.app.gui.frameIndex BEFORE: ', g.app.gui.frameIndex);
 
+        if (!fileString.endsWith('.leo')) {
+            console.log('Not a .leo file, skipping open.');
+            return
+        }
 
+        const w_uri = g.makeUri(fileString);
 
-        // TODO : open it and put in in 'c'...
-        // ... 
+        c = g.app.windowList[g.app.gui.frameIndex].c;
+        await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
+        await c.open_outline(w_uri);
+
+        console.log('g.app.windowList.length AFTER: ', g.app.windowList.length);
+        console.log('g.app.gui.frameIndex AFTER: ', g.app.gui.frameIndex);
+        c = g.app.windowList[g.app.gui.frameIndex].c;
 
         g.es('Have opened a file, outline is now:');
         // Check the console or the log pane of the commander to see the output.

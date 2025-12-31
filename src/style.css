@@ -956,8 +956,7 @@ body.dragging-secondary .node {
   cursor: pointer;
   user-select: none;
   font-size: 0.8rem;
-
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: 6px 6px 0 0; /* tab-like top rounding */
   transition: background 0.2s, transform 0.1s;
 }
