@@ -975,6 +975,7 @@ body.dragging-secondary .node {
   padding: 0.25rem 0.5rem 0.5rem 0.5rem;
   overflow-y: auto;
   overflow-x: auto;
+  line-height: 1.25;
   white-space: pre;
   outline: none;
   flex-grow: 1;
