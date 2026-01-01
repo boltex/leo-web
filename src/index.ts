@@ -187,7 +187,7 @@ class LeoWebApp {
 
         // ok, now maybe offer the 'open dialog' and actually load a file?
         // TODO : show open file dialog...
-        const chosenFileHandle = await this.view.showOpenDialog();
+        const chosenFileHandle = await this.view.showNativeOpenFileDialog();
         if (!chosenFileHandle || chosenFileHandle.name === '') {
             g.es('No file chosen, skipping file open test.');
             return;

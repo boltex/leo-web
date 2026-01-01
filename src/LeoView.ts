@@ -1057,6 +1057,25 @@ export class LeoView {
         }
     }
 
+    public async showNativeOpenFileDialog(): Promise<FileSystemFileHandle | null> {
+        try {
+            const [fileHandle] = await window.showOpenFilePicker();
+            // Before returning, check that the chosen file is inside the workspace directory using 'resolve'
+            const workspaceDir = workspace.getWorkspaceDirHandle();
+            if (workspaceDir) {
+                const result = await workspaceDir.resolve(fileHandle);
+                if (!result || result.length === 0) {
+                    this.showToast('⚠️ Selected file is not inside workspace.', 3000);
+                    return null;
+                }
+            }
+            return fileHandle || null;
+        } catch (e) {
+            console.error('Error showing native open file dialog:', e);
+            return null;
+        }
+    }
+
     // Shows a file open dialog to the user which allows to select a file for opening-purposes.
     public async showOpenDialog(options?: OpenDialogOptions): Promise<FileSystemFileHandle | null> {
         return new Promise(async (resolve) => {
@@ -1102,6 +1121,29 @@ export class LeoView {
                 resolve(null);
             };
         });
+    }
+
+    public async showNativeSaveFileDialog(suggestedName?: string): Promise<FileSystemFileHandle | null> {
+        try {
+            const options: any = {};
+            if (suggestedName) {
+                options.suggestedName = suggestedName;
+            }
+            const fileHandle = await window.showSaveFilePicker(options);
+            // Before returning, check that the chosen file is inside the workspace directory using 'resolve'
+            const workspaceDir = workspace.getWorkspaceDirHandle();
+            if (workspaceDir) {
+                const result = await workspaceDir.resolve(fileHandle);
+                if (!result || result.length === 0) {
+                    this.showToast('⚠️ Selected file is not inside workspace.', 2000);
+                    return null;
+                }
+            }
+            return fileHandle || null;
+        } catch (e) {
+            console.error('Error showing native save file dialog:', e);
+            return null;
+        }
     }
 
     public async showSaveDialog(options?: SaveDialogOptions): Promise<FileSystemFileHandle | null> {
