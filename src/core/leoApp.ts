@@ -1046,9 +1046,7 @@ export class LeoApp {
             return;
         }
 
-        let guiVersion = "Browser"; // Temporary set for leo web, fix later.
-
-        const w_leoWebPackageJson = pkg;
+        const w_leoWebPackageJson = pkg as any;
 
         const leoVer: string = w_leoWebPackageJson.version;
 
@@ -1083,7 +1081,7 @@ export class LeoApp {
 
             if (browserResult.os) {
                 if (browserResult.os.name) {
-                    sysVersion += ' on ' + browserResult.os.name;
+                    sysVersion += '\n' + browserResult.os.name;
                 }
                 if (browserResult.os.version) {
                     sysVersion += ' ' + browserResult.os.version;
@@ -1099,7 +1097,7 @@ export class LeoApp {
         const date = w_leoWebPackageJson.gitDate;
 
         // Compute g.app.signon.
-        const signon: string[] = [`Leo Web ${leoVer}`];
+        const signon: string[] = [`Leo-Web ${leoVer}`];
         if (branch) {
             signon.push(`, ${branch} branch`);
         }
@@ -1111,7 +1109,7 @@ export class LeoApp {
         }
         app.signon = signon.join('');
         // Compute g.app.signon1.
-        app.signon1 = `${n1}${guiVersion}\n${sysVersion}`;
+        app.signon1 = `${sysVersion}`;
     }
 
     /**
@@ -1140,9 +1138,10 @@ export class LeoApp {
         const buffer = g.logBuffer;
         buffer.unshift(app.signon1);
         buffer.unshift(app.signon);
+        buffer.unshift('Leo Log Window');
 
         if (buffer.length) {
-            let len = buffer.length; // Only do loop once if logPano not visible
+            let len = buffer.length; // Only do loop once if log pane not visible
             while (len > 0) {
                 // Pop the bottom one and append it
                 g.es_print(buffer.shift()!);
@@ -3447,6 +3446,7 @@ export class LoadManager {
         // New in Leo 4.6: provide an official way for very late initialization.
         // c.frame.tree.initAfterLoad();
         // c.initAfterLoad();
+        // lm.createMenu(c, c.fileName())
 
         // chapterController.finishCreate must be called after the first real redraw
         // because it requires a valid value for c.rootPosition().
