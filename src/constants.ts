@@ -49,6 +49,15 @@ export class Constants {
     ];
 
     /**
+     * * Configuration Defaults used in config.ts
+     */
+    public static CONFIG_DEFAULTS = {
+        CHECK_FOR_CHANGE_EXTERNAL_FILES: "none",
+        DEFAULT_RELOAD_IGNORE: "none",
+        LEO_ID: ""
+    };
+
+    /**
      * Basic user messages strings for messages and dialogs
      */
     public static USER_MESSAGES = {
