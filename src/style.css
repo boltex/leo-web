@@ -55,8 +55,6 @@
   --body-pane-wrap: pre;
   /* message dialog */
   --message-dialog-display: none;
-  /* file dialog */
-  --file-dialog-display: none;
   /* input-dialog */
   --input-dialog-display: none;
   /* quickpick-dialog */
@@ -171,10 +169,6 @@
 
 [data-show-message-dialog="true"] {
   --message-dialog-display: flex;
-}
-
-[data-show-file-dialog="true"] {
-  --file-dialog-display: flex;
 }
 
 [data-show-input-dialog="true"] {
@@ -1244,6 +1238,7 @@ a:hover {
   pointer-events: none;
   transition: opacity 180ms ease, transform 180ms ease;
   z-index: 2000;
+  text-align: center;
   font-family: sans-serif;
   font-size: 13px;
   white-space: pre;
@@ -1294,183 +1289,6 @@ a:hover {
 }
 #message-dialog .modal-content button:hover {
   background: var(--hover-bg);
-}
-
-/* File open/save dialog */
-#file-dialog {
-  display: var(--file-dialog-display);
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-}
-
-/* File dialog header */
-#file-dialog .file-dialog-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--find-border-color);
-  padding-bottom: 8px;
-}
-
-#file-dialog-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--find-text-color);
-}
-
-#file-dialog-close {
-  appearance: none;
-  border: 1px solid var(--find-border-color);
-  background: transparent;
-  color: var(--find-text-color);
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-#file-dialog-close:hover {
-  background: var(--hover-bg);
-}
-
-/* Breadcrumb row */
-.file-dialog-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-/* Up button */
-#file-dialog-up {
-  appearance: none;
-  border: 1px solid var(--find-border-color);
-  background: rgba(255, 232, 29, 0.25);
-  color: var(--find-text-color);
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-#file-dialog-up:hover {
-  background: var(--hover-bg);
-}
-#file-dialog-up:disabled {
-  opacity: 0.4;
-  background: rgba(221, 214, 150, 0.25);
-  cursor: default;
-  border-color: var(--caret-dim-color);
-}
-
-/* Path breadcrumb */
-#file-dialog-path {
-  flex-grow: 2;
-  font-family: monospace;
-  font-size: 0.9rem;
-  color: var(--caret-dim-color);
-  padding: 6px 8px;
-  border: 1px solid var(--find-border-color);
-  border-radius: 6px;
-  background: var(--find-pane-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* File list */
-.file-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 12px 0;
-  border: 1px solid var(--find-border-color);
-  border-radius: 8px;
-  background: var(--find-pane-color);
-  height: 300px; /* fixed height */
-  overflow-y: auto; /* vertical scroll */
-  overflow-x: hidden;
-}
-
-.file-list li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  cursor: pointer;
-  color: var(--text-color);
-  user-select: none;
-}
-
-/* File icons as  pseudo-elements */
-.file-list li.file::before,
-.file-list li.directory::before {
-  content: "";
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  flex-shrink: 0;
-}
-
-.file-list li.file::before {
-  /* Generic file icon emoji */
-  content: "📄";
-}
-
-.file-list li.directory::before {
-  /* Generic folder icon emoji */
-  content: "📁";
-}
-
-.file-list li:hover {
-  background: var(--hover-bg);
-}
-.file-list li.selected {
-  background: var(--selected-bg);
-  outline: 1px solid var(--find-border-color);
-}
-
-/* Footer: input + buttons */
-.file-dialog-footer {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-#file-dialog-filename {
-  flex: 1;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--find-border-color);
-  background: transparent;
-  color: var(--text-color);
-}
-#file-dialog-filename::placeholder {
-  color: var(--find-placeholder-color);
-}
-#file-dialog-filename:focus {
-  outline: 2px solid var(--find-selection);
-  border-color: var(--find-selection);
-  outline-offset: -1px;
-}
-
-#file-dialog-confirm {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--find-border-color);
-  background: var(--resizer-color);
-  color: var(--text-color);
-  cursor: pointer;
-  font-weight: 600;
-}
-#file-dialog-confirm:hover {
-  background: var(--hover-bg);
-}
-
-/* Optional: subtle accent border for the dialog content */
-#file-dialog .modal-content {
-  border: 1px solid var(--menu-border-color);
 }
 
 /* Input dialog */

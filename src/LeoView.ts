@@ -69,14 +69,6 @@ export class LeoView {
     private MODAL_DIALOG_DESCRIPTION: HTMLElement;
     private MODAL_DIALOG_BTN: HTMLButtonElement;
 
-    private FILE_DIALOG_TITLE: HTMLElement;
-    private FILE_DIALOG_CLOSE: HTMLButtonElement;
-    private FILE_DIALOG_UP: HTMLButtonElement;
-    private FILE_DIALOG_PATH: HTMLElement;
-    private FILE_DIALOG_LIST: HTMLElement;
-    private FILE_DIALOG_FILENAME: HTMLInputElement;
-    private FILE_DIALOG_CONFIRM: HTMLButtonElement;
-
     private INPUT_DIALOG_TITLE: HTMLElement;
     private INPUT_DIALOG_DESCRIPTION: HTMLElement;
     private INPUT_DIALOG_INPUT: HTMLInputElement;
@@ -114,6 +106,7 @@ export class LeoView {
     public secondaryIsDragging = false;
     public crossIsDragging = false;
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
+    private __toastResolvers: Array<() => void> = [];
 
     public minWidth = 20;
     public minHeight = 20;
@@ -184,14 +177,6 @@ export class LeoView {
         this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;
         this.MODAL_DIALOG_BTN = document.getElementById('modal-dialog-btn')! as HTMLButtonElement;
-
-        this.FILE_DIALOG_TITLE = document.getElementById('file-dialog-title')!
-        this.FILE_DIALOG_CLOSE = document.getElementById('file-dialog-close') as HTMLButtonElement;
-        this.FILE_DIALOG_UP = document.getElementById('file-dialog-up') as HTMLButtonElement;
-        this.FILE_DIALOG_PATH = document.getElementById('file-dialog-path')!
-        this.FILE_DIALOG_LIST = document.getElementById('file-dialog-list')!
-        this.FILE_DIALOG_FILENAME = document.getElementById('file-dialog-filename') as HTMLInputElement;
-        this.FILE_DIALOG_CONFIRM = document.getElementById('file-dialog-confirm') as HTMLButtonElement;
 
         this.INPUT_DIALOG_TITLE = document.getElementById('input-dialog-title')!;
         this.INPUT_DIALOG_DESCRIPTION = document.getElementById('input-dialog-description')!;
@@ -898,21 +883,41 @@ export class LeoView {
         };
     }
 
-    public showToast(message: string, duration = 2000) {
-        if (!this.TOAST) return;
+    public showToast(message: string, duration = 2000, detail?: string): Promise<void> {
+        if (!this.TOAST) return Promise.resolve();
+
+        // Set content
         this.TOAST.textContent = message;
+        if (detail) {
+            // Two newlines for a better separation
+            this.TOAST.textContent += `\n\n${detail}`;
+        }
+
+        // Show toast
         this.TOAST.hidden = false;
-        // Force reflow so the transition always runs when toggling
-        void this.TOAST.offsetWidth;
+        void this.TOAST.offsetWidth; // Force reflow for transition
         this.TOAST.classList.add('show');
+
+        // Reset any previous timer
         if (this.__toastTimer) {
             clearTimeout(this.__toastTimer);
+            this.__toastTimer = null;
         }
+
+        // Schedule hide and resolve all pending promises when finally hidden
         this.__toastTimer = setTimeout(() => {
             this.TOAST.classList.remove('show');
-            setTimeout(() => { this.TOAST.hidden = true; }, 220);
-            this.__toastTimer = null;
+            setTimeout(() => {
+                this.TOAST.hidden = true;
+                this.__toastTimer = null;
+                const resolvers = this.__toastResolvers.splice(0);
+                for (const resolve of resolvers) resolve();
+            }, 220); // match CSS transition duration
         }, duration);
+
+        return new Promise<void>((resolve) => {
+            this.__toastResolvers.push(resolve);
+        });
     }
 
     public showBody(text: string, wrap: boolean) {
@@ -994,69 +999,6 @@ export class LeoView {
         };
     }
 
-    /* This code may be useful to get open chosen file:
-        const filename = this.FILE_DIALOG_FILENAME.value;
-        const current = pathStack[pathStack.length - 1];
-        const fileHandle = await current.handle.getFileHandle(filename);
-    */
-
-    // This populate the choose-file/folder dialog UI with the contents of the given pathStack
-    public async refreshDialog(pathStack: FilePath[]) {
-        const current = pathStack[pathStack.length - 1]!;
-
-        this.FILE_DIALOG_PATH.textContent =
-            "/" + pathStack.map(p => p.name).join("/");
-
-        this.FILE_DIALOG_LIST.innerHTML = "";
-
-        const entries = await utils.readDirectory(current.handle);
-
-        // Sort: directories first, then files; each group alphabetically (case-insensitive)
-        entries.sort((a, b) => {
-            const aIsDir = a.kind === "directory";
-            const bIsDir = b.kind === "directory";
-            if (aIsDir && !bIsDir) return -1;
-            if (!aIsDir && bIsDir) return 1;
-            return a.name.localeCompare(b.name, undefined, { sensitivity: "accent", numeric: true });
-        });
-
-        // Parent directory ("..")
-        this.FILE_DIALOG_UP.disabled = pathStack.length <= 1;
-        this.FILE_DIALOG_UP.onclick = () => {
-            if (pathStack.length > 1) {
-                pathStack.pop();
-                this.refreshDialog(pathStack);
-            }
-        };
-
-        // Subfolders/files
-        for (const e of entries) {
-            const li = document.createElement("li");
-            li.textContent = e.name;
-            li.classList.add(e.kind);
-            li.ondblclick = () => {
-                if (e.kind === "directory") {
-                    pathStack.push({ name: e.name, handle: e.handle as FileSystemDirectoryHandle });
-                    this.refreshDialog(pathStack);
-                }
-            };
-            li.onclick = () => {
-                const previouslySelected = this.FILE_DIALOG_LIST.querySelector("li.selected");
-                if (previouslySelected) {
-                    previouslySelected.classList.remove("selected");
-                }
-                li.classList.add("selected");
-                if (e.kind === "directory") {
-                    // If directory, do nothing for now, but may add a 'directory mode' later
-                } else {
-                    this.FILE_DIALOG_FILENAME.value = e.name;
-                }
-            };
-
-            this.FILE_DIALOG_LIST.appendChild(li);
-        }
-    }
-
     public async showNativeOpenFileDialog(): Promise<FileSystemFileHandle | null> {
         try {
             const [fileHandle] = await window.showOpenFilePicker();
@@ -1074,53 +1016,6 @@ export class LeoView {
             console.error('Error showing native open file dialog:', e);
             return null;
         }
-    }
-
-    // Shows a file open dialog to the user which allows to select a file for opening-purposes.
-    public async showOpenDialog(options?: OpenDialogOptions): Promise<FileSystemFileHandle | null> {
-        return new Promise(async (resolve) => {
-            this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'true');
-            this.FILE_DIALOG_TITLE.textContent = options?.title || 'Open File';
-            this.FILE_DIALOG_FILENAME.value = "";
-            const pathStack: FilePath[] = [];
-            if (workspace.getWorkspaceDirHandle()) {
-                pathStack.push({ name: workspace.getWorkspaceDirHandle()!.name, handle: workspace.getWorkspaceDirHandle()! });
-            } else {
-                throw new Error("Workspace directory handle is not set.");
-            }
-
-            await this.refreshDialog(pathStack);
-            this.FILE_DIALOG_CONFIRM.textContent = options?.openLabel || 'Open';
-            const openCallback = async () => {
-                const filename = this.FILE_DIALOG_FILENAME.value;
-                if (!filename) {
-                    // No file selected
-                    return;
-                }
-                const current = pathStack[pathStack.length - 1]!;
-                try {
-                    const fileHandle = await current.handle.getFileHandle(filename);
-                    this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
-                    resolve(fileHandle);
-                } catch (e) {
-                    console.error('Error getting file handle:', e);
-                    this.FILE_DIALOG_TITLE.textContent = (options?.title || 'Open File') + ' - Error: Could not open file';
-                    // Do not close dialog, let user retry
-                }
-            };
-            this.FILE_DIALOG_CONFIRM.onclick = openCallback;
-            // Also call on Enter key in filename input
-            this.FILE_DIALOG_FILENAME.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    openCallback();
-                }
-            };
-
-            this.FILE_DIALOG_CLOSE.onclick = () => {
-                this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
-                resolve(null);
-            };
-        });
     }
 
     public async showNativeSaveFileDialog(suggestedName?: string): Promise<FileSystemFileHandle | null> {
@@ -1144,51 +1039,6 @@ export class LeoView {
             console.error('Error showing native save file dialog:', e);
             return null;
         }
-    }
-
-    public async showSaveDialog(options?: SaveDialogOptions): Promise<FileSystemFileHandle | null> {
-        return new Promise(async (resolve) => {
-            this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'true');
-            this.FILE_DIALOG_TITLE.textContent = options?.title || 'Save File';
-            this.FILE_DIALOG_FILENAME.value = "";
-            const pathStack: FilePath[] = [];
-            if (workspace.getWorkspaceDirHandle()) {
-                pathStack.push({ name: workspace.getWorkspaceDirHandle()!.name, handle: workspace.getWorkspaceDirHandle()! });
-            } else {
-                throw new Error("Workspace directory handle is not set.");
-            }
-            await this.refreshDialog(pathStack);
-            this.FILE_DIALOG_CONFIRM.textContent = options?.saveLabel || 'Save';
-            const saveCallback = async () => {
-                const filename = this.FILE_DIALOG_FILENAME.value;
-                if (!filename) {
-                    // No file selected
-                    return;
-                }
-                const current = pathStack[pathStack.length - 1]!;
-                try {
-                    const fileHandle = await current.handle.getFileHandle(filename, { create: true });
-                    this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
-                    resolve(fileHandle);
-                } catch (e) {
-                    console.error('Error getting file handle:', e);
-                    this.FILE_DIALOG_TITLE.textContent = (options?.title || 'Save File') + ' - Error: Could not save file';
-                    // Do not close dialog, let user retry
-                }
-            };
-            this.FILE_DIALOG_CONFIRM.onclick = saveCallback;
-            // Also call on Enter key in filename input
-            this.FILE_DIALOG_FILENAME.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    saveCallback();
-                }
-            };
-
-            this.FILE_DIALOG_CLOSE.onclick = () => {
-                this.HTML_ELEMENT.setAttribute('data-show-file-dialog', 'false');
-                resolve(null);
-            };
-        });
     }
 
     public async showInputDialog(options: InputDialogOptions): Promise<string | null> {
@@ -1219,7 +1069,6 @@ export class LeoView {
             };
         });
     }
-
 
     public showTextDocument(uri: Uri): void {
         // Read the file, and open in a new tab or window
@@ -1257,7 +1106,11 @@ export class LeoView {
             }
 
         } else {
-            this.showToast(message, 2000);
+            if (options?.detail) {
+                this.showToast(message, 2000, options.detail);
+            } else {
+                this.showToast(message, 2000);
+            }
         }
     }
 

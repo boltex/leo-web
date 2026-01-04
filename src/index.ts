@@ -18,10 +18,6 @@ process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of pro
 
 class LeoWebApp {
 
-    private model!: LeoModel;
-    private view!: LeoView;
-    private controller!: LeoController;
-
     constructor() {
         this.init();
     }
@@ -46,13 +42,13 @@ class LeoWebApp {
     private async setupApp(): Promise<void> {
 
         // Initialize the MVC components
-        this.model = new LeoModel(); // The model will ultimately be the same core as LeoJS
+        const model = new LeoModel(); // The model will ultimately be the same core as LeoJS
+        const view = new LeoView();
 
-        this.view = new LeoView();
-        this.controller = new LeoController(this.model, this.view);
-        workspace.setView(this.view);
+        const controller = new LeoController(model, view);
+        workspace.setView(view);
 
-        await this.controller.initialize();
+        await controller.initialize();
 
         // Test out UI experiments (if any)
         await this.uiExperiments(); // * Remove when done *
@@ -70,7 +66,7 @@ class LeoWebApp {
         console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
 
         // Now test the Leo code itself by creating a new commander, inserting a node, change its headeline/body, and printing the outline to console.
-        await this.leoCoreExperiments(); // * Remove when done *
+        // await this.leoCoreExperiments(); // * Remove when done *
 
     }
 
@@ -130,6 +126,11 @@ class LeoWebApp {
         // });
         // console.log("Quick pick result:", result);
 
+        // Test showToast
+        await workspace.view.showToast('This is a test toast message!', 3000);
+        await workspace.view.showToast('This is another test toast message!', 2000, "some detail info for toast");
+        await workspace.view.showToast('This is a longer toast message that will stay for 5 seconds.', 5000);
+
     }
 
     private async leoCoreExperiments(): Promise<void> {
@@ -187,7 +188,7 @@ class LeoWebApp {
 
         // ok, now maybe offer the 'open dialog' and actually load a file?
         // TODO : show open file dialog...
-        const chosenFileHandle = await this.view.showNativeOpenFileDialog();
+        const chosenFileHandle = await workspace.view.showNativeOpenFileDialog();
         if (!chosenFileHandle || chosenFileHandle.name === '') {
             g.es('No file chosen, skipping file open test.');
             return;
