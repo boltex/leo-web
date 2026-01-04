@@ -1277,9 +1277,14 @@ a:hover {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
+#message-dialog .modal-content #modal-dialog-btn-container {
+  display: flex;
+  justify-content: center;
+}
+
 #message-dialog .modal-content button {
   display: block;
-  margin: 16px auto 0 auto;
+  margin-right: 8px;
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--find-border-color);
@@ -1287,6 +1292,7 @@ a:hover {
   color: var(--text-color);
   cursor: pointer;
 }
+
 #message-dialog .modal-content button:hover {
   background: var(--hover-bg);
 }

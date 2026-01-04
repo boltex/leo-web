@@ -67,7 +67,7 @@ export class LeoView {
     private TOAST: HTMLElement;
     private MODAL_DIALOG_TITLE: HTMLElement;
     private MODAL_DIALOG_DESCRIPTION: HTMLElement;
-    private MODAL_DIALOG_BTN: HTMLButtonElement;
+    private MODAL_DIALOG_BTN_CONTAINER: HTMLElement;
 
     private INPUT_DIALOG_TITLE: HTMLElement;
     private INPUT_DIALOG_DESCRIPTION: HTMLElement;
@@ -106,7 +106,15 @@ export class LeoView {
     public secondaryIsDragging = false;
     public crossIsDragging = false;
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
-    private __toastResolvers: Array<() => void> = [];
+    private __toastResolvers: Array<(value: PromiseLike<undefined> | undefined) => void> = [];
+
+    private __messageDialogQueue: Array<{
+        message: string;
+        options?: MessageOptions;
+        items: string[];
+        resolve: (value: string | undefined) => void;
+    }> = [];
+    private __isMessageDialogOpen = false;
 
     public minWidth = 20;
     public minHeight = 20;
@@ -176,7 +184,7 @@ export class LeoView {
 
         this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;
-        this.MODAL_DIALOG_BTN = document.getElementById('modal-dialog-btn')! as HTMLButtonElement;
+        this.MODAL_DIALOG_BTN_CONTAINER = document.getElementById('modal-dialog-btn-container')!;
 
         this.INPUT_DIALOG_TITLE = document.getElementById('input-dialog-title')!;
         this.INPUT_DIALOG_DESCRIPTION = document.getElementById('input-dialog-description')!;
@@ -806,85 +814,107 @@ export class LeoView {
         // First, check if window.showDirectoryPicker is available to adapt the message in the dialog, and just reject if not.
         if (!('showDirectoryPicker' in window)) {
             return new Promise((resolve, reject) => {
-                this.showMessageDialog({
-                    title: '⚠️ Opening Local folders is Unsupported',
-                    description: 'Your browser does not support opening local folders.',
-                    primaryLabel: 'View Specification',
-                    onPrimaryClick: async () => {
-                        try {
+                return this.showMessageDialog(
+                    '⚠️ Opening Local folders is Unsupported',
+                    {
+                        detail: 'Your browser does not support opening local folders.',
+                    },
+                    'View Specification')
+                    .then((result) => {
+                        if (result === 'View Specification') {
                             window.location.href =
                                 'https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker';
-                            reject('Browser does not support showDirectoryPicker API.');
-                        } catch (e) {
-                            reject(e);
                         }
-                    },
-                });
+                        reject('Browser does not support showDirectoryPicker API.');
+                    });
             });
+
+
         } else {
             // ok, continue with the normal flow
             return new Promise((resolve, reject) => {
-                this.showMessageDialog({
-                    title: '📁 Choose a Workspace',
-                    description: 'Leo-Web needs permission to read and write files in a folder of your choice.',
-                    primaryLabel: 'Choose Folder',
-                    onPrimaryClick: async (setPrimaryLabel) => {
-                        setPrimaryLabel('Choosing...');
-                        try {
-                            const dir = await window.showDirectoryPicker({ mode: 'readwrite' });
-                            resolve(dir);
-                        } catch (e) {
-                            reject(e);
-                        }
-                    },
+                return this.showMessageDialog(
+                    '📁 Choose a Workspace',
+                    { detail: 'Leo-Web needs permission to read and write files in a folder of your choice.', },
+                    'Choose Folder'
+                ).then((result) => {
+                    if (result === 'Choose Folder') {
+                        return window.showDirectoryPicker({ mode: 'readwrite' })
+                            .then((dir) => {
+                                resolve(dir);
+                            })
+                            .catch((e) => {
+                                reject(e);
+                            });
+                    } else {
+                        reject('User cancelled directory selection.');
+                    }
                 });
+
+
             });
         }
 
     }
 
-    public showMessageDialog(options: {
-        title: string;
-        description?: string;
-        primaryLabel?: string;
-        onPrimaryClick?: (setPrimaryLabel: (text: string) => void) => void | Promise<void>;
-        autoShow?: boolean; // default true
-    }) {
-        const { title, description, primaryLabel = 'OK', onPrimaryClick, autoShow = true } = options;
+    // This is similar to vscode's showInformationMessage API: returning the clicked button's label, or undefined if dismissed.
+    public showMessageDialog(
+        message: string, options?: MessageOptions, ...items: string[]
+    ): Thenable<string | undefined> {
+        return new Promise<string | undefined>((resolve) => {
+            // Add to queue
+            this.__messageDialogQueue.push({
+                message,
+                options,
+                items,
+                resolve
+            });
 
-        // Show dialog
-        if (autoShow) {
-            this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
-        }
-
-        // Set content
-        this.MODAL_DIALOG_TITLE.textContent = title;
-        this.MODAL_DIALOG_DESCRIPTION.textContent = description ?? '';
-        this.MODAL_DIALOG_BTN.textContent = primaryLabel;
-
-        // Wire primary button
-        const setPrimaryLabel = (text: string) => this.MODAL_DIALOG_BTN.textContent = text;
-        this.MODAL_DIALOG_BTN.onclick = () => {
-            if (!onPrimaryClick) {
-                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
-                return;
+            // Process queue if not already processing
+            if (!this.__isMessageDialogOpen) {
+                this._processMessageDialogQueue();
             }
-            const maybePromise = onPrimaryClick(setPrimaryLabel);
-            if (maybePromise && typeof (maybePromise as Promise<void>).then === 'function') {
-                // Optional: prevent double clicks while async op runs
-                this.MODAL_DIALOG_BTN.disabled = true;
-                (maybePromise as Promise<void>).finally(() => {
-                    this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
-                    this.MODAL_DIALOG_BTN.disabled = false;
-                });
-            } else {
-                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
-            }
-        };
+        });
     }
 
-    public showToast(message: string, duration = 2000, detail?: string): Promise<void> {
-        if (!this.TOAST) return Promise.resolve();
+    private _processMessageDialogQueue(): void {
+        // If queue is empty or dialog is already open, do nothing
+        if (this.__messageDialogQueue.length === 0 || this.__isMessageDialogOpen) {
+            return;
+        }
+
+        this.__isMessageDialogOpen = true;
+        const dialog = this.__messageDialogQueue.shift()!;
+
+        // Show the dialog
+        this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
+
+        // Set content
+        this.MODAL_DIALOG_TITLE.textContent = dialog.message;
+        this.MODAL_DIALOG_DESCRIPTION.textContent = dialog.options?.detail ?? '';
+
+        // If no items, use 'OK' as default
+        const buttonLabels = dialog.items.length > 0 ? dialog.items : ['OK'];
+
+        // Fill up MODAL_DIALOG_BTN_CONTAINER with buttons
+        this.MODAL_DIALOG_BTN_CONTAINER.innerHTML = '';
+        buttonLabels.forEach(label => {
+            const btn = document.createElement('button');
+            btn.textContent = label;
+            btn.className = 'modal-dialog-button';
+            btn.onclick = () => {
+                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+                this.__isMessageDialogOpen = false;
+                dialog.resolve(label);
+                // Process next dialog in queue after a small delay
+                setTimeout(() => this._processMessageDialogQueue(), 100);
+            };
+            this.MODAL_DIALOG_BTN_CONTAINER.appendChild(btn);
+        });
+    }
+
+    public showToast(message: string, duration = 2000, detail?: string): Promise<undefined> {
+        if (!this.TOAST) return Promise.resolve(undefined);
 
         // Set content
         this.TOAST.textContent = message;
@@ -911,11 +941,11 @@ export class LeoView {
                 this.TOAST.hidden = true;
                 this.__toastTimer = null;
                 const resolvers = this.__toastResolvers.splice(0);
-                for (const resolve of resolvers) resolve();
+                for (const resolve of resolvers) resolve(undefined);
             }, 220); // match CSS transition duration
         }, duration);
 
-        return new Promise<void>((resolve) => {
+        return new Promise<undefined>((resolve) => {
             this.__toastResolvers.push(resolve);
         });
     }
@@ -1089,27 +1119,31 @@ export class LeoView {
     /**
      * Method that mimics VSCode's showInformationMessage API.
      */
-    public showInformationMessage(message: string, options?: MessageOptions): void {
-        // if modal is true, use showMessageDialog, if false, use toast
-        // TODO: improve showToast to support 'details' option of the MessageOptions interface
+    public showInformationMessage(message: string, options?: MessageOptions, ...items: string[]): Thenable<string | void> {
+        // if modal, use our showMessageDialog and allow for options and buttons for each item in items array like vscode's API
         if (options?.modal) {
             if (options.detail) {
-                this.showMessageDialog({
-                    title: message,
-                    description: options.detail,
-                });
+                return this.showMessageDialog(
+                    message,
+                    options,
+                    ...items
+                );
             } else {
-                this.showMessageDialog({
-                    title: 'ℹ️ Information',
-                    description: message,
-                });
-            }
+                return this.showMessageDialog(
+                    'ℹ️ Information',
+                    {
+                        detail: message,
+                    },
+                    ...items
 
+                );
+            }
         } else {
+            // if not modal, use toast
             if (options?.detail) {
-                this.showToast(message, 2000, options.detail);
+                return this.showToast(message, 2000, options.detail);
             } else {
-                this.showToast(message, 2000);
+                return this.showToast(message, 2000);
             }
         }
     }

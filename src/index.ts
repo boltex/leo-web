@@ -126,10 +126,15 @@ class LeoWebApp {
         // });
         // console.log("Quick pick result:", result);
 
-        // Test showToast
-        await workspace.view.showToast('This is a test toast message!', 3000);
-        await workspace.view.showToast('This is another test toast message!', 2000, "some detail info for toast");
-        await workspace.view.showToast('This is a longer toast message that will stay for 5 seconds.', 5000);
+        // test showInformationMessage dialog with the modal option.
+        workspace.view.showInformationMessage("This is an information message.", { modal: true, detail: "Additional details can go here." }, "OK", "Cancel").then((selection) => {
+            console.log("Information message selection:", selection);
+        });
+        // Another modal example that should be seen after closing the first one.
+        workspace.view.showInformationMessage("Another information message.", { modal: true }, "Yes", "No", "Maybe").then((selection) => {
+            console.log("Second information message selection:", selection);
+        });
+        console.log("Displayed information messages. This hsould be seen in console before user closes the dialogs.");
 
     }
 
