@@ -1039,19 +1039,29 @@ export class LeoView {
 
             // Add file type filters if provided
             if (options?.filters && Object.keys(options.filters).length > 0) {
-                properOptions.types = Object.entries(options.filters).map(([description, extensions]) => {
-                    const normalizedExts = extensions.map(ext => ext.startsWith('.') ? ext : `.${ext}`) as `.${string}`[];
+                const types: FilePickerAcceptType[] = [];
 
-                    // Use */* MIME type for "all files" filter (.*), otherwise use application/octet-stream
-                    const mimeType = extensions.includes('.*') || extensions.includes('*') ? '*/*' : 'application/octet-stream';
+                for (const [description, extensions] of Object.entries(options.filters)) {
+                    // Skip "all files" filter - browser provides this by default
+                    if (extensions.includes('.*') || extensions.includes('*')) {
+                        continue;
+                    }
 
-                    return {
+                    // Use a unique MIME type per filter to prevent extension mixing
+                    types.push({
                         description,
                         accept: {
-                            [mimeType]: normalizedExts
+                            // Use text/plain for common text extensions, otherwise use a unique identifier
+                            [`application/${description.toLowerCase().replace(/\s+/g, '-')}`]: extensions.map(ext =>
+                                ext.startsWith('.') ? ext : `.${ext}`
+                            ) as `.${string}`[]
                         }
-                    };
-                });
+                    });
+                }
+
+                if (types.length > 0) {
+                    properOptions.types = types;
+                }
             }
 
             // Set start location if defaultUri is provided
@@ -1094,19 +1104,28 @@ export class LeoView {
 
             // Add file type filters if provided
             if (options?.filters && Object.keys(options.filters).length > 0) {
-                properOptions.types = Object.entries(options.filters).map(([description, extensions]) => {
-                    const normalizedExts = extensions.map(ext => ext.startsWith('.') ? ext : `.${ext}`) as `.${string}`[];
+                const types: FilePickerAcceptType[] = [];
 
-                    // Use */* MIME type for "all files" filter (.*), otherwise use application/octet-stream
-                    const mimeType = extensions.includes('.*') || extensions.includes('*') ? '*/*' : 'application/octet-stream';
+                for (const [description, extensions] of Object.entries(options.filters)) {
+                    // Skip "all files" filter - browser provides this by default
+                    if (extensions.includes('.*') || extensions.includes('*')) {
+                        continue;
+                    }
 
-                    return {
+                    // Use a unique MIME type per filter to prevent extension mixing
+                    types.push({
                         description,
                         accept: {
-                            [mimeType]: normalizedExts
+                            [`application/${description.toLowerCase().replace(/\s+/g, '-')}`]: extensions.map(ext =>
+                                ext.startsWith('.') ? ext : `.${ext}`
+                            ) as `.${string}`[]
                         }
-                    };
-                });
+                    });
+                }
+
+                if (types.length > 0) {
+                    properOptions.types = types;
+                }
             }
 
             // Set suggested file name if defaultUri is provided

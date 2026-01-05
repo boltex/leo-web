@@ -192,11 +192,10 @@ class LeoWebApp {
         }
 
         // ok, now maybe offer the 'open dialog' and actually load a file?
-        // TODO : show open file dialog...
         const filetypes: [string, string][] = [
             ["Leo files", "*.leojs *.leo *.db"],
             ["Python files", "*.py"],
-            // ["All files", "*"]
+            ["All files", "*"]
         ];
         const openResult = await workspace.view.showOpenDialog(
             {
