@@ -56,6 +56,16 @@ export class Constants {
         DEFAULT_RELOAD_IGNORE: "none",
         LEO_ID: ""
     };
+    public static CHECK_FOR_CHANGE_EXTERNAL_FILES_OPTIONS = {
+        "none": "Default from Leo's config",
+        "force-check": "Check for changes",
+        "force-ignore": "Ignore all changes"
+    }
+    public static DEFAULT_RELOAD_IGNORE_OPTIONS = {
+        "none": "Choose each time",
+        "yes-all": "Reload All",
+        "no-all": "Ignore All"
+    }
 
     /**
      * Basic user messages strings for messages and dialogs
