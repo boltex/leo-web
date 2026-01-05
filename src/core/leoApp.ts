@@ -1138,8 +1138,6 @@ export class LeoApp {
         const buffer = g.logBuffer;
         buffer.unshift(app.signon1);
         buffer.unshift(app.signon);
-        buffer.unshift('Leo Log Window');
-
         if (buffer.length) {
             let len = buffer.length; // Only do loop once if log pane not visible
             while (len > 0) {

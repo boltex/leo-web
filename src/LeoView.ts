@@ -1029,33 +1029,99 @@ export class LeoView {
         };
     }
 
-    public async showNativeOpenFileDialog(): Promise<FileSystemFileHandle | null> {
+    public async showOpenDialog(options?: OpenDialogOptions): Promise<Uri[] | null> {
         try {
-            const [fileHandle] = await window.showOpenFilePicker();
-            // Before returning, check that the chosen file is inside the workspace directory using 'resolve'
-            const workspaceDir = workspace.getWorkspaceDirHandle();
-            if (workspaceDir) {
-                const result = await workspaceDir.resolve(fileHandle);
-                if (!result || result.length === 0) {
-                    this.showToast('⚠️ Selected file is not inside workspace.', 3000);
-                    return null;
-                }
+            // Build proper options for window.showOpenFilePicker from OpenDialogOptions
+            const properOptions: OpenFilePickerOptions = {
+                multiple: options?.canSelectMany ?? false,
+                excludeAcceptAllOption: false,
+            };
+
+            // Add file type filters if provided
+            if (options?.filters && Object.keys(options.filters).length > 0) {
+                properOptions.types = Object.entries(options.filters).map(([description, extensions]) => {
+                    const normalizedExts = extensions.map(ext => ext.startsWith('.') ? ext : `.${ext}`) as `.${string}`[];
+
+                    // Use */* MIME type for "all files" filter (.*), otherwise use application/octet-stream
+                    const mimeType = extensions.includes('.*') || extensions.includes('*') ? '*/*' : 'application/octet-stream';
+
+                    return {
+                        description,
+                        accept: {
+                            [mimeType]: normalizedExts
+                        }
+                    };
+                });
             }
-            return fileHandle || null;
+
+            // Set start location if defaultUri is provided
+            if (options?.defaultUri) {
+                properOptions.startIn = 'documents'; // Could be enhanced to parse the Uri path
+            }
+
+            const fileHandles = await window.showOpenFilePicker(properOptions);
+
+            // Check that all chosen files are inside the workspace directory
+            const workspaceDir = workspace.getWorkspaceDirHandle();
+            const uris: Uri[] = [];
+
+            for (const fileHandle of fileHandles) {
+                if (workspaceDir) {
+                    const result = await workspaceDir.resolve(fileHandle);
+                    if (!result || result.length === 0) {
+                        this.showToast('⚠️ Selected file is not inside workspace.', 3000);
+                        continue;
+                    }
+                }
+                const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(fileHandle);
+                const filename = resolveResult ? '/' + resolveResult.join('/') : fileHandle.name;
+                uris.push(new Uri(filename));
+            }
+
+            return uris.length > 0 ? uris : null;
         } catch (e) {
             console.error('Error showing native open file dialog:', e);
             return null;
         }
     }
 
-    public async showNativeSaveFileDialog(suggestedName?: string): Promise<FileSystemFileHandle | null> {
+    public async showSaveDialog(options?: SaveDialogOptions): Promise<Uri | null> {
         try {
-            const options: any = {};
-            if (suggestedName) {
-                options.suggestedName = suggestedName;
+            // Build proper options for window.showSaveFilePicker from SaveDialogOptions
+            const properOptions: SaveFilePickerOptions = {
+                excludeAcceptAllOption: false,
+            };
+
+            // Add file type filters if provided
+            if (options?.filters && Object.keys(options.filters).length > 0) {
+                properOptions.types = Object.entries(options.filters).map(([description, extensions]) => {
+                    const normalizedExts = extensions.map(ext => ext.startsWith('.') ? ext : `.${ext}`) as `.${string}`[];
+
+                    // Use */* MIME type for "all files" filter (.*), otherwise use application/octet-stream
+                    const mimeType = extensions.includes('.*') || extensions.includes('*') ? '*/*' : 'application/octet-stream';
+
+                    return {
+                        description,
+                        accept: {
+                            [mimeType]: normalizedExts
+                        }
+                    };
+                });
             }
-            const fileHandle = await window.showSaveFilePicker(options);
-            // Before returning, check that the chosen file is inside the workspace directory using 'resolve'
+
+            // Set suggested file name if defaultUri is provided
+            if (options?.defaultUri) {
+                const pathParts = options.defaultUri.fsPath.split('/');
+                const fileName = pathParts[pathParts.length - 1];
+                if (fileName) {
+                    properOptions.suggestedName = fileName;
+                }
+                properOptions.startIn = 'documents'; // Could be enhanced to parse the Uri path
+            }
+
+            const fileHandle = await window.showSaveFilePicker(properOptions);
+
+            // Check that the chosen file is inside the workspace directory
             const workspaceDir = workspace.getWorkspaceDirHandle();
             if (workspaceDir) {
                 const result = await workspaceDir.resolve(fileHandle);
@@ -1064,7 +1130,10 @@ export class LeoView {
                     return null;
                 }
             }
-            return fileHandle || null;
+            const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(fileHandle);
+            const filename = resolveResult ? '/' + resolveResult.join('/') : fileHandle.name;
+            return new Uri(filename);
+
         } catch (e) {
             console.error('Error showing native save file dialog:', e);
             return null;

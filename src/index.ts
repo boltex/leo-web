@@ -51,7 +51,7 @@ class LeoWebApp {
         await controller.initialize();
 
         // Test out UI experiments (if any)
-        await this.uiExperiments(); // * Remove when done *
+        // await this.uiExperiments(); // * Remove when done *
 
         console.log('Leo Web UI initialized.');
 
@@ -66,7 +66,7 @@ class LeoWebApp {
         console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
 
         // Now test the Leo code itself by creating a new commander, inserting a node, change its headeline/body, and printing the outline to console.
-        // await this.leoCoreExperiments(); // * Remove when done *
+        await this.leoCoreExperiments(); // * Remove when done *
 
     }
 
@@ -193,18 +193,27 @@ class LeoWebApp {
 
         // ok, now maybe offer the 'open dialog' and actually load a file?
         // TODO : show open file dialog...
-        const chosenFileHandle = await workspace.view.showNativeOpenFileDialog();
-        if (!chosenFileHandle || chosenFileHandle.name === '') {
+        const filetypes: [string, string][] = [
+            ["Leo files", "*.leojs *.leo *.db"],
+            ["Python files", "*.py"],
+            // ["All files", "*"]
+        ];
+        const openResult = await workspace.view.showOpenDialog(
+            {
+                title: "Open Leo File",
+                filters: utils.convertLeoFiletypes(filetypes)
+            }
+        );
+        if (!openResult || openResult.length === 0) {
             g.es('No file chosen, skipping file open test.');
             return;
         }
-        console.log('kind and name', chosenFileHandle.kind, chosenFileHandle.name);
-        const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(chosenFileHandle!);
-        console.log('Resolves to:', resolveResult);
-        const filename = resolveResult ? '/' + resolveResult.join('/') : chosenFileHandle.name;
+        const file_URI = openResult[0];
+        if (!file_URI || file_URI.fsPath === '') {
+            g.es('No file chosen, skipping file open test.');
+            return;
+        }
 
-        g.es(`Opening file: ${filename} ...`);
-        const file_URI = new Uri(filename);
         console.log('   file_URI: ', file_URI);
         // for now, try g.readFileIntoString
         const fileString = file_URI.fsPath;
@@ -220,11 +229,9 @@ class LeoWebApp {
             return
         }
 
-        const w_uri = g.makeUri(fileString);
-
         c = g.app.windowList[g.app.gui.frameIndex].c;
         await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
-        await c.open_outline(w_uri);
+        await c.open_outline(file_URI);
 
         console.log('g.app.windowList.length AFTER: ', g.app.windowList.length);
         console.log('g.app.gui.frameIndex AFTER: ', g.app.gui.frameIndex);
