@@ -1,6 +1,6 @@
 import { LeoModel } from "./LeoModel";
 import { LeoView } from "./LeoView";
-import { TreeNode, FlatRow, QuickPickItem, QuickPickItemKind } from "./types";
+import { TreeNode, FlatRow } from "./types";
 import * as utils from './utils';
 import { workspace } from "./workspace";
 

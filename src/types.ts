@@ -176,46 +176,6 @@ export interface InputDialogOptions {
 export interface ConfigMembers {
     checkForChangeExternalFiles: string;
     defaultReloadIgnore: string;
-    sessionPerWorkspace: boolean;
-    leoTreeBrowse: boolean;
-    treeKeepFocus: boolean;
-    treeKeepFocusWhenAside: boolean;
-
-    collapseAllShortcut: boolean;
-    activityViewShortcut: boolean;
-    goAnywhereShortcut: boolean;
-
-    showUnlOnStatusBar: boolean,
-
-    treeInExplorer: boolean;
-
-    showFileOnOutline: boolean;
-    showHoistDehoistOnOutline: boolean;
-    showPrevNextOnOutline: boolean;
-    showPromoteDemoteOnOutline: boolean;
-    showRecentFilesOnOutline: boolean;
-    showSettingsOnOutline: boolean;
-    showShowLogOnOutline: boolean;
-    showUndoRedoOnOutline: boolean;
-
-    showEditOnNodes: boolean;
-    showAddOnNodes: boolean;
-    showMarkOnNodes: boolean;
-    showCloneOnNodes: boolean;
-    showCopyOnNodes: boolean;
-
-    // showEditionOnBody: boolean; // clone delete insert(s)
-    // showClipboardOnBody: boolean; // cut copy paste(s)
-    // showPromoteOnBody: boolean; // promote demote
-    // showExecuteOnBody: boolean; // extract(s)
-    // showExtractOnBody: boolean;
-    // showImportOnBody: boolean;
-    // showRefreshOnBody: boolean;
-    // showHoistOnBody: boolean;
-    // showMarkOnBody: boolean;
-    // showSortOnBody: boolean;
-
-    invertNodeContrast: boolean;
     leoID: string;
 }
 

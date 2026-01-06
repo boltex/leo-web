@@ -8,6 +8,7 @@ export class Config {
     // Config settings used on Leo's side
     public checkForChangeExternalFiles: string = Constants.CONFIG_DEFAULTS.CHECK_FOR_CHANGE_EXTERNAL_FILES;
     public defaultReloadIgnore: string = Constants.CONFIG_DEFAULTS.DEFAULT_RELOAD_IGNORE;
+    public leoID: string = Constants.CONFIG_DEFAULTS.LEO_ID;
 
     constructor() {
         // Nothing for now
