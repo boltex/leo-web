@@ -21,6 +21,7 @@ export class Constants {
 
     public static UNTITLED_FILE_NAME: string = "untitled";
 
+    public static LOCAL_STORAGE_KEY: string = "leoWebConfig";
 
     /**
      * Supported Languages
