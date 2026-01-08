@@ -126,12 +126,6 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
         w_choices.push(...w_withDetails);
 
-        // const q_minibufferQuickPick: Promise<QuickPickItem | undefined> = new Promise((resolve, reject) => {
-        //     const quickPick = vscode.window.createQuickPick();
-        //     quickPick.items = w_choices;
-        //     quickPick.placeholder = Constants.USER_MESSAGES.MINIBUFFER_PROMPT;
-        // });
-
         const w_picked = await workspace.view.showQuickPick(w_choices, {
             placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
         });
