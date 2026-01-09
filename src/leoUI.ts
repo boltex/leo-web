@@ -6,8 +6,11 @@ import { IdleTime } from "./core/idle_time";
 import * as utils from "./utils";
 import { Uri, workspace } from "./workspace";
 import { Commands } from "./core/leoCommands";
-import { ConfigSetting, QuickPickItem } from "./types";
+import { ConfigSetting, Focus, QuickPickItem, ReqRefresh, RevealType } from "./types";
 import { StringTextWrapper } from "./core/leoFrame";
+import { Position } from "./core/leoNodes";
+import { debounce, DebouncedFunc } from "lodash";
+import { Config } from "./config";
 
 /**
  * Creates and manages instances of the UI elements along with their events
@@ -19,6 +22,51 @@ export class LeoUI extends NullGui {
     protected _leoLogPane: boolean = false;
     private _currentOutlineTitle: string = "";
 
+    // * Timers
+    public refreshTimer: [number, number] | undefined; // until the selected node is found - even if already started refresh
+    public lastRefreshTimer: [number, number] | undefined; // until the selected node is found - refreshed even if not found
+    public commandRefreshTimer: [number, number] | undefined; // until the selected node is found -  keep if starting a new command already pending
+    public lastCommandRefreshTimer: [number, number] | undefined; // until the selected node is found - refreshed if starting a new command
+    public commandTimer: [number, number] | undefined; // until the command done - keep if starting a new one already pending
+    public lastCommandTimer: [number, number] | undefined; // until the command done - refreshed if starting a new one
+
+    // * Refresh Cycle
+    private _refreshType: ReqRefresh = {}; // Flags for commands to require parts of UI to refresh
+    private _revealType: RevealType = RevealType.NoReveal; // Type of reveal for the selected node (when refreshing outline)
+
+    public finalFocus: Focus = Focus.NoChange; // Set in _setupRefresh : Last command issued had focus on outline, as opposed to the body
+    public refreshPreserveRange = false; // this makes the next refresh cycle preserve the "findFocusTree" flag once.
+
+    private __refreshNode: Position | undefined; // Set in _setupRefresh : Last command issued a specific node to reveal
+    private _lastRefreshNodeTS: number = 0;
+    get _refreshNode(): Position | undefined {
+        return this.__refreshNode;
+    }
+    set _refreshNode(p_ap: Position | undefined) {
+        // Needs undefined type because it cannot be set in the constructor
+        this.__refreshNode = p_ap;
+        this._lastRefreshNodeTS = utils.performanceNow();
+    }
+
+    private _lastSelectedNode: Position | undefined;
+    public lastSelectedNodeTime: number | undefined = 0; // Falsy means not set
+    private _lastSelectedNodeTS: number = 0;
+    get lastSelectedNode(): Position | undefined {
+        return this._lastSelectedNode;
+    }
+    set lastSelectedNode(p_ap: Position | undefined) {
+        // Needs undefined type because it cannot be set in the constructor
+        this._lastSelectedNode = p_ap;
+        this._lastSelectedNodeTS = utils.performanceNow();
+    }
+
+    // * Debounced method used to get states for UI display flags (commands such as undo, redo, save, ...)
+    public getStates: (() => void);
+
+    // * Debounced method for refreshing the UI
+    public launchRefresh: DebouncedFunc<() => Promise<unknown>>;
+
+
     constructor(guiName = 'browserGui') {
         super(guiName);
         console.log('LeoUI initialized with gui:', guiName);
@@ -28,6 +76,22 @@ export class LeoUI extends NullGui {
 
         // * Setup States
         this.leoStates = new LeoStates(this);
+        // * Get configuration settings
+        this.config = new Config();
+
+        // * also check workbench.editor.enablePreview
+        this.config.buildFromSavedSettings();
+
+        this.getStates = debounce(
+            this._triggerGetStates,
+            Constants.STATES_DEBOUNCE_DELAY
+        );
+
+        this.launchRefresh = debounce(
+            this._launchRefresh,
+            Constants.REFRESH_DEBOUNCE_DELAY
+        );
+
     }
 
     /**
@@ -129,6 +193,92 @@ export class LeoUI extends NullGui {
     }
 
     /**
+     * * Setup global refresh options
+     * @param p_finalFocus Flag for focus to be placed in outline
+     * @param p_refreshType Refresh flags for each UI part
+    */
+    public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh, p_preserveRange?: boolean): void {
+        if (p_preserveRange) {
+            this.refreshPreserveRange = true; // Will be cleared after a refresh cycle.
+        }
+        // Set final "focus-placement" EITHER true or false
+        this.finalFocus = p_finalFocus;
+
+        if (p_refreshType) {
+            // Set all properties WITHOUT clearing others.
+            Object.assign(this._refreshType, p_refreshType);
+        }
+    }
+
+    /**
+     * * Launches refresh for UI components and context states (Debounced)
+     */
+    public async _launchRefresh(): Promise<unknown> {
+        // TODO : implement actual refresh of UI components based on this._refreshType and this.finalFocus
+        console.log('Launching UI refresh with options:', this._refreshType, ' finalFocus:', this.finalFocus);
+        return Promise.resolve();
+    }
+
+    /**
+     * * Refreshes all parts.
+     * @returns Promise back from command's execution, if added on stack, undefined otherwise.
+     */
+    public fullRefresh(p_keepFocus?: boolean): void {
+        this.setupRefresh(
+            p_keepFocus ? Focus.NoChange : this.finalFocus,
+            {
+                tree: true,
+                body: true,
+                states: true,
+                buttons: true,
+                documents: true,
+                goto: true,
+            }
+        );
+        void this.launchRefresh();
+    }
+
+    /**
+     * * Looks for given position's coloring language and wrap, taking account of '@killcolor', etc.
+     */
+    private _getBodyLanguage(p: Position): [string, boolean] {
+        const c = p.v.context;
+        let w_language = "plain";
+        const w_wrap = !!c.getWrap(p);
+        if (g.useSyntaxColoring(p)) {
+
+            // DEPRECATED leojs old colorizer language detection--------
+            // const aList = g.get_directives_dict_list(p);
+            // const d = g.scanAtCommentAndAtLanguageDirectives(aList);
+            // w_language =
+            //     (d && d['language'])
+            //     || g.getLanguageFromAncestorAtFileNode(p)
+            //     || c.config.getLanguage('target-language')
+            //     || 'plain';
+            // ---------------------------------------------------------
+
+            // * as per original Leo's leoColorizer.py
+            w_language = c.getLanguage(p) || c.config.getLanguage('target-language');
+            w_language = w_language.toLowerCase();
+        }
+
+        return [w_language, w_wrap];
+    }
+
+
+    /**
+     * * 'getStates' action for use in debounced method call
+     */
+    private _triggerGetStates(): void {
+
+        const c = g.app.windowList[this.frameIndex].c;
+        // TODO : Finish implementation of getting states for commands
+        console.log('in _triggerGetStates for commander:', c.fileName());
+
+    }
+
+
+    /**
      * * Setup UI for having no opened Leo documents
      */
     private _setupNoOpenedLeoDocument(): void {
@@ -155,10 +305,10 @@ export class LeoUI extends NullGui {
     }
 
     /**
- * * Invokes the commander.save() command
- * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
- * @returns Promise that resolves when the save command is done
- */
+     * * Invokes the commander.save() command
+     * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
+     * @returns Promise that resolves when the save command is done
+     */
     public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
         // TODO : MAYBE TRIGGER BODY SAVE?
         // await this.triggerBodySave(true);
