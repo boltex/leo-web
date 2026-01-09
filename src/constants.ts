@@ -248,18 +248,6 @@ export class Constants {
     };
 
     /**
-     * * Table for converting Leo languages names for the currently opened body pane
-     * Used in showBody method of leoUI.ts
-     */
-    public static LANGUAGE_CODES: { [key: string]: string | undefined } = {
-        cplusplus: 'cpp',
-        md: 'markdown',
-        rest: 'restructuredtext',
-        rst: 'restructuredtext',
-        text: 'plain'
-    };
-
-    /**
      * All commands this expansion exposes to the user via GUI/keybindings in package.json
      */
     public static COMMANDS = {
