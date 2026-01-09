@@ -318,12 +318,12 @@ export class LeoController {
         view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
 
-        const initialSelectedNode = this.loadDocumentStateFromLocalStorage();
-        if (!initialSelectedNode) {
-            this.selectAndOrToggleAndRedraw(model.tree.children![0]); // sets selectedNode amd flatRows
-        } else {
-            this.selectAndOrToggleAndRedraw(initialSelectedNode); // sets selectedNode amd flatRows
-        }
+        // const initialSelectedNode = this.loadDocumentStateFromLocalStorage();
+        // if (!initialSelectedNode) {
+        //     this.selectAndOrToggleAndRedraw(model.tree.children![0]); // sets selectedNode amd flatRows
+        // } else {
+        //     this.selectAndOrToggleAndRedraw(initialSelectedNode); // sets selectedNode amd flatRows
+        // }
         view.setupButtonContainerAutoHide();
         view.updateMarkedButtonStates(model.marked.size > 0);
         view.showTab("log");
@@ -724,66 +724,9 @@ export class LeoController {
     }
 
     private selectAndOrToggleAndRedraw(newSelectedNode: TreeNode | null = null, nodeToToggle: TreeNode | null = null) {
-        const model = this.model;
+
         const view = this.view;
-        // Handle toggling if requested
-        if (nodeToToggle) {
-            if (model.isExpanded(nodeToToggle)) {
-                model.expanded.delete(nodeToToggle);
-            } else {
-                model.expanded.add(nodeToToggle);
-            }
-            nodeToToggle.toggled = true; // Mark as toggled
-        }
 
-        const isNew = newSelectedNode && newSelectedNode !== model.selectedNode;
-
-        // Handle selection if requested
-        if (isNew) {
-            let hoistTop = model.getCurrentRoot();
-
-            // While the top of hoist stack is not an ancestor of the new selected node, pop it
-            while (newSelectedNode !== hoistTop && model.hoistStack.length > 0 && !model.isAncestorOf(hoistTop, newSelectedNode)) {
-                model.hoistStack.pop();
-                hoistTop = model.getCurrentRoot();
-            }
-
-            // Ensure all parent nodes are expanded so the selected node is visible
-            let currentNode = newSelectedNode;
-            while (currentNode && currentNode.parent && currentNode !== hoistTop) {
-                // Skip the hidden root node since it's always expanded (When hoist is implemented, stop at hoist root)
-                if (currentNode.parent.parent) {
-                    model.expanded.add(currentNode.parent);
-                }
-                currentNode = currentNode.parent;
-            }
-
-            model.selectedNode = newSelectedNode;
-            model.addToHistory(newSelectedNode);
-            this.view.updateHistoryButtonStates(
-                model.currentHistoryIndex <= 0,
-                model.currentHistoryIndex >= model.navigationHistory.length - 1 || !model.navigationHistory.length
-            );
-            this.refreshButtonVisibility();
-            this.refreshHoistButtonStates();
-            this.refreshContextMenuState();
-        }
-
-        this.buildRowsRenderTree();
-
-        // Update body pane if selection changed (selectedNode cannot be null here because of isNew check)
-        if (isNew) {
-            if (newSelectedNode && model.data[newSelectedNode.gnx]) {
-                const [text, wrap] = this.computeBody(newSelectedNode);
-                view.showBody(text, wrap);
-            } else {
-                view.showBody("", true); // No node selected
-            }
-        }
-        if (model.selectedNode) {
-            view.scrollNodeIntoView(model.selectedNode);
-        }
-        view.updateCollapseAllPosition(); // In case the height made the scrollbar appear/disappear
     }
 
     private computeBody(node: TreeNode): [string, boolean] {
