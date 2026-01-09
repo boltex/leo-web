@@ -171,7 +171,7 @@ export class ChapterController {
         const cc = this;
         const names = cc.setAllChapterNames();
         const options = { placeHolder: "Select chapter" };
-        return g.app.gui.get1Arg(options, undefined, names).then(
+        return g.app.gui.get1Arg(options, names).then(
             (arg) => {
                 if (arg) {
                     cc.selectChapterByName(arg);

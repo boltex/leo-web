@@ -1159,7 +1159,7 @@ export class LeoView {
         }
     }
 
-    public async showInputDialog(options: InputDialogOptions): Promise<string | null> {
+    public async showInputDialog(options: InputDialogOptions): Promise<string | undefined> {
         return new Promise((resolve) => {
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'true');
             this.INPUT_DIALOG_TITLE.textContent = options.title;

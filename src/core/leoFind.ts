@@ -2712,7 +2712,6 @@ export class LeoFind {
                     placeHolder: "<tag>",
                     prompt: "Enter a tag name",
                 },
-                undefined,
                 w_p.u.__node_tags
             )
                 .then((p_findString: string | undefined) => {

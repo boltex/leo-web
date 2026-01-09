@@ -303,7 +303,6 @@ export class BufferCommandsClass extends BaseEditCommandsClass {
                 title: label,
                 placeHolder: 'buffer name',
             },
-            undefined,
             this.nameList
         );
 

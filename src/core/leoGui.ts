@@ -329,7 +329,7 @@ export class LeoGui {
     public get1Arg(
         options: any,
         tabList?: string[]
-    ): Thenable<string | undefined | null> {
+    ): Thenable<string | undefined> {
         return Promise.resolve('');
     }
     //@+node:felix.20251213133753.226: *4* LeoGui.get1Char (Leo-Web)

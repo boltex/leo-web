@@ -460,7 +460,7 @@ export class LeoUI extends NullGui {
             placeHolder?: string;
         },
         tabList?: string[]
-    ): Thenable<string | undefined | null> {
+    ): Thenable<string | undefined> {
         if (tabList) {
             const itemList: QuickPickItem[] = tabList.map(
                 (entry) => { return { label: entry }; }

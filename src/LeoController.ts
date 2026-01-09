@@ -13,19 +13,23 @@ export class LeoController {
     constructor(model: LeoModel, view: LeoView) {
         this.model = model;
         this.view = view;
+
+        console.log('todo: replace with real leo commands');
         this.outlinePaneKeyMap = {
             'Enter': () => view.BODY_PANE.focus(),
             'Tab': () => view.BODY_PANE.focus(),
-            ' ': () => this.toggleSelected(),
-            'ArrowUp': () => this.selectVisBack(),
-            'ArrowDown': () => this.selectVisNext(),
-            'ArrowLeft': () => this.contractNodeOrGoToParent(),
-            'ArrowRight': () => this.expandNodeAndGoToFirstChild(),
-            'PageUp': () => this.gotoFirstSiblingOrParent(),
-            'PageDown': () => this.gotoLastSiblingOrVisNext(),
-            'Home': () => this.gotoFirstVisibleNode(),
-            'End': () => this.gotoLastVisibleNode()
+
+            // ' ': () => this.toggleSelected(),
+            // 'ArrowUp': () => this.selectVisBack(),
+            // 'ArrowDown': () => this.selectVisNext(),
+            // 'ArrowLeft': () => this.contractNodeOrGoToParent(),
+            // 'ArrowRight': () => this.expandNodeAndGoToFirstChild(),
+            // 'PageUp': () => this.gotoFirstSiblingOrParent(),
+            // 'PageDown': () => this.gotoLastSiblingOrVisNext(),
+            // 'Home': () => this.gotoFirstVisibleNode(),
+            // 'End': () => this.gotoLastVisibleNode()
         };
+
         view.buildMenu(model.menuData);
         view.initializeThemeAndLayout(model.defaultTitle); // gets ratios from localStorage and applies layout and theme
     }
@@ -88,28 +92,31 @@ export class LeoController {
 
     private setupButtonHandlers() {
         const view = this.view;
-        view.COLLAPSE_ALL_BTN.addEventListener('click', this.collapseAll);
-        view.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
-        view.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
-        view.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        view.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        view.HOIST_BTN.addEventListener('click', this.hoistNode);
-        view.DEHOIST_BTN.addEventListener('click', this.dehoistNode);
-        view.PREV_BTN.addEventListener('click', this.previousHistory);
-        view.NEXT_BTN.addEventListener('click', this.nextHistory);
-        view.TOGGLE_MARK_BTN.addEventListener('click', this.toggleMarkCurrentNode);
-        view.NEXT_MARKED_BTN.addEventListener('click', this.gotoNextMarkedNode);
-        view.PREV_MARKED_BTN.addEventListener('click', this.gotoPrevMarkedNode);
+        console.log('Setting up button handlers');
 
-        view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
-        view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
-        view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") });
-        view.SETTINGS_TAB.addEventListener('click', () => { view.showTab("settings") });
+        // Example of setting up button handlers:
+        // view.COLLAPSE_ALL_BTN.addEventListener('click', this.collapseAll);
+        // view.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
+        // view.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
+        // view.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        // view.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        // view.HOIST_BTN.addEventListener('click', this.hoistNode);
+        // view.DEHOIST_BTN.addEventListener('click', this.dehoistNode);
+        // view.PREV_BTN.addEventListener('click', this.previousHistory);
+        // view.NEXT_BTN.addEventListener('click', this.nextHistory);
+        // view.TOGGLE_MARK_BTN.addEventListener('click', this.toggleMarkCurrentNode);
+        // view.NEXT_MARKED_BTN.addEventListener('click', this.gotoNextMarkedNode);
+        // view.PREV_MARKED_BTN.addEventListener('click', this.gotoPrevMarkedNode);
 
-        view.ACTION_MARK.addEventListener('click', this.toggleMarkCurrentNode);
-        view.ACTION_UNMARK.addEventListener('click', this.toggleMarkCurrentNode); // Same action
-        view.ACTION_HOIST.addEventListener('click', this.hoistNode);
-        view.ACTION_DEHOIST.addEventListener('click', this.dehoistNode);
+        // view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
+        // view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
+        // view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") });
+        // view.SETTINGS_TAB.addEventListener('click', () => { view.showTab("settings") });
+
+        // view.ACTION_MARK.addEventListener('click', this.toggleMarkCurrentNode);
+        // view.ACTION_UNMARK.addEventListener('click', this.toggleMarkCurrentNode); // Same action
+        // view.ACTION_HOIST.addEventListener('click', this.hoistNode);
+        // view.ACTION_DEHOIST.addEventListener('click', this.dehoistNode);
     }
 
 
@@ -453,46 +460,47 @@ export class LeoController {
     // Global key handlers (work anywhere)
     private handleGlobalKeyDown = (e: KeyboardEvent) => {
         const view = this.view;
-        if (e.key.toLowerCase() === 'f' && e.ctrlKey && !e.altKey && !e.metaKey) {
-            e.preventDefault();
-            this.startFind();
-        } else if (e.key.toLowerCase() === 'm' && e.ctrlKey && !e.altKey && !e.metaKey) {
-            e.preventDefault();
-            this.toggleMarkCurrentNode();
-        } else if (e.key === 'F2') {
-            e.preventDefault();
-            this.findPrevious();
-        } else if (e.key === 'F3') {
-            e.preventDefault();
-            this.findNext();
-        } else if (e.key === '-' && e.altKey && !e.ctrlKey && !e.metaKey) {
-            e.preventDefault();
-            this.collapseAll();
-        } else if (e.altKey && !e.ctrlKey && !e.metaKey) {
-            // Handle Alt+Arrow keys globally
-            switch (e.key) {
-                case 'ArrowUp':
-                    e.preventDefault();
-                    view.OUTLINE_PANE.focus();
-                    this.selectVisBack();
-                    break;
-                case 'ArrowDown':
-                    e.preventDefault();
-                    view.OUTLINE_PANE.focus();
-                    this.selectVisNext();
-                    break;
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    view.OUTLINE_PANE.focus();
-                    this.contractNodeOrGoToParent();
-                    break;
-                case 'ArrowRight':
-                    e.preventDefault();
-                    view.OUTLINE_PANE.focus();
-                    this.expandNodeAndGoToFirstChild();
-                    break;
-            }
-        }
+        console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
+        // if (e.key.toLowerCase() === 'f' && e.ctrlKey && !e.altKey && !e.metaKey) {
+        //     e.preventDefault();
+        //     this.startFind();
+        // } else if (e.key.toLowerCase() === 'm' && e.ctrlKey && !e.altKey && !e.metaKey) {
+        //     e.preventDefault();
+        //     this.toggleMarkCurrentNode();
+        // } else if (e.key === 'F2') {
+        //     e.preventDefault();
+        //     this.findPrevious();
+        // } else if (e.key === 'F3') {
+        //     e.preventDefault();
+        //     this.findNext();
+        // } else if (e.key === '-' && e.altKey && !e.ctrlKey && !e.metaKey) {
+        //     e.preventDefault();
+        //     this.collapseAll();
+        // } else if (e.altKey && !e.ctrlKey && !e.metaKey) {
+        //     // Handle Alt+Arrow keys globally
+        //     switch (e.key) {
+        //         case 'ArrowUp':
+        //             e.preventDefault();
+        //             view.OUTLINE_PANE.focus();
+        //             this.selectVisBack();
+        //             break;
+        //         case 'ArrowDown':
+        //             e.preventDefault();
+        //             view.OUTLINE_PANE.focus();
+        //             this.selectVisNext();
+        //             break;
+        //         case 'ArrowLeft':
+        //             e.preventDefault();
+        //             view.OUTLINE_PANE.focus();
+        //             this.contractNodeOrGoToParent();
+        //             break;
+        //         case 'ArrowRight':
+        //             e.preventDefault();
+        //             view.OUTLINE_PANE.focus();
+        //             this.expandNodeAndGoToFirstChild();
+        //             break;
+        //     }
+        // }
     }
 
     private handleDrag = utils.throttle((e) => {
@@ -694,31 +702,6 @@ export class LeoController {
         this.view.toggleTheme();
     }
 
-    // * Controller Methods (Command Execution) *
-
-    private hoistNode = () => {
-        const view = this.view;
-        const model = this.model;
-        // This method in an MVC model would be in the controller because it affects the model (hoist stack) and view (button states)
-        if (!model.selectedNode) return;
-
-        // If selected node is already hoisted: no-op (Even if button should be disabled in that case)
-        if (model.hoistStack.length > 0 && model.hoistStack[model.hoistStack.length - 1] === model.selectedNode) return;
-
-        if (!model.selectedNode.parent) {
-            return; // root node (though it should never be selected anyway)
-        }
-
-        model.hoistStack.push(model.selectedNode);
-        if (model.hasChildren(model.selectedNode) && !model.isExpanded(model.selectedNode)) {
-            model.expanded.add(model.selectedNode);
-            model.selectedNode.toggled = true; // Mark as toggled
-        }
-        this.refreshHoistButtonStates();
-        this.refreshContextMenuState(); // Node was already selected so no need to reupdate based on hoist
-        this.buildRowsRenderTree();
-    }
-
     private refreshHoistButtonStates(): void {
         const model = this.model;
         const isCurrentlyHoisted = model.hoistStack.length > 0 && model.hoistStack[model.hoistStack.length - 1] === model.selectedNode;
@@ -738,16 +721,6 @@ export class LeoController {
             hasSelectedNode && model.hasChildren(model.selectedNode!) && !isCurrentlyHoisted,
             model.hoistStack.length > 0
         );
-    }
-
-    private dehoistNode = () => {
-        // This method in an MVC model would be in the controller because it affects the model (hoist stack) and view (button states)
-        if (this.model.hoistStack.length === 0) {
-            return;
-        }
-        const previousHoist = this.model.hoistStack.pop()!;
-        this.selectAndOrToggleAndRedraw(previousHoist);
-        this.refreshHoistButtonStates();
     }
 
     private selectAndOrToggleAndRedraw(newSelectedNode: TreeNode | null = null, nodeToToggle: TreeNode | null = null) {
@@ -838,297 +811,6 @@ export class LeoController {
         });
         return [text, !nowrapFound];
     }
-
-    private expandNodeAndGoToFirstChild() {
-        const model = this.model;
-        // If the presently selected node has children, expand it if needed and go to the first child.
-        let node = model.selectedNode!;
-        if (model.hasChildren(node)) {
-            if (!model.isExpanded(node)) {
-                model.expanded.add(node);
-                node.toggled = true; // Mark as toggled
-            }
-            node = model.moveToFirstChild(node)!;
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    }
-
-    private contractNodeOrGoToParent() {
-        const model = this.model;
-        // If the presently selected node is expanded, collapse it. Otherwise go to the parent.
-        let node = model.selectedNode!;
-        if (model.hasChildren(node) && model.isExpanded(node)) {
-            this.selectAndOrToggleAndRedraw(null, node);
-        } else if (model.hasParent(node)) {
-            const parent = model.moveToParent(node)!;
-            if (model.isVisible(parent)) {
-                // Contract all children first
-                for (const child of model.children(parent)) {
-                    if (model.isExpanded(child)) {
-                        model.expanded.delete(child);
-                        child.toggled = true; // Mark as toggled
-                    }
-                }
-                this.selectAndOrToggleAndRedraw(parent);
-            }
-        }
-    }
-
-    private selectVisBack() {
-        const model = this.model;
-        // Select the visible node preceding the presently selected node.
-        let node = model.selectedNode!;
-        if (model.moveToVisBack(node)) {
-            node = model.moveToVisBack(node)!;
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    }
-
-    private selectVisNext() {
-        const model = this.model;
-        // Select the visible node following the presently selected node.
-        let node = model.selectedNode!;
-        if (model.moveToVisNext(node)) {
-            node = model.moveToVisNext(node)!;
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    }
-
-    private gotoFirstSiblingOrParent() {
-        const model = this.model;
-        // Select the first sibling of the presently selected node, or its parent if already first.
-        let node = model.selectedNode!;
-        const currentRoot = model.getCurrentRoot();
-        if (model.hasBack(node)) {
-            let firstVisibleSibling = null;
-            let current = node;
-            while (model.hasBack(current)) {
-                let prev = model.moveToBack(current)!;
-                if (model.isVisible(prev)) {
-                    firstVisibleSibling = prev;
-                    current = prev;
-                } else {
-                    break;
-                }
-            }
-            if (firstVisibleSibling) {
-                node = firstVisibleSibling;
-            }
-        } else if (model.hasParent(node) && node !== currentRoot) {
-            const parent = model.moveToParent(node)!;
-            if (parent === currentRoot || model.isDescendantOfHoistedNode(parent)) {
-                node = parent;
-            }
-        }
-        this.selectAndOrToggleAndRedraw(node);
-    };
-
-    private gotoLastSiblingOrVisNext() {
-        const model = this.model;
-        // Select the last sibling of the presently selected node, or the next visible node if already last.
-        let node = model.selectedNode!;
-        const currentRoot = model.getCurrentRoot();
-        if (model.hasNext(node)) {
-            let lastVisibleSibling = null;
-            let current = node;
-            while (model.hasNext(current)) {
-                let next = model.moveToNext(current)!;
-                if (model.isVisible(next)) {
-                    lastVisibleSibling = next;
-                    current = next;
-                } else {
-                    break;
-                }
-            }
-            if (lastVisibleSibling) {
-                node = lastVisibleSibling;
-            }
-        } else if (model.moveToVisNext(node)) {
-            node = model.moveToVisNext(node)!;
-        }
-        if (node) this.selectAndOrToggleAndRedraw(node);
-    };
-
-    private gotoFirstVisibleNode() {
-        const model = this.model;
-        // Get the current root (could be hoisted node or hidden root)
-        const currentRoot = model.getCurrentRoot()!;
-
-        // If we're hoisted, the first visible node could be the hoisted node itself
-        if (model.hoistStack.length > 0) {
-            this.selectAndOrToggleAndRedraw(currentRoot);
-            return;
-        }
-
-        // Otherwise, select the first child of the root node
-        const firstNode = model.moveToFirstChild(currentRoot);
-        if (firstNode) {
-            this.selectAndOrToggleAndRedraw(firstNode);
-        }
-    };
-
-    private gotoLastVisibleNode() {
-        const model = this.model;
-        // Select the last visible node in the outline.
-        let node = model.selectedNode!;
-        while (node) {
-            const next = model.moveToVisNext(node);
-            if (next && model.isVisible(next)) {
-                node = next;
-            } else {
-                break;
-            }
-        }
-        if (node) {
-            this.selectAndOrToggleAndRedraw(node);
-        }
-    };
-
-    private previousHistory = () => {
-        const model = this.model;
-        if (model.currentHistoryIndex > 0) {
-            model.currentHistoryIndex--;
-            const node = model.navigationHistory[model.currentHistoryIndex];
-            this.selectAndOrToggleAndRedraw(node); // Goto node without adding to history
-            this.view.updateHistoryButtonStates(
-                model.currentHistoryIndex <= 0,
-                model.currentHistoryIndex >= model.navigationHistory.length - 1 || !model.navigationHistory.length
-            );
-        }
-    }
-
-    private nextHistory = () => {
-        const model = this.model;
-        if (model.currentHistoryIndex < model.navigationHistory.length - 1) {
-            model.currentHistoryIndex++;
-            const node = model.navigationHistory[model.currentHistoryIndex];
-            this.selectAndOrToggleAndRedraw(node); // Goto node without adding to history
-            this.view.updateHistoryButtonStates(
-                model.currentHistoryIndex <= 0,
-                model.currentHistoryIndex >= model.navigationHistory.length - 1 || !model.navigationHistory.length
-            );
-        }
-    }
-
-    private toggleSelected() {
-        const model = this.model;
-        if (model.selectedNode && model.selectedNode.children && model.selectedNode.children.length > 0) {
-            this.selectAndOrToggleAndRedraw(null, model.selectedNode);
-        }
-    }
-
-    private toggleMarkCurrentNode = () => {
-        const model = this.model;
-        if (model.selectedNode) {
-            model.toggleMark(model.selectedNode);
-            this.view.updateMarkedButtonStates(model.marked.size > 0);
-            this.refreshButtonVisibility();
-
-            // Only need to redraw the affected node if visible, no need to re-flatten because structure didn't change
-            if (model.isVisible(model.selectedNode)) {
-                this.buildRowsRenderTree();
-            }
-        }
-    }
-
-    private gotoNextMarkedNode = () => {
-        const model = this.model;
-        if (!model.selectedNode || model.marked.size === 0) {
-            return;
-        }
-
-        const currentIndex = model.allNodesInOrder.findIndex(node => node === model.selectedNode);
-        if (currentIndex === -1) {
-            return; // Should never happen
-        }
-
-        let foundMarked = false;
-        for (let i = 1; i <= model.allNodesInOrder.length; i++) {
-            const nextIndex = (currentIndex + i) % model.allNodesInOrder.length; // Wrap around
-            const node = model.allNodesInOrder[nextIndex]!;
-
-            if (node === model.selectedNode) {
-                continue;
-            }
-
-            if (model.marked.has(node.gnx)) {
-                this.selectAndOrToggleAndRedraw(node);
-                foundMarked = true;
-                break;
-            }
-        }
-
-        if (!foundMarked) {
-            if (model.marked.size === 1 && model.marked.has(model.selectedNode.gnx)) {
-                this.view.showToast("Only one marked node.");
-            } else {
-                this.view.showToast("No other marked nodes found.");
-            }
-        }
-    }
-
-    private gotoPrevMarkedNode = () => {
-        const model = this.model;
-        if (!model.selectedNode || model.marked.size === 0) {
-            return;
-        }
-
-        const currentIndex = model.allNodesInOrder.findIndex(node => node === model.selectedNode);
-        if (currentIndex === -1) {
-            return; // Should never happen
-        }
-
-        let foundMarked = false;
-        for (let i = 1; i <= model.allNodesInOrder.length; i++) {
-            const prevIndex = (currentIndex - i + model.allNodesInOrder.length) % model.allNodesInOrder.length; // Wrap around
-            const node = model.allNodesInOrder[prevIndex]!;
-
-            if (node === model.selectedNode) {
-                continue;
-            }
-
-            if (model.marked.has(node.gnx)) {
-                this.selectAndOrToggleAndRedraw(node);
-                foundMarked = true;
-                break;
-            }
-        }
-
-        if (!foundMarked) {
-            if (model.marked.size === 1 && model.marked.has(model.selectedNode.gnx)) {
-                this.view.showToast("Only one marked node.");
-            } else {
-                this.view.showToast("No other marked nodes found.");
-            }
-        }
-    }
-
-    private collapseAll = () => {
-        const model = this.model;
-        // Collapse all nodes in visible outline and select the proper top-level node
-        const currentRoot = model.getCurrentRoot()!;
-        if (currentRoot === model.tree) {
-            model.expanded.clear();
-        } else {
-            const nodesToRemove: TreeNode[] = [];
-            model.expanded.forEach(node => {
-                if (node === currentRoot || model.isAncestorOf(currentRoot, node)) {
-                    nodesToRemove.push(node);
-                }
-            });
-            nodesToRemove.forEach(node => model.expanded.delete(node));
-        }
-        if (model.hoistStack.length > 0) {
-            this.selectAndOrToggleAndRedraw(currentRoot);
-        } else {
-            let node = model.selectedNode!;
-            // If currently selected node is a descendant of a top-level node, find that top-level node
-            while (node && model.hasParent(node) && node.parent !== model.tree) {
-                node = model.moveToParent(node)!;
-            }
-            if (node) this.selectAndOrToggleAndRedraw(node);
-        }
-    };
 
     // * Controller Methods (Search Orchestration) *
     private startFind() {
