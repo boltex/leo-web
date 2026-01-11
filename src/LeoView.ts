@@ -108,13 +108,24 @@ export class LeoView {
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
     private __toastResolvers: Array<(value: PromiseLike<undefined> | undefined) => void> = [];
 
-    private __messageDialogQueue: Array<{
-        message: string;
+    private __dialogQueue: Array<{
+        type: 'message' | 'input' | 'singleChar' | 'quickPick' | 'openFile' | 'saveFile';
+        // For message dialogs
+        message?: string;
         options?: MessageOptions;
-        items: string[];
-        resolve: (value: string | undefined) => void;
+        items?: string[];
+        // For input dialogs
+        inputOptions?: InputDialogOptions;
+        // For quick pick
+        quickPickItems?: QuickPickItem[];
+        quickPickOptions?: QuickPickOptions;
+        // For file dialogs
+        openDialogOptions?: OpenDialogOptions;
+        saveDialogOptions?: SaveDialogOptions;
+        // Resolver
+        resolve: (value: any) => void;
     }> = [];
-    private __isMessageDialogOpen = false;
+    private __isDialogOpen = false;
 
     public minWidth = 20;
     public minHeight = 20;
@@ -857,62 +868,6 @@ export class LeoView {
 
     }
 
-    // This is similar to vscode's showInformationMessage API: returning the clicked button's label, or undefined if dismissed.
-    public showMessageDialog(
-        message: string, options?: MessageOptions, ...items: string[]
-    ): Thenable<string | undefined> {
-        return new Promise<string | undefined>((resolve) => {
-            // Add to queue
-            this.__messageDialogQueue.push({
-                message,
-                options,
-                items,
-                resolve
-            });
-
-            // Process queue if not already processing
-            if (!this.__isMessageDialogOpen) {
-                this._processMessageDialogQueue();
-            }
-        });
-    }
-
-    private _processMessageDialogQueue(): void {
-        // If queue is empty or dialog is already open, do nothing
-        if (this.__messageDialogQueue.length === 0 || this.__isMessageDialogOpen) {
-            return;
-        }
-
-        this.__isMessageDialogOpen = true;
-        const dialog = this.__messageDialogQueue.shift()!;
-
-        // Show the dialog
-        this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
-
-        // Set content
-        this.MODAL_DIALOG_TITLE.textContent = dialog.message;
-        this.MODAL_DIALOG_DESCRIPTION.textContent = dialog.options?.detail ?? '';
-
-        // If no items, use 'OK' as default
-        const buttonLabels = dialog.items.length > 0 ? dialog.items : ['OK'];
-
-        // Fill up MODAL_DIALOG_BTN_CONTAINER with buttons
-        this.MODAL_DIALOG_BTN_CONTAINER.innerHTML = '';
-        buttonLabels.forEach(label => {
-            const btn = document.createElement('button');
-            btn.textContent = label;
-            btn.className = 'modal-dialog-button';
-            btn.onclick = () => {
-                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
-                this.__isMessageDialogOpen = false;
-                dialog.resolve(label);
-                // Process next dialog in queue after a small delay
-                setTimeout(() => this._processMessageDialogQueue(), 100);
-            };
-            this.MODAL_DIALOG_BTN_CONTAINER.appendChild(btn);
-        });
-    }
-
     public showToast(message: string, duration = 2000, detail?: string): Promise<undefined> {
         if (!this.TOAST) return Promise.resolve(undefined);
 
@@ -1029,164 +984,7 @@ export class LeoView {
         };
     }
 
-    public async showOpenDialog(options?: OpenDialogOptions): Promise<Uri[] | null> {
-        try {
-            // Build proper options for window.showOpenFilePicker from OpenDialogOptions
-            const properOptions: OpenFilePickerOptions = {
-                multiple: options?.canSelectMany ?? false,
-                excludeAcceptAllOption: false,
-            };
 
-            // Add file type filters if provided
-            if (options?.filters && Object.keys(options.filters).length > 0) {
-                const types: FilePickerAcceptType[] = [];
-
-                for (const [description, extensions] of Object.entries(options.filters)) {
-                    // Skip "all files" filter - browser provides this by default
-                    if (extensions.includes('.*') || extensions.includes('*')) {
-                        continue;
-                    }
-
-                    // Use a unique MIME type per filter to prevent extension mixing
-                    types.push({
-                        description,
-                        accept: {
-                            // Use text/plain for common text extensions, otherwise use a unique identifier
-                            [`application/${description.toLowerCase().replace(/\s+/g, '-')}`]: extensions.map(ext =>
-                                ext.startsWith('.') ? ext : `.${ext}`
-                            ) as `.${string}`[]
-                        }
-                    });
-                }
-
-                if (types.length > 0) {
-                    properOptions.types = types;
-                }
-            }
-
-            // Set start location if defaultUri is provided
-            if (options?.defaultUri) {
-                properOptions.startIn = 'documents'; // Could be enhanced to parse the Uri path
-            }
-
-            const fileHandles = await window.showOpenFilePicker(properOptions);
-
-            // Check that all chosen files are inside the workspace directory
-            const workspaceDir = workspace.getWorkspaceDirHandle();
-            const uris: Uri[] = [];
-
-            for (const fileHandle of fileHandles) {
-                if (workspaceDir) {
-                    const result = await workspaceDir.resolve(fileHandle);
-                    if (!result || result.length === 0) {
-                        this.showToast('⚠️ Selected file is not inside workspace.', 3000);
-                        continue;
-                    }
-                }
-                const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(fileHandle);
-                const filename = resolveResult ? '/' + resolveResult.join('/') : fileHandle.name;
-                uris.push(new Uri(filename));
-            }
-
-            return uris.length > 0 ? uris : null;
-        } catch (e) {
-            console.error('Error showing native open file dialog:', e);
-            return null;
-        }
-    }
-
-    public async showSaveDialog(options?: SaveDialogOptions): Promise<Uri | null> {
-        try {
-            // Build proper options for window.showSaveFilePicker from SaveDialogOptions
-            const properOptions: SaveFilePickerOptions = {
-                excludeAcceptAllOption: false,
-            };
-
-            // Add file type filters if provided
-            if (options?.filters && Object.keys(options.filters).length > 0) {
-                const types: FilePickerAcceptType[] = [];
-
-                for (const [description, extensions] of Object.entries(options.filters)) {
-                    // Skip "all files" filter - browser provides this by default
-                    if (extensions.includes('.*') || extensions.includes('*')) {
-                        continue;
-                    }
-
-                    // Use a unique MIME type per filter to prevent extension mixing
-                    types.push({
-                        description,
-                        accept: {
-                            [`application/${description.toLowerCase().replace(/\s+/g, '-')}`]: extensions.map(ext =>
-                                ext.startsWith('.') ? ext : `.${ext}`
-                            ) as `.${string}`[]
-                        }
-                    });
-                }
-
-                if (types.length > 0) {
-                    properOptions.types = types;
-                }
-            }
-
-            // Set suggested file name if defaultUri is provided
-            if (options?.defaultUri) {
-                const pathParts = options.defaultUri.fsPath.split('/');
-                const fileName = pathParts[pathParts.length - 1];
-                if (fileName) {
-                    properOptions.suggestedName = fileName;
-                }
-                properOptions.startIn = 'documents'; // Could be enhanced to parse the Uri path
-            }
-
-            const fileHandle = await window.showSaveFilePicker(properOptions);
-
-            // Check that the chosen file is inside the workspace directory
-            const workspaceDir = workspace.getWorkspaceDirHandle();
-            if (workspaceDir) {
-                const result = await workspaceDir.resolve(fileHandle);
-                if (!result || result.length === 0) {
-                    this.showToast('⚠️ Selected file is not inside workspace.', 2000);
-                    return null;
-                }
-            }
-            const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(fileHandle);
-            const filename = resolveResult ? '/' + resolveResult.join('/') : fileHandle.name;
-            return new Uri(filename);
-
-        } catch (e) {
-            console.error('Error showing native save file dialog:', e);
-            return null;
-        }
-    }
-
-    public async showInputDialog(options: InputDialogOptions): Promise<string | undefined> {
-        return new Promise((resolve) => {
-            this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'true');
-            this.INPUT_DIALOG_TITLE.textContent = options.title;
-            this.INPUT_DIALOG_DESCRIPTION.textContent = options.prompt;
-            this.INPUT_DIALOG_INPUT.value = options.value || '';
-            if (options.value) {
-                // Select all text for easy replacement
-                setTimeout(() => {
-                    this.INPUT_DIALOG_INPUT.select();
-                }, 0);
-            }
-            this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
-            const inputCallback = async () => {
-                const inputValue = this.INPUT_DIALOG_INPUT.value;
-                this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
-                resolve(inputValue);
-            };
-            this.INPUT_DIALOG_BTN.textContent = 'OK';
-            this.INPUT_DIALOG_BTN.onclick = inputCallback;
-            // Also call on Enter key in input
-            this.INPUT_DIALOG_INPUT.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    inputCallback();
-                }
-            };
-        });
-    }
 
     public showTextDocument(uri: Uri): void {
         // Read the file, and open in a new tab or window
@@ -1236,238 +1034,554 @@ export class LeoView {
         }
     }
 
-    /**
-     * Method that mimics a subset of VSCode's showQuickPick API.
-     * If a string was used in the input box to restrict choices, filter items accordingly.
-     * Returns the selected QuickPickItem, or null if cancelled.
-     * Will return a string only if something was typed but no item selected because of filtering out all items.
-     */
+    public showMessageDialog(
+        message: string, options?: MessageOptions, ...items: string[]
+    ): Thenable<string | undefined> {
+        return new Promise<string | undefined>((resolve) => {
+            this.__dialogQueue.push({
+                type: 'message',
+                message,
+                options,
+                items,
+                resolve
+            });
+
+            if (!this.__isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
+
+    public async showInputDialog(options: InputDialogOptions): Promise<string | undefined> {
+        return new Promise((resolve) => {
+            this.__dialogQueue.push({
+                type: 'input',
+                inputOptions: options,
+                resolve
+            });
+
+            if (!this.__isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
+
+    public showSingleCharInputDialog(options: InputDialogOptions): Promise<string | undefined> {
+        return new Promise((resolve) => {
+            this.__dialogQueue.push({
+                type: 'singleChar',
+                inputOptions: options,
+                resolve
+            });
+
+            if (!this.__isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
+
     public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | string | null> {
         if (!items || items.length === 0) {
             return Promise.resolve(null);
         }
         return new Promise((resolve) => {
-            // Show the dialog
-            this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'true');
+            this.__dialogQueue.push({
+                type: 'quickPick',
+                quickPickItems: items,
+                quickPickOptions: options,
+                resolve
+            });
 
-            // Set placeholder if provided
-            this.QUICKPICK_DIALOG_INPUT.placeholder = options?.placeHolder || '';
-            this.QUICKPICK_DIALOG_INPUT.value = '';
+            if (!this.__isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
 
-            // Keep track of current selection and filtered items
-            let filteredItems: QuickPickItem[] = [...items];
-            let selectedIndex = -1;
+    public async showOpenDialog(options?: OpenDialogOptions): Promise<Uri[] | null> {
+        return new Promise((resolve) => {
+            this.__dialogQueue.push({
+                type: 'openFile',
+                openDialogOptions: options,
+                resolve
+            });
 
-            // Find first initially picked item or first non-separator
+            if (!this.__isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
+
+    public async showSaveDialog(options?: SaveDialogOptions): Promise<Uri | null> {
+        return new Promise((resolve) => {
+            this.__dialogQueue.push({
+                type: 'saveFile',
+                saveDialogOptions: options,
+                resolve
+            });
+
+            if (!this.__isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
+
+    private _processDialogQueue(): void {
+        if (this.__dialogQueue.length === 0 || this.__isDialogOpen) {
+            return;
+        }
+
+        this.__isDialogOpen = true;
+        const dialog = this.__dialogQueue.shift()!;
+
+        switch (dialog.type) {
+            case 'message':
+                this._showMessageDialogInternal(dialog);
+                break;
+            case 'input':
+                this._showInputDialogInternal(dialog);
+                break;
+            case 'singleChar':
+                this._showSingleCharInputDialogInternal(dialog);
+                break;
+            case 'quickPick':
+                this._showQuickPickInternal(dialog);
+                break;
+            case 'openFile':
+                this._showOpenDialogInternal(dialog);
+                break;
+            case 'saveFile':
+                this._showSaveDialogInternal(dialog);
+                break;
+        }
+    }
+
+    private _showMessageDialogInternal(dialog: any): void {
+        this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
+
+        this.MODAL_DIALOG_TITLE.textContent = dialog.message;
+        this.MODAL_DIALOG_DESCRIPTION.textContent = dialog.options?.detail ?? '';
+
+        const buttonLabels = dialog.items && dialog.items.length > 0 ? dialog.items : ['OK'];
+
+        this.MODAL_DIALOG_BTN_CONTAINER.innerHTML = '';
+        buttonLabels.forEach((label: string) => {
+            const btn = document.createElement('button');
+            btn.textContent = label;
+            btn.className = 'modal-dialog-button';
+            btn.onclick = () => {
+                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+                this.__isDialogOpen = false;
+                dialog.resolve(label);
+                setTimeout(() => this._processDialogQueue(), 100);
+            };
+            this.MODAL_DIALOG_BTN_CONTAINER.appendChild(btn);
+        });
+    }
+
+    private _showInputDialogInternal(dialog: any): void {
+        const options = dialog.inputOptions;
+        this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'true');
+        this.INPUT_DIALOG_TITLE.textContent = options.title;
+        this.INPUT_DIALOG_DESCRIPTION.textContent = options.prompt;
+        this.INPUT_DIALOG_INPUT.value = options.value || '';
+        this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
+
+        if (options.value) {
+            setTimeout(() => {
+                this.INPUT_DIALOG_INPUT.select();
+            }, 0);
+        }
+
+        const inputCallback = () => {
+            const inputValue = this.INPUT_DIALOG_INPUT.value;
+            this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+            this.__isDialogOpen = false;
+            dialog.resolve(inputValue);
+            setTimeout(() => this._processDialogQueue(), 100);
+        };
+
+        this.INPUT_DIALOG_BTN.textContent = 'OK';
+        this.INPUT_DIALOG_BTN.onclick = inputCallback;
+        this.INPUT_DIALOG_INPUT.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                inputCallback();
+            }
+        };
+    }
+
+    private _showSingleCharInputDialogInternal(dialog: any): void {
+        const options = dialog.inputOptions;
+        this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'true');
+        this.INPUT_DIALOG_TITLE.textContent = options.title;
+        this.INPUT_DIALOG_DESCRIPTION.textContent = options.prompt;
+        this.INPUT_DIALOG_INPUT.value = options.value || '';
+        this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
+
+        const inputCallback = () => {
+            const inputValue = this.INPUT_DIALOG_INPUT.value;
+            this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+            this.__isDialogOpen = false;
+            dialog.resolve(inputValue);
+            setTimeout(() => this._processDialogQueue(), 100);
+        };
+
+        this.INPUT_DIALOG_INPUT.oninput = () => {
+            if (this.INPUT_DIALOG_INPUT.value.length >= 1) {
+                this.INPUT_DIALOG_INPUT.value = this.INPUT_DIALOG_INPUT.value.charAt(0);
+                inputCallback();
+            }
+        };
+    }
+
+    private _showQuickPickInternal(dialog: any): void {
+        const items: QuickPickItem[] = dialog.quickPickItems;
+        const options = dialog.quickPickOptions;
+
+        this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'true');
+
+        this.QUICKPICK_DIALOG_INPUT.placeholder = options?.placeHolder || '';
+        this.QUICKPICK_DIALOG_INPUT.value = '';
+
+        let filteredItems: QuickPickItem[] = [...items];
+        let selectedIndex = -1;
+
+        for (let i = 0; i < items.length; i++) {
+            if (items[i]!.picked) {
+                selectedIndex = i;
+                break;
+            }
+        }
+        if (selectedIndex === -1) {
             for (let i = 0; i < items.length; i++) {
-                if (items[i]!.picked) {
+                if (items[i]!.kind !== -1) {
                     selectedIndex = i;
                     break;
                 }
             }
-            if (selectedIndex === -1) {
-                for (let i = 0; i < items.length; i++) {
-                    if (items[i]!.kind !== -1) {
-                        selectedIndex = i;
-                        break;
-                    }
-                }
+        }
+
+        const renderList = () => {
+            this.QUICKPICK_DIALOG_LIST.innerHTML = '';
+
+            if (filteredItems.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No results';
+                li.style.fontStyle = 'italic';
+                li.style.color = 'var(--find-placeholder-color)';
+                li.style.cursor = 'default';
+                li.style.pointerEvents = 'none';
+                this.QUICKPICK_DIALOG_LIST.appendChild(li);
+                return;
             }
 
-            const renderList = () => {
-                this.QUICKPICK_DIALOG_LIST.innerHTML = '';
+            filteredItems.forEach((item, index) => {
+                const li = document.createElement('li');
 
-                if (filteredItems.length === 0) {
-                    const li = document.createElement('li');
-                    li.textContent = 'No results';
-                    li.style.fontStyle = 'italic';
-                    li.style.color = 'var(--find-placeholder-color)';
-                    li.style.cursor = 'default';
-                    li.style.pointerEvents = 'none';
+                if (item.kind === -1) {
+                    li.classList.add('separator');
+                    li.textContent = item.label;
                     this.QUICKPICK_DIALOG_LIST.appendChild(li);
                     return;
                 }
 
-                filteredItems.forEach((item, index) => {
-                    const li = document.createElement('li');
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'quick-pick-label';
+                labelSpan.textContent = item.label;
+                li.appendChild(labelSpan);
 
-                    // Handle separators
-                    if (item.kind === -1) {
-                        li.classList.add('separator');
-                        li.textContent = item.label;
-                        this.QUICKPICK_DIALOG_LIST.appendChild(li);
-                        return;
-                    }
-
-                    // Create label
-                    const labelSpan = document.createElement('span');
-                    labelSpan.className = 'quick-pick-label';
-                    labelSpan.textContent = item.label;
-                    li.appendChild(labelSpan);
-
-                    // Add description if present
-                    if (item.description) {
-                        const descSpan = document.createElement('span');
-                        descSpan.className = 'quick-pick-description';
-                        descSpan.textContent = item.description;
-                        li.appendChild(descSpan);
-                    }
-
-                    // Add detail if present
-                    if (item.detail) {
-                        const detailDiv = document.createElement('div');
-                        detailDiv.className = 'quick-pick-detail';
-                        detailDiv.textContent = item.detail;
-                        li.appendChild(detailDiv);
-                    }
-
-                    // Mark as selected if it matches selectedIndex
-                    if (index === selectedIndex) {
-                        li.classList.add('selected');
-                        // Selected should scroll into view if needed
-                        setTimeout(() => {
-                            li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                        }, 0);
-                    }
-
-                    // Handle click
-                    li.onclick = () => {
-                        this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
-                        if (options?.onDidSelectItem) {
-                            options.onDidSelectItem(item);
-                        }
-                        resolve(item);
-                    };
-
-                    this.QUICKPICK_DIALOG_LIST.appendChild(li);
-                });
-            };
-
-            const filterItems = () => {
-                const filterText = this.QUICKPICK_DIALOG_INPUT.value.toLowerCase().trim();
-
-                if (!filterText) {
-                    filteredItems = [...items];
-                } else {
-                    filteredItems = items.filter(item => {
-                        // When filtered, dont show separators
-                        if (item.kind === -1) {
-                            return false;
-                        }
-                        // Show items that should always be shown
-                        if (item.alwaysShow) {
-                            return true;
-                        }
-                        // Filter by label, description, or detail
-                        const labelMatch = item.label.toLowerCase().includes(filterText);
-                        const descMatch = item.description?.toLowerCase().includes(filterText) || false;
-                        const detailMatch = item.detail?.toLowerCase().includes(filterText) || false;
-                        return labelMatch || descMatch || detailMatch;
-                    });
+                if (item.description) {
+                    const descSpan = document.createElement('span');
+                    descSpan.className = 'quick-pick-description';
+                    descSpan.textContent = item.description;
+                    li.appendChild(descSpan);
                 }
 
-                // Reset selection to first non-separator item
-                selectedIndex = -1;
-                for (let i = 0; i < filteredItems.length; i++) {
+                if (item.detail) {
+                    const detailDiv = document.createElement('div');
+                    detailDiv.className = 'quick-pick-detail';
+                    detailDiv.textContent = item.detail;
+                    li.appendChild(detailDiv);
+                }
+
+                if (index === selectedIndex) {
+                    li.classList.add('selected');
+                    setTimeout(() => {
+                        li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }, 0);
+                }
+
+                li.onclick = () => {
+                    this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
+                    if (options?.onDidSelectItem) {
+                        options.onDidSelectItem(item);
+                    }
+                    this.__isDialogOpen = false;
+                    dialog.resolve(item);
+                    setTimeout(() => this._processDialogQueue(), 100);
+                };
+
+                this.QUICKPICK_DIALOG_LIST.appendChild(li);
+            });
+        };
+
+        const filterItems = () => {
+            const filterText = this.QUICKPICK_DIALOG_INPUT.value.toLowerCase().trim();
+
+            if (!filterText) {
+                filteredItems = [...items];
+            } else {
+                filteredItems = items.filter(item => {
+                    if (item.kind === -1) {
+                        return false;
+                    }
+                    if (item.alwaysShow) {
+                        return true;
+                    }
+                    const labelMatch = item.label.toLowerCase().includes(filterText);
+                    const descMatch = item.description?.toLowerCase().includes(filterText) || false;
+                    const detailMatch = item.detail?.toLowerCase().includes(filterText) || false;
+                    return labelMatch || descMatch || detailMatch;
+                });
+            }
+
+            selectedIndex = -1;
+            for (let i = 0; i < filteredItems.length; i++) {
+                if (filteredItems[i]!.kind !== -1) {
+                    selectedIndex = i;
+                    break;
+                }
+            }
+
+            renderList();
+        };
+
+        const closeDialog = (returnValue: QuickPickItem | string | null) => {
+            this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
+            this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
+            this.QUICKPICK_DIALOG_INPUT.oninput = null;
+            this.__isDialogOpen = false;
+            dialog.resolve(returnValue);
+            setTimeout(() => this._processDialogQueue(), 100);
+        };
+
+        this.QUICKPICK_DIALOG_INPUT.onkeydown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeDialog(null);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedIndex >= 0 && selectedIndex < filteredItems.length) {
+                    const selectedItem = filteredItems[selectedIndex];
+                    if (selectedItem && selectedItem.kind !== -1) {
+                        if (options?.onDidSelectItem) {
+                            options.onDidSelectItem(selectedItem);
+                        }
+                        closeDialog(selectedItem);
+                    }
+                } else if (this.QUICKPICK_DIALOG_INPUT.value) {
+                    closeDialog(this.QUICKPICK_DIALOG_INPUT.value);
+                } else {
+                    closeDialog(null);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
                     if (filteredItems[i]!.kind !== -1) {
                         selectedIndex = i;
                         break;
                     }
                 }
-
                 renderList();
-            };
-
-            const closeDialog = (returnValue: QuickPickItem | string | null) => {
-                this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
-                this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
-                this.QUICKPICK_DIALOG_INPUT.oninput = null;
-                resolve(returnValue);
-            };
-
-            // Handle keyboard navigation
-            this.QUICKPICK_DIALOG_INPUT.onkeydown = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                    closeDialog(null);
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (selectedIndex >= 0 && selectedIndex < filteredItems.length) {
-                        const selectedItem = filteredItems[selectedIndex];
-                        if (selectedItem && selectedItem.kind !== -1) {
-                            if (options?.onDidSelectItem) {
-                                options.onDidSelectItem(selectedItem);
-                            }
-                            closeDialog(selectedItem);
-                        }
-                    } else if (this.QUICKPICK_DIALOG_INPUT.value) {
-                        // Return the typed string if no item matches
-                        closeDialog(this.QUICKPICK_DIALOG_INPUT.value);
-                    } else {
-                        closeDialog(null);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                for (let i = selectedIndex - 1; i >= 0; i--) {
+                    if (filteredItems[i]!.kind !== -1) {
+                        selectedIndex = i;
+                        break;
                     }
-                } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    // Move to next non-separator item
-                    for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
-                        if (filteredItems[i]!.kind !== -1) {
-                            selectedIndex = i;
-                            break;
-                        }
-                    }
-                    renderList();
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    // Move to previous non-separator item
-                    for (let i = selectedIndex - 1; i >= 0; i--) {
-                        if (filteredItems[i]!.kind !== -1) {
-                            selectedIndex = i;
-                            break;
-                        }
-                    }
-                    renderList();
-                } else if (e.key === 'PageDown') {
-                    e.preventDefault();
-                    // Move down by 5 non-separator items
-                    let count = 0;
-                    for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
-                        if (filteredItems[i]!.kind !== -1) {
-                            selectedIndex = i;
-                            count++;
-                            if (count >= 5) break;
-                        }
-                    }
-                    renderList();
-                } else if (e.key === 'PageUp') {
-                    e.preventDefault();
-                    // Move up by 5 non-separator items
-                    let count = 0;
-                    for (let i = selectedIndex - 1; i >= 0; i--) {
-                        if (filteredItems[i]!.kind !== -1) {
-                            selectedIndex = i;
-                            count++;
-                            if (count >= 5) break;
-                        }
-                    }
-                    renderList();
-                } else if (e.key === 'Tab') {
-                    // Just prevent tabbing out of input.
-                    e.preventDefault();
                 }
-            };
+                renderList();
+            } else if (e.key === 'PageDown') {
+                e.preventDefault();
+                let count = 0;
+                for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
+                    if (filteredItems[i]!.kind !== -1) {
+                        selectedIndex = i;
+                        count++;
+                        if (count >= 5) break;
+                    }
+                }
+                renderList();
+            } else if (e.key === 'PageUp') {
+                e.preventDefault();
+                let count = 0;
+                for (let i = selectedIndex - 1; i >= 0; i--) {
+                    if (filteredItems[i]!.kind !== -1) {
+                        selectedIndex = i;
+                        count++;
+                        if (count >= 5) break;
+                    }
+                }
+                renderList();
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+            }
+        };
 
-            // Handle filtering on input
-            this.QUICKPICK_DIALOG_INPUT.oninput = () => {
-                filterItems();
-            };
+        this.QUICKPICK_DIALOG_INPUT.oninput = () => {
+            filterItems();
+        };
 
-            // Initial render
-            renderList();
+        renderList();
 
-            // Focus the input
-            setTimeout(() => {
-                this.QUICKPICK_DIALOG_INPUT.focus();
-            }, 0);
-        });
+        setTimeout(() => {
+            this.QUICKPICK_DIALOG_INPUT.focus();
+        }, 0);
     }
+
+    private async _showOpenDialogInternal(dialog: any): Promise<void> {
+        const options = dialog.openDialogOptions;
+
+        try {
+            // Build proper options for window.showOpenFilePicker from OpenDialogOptions
+            const properOptions: OpenFilePickerOptions = {
+                multiple: options?.canSelectMany ?? false,
+                excludeAcceptAllOption: false,
+            };
+
+            // Add file type filters if provided
+            if (options?.filters && Object.keys(options.filters).length > 0) {
+                const types: FilePickerAcceptType[] = [];
+
+                for (const [description, extensions] of Object.entries(options.filters as { [name: string]: string[] })) {
+                    // Skip "all files" filter - browser provides this by default
+                    if (extensions.includes('.*') || extensions.includes('*')) {
+                        continue;
+                    }
+
+                    // Use a unique MIME type per filter to prevent extension mixing
+                    types.push({
+                        description,
+                        accept: {
+                            [`application/${description.toLowerCase().replace(/\s+/g, '-')}`]: extensions.map(ext =>
+                                ext.startsWith('.') ? ext : `.${ext}`
+                            ) as `.${string}`[]
+                        }
+                    });
+                }
+
+                if (types.length > 0) {
+                    properOptions.types = types;
+                }
+            }
+
+            // Set start location if defaultUri is provided
+            if (options?.defaultUri) {
+                properOptions.startIn = 'documents';
+            }
+
+            const fileHandles = await window.showOpenFilePicker(properOptions);
+
+            // Check that all chosen files are inside the workspace directory
+            const workspaceDir = workspace.getWorkspaceDirHandle();
+            const uris: Uri[] = [];
+
+            for (const fileHandle of fileHandles) {
+                if (workspaceDir) {
+                    const result = await workspaceDir.resolve(fileHandle);
+                    if (!result || result.length === 0) {
+                        this.showToast('⚠️ Selected file is not inside workspace.', 3000);
+                        continue;
+                    }
+                }
+                const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(fileHandle);
+                const filename = resolveResult ? '/' + resolveResult.join('/') : fileHandle.name;
+                uris.push(new Uri(filename));
+            }
+
+            this.__isDialogOpen = false;
+            dialog.resolve(uris.length > 0 ? uris : null);
+            setTimeout(() => this._processDialogQueue(), 100);
+        } catch (e) {
+            console.error('Error showing native open file dialog:', e);
+            this.__isDialogOpen = false;
+            dialog.resolve(null);
+            setTimeout(() => this._processDialogQueue(), 100);
+        }
+    }
+
+    private async _showSaveDialogInternal(dialog: any): Promise<void> {
+        const options = dialog.saveDialogOptions;
+
+        try {
+            // Build proper options for window.showSaveFilePicker from SaveDialogOptions
+            const properOptions: SaveFilePickerOptions = {
+                excludeAcceptAllOption: false,
+            };
+
+            // Add file type filters if provided
+            if (options?.filters && Object.keys(options.filters).length > 0) {
+                const types: FilePickerAcceptType[] = [];
+
+                for (const [description, extensions] of Object.entries(options.filters as { [name: string]: string[] })) {
+                    // Skip "all files" filter - browser provides this by default
+                    if (extensions.includes('.*') || extensions.includes('*')) {
+                        continue;
+                    }
+
+                    // Use a unique MIME type per filter to prevent extension mixing
+                    types.push({
+                        description,
+                        accept: {
+                            [`application/${description.toLowerCase().replace(/\s+/g, '-')}`]: extensions.map(ext =>
+                                ext.startsWith('.') ? ext : `.${ext}`
+                            ) as `.${string}`[]
+                        }
+                    });
+                }
+
+                if (types.length > 0) {
+                    properOptions.types = types;
+                }
+            }
+
+            // Set suggested file name if defaultUri is provided
+            if (options?.defaultUri) {
+                const pathParts = options.defaultUri.fsPath.split('/');
+                const fileName = pathParts[pathParts.length - 1];
+                if (fileName) {
+                    properOptions.suggestedName = fileName;
+                }
+                properOptions.startIn = 'documents';
+            }
+
+            const fileHandle = await window.showSaveFilePicker(properOptions);
+
+            // Check that the chosen file is inside the workspace directory
+            const workspaceDir = workspace.getWorkspaceDirHandle();
+            if (workspaceDir) {
+                const result = await workspaceDir.resolve(fileHandle);
+                if (!result || result.length === 0) {
+                    this.showToast('⚠️ Selected file is not inside workspace.', 2000);
+                    this.__isDialogOpen = false;
+                    dialog.resolve(null);
+                    setTimeout(() => this._processDialogQueue(), 100);
+                    return;
+                }
+            }
+            const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(fileHandle);
+            const filename = resolveResult ? '/' + resolveResult.join('/') : fileHandle.name;
+
+            this.__isDialogOpen = false;
+            dialog.resolve(new Uri(filename));
+            setTimeout(() => this._processDialogQueue(), 100);
+        } catch (e) {
+            console.error('Error showing native save file dialog:', e);
+            this.__isDialogOpen = false;
+            dialog.resolve(null);
+            setTimeout(() => this._processDialogQueue(), 100);
+        }
+    }
+
 }
