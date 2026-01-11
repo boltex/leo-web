@@ -6,7 +6,7 @@ import { IdleTime } from "./core/idle_time";
 import * as utils from "./utils";
 import { Uri, workspace } from "./workspace";
 import { Commands } from "./core/leoCommands";
-import { ConfigSetting, Focus, QuickPickItem, ReqRefresh, RevealType } from "./types";
+import { ConfigSetting, Focus, LeoPackageStates, QuickPickItem, ReqRefresh, RevealType } from "./types";
 import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
@@ -59,6 +59,16 @@ export class LeoUI extends NullGui {
         this._lastSelectedNode = p_ap;
         this._lastSelectedNodeTS = utils.performanceNow();
     }
+
+    // * Selection & scroll
+    private _selectionDirty: boolean = false; // Flag set when cursor selection is changed
+    private _selectionGnx: string = ''; // Packaged into 'BodySelectionInfo' structures, sent to Leo
+    private _selection: Selection | undefined; // also packaged into 'BodySelectionInfo'
+    private _scrollDirty: boolean = false; // Flag set when cursor selection is changed
+    private _scrollGnx: string = '';
+    private _scroll: Range | undefined;
+
+    private _editorTouched: boolean = false; // Signifies that the body editor DOM element has been modified by the user since last save
 
     // * Debounced method used to get states for UI display flags (commands such as undo, redo, save, ...)
     public getStates: (() => void);
@@ -166,6 +176,68 @@ export class LeoUI extends NullGui {
         this.refreshDesc();
     }
 
+    /**
+     * * Validate headline edit input box if active, or, Save body to the Leo app if its dirty.
+     *   That is, only if a change has been made to the body 'document' so far
+     * @param p_forcedVsCodeSave Flag to also have vscode 'save' the content of this editor through the filesystem
+     * @returns a promise that resolves when the possible saving process is finished
+     */
+    public triggerBodySave(p_forcedVsCodeSave?: boolean, p_fromFocusChange?: boolean): Thenable<unknown> {
+
+        // * Check if headline edit input box is active. Validate it with current value.
+        // TODO : implement headline edit box check and validation
+        // if (!p_fromFocusChange && this._hib && this._hib.enabled) {
+        //     this._hibInterrupted = true;
+        //     this._hib.enabled = false;
+        //     this._hibLastValue = this._hib.value;
+        //     this._hib.hide();
+        //     if (this._onDidHideResolve) {
+        //         console.error('IN triggerBodySave AND _onDidHideResolve PROMISE ALREADY EXISTS!');
+        //     }
+        //     const w_resolveAfterEditHeadline = new Promise<void>((p_resolve, p_reject) => {
+        //         this._onDidHideResolve = p_resolve;
+        //     });
+        //     return w_resolveAfterEditHeadline;
+        // }
+
+        // * Save body to Leo if a change has been made to the body 'document' so far
+        let q_savePromise: Thenable<boolean>;
+        if (this._editorTouched) {
+            this._editorTouched = false;
+            q_savePromise = this._bodySaveDocument();
+        } else {
+            q_savePromise = Promise.resolve(true);
+        }
+
+        return q_savePromise;
+    }
+
+
+    /**
+     * Saves the cursor position along with the text selection range and scroll position
+     * of the last body, or detached body pane, that had its cursor info set in this._selection, etc.
+     */
+    private _bodySaveSelection(): void {
+
+        if (!this._selectionDirty || !this._selection) {
+            return;
+        }
+        // TODO : implement body selection saving
+
+
+        // save the cursor selection, supports both body and detached bodies
+        this._bodySaveSelection();
+    }
+
+
+
+    /**
+     * * Sets new body text on leo's side.
+     * @returns a promise that resolves when the complete saving process is finished
+     */
+    private _bodySaveDocument(): Thenable<boolean> {
+        return Promise.resolve(true);
+    }
 
     /**
      * Set filename as description
@@ -191,6 +263,19 @@ export class LeoUI extends NullGui {
     public refreshDocumentsPane(): void {
         // TODO : implement documents pane refresh
     }
+    public refreshUndoPane(): void {
+        // TODO : implement undo pane refresh
+    }
+    public refreshBodyStates(): void {
+        // TODO : implement body states refresh
+    }
+    public refreshGotoPane(): void {
+        // TODO : implement goto pane refresh
+    }
+    public refreshButtonsPane(): void {
+        // TODO : implement buttons pane refresh
+    }
+
 
     /**
      * * Setup global refresh options
@@ -272,9 +357,65 @@ export class LeoUI extends NullGui {
     private _triggerGetStates(): void {
 
         const c = g.app.windowList[this.frameIndex].c;
-        // TODO : Finish implementation of getting states for commands
-        console.log('in _triggerGetStates for commander:', c.fileName());
 
+        if (this._refreshType.states) {
+            this._refreshType.states = false;
+            const p = c.p;
+            // TODO : set status bar info
+            // if (this._leoStatusBar && p && p.v) {
+            //     const unl = c.frame.computeStatusUnl(p);
+            //     this._leoStatusBar.setString(unl);
+            //     this._leoStatusBar.setTooltip(p.h);
+            // }
+            let w_canHoist = true;
+            let w_topIsChapter = false;
+            if (c.hoistStack.length) {
+                const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
+                w_topIsChapter = w_ph.h.startsWith('@chapter ');
+                if (p.__eq__(w_ph)) {
+                    // p is already the hoisted node
+                    w_canHoist = false;
+                }
+            } else {
+                // not hoisted, was it the single top child of the real root?
+                if (c.rootPosition()!.__eq__(p) && c.hiddenRootNode.children.length === 1) {
+                    w_canHoist = false;
+                }
+            }
+            const w_states: LeoPackageStates = {
+                changed: c.changed, // Document has changed (is dirty)
+                canUndo: c.canUndo(), // Document can undo the last operation done
+                canRedo: c.canRedo(), // Document can redo the last operation 'undone'
+                canGoBack: c.nodeHistory.beadPointer > 0,
+                canGoNext: c.nodeHistory.beadPointer + 1 < c.nodeHistory.beadList.length,
+                canDemote: c.canDemote(), // Selected node can have its siblings demoted
+                canPromote: c.canPromote(), // Selected node can have its children promoted
+                canDehoist: c.canDehoist(), // Document is currently hoisted and can be de-hoisted
+                canHoist: w_canHoist,
+                topIsChapter: w_topIsChapter
+                // 
+            };
+            this.leoStates.setLeoStateFlags(w_states);
+            this.refreshUndoPane();
+        }
+        // Set leoChanged and leoOpenedFilename
+        this.leoStates.leoChanged = c.changed;
+        this.leoStates.leoOpenedFileName = c.fileName();
+
+        this.refreshBodyStates(); // Set language and wrap states, if different.
+
+        if (this._refreshType.documents) {
+            this._refreshType.documents = false;
+            this.refreshDocumentsPane();
+        }
+        if (this._refreshType.goto) {
+            this._refreshType.goto = false;
+            this.refreshGotoPane();
+        }
+        if (this._refreshType.buttons) {
+            this._refreshType.buttons = false;
+            this.refreshButtonsPane();
+        }
     }
 
 
@@ -302,6 +443,23 @@ export class LeoUI extends NullGui {
         if (!this.leoStates.leoIdUnset && g.app.leoID !== 'None') {
             this.leoStates.fileOpenedReady = true;
         }
+
+        this._revealType = RevealType.RevealSelect; // For initial outline 'visible' event
+
+        this.setupRefresh(
+            Focus.Body, // Original Leo seems to open itself with focus in body.
+            {
+                tree: true,
+                body: true,
+                states: true,
+                buttons: true,
+                documents: true,
+                goto: true
+            },
+        );
+
+        this.loadSearchSettings();
+
     }
 
     /**
@@ -310,25 +468,24 @@ export class LeoUI extends NullGui {
      * @returns Promise that resolves when the save command is done
      */
     public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
-        // TODO : MAYBE TRIGGER BODY SAVE?
-        // await this.triggerBodySave(true);
+
+        await this.triggerBodySave(true);
 
         const c = g.app.windowList[this.frameIndex].c;
 
         await c.save();
 
-        // TODO: MAYBE REMOVE THIS CODE FROM LEOJS LATER?
-        // setTimeout(() => {
-        //     this.setupRefresh(
-        //         p_fromOutline ? Focus.Outline : Focus.Body,
-        //         {
-        //             tree: true,
-        //             states: true,
-        //             documents: true
-        //         }
-        //     );
-        //     void this.launchRefresh();
-        // });
+        setTimeout(() => {
+            this.setupRefresh(
+                p_fromOutline ? Focus.Outline : Focus.Body,
+                {
+                    tree: true,
+                    states: true,
+                    documents: true
+                }
+            );
+            void this.launchRefresh();
+        });
 
         return Promise.resolve();
     }
@@ -493,9 +650,14 @@ export class LeoUI extends NullGui {
             placeHolder: string;
         },
     ): Thenable<string | undefined> {
-        // TODO !
-        console.log(' TODO: implement get1Char dialog');
-        return Promise.resolve('');
+        if (!options) {
+            options = {
+                title: 'Enter a single character',
+                prompt: 'Please enter a single character:',
+                placeHolder: ''
+            };
+        }
+        return workspace.view.showSingleCharInputDialog(options);
     }
 
     public runAboutLeoDialog(
