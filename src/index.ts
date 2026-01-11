@@ -73,100 +73,107 @@ class LeoWebApp {
 
     private async uiExperiments(): Promise<void> {
 
-        // 1 - TEST OPEN FILE DIALOG
-        const chosenFile = await workspace.view.showOpenDialog();
-        if (chosenFile) {
-            console.log('open file:', chosenFile);
-        } else {
-            console.log('No file chosen in OPEN dialog');
-        }
+        // // 1 - TEST OPEN FILE DIALOG
+        // const chosenFile = await workspace.view.showOpenDialog();
+        // if (chosenFile) {
+        //     console.log('open file:', chosenFile);
+        // } else {
+        //     console.log('No file chosen in OPEN dialog');
+        // }
 
-        // 2 - TEST THE SAVE DIALOG
-        const saveFile = await workspace.view.showSaveDialog();
-        if (saveFile) {
-            console.log('save to:', saveFile);
-        } else {
-            console.log('No file chosen in SAVE dialog');
-        }
+        // // 2 - TEST THE SAVE DIALOG
+        // const saveFile = await workspace.view.showSaveDialog();
+        // if (saveFile) {
+        //     console.log('save to:', saveFile);
+        // } else {
+        //     console.log('No file chosen in SAVE dialog');
+        // }
 
-        // 3 - TEST INPUT DIALOG
-        const inputResult = await workspace.view.showInputDialog({
-            title: "Input Dialog Test",
-            prompt: "Please enter some text:",
-            value: "Default value",
+        // // 3 - TEST INPUT DIALOG
+        // const inputResult = await workspace.view.showInputDialog({
+        //     title: "Input Dialog Test",
+        //     prompt: "Please enter some text:",
+        //     value: "Default value",
+        //     placeholder: "Type here..."
+        // });
+        // console.log("Input dialog result:", inputResult);
+
+        // // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
+        // const items: QuickPickItem[] = [
+        //     { label: "Option 1", description: "The first option" },
+        //     { label: "Option 2", description: "The second option", detail: "Additional details about option 2" },
+        //     { label: "", kind: QuickPickItemKind.Separator },
+        //     { label: "Option 3", description: "The third option after a separator", detail: "More details here but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
+        //     { label: "Option 4", description: "some other option", detail: "Detailed description for option 4 goes here." },
+        //     { label: "Option 5", description: "some other option with a longer descriptions blablabla blabla, blablabla..." },
+        //     { label: "Option 6 with longer title", description: "some other option" },
+        //     { label: "Option 7 with extra long title to make sure it does not wrap and end with ellipsis", description: "some other option" },
+        //     { label: "Option 8", description: "some other option" },
+        //     { label: "Option 9", description: "some other option but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
+        //     { label: "Option 10", description: "some other option" },
+        //     { label: "Option 11", description: "some other option" },
+        //     { label: "Option 12", description: "some other option" },
+        // ];
+        // workspace.view.showQuickPick(items, {
+        //     title: "Quick Pick Dialog Test",
+        //     placeHolder: "Select an option",
+        //     onDidSelectItem: (item) => {
+        //         console.log("Highlighted item:", item);
+        //     }
+        // }).then((result) => {
+        //     console.log("Quick pick result:", result);
+        // });
+
+
+        // // NOw test the same 4 again but using 'then' syntax instead of await.
+
+        // // 1 - TEST OPEN FILE DIALOG
+        // workspace.view.showOpenDialog().then((p_result) => {
+        //     if (p_result) {
+        //         console.log('Chosen OPEN FILE handle:', p_result);
+        //     } else {
+        //         console.log('No file chosen in OPEN dialog');
+        //     }
+        // });
+
+        // // 2 - TEST THE SAVE DIALOG
+        // workspace.view.showSaveDialog().then((p_result) => {
+        //     if (p_result) {
+        //         console.log('Chosen SAVE FILE handle:', p_result);
+        //     } else {
+        //         console.log('No file chosen in SAVE dialog');
+        //     }
+        // });
+
+
+        // // 3 - TEST INPUT DIALOG
+        // workspace.view.showInputDialog({
+        //     title: "Input Dialog Test",
+        //     prompt: "Please enter some text:",
+        //     value: "Default value",
+        //     placeholder: "Type here..."
+        // }).then((p_result) => {
+        //     console.log("Input dialog result:", p_result);
+        // });
+
+
+        // // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
+        // const result = await workspace.view.showQuickPick(items, {
+        //     title: "Quick Pick Dialog Test",
+        //     placeHolder: "Select an option",
+        //     onDidSelectItem: (item) => {
+        //         console.log("Highlighted item:", item);
+        //     }
+        // });
+        // console.log("Quick pick result:", result);
+
+        const singleChar = await workspace.view.showSingleCharInputDialog({
+            title: "Input single char Test",
+            prompt: "Please enter some text, it should accept on first one:",
+            value: "",
             placeholder: "Type here..."
         });
-        console.log("Input dialog result:", inputResult);
-
-        // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
-        const items: QuickPickItem[] = [
-            { label: "Option 1", description: "The first option" },
-            { label: "Option 2", description: "The second option", detail: "Additional details about option 2" },
-            { label: "", kind: QuickPickItemKind.Separator },
-            { label: "Option 3", description: "The third option after a separator", detail: "More details here but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
-            { label: "Option 4", description: "some other option", detail: "Detailed description for option 4 goes here." },
-            { label: "Option 5", description: "some other option with a longer descriptions blablabla blabla, blablabla..." },
-            { label: "Option 6 with longer title", description: "some other option" },
-            { label: "Option 7 with extra long title to make sure it does not wrap and end with ellipsis", description: "some other option" },
-            { label: "Option 8", description: "some other option" },
-            { label: "Option 9", description: "some other option but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
-            { label: "Option 10", description: "some other option" },
-            { label: "Option 11", description: "some other option" },
-            { label: "Option 12", description: "some other option" },
-        ];
-        workspace.view.showQuickPick(items, {
-            title: "Quick Pick Dialog Test",
-            placeHolder: "Select an option",
-            onDidSelectItem: (item) => {
-                console.log("Highlighted item:", item);
-            }
-        }).then((result) => {
-            console.log("Quick pick result:", result);
-        });
-
-
-        // NOw test the same 4 again but using 'then' syntax instead of await.
-
-        // 1 - TEST OPEN FILE DIALOG
-        workspace.view.showOpenDialog().then((p_result) => {
-            if (p_result) {
-                console.log('Chosen OPEN FILE handle:', p_result);
-            } else {
-                console.log('No file chosen in OPEN dialog');
-            }
-        });
-
-        // 2 - TEST THE SAVE DIALOG
-        workspace.view.showSaveDialog().then((p_result) => {
-            if (p_result) {
-                console.log('Chosen SAVE FILE handle:', p_result);
-            } else {
-                console.log('No file chosen in SAVE dialog');
-            }
-        });
-
-
-        // 3 - TEST INPUT DIALOG
-        workspace.view.showInputDialog({
-            title: "Input Dialog Test",
-            prompt: "Please enter some text:",
-            value: "Default value",
-            placeholder: "Type here..."
-        }).then((p_result) => {
-            console.log("Input dialog result:", p_result);
-        });
-
-
-        // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
-        const result = await workspace.view.showQuickPick(items, {
-            title: "Quick Pick Dialog Test",
-            placeHolder: "Select an option",
-            onDidSelectItem: (item) => {
-                console.log("Highlighted item:", item);
-            }
-        });
-        console.log("Quick pick result:", result);
-
+        console.log("Single char input dialog result:", singleChar);
 
         // test showInformationMessage dialog with the modal option.
         workspace.view.showInformationMessage("This is an information message.", { modal: true, detail: "Additional details can go here." }, "OK", "Cancel").then((selection) => {

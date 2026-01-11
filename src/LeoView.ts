@@ -1,3 +1,4 @@
+import { set } from 'lodash';
 import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions } from './types';
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
@@ -125,7 +126,10 @@ export class LeoView {
         // Resolver
         resolve: (value: any) => void;
     }> = [];
-    private __isDialogOpen = false;
+    public isDialogOpen = false;
+
+    private __activeFocusTrap: (() => void) | null = null;
+
 
     public minWidth = 20;
     public minHeight = 20;
@@ -984,8 +988,6 @@ export class LeoView {
         };
     }
 
-
-
     public showTextDocument(uri: Uri): void {
         // Read the file, and open in a new tab or window
         workspace.fs.readFile(uri).then(data => {
@@ -1046,7 +1048,7 @@ export class LeoView {
                 resolve
             });
 
-            if (!this.__isDialogOpen) {
+            if (!this.isDialogOpen) {
                 this._processDialogQueue();
             }
         });
@@ -1060,7 +1062,7 @@ export class LeoView {
                 resolve
             });
 
-            if (!this.__isDialogOpen) {
+            if (!this.isDialogOpen) {
                 this._processDialogQueue();
             }
         });
@@ -1074,7 +1076,7 @@ export class LeoView {
                 resolve
             });
 
-            if (!this.__isDialogOpen) {
+            if (!this.isDialogOpen) {
                 this._processDialogQueue();
             }
         });
@@ -1092,7 +1094,7 @@ export class LeoView {
                 resolve
             });
 
-            if (!this.__isDialogOpen) {
+            if (!this.isDialogOpen) {
                 this._processDialogQueue();
             }
         });
@@ -1106,7 +1108,7 @@ export class LeoView {
                 resolve
             });
 
-            if (!this.__isDialogOpen) {
+            if (!this.isDialogOpen) {
                 this._processDialogQueue();
             }
         });
@@ -1120,18 +1122,18 @@ export class LeoView {
                 resolve
             });
 
-            if (!this.__isDialogOpen) {
+            if (!this.isDialogOpen) {
                 this._processDialogQueue();
             }
         });
     }
 
     private _processDialogQueue(): void {
-        if (this.__dialogQueue.length === 0 || this.__isDialogOpen) {
+        if (this.__dialogQueue.length === 0 || this.isDialogOpen) {
             return;
         }
 
-        this.__isDialogOpen = true;
+        this.isDialogOpen = true;
         const dialog = this.__dialogQueue.shift()!;
 
         switch (dialog.type) {
@@ -1165,18 +1167,38 @@ export class LeoView {
         const buttonLabels = dialog.items && dialog.items.length > 0 ? dialog.items : ['OK'];
 
         this.MODAL_DIALOG_BTN_CONTAINER.innerHTML = '';
+        let firstButton: HTMLButtonElement | null = null;
+
         buttonLabels.forEach((label: string) => {
             const btn = document.createElement('button');
+            if (!firstButton) {
+                firstButton = btn;
+            }
             btn.textContent = label;
             btn.className = 'modal-dialog-button';
             btn.onclick = () => {
+                this._cleanupFocusTrap();
                 this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
-                this.__isDialogOpen = false;
+                this.isDialogOpen = false;
                 dialog.resolve(label);
                 setTimeout(() => this._processDialogQueue(), 100);
             };
             this.MODAL_DIALOG_BTN_CONTAINER.appendChild(btn);
         });
+
+        // Get the modal dialog container element
+        const modalDialog = document.querySelector('#message-dialog') as HTMLElement;
+        if (modalDialog) {
+            this._cleanupFocusTrap();
+            this.__activeFocusTrap = this._setupFocusTrap(modalDialog);
+        }
+
+        if (firstButton) {
+            // Focus the first button (usually the primary action)
+            setTimeout(() => {
+                firstButton!.focus();
+            }, 0);
+        }
     }
 
     private _showInputDialogInternal(dialog: any): void {
@@ -1195,8 +1217,9 @@ export class LeoView {
 
         const inputCallback = () => {
             const inputValue = this.INPUT_DIALOG_INPUT.value;
+            this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
-            this.__isDialogOpen = false;
+            this.isDialogOpen = false;
             dialog.resolve(inputValue);
             setTimeout(() => this._processDialogQueue(), 100);
         };
@@ -1208,6 +1231,17 @@ export class LeoView {
                 inputCallback();
             }
         };
+
+        // Set up focus trap
+        const inputDialog = document.querySelector('#input-dialog') as HTMLElement;
+        if (inputDialog) {
+            this._cleanupFocusTrap();
+            this.__activeFocusTrap = this._setupFocusTrap(inputDialog);
+        }
+
+        setTimeout(() => {
+            this.INPUT_DIALOG_INPUT.focus();
+        }, 0);
     }
 
     private _showSingleCharInputDialogInternal(dialog: any): void {
@@ -1218,10 +1252,16 @@ export class LeoView {
         this.INPUT_DIALOG_INPUT.value = options.value || '';
         this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
 
+        // add 'hidden-button' class to OK button since we don't need it for single char input
+        this.INPUT_DIALOG_BTN.classList.add('hidden-button');
+
         const inputCallback = () => {
             const inputValue = this.INPUT_DIALOG_INPUT.value;
+            this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
-            this.__isDialogOpen = false;
+            // Remove the 'hidden-button' class from OK button for future dialogs
+            this.INPUT_DIALOG_BTN.classList.remove('hidden-button');
+            this.isDialogOpen = false;
             dialog.resolve(inputValue);
             setTimeout(() => this._processDialogQueue(), 100);
         };
@@ -1232,6 +1272,17 @@ export class LeoView {
                 inputCallback();
             }
         };
+
+        // Set up focus trap
+        const inputDialog = document.querySelector('#input-dialog') as HTMLElement;
+        if (inputDialog) {
+            this._cleanupFocusTrap();
+            this.__activeFocusTrap = this._setupFocusTrap(inputDialog);
+        }
+
+        setTimeout(() => {
+            this.INPUT_DIALOG_INPUT.focus();
+        }, 0);
     }
 
     private _showQuickPickInternal(dialog: any): void {
@@ -1316,7 +1367,7 @@ export class LeoView {
                     if (options?.onDidSelectItem) {
                         options.onDidSelectItem(item);
                     }
-                    this.__isDialogOpen = false;
+                    this.isDialogOpen = false;
                     dialog.resolve(item);
                     setTimeout(() => this._processDialogQueue(), 100);
                 };
@@ -1357,10 +1408,11 @@ export class LeoView {
         };
 
         const closeDialog = (returnValue: QuickPickItem | string | null) => {
+            this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
             this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
             this.QUICKPICK_DIALOG_INPUT.oninput = null;
-            this.__isDialogOpen = false;
+            this.isDialogOpen = false;
             dialog.resolve(returnValue);
             setTimeout(() => this._processDialogQueue(), 100);
         };
@@ -1435,6 +1487,13 @@ export class LeoView {
 
         renderList();
 
+        // Set up focus trap
+        const quickPickDialog = document.querySelector('#quickpick-dialog') as HTMLElement;
+        if (quickPickDialog) {
+            this._cleanupFocusTrap();
+            this.__activeFocusTrap = this._setupFocusTrap(quickPickDialog);
+        }
+
         setTimeout(() => {
             this.QUICKPICK_DIALOG_INPUT.focus();
         }, 0);
@@ -1500,12 +1559,12 @@ export class LeoView {
                 uris.push(new Uri(filename));
             }
 
-            this.__isDialogOpen = false;
+            this.isDialogOpen = false;
             dialog.resolve(uris.length > 0 ? uris : null);
             setTimeout(() => this._processDialogQueue(), 100);
         } catch (e) {
             console.error('Error showing native open file dialog:', e);
-            this.__isDialogOpen = false;
+            this.isDialogOpen = false;
             dialog.resolve(null);
             setTimeout(() => this._processDialogQueue(), 100);
         }
@@ -1564,7 +1623,7 @@ export class LeoView {
                 const result = await workspaceDir.resolve(fileHandle);
                 if (!result || result.length === 0) {
                     this.showToast('⚠️ Selected file is not inside workspace.', 2000);
-                    this.__isDialogOpen = false;
+                    this.isDialogOpen = false;
                     dialog.resolve(null);
                     setTimeout(() => this._processDialogQueue(), 100);
                     return;
@@ -1573,14 +1632,61 @@ export class LeoView {
             const resolveResult = await workspace.getWorkspaceDirHandle()?.resolve(fileHandle);
             const filename = resolveResult ? '/' + resolveResult.join('/') : fileHandle.name;
 
-            this.__isDialogOpen = false;
+            this.isDialogOpen = false;
             dialog.resolve(new Uri(filename));
             setTimeout(() => this._processDialogQueue(), 100);
         } catch (e) {
             console.error('Error showing native save file dialog:', e);
-            this.__isDialogOpen = false;
+            this.isDialogOpen = false;
             dialog.resolve(null);
             setTimeout(() => this._processDialogQueue(), 100);
+        }
+    }
+
+    private _setupFocusTrap(container: HTMLElement): () => void {
+        // Get all focusable elements within the container
+        const getFocusableElements = (): HTMLElement[] => {
+            const selector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+            return Array.from(container.querySelectorAll<HTMLElement>(selector))
+                .filter(el => !el.hasAttribute('disabled') && el.offsetParent !== null);
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key !== 'Tab') return;
+
+            const focusableElements = getFocusableElements();
+            if (focusableElements.length === 0) return;
+
+            const firstElement = focusableElements[0]!;
+            const lastElement = focusableElements[focusableElements.length - 1]!;
+
+            if (e.shiftKey) {
+                // Shift+Tab: if on first element, move to last
+                if (document.activeElement === firstElement) {
+                    e.preventDefault();
+                    lastElement.focus();
+                }
+            } else {
+                // Tab: if on last element, move to first
+                if (document.activeElement === lastElement) {
+                    e.preventDefault();
+                    firstElement.focus();
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        // Return cleanup function
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }
+
+    private _cleanupFocusTrap(): void {
+        if (this.__activeFocusTrap) {
+            this.__activeFocusTrap();
+            this.__activeFocusTrap = null;
         }
     }
 

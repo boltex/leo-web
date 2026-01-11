@@ -460,6 +460,8 @@ export class LeoController {
     // Global key handlers (work anywhere)
     private handleGlobalKeyDown = (e: KeyboardEvent) => {
         const view = this.view;
+        if (view.isDialogOpen) return; // Prevent handling when a dialog is open
+
         console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
         // if (e.key.toLowerCase() === 'f' && e.ctrlKey && !e.altKey && !e.metaKey) {
         //     e.preventDefault();
