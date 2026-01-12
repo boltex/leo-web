@@ -6,7 +6,7 @@ import { IdleTime } from "./core/idle_time";
 import * as utils from "./utils";
 import { Uri, workspace } from "./workspace";
 import { Commands } from "./core/leoCommands";
-import { ConfigSetting, Focus, LeoPackageStates, QuickPickItem, ReqRefresh, RevealType } from "./types";
+import { CommandOptions, ConfigSetting, Focus, LeoPackageStates, QuickPickItem, ReqRefresh, RevealType } from "./types";
 import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
@@ -18,6 +18,8 @@ import { Config } from "./config";
 export class LeoUI extends NullGui {
 
     public leoStates: LeoStates;
+    public trace: boolean = false; //true;
+
     // * Log Pane
     protected _leoLogPane: boolean = false;
     private _currentOutlineTitle: string = "";
@@ -75,7 +77,6 @@ export class LeoUI extends NullGui {
 
     // * Debounced method for refreshing the UI
     public launchRefresh: DebouncedFunc<() => Promise<unknown>>;
-
 
     constructor(guiName = 'browserGui') {
         super(guiName);
@@ -159,7 +160,6 @@ export class LeoUI extends NullGui {
 
     }
 
-
     /**
      * * Sets the outline pane top bar string message or refreshes with existing title if no title passed
      * @param p_title new string to replace the current title
@@ -212,7 +212,6 @@ export class LeoUI extends NullGui {
         return q_savePromise;
     }
 
-
     /**
      * Saves the cursor position along with the text selection range and scroll position
      * of the last body, or detached body pane, that had its cursor info set in this._selection, etc.
@@ -228,8 +227,6 @@ export class LeoUI extends NullGui {
         // save the cursor selection, supports both body and detached bodies
         this._bodySaveSelection();
     }
-
-
 
     /**
      * * Sets new body text on leo's side.
@@ -275,7 +272,6 @@ export class LeoUI extends NullGui {
     public refreshButtonsPane(): void {
         // TODO : implement buttons pane refresh
     }
-
 
     /**
      * * Setup global refresh options
@@ -350,7 +346,6 @@ export class LeoUI extends NullGui {
         return [w_language, w_wrap];
     }
 
-
     /**
      * * 'getStates' action for use in debounced method call
      */
@@ -418,7 +413,6 @@ export class LeoUI extends NullGui {
         }
     }
 
-
     /**
      * * Setup UI for having no opened Leo documents
      */
@@ -463,6 +457,98 @@ export class LeoUI extends NullGui {
     }
 
     /**
+     * Leo Command. This is used in "command bindings" from the UI to execute commands.
+     * @param p_cmd Command name string
+     * @param p_options: CommandOptions for the command
+     */
+    public async command(
+        p_cmd: string,
+        p_options: CommandOptions
+    ): Promise<unknown> {
+        this.lastCommandTimer = process.hrtime();
+        if (this.commandTimer === undefined) {
+            this.commandTimer = this.lastCommandTimer;
+        }
+        this.lastCommandRefreshTimer = this.lastCommandTimer;
+        if (this.commandRefreshTimer === undefined) {
+            this.commandRefreshTimer = this.lastCommandTimer;
+        }
+
+        await this.triggerBodySave(true);
+
+
+        const c = g.app.windowList[this.frameIndex].c;
+        this.setupRefresh(p_options.finalFocus, p_options.refreshType);
+
+        let value: any = undefined;
+        const p = p_options.node ? p_options.node : c.p;
+
+
+        let w_offset = 0;
+        if (p_options.keepSelection) {
+            if (Constants.OLD_POS_OFFSETS.DELETE.includes(p_cmd)) {
+                w_offset = -1;
+            } else if (Constants.OLD_POS_OFFSETS.ADD.includes(p_cmd)) {
+                w_offset = 1;
+            }
+        }
+
+        try {
+            if (p.__eq__(c.p)) {
+                value = c.doCommandByName(p_cmd); // no need for re-selection
+            } else {
+                const old_p = c.p;
+                c.selectPosition(p);
+                value = c.doCommandByName(p_cmd);
+                if (p_options.keepSelection) {
+                    if (value && value.then) {
+                        void (value as Thenable<unknown>).then((p_result) => {
+                            if (c.positionExists(old_p)) {
+                                c.selectPosition(old_p);
+                            } else {
+                                old_p._childIndex = old_p._childIndex + w_offset;
+                                if (c.positionExists(old_p)) {
+                                    c.selectPosition(old_p);
+                                }
+                            }
+                        });
+                    } else {
+                        if (c.positionExists(old_p)) {
+                            c.selectPosition(old_p);
+                        } else {
+                            old_p._childIndex = old_p._childIndex + w_offset;
+                            if (c.positionExists(old_p)) {
+                                c.selectPosition(old_p);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            void workspace.view.showInformationMessage("LeoUI Error: " + e);
+        }
+
+        if (this.trace) {
+            if (this.lastCommandTimer) {
+                console.log('lastCommandTimer', utils.getDurationMs(this.lastCommandTimer));
+            }
+        }
+
+        this.lastCommandTimer = undefined;
+
+        if (value && value.then) {
+            void (value as Thenable<unknown>).then((p_result) => {
+                void this.launchRefresh();
+            });
+            return value;
+        } else {
+            void this.launchRefresh();
+            return Promise.resolve(value); // value may be a promise but it will resolve all at once.
+        }
+
+    }
+
+    /**
      * * Invokes the commander.save() command
      * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
      * @returns Promise that resolves when the save command is done
@@ -489,7 +575,6 @@ export class LeoUI extends NullGui {
 
         return Promise.resolve();
     }
-
 
     /**
      * Show info window about requiring leoID to start
@@ -636,7 +721,6 @@ export class LeoUI extends NullGui {
             return workspace.view.showInputDialog(options);
         }
     }
-
 
     /**
      * * Gets a single character input from the user, automatically accepting as soon as a character is entered
