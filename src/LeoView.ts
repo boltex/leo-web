@@ -1004,6 +1004,10 @@ export class LeoView {
         });
     }
 
+    public getLastQuickPickInput(): string | undefined {
+        return this.QUICKPICK_DIALOG_INPUT.value;
+    }
+
     /**
      * Method that mimics VSCode's showInformationMessage API.
      */
@@ -1082,9 +1086,9 @@ export class LeoView {
         });
     }
 
-    public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | string | null> {
+    public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | undefined> {
         if (!items || items.length === 0) {
-            return Promise.resolve(null);
+            return Promise.resolve(undefined);
         }
         return new Promise((resolve) => {
             this.__dialogQueue.push({
@@ -1431,8 +1435,6 @@ export class LeoView {
                         }
                         closeDialog(selectedItem);
                     }
-                } else if (this.QUICKPICK_DIALOG_INPUT.value) {
-                    closeDialog(this.QUICKPICK_DIALOG_INPUT.value);
                 } else {
                     closeDialog(null);
                 }

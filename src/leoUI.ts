@@ -6,7 +6,7 @@ import { IdleTime } from "./core/idle_time";
 import * as utils from "./utils";
 import { Uri, workspace } from "./workspace";
 import { Commands } from "./core/leoCommands";
-import { CommandOptions, ConfigSetting, Focus, LeoPackageStates, QuickPickItem, ReqRefresh, RevealType } from "./types";
+import { CommandOptions, ConfigSetting, Focus, LeoPackageStates, QuickPickItem, QuickPickItemKind, QuickPickOptions, ReqRefresh, RevealType } from "./types";
 import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
@@ -547,6 +547,247 @@ export class LeoUI extends NullGui {
         }
 
     }
+
+    /**
+     * Opens quickPick minibuffer pallette to choose from all commands in this file's commander
+     * @returns Promise from the command resolving - or resolve with undefined if cancelled
+     */
+    public async minibuffer(): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const c = g.app.windowList[this.frameIndex].c;
+        const commands: QuickPickItem[] = [];
+        const cDict = c.commandsDict;
+        for (let key in cDict) {
+            const command = cDict[key];
+            // Going to get replaced. Don't take those that begin with 'async-'
+            const w_name = (command as any).__name__ || '';
+            if (!w_name.startsWith('async-')) {
+                commands.push({
+                    label: key,
+                    detail: (command as any).__doc__
+                });
+            }
+        }
+
+        const w_noDetails: QuickPickItem[] = [];
+        const stash_button: string[] = [];
+        const stash_rclick: string[] = [];
+        const stash_command: string[] = [];
+
+        for (const w_com of commands) {
+            if (
+                !w_com.detail && !(
+                    w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_BUTTON_START) ||
+                    w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_RCLICK_START) ||
+                    w_com.label === Constants.USER_MESSAGES.MINIBUFFER_SCRIPT_BUTTON ||
+                    w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_DEL_SCRIPT_BUTTON) ||
+                    w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_DEL_BUTTON_START) ||
+                    w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_COMMAND_START)
+                )
+            ) {
+                w_noDetails.push(w_com);
+            }
+
+            if (w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_BUTTON_START)) {
+                stash_button.push(w_com.label);
+            }
+            if (w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_RCLICK_START)) {
+                stash_rclick.push(w_com.label);
+            }
+            if (w_com.label.startsWith(Constants.USER_MESSAGES.MINIBUFFER_COMMAND_START)) {
+                stash_command.push(w_com.label);
+            }
+        }
+
+        for (const p_command of w_noDetails) {
+            if (stash_button.includes(Constants.USER_MESSAGES.MINIBUFFER_BUTTON_START + p_command.label)) {
+                p_command.description = Constants.USER_MESSAGES.MINIBUFFER_BUTTON;
+            }
+            if (stash_rclick.includes(Constants.USER_MESSAGES.MINIBUFFER_RCLICK_START + p_command.label)) {
+                p_command.description = Constants.USER_MESSAGES.MINIBUFFER_RCLICK;
+            }
+            if (stash_command.includes(Constants.USER_MESSAGES.MINIBUFFER_COMMAND_START + p_command.label)) {
+                p_command.description = Constants.USER_MESSAGES.MINIBUFFER_COMMAND;
+            }
+            p_command.description = p_command.description ? p_command.description : Constants.USER_MESSAGES.MINIBUFFER_USER_DEFINED;
+        }
+
+        const w_withDetails = commands.filter(p_command => !!p_command.detail);
+
+        // Only sort 'regular' Leo commands, leaving custom commands at the top
+        w_withDetails.sort((a, b) => {
+            return a.label < b.label ? -1 : (a.label === b.label ? 0 : 1);
+        });
+
+        const w_choices: QuickPickItem[] = [];
+
+        if (c.commandHistory.length) {
+            w_choices.push({
+                label: Constants.USER_MESSAGES.MINIBUFFER_HISTORY_LABEL,
+                description: Constants.USER_MESSAGES.MINIBUFFER_HISTORY_DESC
+
+            });
+        }
+
+        // Finish minibuffer list
+        if (w_noDetails.length) {
+            w_choices.push(...w_noDetails);
+        }
+
+        // Separator above real commands, if needed...
+        if (w_noDetails.length || c.commandHistory.length) {
+            w_choices.push({
+                label: "", kind: QuickPickItemKind.Separator
+            });
+        }
+
+        w_choices.push(...w_withDetails);
+
+        const w_picked = await workspace.view.showQuickPick(w_choices, {
+            placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
+        });
+
+        // To check for numeric line goto 'easter egg'
+        const lastInput = workspace.view.getLastQuickPickInput();
+        if (lastInput && /^\d+$/.test(lastInput)) {
+            // * Was an integer EASTER EGG
+            this.setupRefresh(
+                Focus.Body,
+                {
+                    tree: true,
+                    body: true,
+                    scroll: true, // scroll to line
+                    documents: false,
+                    buttons: false,
+                    states: true
+                }
+            );
+            // not awaited
+            c.editCommands.gotoGlobalLine(Number(lastInput)).then((p_gotoResult) => {
+                if (p_gotoResult[0]) {
+                    void this.launchRefresh();
+                }
+            }, () => {
+                // pass
+            });
+        }
+
+        // First, check for undo-history list being requested
+        if (w_picked && w_picked.label === Constants.USER_MESSAGES.MINIBUFFER_HISTORY_LABEL) {
+            return this._showMinibufferHistory(w_choices);
+        }
+        if (w_picked) {
+            return this._doMinibufferCommand(w_picked);
+        }
+
+    }
+
+
+    /**
+     * * Opens quickPick minibuffer command pallette from the user's session commands usage history
+     * @returns Promise that resolves when the chosen command is placed on the front-end command stack
+     */
+    private async _showMinibufferHistory(p_choices: QuickPickItem[]): Promise<unknown> {
+
+        // Wait for _isBusyTriggerSave resolve because the full body save may change available commands
+        await this.triggerBodySave(true);
+
+        const c = g.app.windowList[this.frameIndex].c;
+
+        if (!c.commandHistory.length) {
+            return;
+        }
+        // Build from list of strings (labels).
+        let w_commandList: QuickPickItem[] = [];
+        for (const w_command of c.commandHistory) {
+            let w_found = false;
+            for (const w_pick of p_choices) {
+                if (w_pick.label === w_command) {
+                    w_commandList.push(w_pick);
+                    w_found = true;
+                    break;
+                }
+            }
+            if (!w_found) {
+                w_commandList.push({
+                    label: w_command,
+                    description: Constants.USER_MESSAGES.MINIBUFFER_BAD_COMMAND,
+                    detail: `No command function for ${w_command}`
+                });
+            }
+        }
+        if (!w_commandList.length) {
+            return;
+        }
+        // Add Nav tab special commands
+        const w_options: QuickPickOptions = {
+            placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
+        };
+        const w_picked = await workspace.view.showQuickPick(w_commandList, w_options);
+        return this._doMinibufferCommand(w_picked);
+    }
+
+    /**
+     * * Perform chosen minibuffer command
+     */
+    private _doMinibufferCommand(p_picked?: QuickPickItem): Promise<unknown> {
+        if (p_picked && p_picked.label) {
+            // Setup refresh
+            this.setupRefresh(Focus.NoChange,
+                {
+                    tree: true,
+                    body: true,
+                    documents: true,
+                    buttons: true,
+                    states: true
+                }
+            );
+
+            this._addToMinibufferHistory(p_picked);
+            const c = g.app.windowList[this.frameIndex].c;
+
+            let w_command = p_picked.label; // May be overriden with async commands
+
+            // OVERRIDE with custom async commands where applicable
+            if (Constants.MINIBUFFER_OVERRIDDEN_NAMES[p_picked.label]) {
+                w_command = Constants.MINIBUFFER_OVERRIDDEN_NAMES[p_picked.label];
+            }
+
+            const w_commandResult = c.executeMinibufferCommand(w_command);
+
+            if (w_commandResult && w_commandResult.then) {
+                // IS A PROMISE so tack-on the launchRefresh to its '.then' chain. 
+                void (w_commandResult as Thenable<unknown>).then((p_result) => {
+                    void this.launchRefresh();
+                });
+            } else {
+                void this.launchRefresh();
+            }
+            // In both cases, return the result, or if a promise: the promise itself, not the result.
+            return Promise.resolve(w_commandResult);
+
+        } else {
+            // Canceled
+            return Promise.resolve(undefined);
+        }
+    }
+
+    /**
+     * Add to the minibuffer history (without duplicating entries)
+     */
+    private _addToMinibufferHistory(p_command: QuickPickItem): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const w_found = c.commandHistory.indexOf(p_command.label);
+        // If found, will be removed (and placed on top)
+        if (w_found >= 0) {
+            c.commandHistory.splice(w_found, 1);
+        }
+        // Add to top of minibuffer history
+        c.commandHistory.unshift(p_command.label);
+    }
+
+
 
     /**
      * * Invokes the commander.save() command
