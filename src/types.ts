@@ -1,11 +1,10 @@
-// import { Position } from "./core/leoNodes";
+import { Position } from "./core/leoNodes";
 // import { RClick } from "./core/mod_scripting";
 
 import { Uri } from "./workspace";
 
 // For now, these imports are commented out until implemented.
 type RClick = any;
-type Position = any;
 
 export interface MessageOptions {
 
@@ -39,6 +38,18 @@ export interface FlatRow {
     hasChildren: boolean;
     isExpanded: boolean;
     node: TreeNode;
+    isSelected: boolean;
+    isAncestor: boolean;      // Is ancestor of selected node
+    isInitialFind: boolean;   // Used for find scope highlighting
+    icon: number;             // Icon number for the node
+}
+export interface FlatRowLeo {
+    label: string;
+    depth: number;
+    toggled: boolean; // Will make it render with toggled class
+    hasChildren: boolean;
+    isExpanded: boolean;
+    node: Position;
     isSelected: boolean;
     isAncestor: boolean;      // Is ancestor of selected node
     isInitialFind: boolean;   // Used for find scope highlighting

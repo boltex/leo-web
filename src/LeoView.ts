@@ -1,5 +1,5 @@
 import { set } from 'lodash';
-import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions } from './types';
+import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions, FlatRowLeo } from './types';
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
 
@@ -91,6 +91,15 @@ export class LeoView {
     }
     public setTreeData(rows: FlatRow[]) {
         this._flatRows = rows;
+        this.renderTree();
+    }
+
+    private _flatRowsLeo: FlatRowLeo[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
+    public get flatRowsLeo(): FlatRowLeo[] | null {
+        return this._flatRowsLeo;
+    }
+    public setTreeDataLeo(rows: FlatRowLeo[]) {
+        this._flatRowsLeo = rows;
         this.renderTree();
     }
 
@@ -217,9 +226,10 @@ export class LeoView {
     }
 
     public renderTree = () => {
-        if (!this._flatRows) {
+        if (!this._flatRows && !this._flatRowsLeo) {
             return; // Not initialized yet
         }
+        const flatRows = this._flatRows || this._flatRowsLeo!;
 
         // Render visible rows only
         const scrollTop = this.OUTLINE_PANE.scrollTop;
@@ -228,18 +238,18 @@ export class LeoView {
 
         const startIndex = Math.floor(scrollTop / this.ROW_HEIGHT);
         const visibleCount = Math.ceil(viewportHeight / this.ROW_HEIGHT) + 1;
-        const endIndex = Math.min(this._flatRows.length, startIndex + visibleCount);
+        const endIndex = Math.min(flatRows.length, startIndex + visibleCount);
         let leftOffset = this.LEFT_OFFSET;
 
         // If all nodes have no children, remove the left offset
-        if (this._flatRows.every(row => !row.hasChildren)) {
+        if (flatRows.every(row => !row.hasChildren)) {
             leftOffset = 0;
         }
 
         this.SPACER.innerHTML = "";
-        this.SPACER.style.height = this._flatRows.length * this.ROW_HEIGHT + "px";
+        this.SPACER.style.height = flatRows.length * this.ROW_HEIGHT + "px";
         for (let i = startIndex; i < endIndex; i++) {
-            const row = this._flatRows[i]!;
+            const row = flatRows[i]!;
             const div = document.createElement("div");
             div.className = "node";
 

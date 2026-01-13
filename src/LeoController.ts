@@ -1,7 +1,10 @@
+import { Position } from "./core/leoNodes";
 import { LeoModel } from "./LeoModel";
 import { LeoView } from "./LeoView";
-import { TreeNode, FlatRow } from "./types";
+import * as g from './core/leoGlobals';
+import { TreeNode, FlatRow, FlatRowLeo } from "./types";
 import * as utils from './utils';
+
 import { workspace } from "./workspace";
 
 export class LeoController {
@@ -728,6 +731,10 @@ export class LeoController {
     private selectAndOrToggleAndRedraw(newSelectedNode: TreeNode | null = null, nodeToToggle: TreeNode | null = null) {
 
         const view = this.view;
+        // this.buildRowsRenderTree();
+
+        // TODO : Rename/Implement this method properly
+        console.log('selectAndOrToggleAndRedraw called with newSelectedNode:', newSelectedNode, 'nodeToToggle:', nodeToToggle);
 
     }
 
@@ -1320,6 +1327,52 @@ export class LeoController {
 
         return flatRows;
     }
+
+    // Migration to a real Leo core. redo base methods to use LeoJS's core API.
+    private buildRowsRenderTreeLeo(): void {
+        const view = this.view;
+        let root = null;
+        if (g.app.windowList[g.app.gui.frameIndex]) {
+            // Currently Selected Document's Commander
+            const w_c = g.app.windowList[g.app.gui.frameIndex].c;
+            if (w_c.hoistStack.length) {
+                // HOISTED: Topmost hoisted node starts the outline as single root 'child'
+                const w_rootPosition = w_c.hoistStack[w_c.hoistStack.length - 1].p;
+                w_rootPosition._isRoot = true;
+                root = w_rootPosition;
+            } else {
+                // NOT HOISTED
+            }
+            // Calculate data, then pass to View. View handles the rendering.
+            const rows = this.flattenTreeLeo(
+                root,
+                0,
+                !this.model.hoistStack.length,
+                w_c.p,
+                null // TODO: Implement initialFindNode tracking in Leo core
+
+            );
+            view.setTreeDataLeo(rows);
+        } else {
+            console.warn("No active Leo document found for building render tree.");
+        }
+    }
+
+
+    public flattenTreeLeo(
+        node: Position | null,
+        depth = 0,
+        isRoot = true,
+        selectedNode: Position | null,
+        initialFindNode: Position | null,
+    ): FlatRowLeo[] {
+
+        const flatRows: FlatRowLeo[] = [];
+        // TODO: Implement using LeoJS core API
+
+        return flatRows;
+    }
+
 
     private computeIsInitialFind(
         node: TreeNode,
