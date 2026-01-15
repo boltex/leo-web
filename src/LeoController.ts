@@ -1334,10 +1334,10 @@ export class LeoController {
         let root = null;
         if (g.app.windowList[g.app.gui.frameIndex]) {
             // Currently Selected Document's Commander
-            const w_c = g.app.windowList[g.app.gui.frameIndex].c;
-            if (w_c.hoistStack.length) {
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            if (c.hoistStack.length) {
                 // HOISTED: Topmost hoisted node starts the outline as single root 'child'
-                const w_rootPosition = w_c.hoistStack[w_c.hoistStack.length - 1].p;
+                const w_rootPosition = c.hoistStack[c.hoistStack.length - 1].p;
                 w_rootPosition._isRoot = true;
                 root = w_rootPosition;
             } else {
@@ -1348,7 +1348,7 @@ export class LeoController {
                 root,
                 0,
                 !this.model.hoistStack.length,
-                w_c.p,
+                c.p,
                 null // TODO: Implement initialFindNode tracking in Leo core
 
             );
@@ -1358,7 +1358,6 @@ export class LeoController {
         }
     }
 
-
     public flattenTreeLeo(
         node: Position | null,
         depth = 0,
@@ -1367,10 +1366,51 @@ export class LeoController {
         initialFindNode: Position | null,
     ): FlatRowLeo[] {
 
-        const flatRows: FlatRowLeo[] = [];
-        // TODO: Implement using LeoJS core API
+        const flatRowsLeo: FlatRowLeo[] = [];
+        if (node) {
+            // A node is given, proceed to build the tree
+            if (!isRoot && !node.isVisible()) {
+                return flatRowsLeo; // Skip hidden nodes
+            }
+            if (!isRoot) {
 
-        return flatRows;
+                flatRowsLeo.push({
+                    label: node.h,
+                    depth: depth,
+                    toggled: false, // Reset each time
+                    hasChildren: node.hasChildren(),
+                    isExpanded: node.isExpanded(),
+                    node: node,
+                    isSelected: node === selectedNode,
+                    isAncestor: selectedNode ? node.isAncestorOf(selectedNode) : false,
+                    isInitialFind: false, // TODO: (later stage) Implement initial find state tracking in Leo core
+                    icon: (+(!!node.isDirty()) << 3) |
+                        (+node.isCloned() << 2) |
+                        (+node.isMarked() << 1) |
+                        +node.v.hasBody()
+                });
+            }
+            if (node.isExpanded() || isRoot) {
+                // for each child, push to flatRowsLeo recursively
+                for (const child of node.children()) {
+                    flatRowsLeo.push(...this.flattenTreeLeo(child, depth + (isRoot ? 0 : 1), false, selectedNode, initialFindNode));
+                }
+            }
+
+        } else {
+            // No node given, start with hidden root node
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            let preventHoistSingleTopNode = false;
+            if (c.hiddenRootNode.children.length === 1) {
+                // Exactly one: prevent hoisting on SINGLE top node
+                preventHoistSingleTopNode = true;
+            }
+            for (const child of c.all_root_children()) {
+                child._isRoot = preventHoistSingleTopNode;
+                flatRowsLeo.push(...this.flattenTreeLeo(child, depth + (isRoot ? 0 : 1), false, selectedNode, initialFindNode));
+            }
+        }
+        return flatRowsLeo;
     }
 
 
