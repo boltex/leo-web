@@ -1175,12 +1175,7 @@ input[type="checkbox"]:focus-visible:checked::after {
 }
 
 #find-controls input:focus,
-#find-controls input:focus-visible {
-  border-color: var(--find-selection);
-  outline: 2px solid var(--find-selection);
-  outline-offset: -1px;
-}
-
+#find-controls input:focus-visible,
 #config-controls input:focus,
 #config-controls input:focus-visible {
   border-color: var(--find-selection);
