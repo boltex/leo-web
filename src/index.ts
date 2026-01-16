@@ -124,7 +124,6 @@ class LeoWebApp {
         //     console.log("Quick pick result:", result);
         // });
 
-
         // // NOw test the same 4 again but using 'then' syntax instead of await.
 
         // // 1 - TEST OPEN FILE DIALOG
@@ -145,17 +144,15 @@ class LeoWebApp {
         //     }
         // });
 
-
-        // // 3 - TEST INPUT DIALOG
-        // workspace.view.showInputDialog({
-        //     title: "Input Dialog Test",
-        //     prompt: "Please enter some text:",
-        //     value: "Default value",
-        //     placeholder: "Type here..."
-        // }).then((p_result) => {
-        //     console.log("Input dialog result:", p_result);
-        // });
-
+        // 3 - TEST INPUT DIALOG
+        workspace.view.showInputDialog({
+            title: "Input Dialog Test",
+            prompt: "Please enter some text:",
+            value: "Preset input value",
+            placeholder: "Type here..."
+        }).then((p_result) => {
+            console.log("Input dialog result:", p_result);
+        });
 
         // // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
         // const result = await workspace.view.showQuickPick(items, {
@@ -229,7 +226,6 @@ class LeoWebApp {
         g.es("a last line from the script body.");
         `;
         c.redraw(p); // Selects the new node.
-
 
         // Now going to execute the script in the body of the new node.
         await c.executeScript(p);

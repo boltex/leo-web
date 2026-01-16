@@ -1105,7 +1105,6 @@ body.dragging-secondary .node {
 
 #find-input {
   width: 100%;
-  /* max-width: 260px; */
   box-sizing: border-box;
   padding: 0.4rem 0.5rem;
   margin: 0;
@@ -1177,6 +1176,13 @@ input[type="checkbox"]:focus-visible:checked::after {
 
 #find-controls input:focus,
 #find-controls input:focus-visible {
+  border-color: var(--find-selection);
+  outline: 2px solid var(--find-selection);
+  outline-offset: -1px;
+}
+
+#config-controls input:focus,
+#config-controls input:focus-visible {
   border-color: var(--find-selection);
   outline: 2px solid var(--find-selection);
   outline-offset: -1px;
@@ -1323,7 +1329,9 @@ a:hover {
   color: var(--find-placeholder-color);
 }
 
-#input-dialog-input:focus {
+#input-dialog-input:focus,
+#input-dialog-btn:focus,
+.modal-dialog-btn:focus {
   outline: 2px solid var(--find-selection);
   border-color: var(--find-selection);
   outline-offset: -1px;
@@ -1343,6 +1351,16 @@ a:hover {
 #input-dialog-btn:hover {
   background: var(--hover-bg);
 }
+
+/*
+#input-dialog-btn:focus {
+  //
+}
+
+.modal-dialog-btn:focus {
+  //
+}
+*/
 
 /* QuickPick dialog */
 #quickpick-dialog {

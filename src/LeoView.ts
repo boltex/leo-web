@@ -1189,7 +1189,7 @@ export class LeoView {
                 firstButton = btn;
             }
             btn.textContent = label;
-            btn.className = 'modal-dialog-button';
+            btn.className = 'modal-dialog-btn';
             btn.onclick = () => {
                 this._cleanupFocusTrap();
                 this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');

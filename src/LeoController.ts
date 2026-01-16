@@ -97,12 +97,8 @@ export class LeoController {
         const view = this.view;
         console.log('Setting up button handlers');
 
-        // Example of setting up button handlers:
+        // * Outline Actions (TODO: connect these methods) *
         // view.COLLAPSE_ALL_BTN.addEventListener('click', this.collapseAll);
-        // view.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
-        // view.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
-        // view.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        // view.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         // view.HOIST_BTN.addEventListener('click', this.hoistNode);
         // view.DEHOIST_BTN.addEventListener('click', this.dehoistNode);
         // view.PREV_BTN.addEventListener('click', this.previousHistory);
@@ -110,16 +106,20 @@ export class LeoController {
         // view.TOGGLE_MARK_BTN.addEventListener('click', this.toggleMarkCurrentNode);
         // view.NEXT_MARKED_BTN.addEventListener('click', this.gotoNextMarkedNode);
         // view.PREV_MARKED_BTN.addEventListener('click', this.gotoPrevMarkedNode);
-
-        // view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
-        // view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
-        // view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") });
-        // view.SETTINGS_TAB.addEventListener('click', () => { view.showTab("settings") });
-
         // view.ACTION_MARK.addEventListener('click', this.toggleMarkCurrentNode);
         // view.ACTION_UNMARK.addEventListener('click', this.toggleMarkCurrentNode); // Same action
         // view.ACTION_HOIST.addEventListener('click', this.hoistNode);
         // view.ACTION_DEHOIST.addEventListener('click', this.dehoistNode);
+
+        // * Interface Only Actions *
+        view.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
+        view.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
+        view.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        view.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
+        view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
+        view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") });
+        view.SETTINGS_TAB.addEventListener('click', () => { view.showTab("settings") });
     }
 
 
