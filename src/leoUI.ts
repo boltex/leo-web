@@ -296,8 +296,76 @@ export class LeoUI extends NullGui {
      */
     public async _launchRefresh(): Promise<unknown> {
         // TODO : implement actual refresh of UI components based on this._refreshType and this.finalFocus
+
         console.log('Launching UI refresh with options:', this._refreshType, ' finalFocus:', this.finalFocus);
-        return Promise.resolve();
+
+
+        // check states for having at least a document opened
+        if (this.leoStates.leoReady && this.leoStates.fileOpenedReady) {
+            // Had some opened
+            if (!g.app.windowList.length) {
+                return this._setupNoOpenedLeoDocument(); // All closed now!
+            }
+        }
+
+
+        // Maybe first refresh after opening
+        if (this.leoStates.leoReady && !this.leoStates.fileOpenedReady) {
+            // Was all closed
+            if (g.app.windowList.length) {
+                this._setupOpenedLeoDocument();
+                // Has a commander opened, but wait for UI!
+                await this.leoStates.qLastContextChange;
+            } else {
+                // First time starting: not even an untitled nor workbook.leo
+                return;
+            }
+        }
+
+        // Consider last command finished since the refresh cycle is starting
+        if (this.trace) {
+            if (this.commandTimer !== undefined) {
+                console.log('commandTimer', utils.getDurationMs(this.commandTimer));
+            }
+        }
+        this.commandTimer = undefined;
+
+        // Start reset-timer capture, if has been reset.
+        this.lastRefreshTimer = process.hrtime();
+        if (this.refreshTimer === undefined) {
+            this.refreshTimer = this.lastRefreshTimer;
+        }
+
+        let w_revealType: RevealType;
+        if (this.finalFocus.valueOf() === Focus.Outline) {
+            w_revealType = RevealType.RevealSelectFocus;
+        } else {
+            w_revealType = RevealType.RevealSelect;
+        }
+
+        const c = g.app.windowList[this.frameIndex].c;
+        this._refreshNode = c.p;
+
+        if (this._refreshType.tree) {
+            this._refreshType.tree = false;
+            this._refreshType.node = false; // Also clears node
+            // TODO : implement outline/tree refresh with this._refreshNode and w_revealType
+            this._refreshOutline(w_revealType);
+        } else if (this._refreshType.node && this._refreshNode) {
+            // * Force single node "refresh" by revealing it, instead of "refreshing" it
+            this._refreshType.node = false;
+            this.leoStates.setSelectedNodeFlags(this._refreshNode);
+        }
+
+        if (this._refreshType.body) {
+            this._refreshType.body = false;
+            let w_showBodyNoFocus: boolean = this.finalFocus.valueOf() !== Focus.Body; // Will preserve focus where it is without forcing into the body pane if true
+
+            this._tryApplyNodeToBody(this._refreshNode || this.lastSelectedNode!, false, w_showBodyNoFocus);
+        }
+
+        // getStates will check if documents, buttons and states flags are set and refresh accordingly
+        return this.getStates();
     }
 
     /**
@@ -318,6 +386,22 @@ export class LeoUI extends NullGui {
         );
         void this.launchRefresh();
     }
+
+    /**
+         * * Refreshes the outline. A reveal type can be passed along to specify the reveal type for the selected node
+         * @param p_revealType Facultative reveal type to specify type of reveal when the 'selected node' is encountered
+         */
+    private _refreshOutline(p_revealType?: RevealType): void {
+        // TODO
+        console.log('TODO ! _refreshOutline called with reveal type:', p_revealType);
+        workspace.controller.buildRowsRenderTreeLeo();
+    }
+
+    private _tryApplyNodeToBody(node: Position, p_forceShow: boolean, p_showBodyNoFocus: boolean): void {
+        // TODO
+        console.log('TODO ! _tryApplyNodeToBody called with node:', node, ' forceShow:', p_forceShow, ' showBodyNoFocus:', p_showBodyNoFocus);
+    }
+
 
     /**
      * * Looks for given position's coloring language and wrap, taking account of '@killcolor', etc.
@@ -418,7 +502,8 @@ export class LeoUI extends NullGui {
      */
     private _setupNoOpenedLeoDocument(): void {
 
-        console.log('in _setupNoOpenedLeoDocument');
+        // TODO : implement UI setup for no opened Leo documents
+        console.log('TODO: _setupNoOpenedLeoDocument');
 
         this.leoStates.fileOpenedReady = false;
 

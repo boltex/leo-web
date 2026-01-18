@@ -2818,7 +2818,7 @@ export class LoadManager {
         // Enable redraws.
         g.app.disable_redraw = false;
 
-        const allowNoDocumentStart = true; // ! TODO: FIX THIS EXPERIMENTAL FLAG !
+        const allowNoDocumentStart = false; // ! TODO: FIX THIS EXPERIMENTAL FLAG !
 
         if (!c1 && !allowNoDocumentStart) {
             // Open or create a workbook.

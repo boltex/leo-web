@@ -48,11 +48,12 @@ class LeoWebApp {
 
         const controller = new LeoController(model, view);
         workspace.setView(view);
+        workspace.setController(controller);
 
         await controller.initialize();
 
         // Test out UI experiments (if any)
-        await this.uiExperiments(); // * Remove when done *
+        // await this.uiExperiments(); // * Remove when done *
 
         console.log('Leo Web UI initialized.');
 

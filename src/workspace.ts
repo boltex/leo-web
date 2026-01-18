@@ -1,3 +1,4 @@
+import { LeoController } from "./LeoController";
 import { LeoView } from "./LeoView";
 import { FileStat } from "./types";
 
@@ -139,13 +140,18 @@ class Workspace {
     // Window's workspace in use
     public workspaceDirHandle: FileSystemDirectoryHandle | null = null; // The FileSystemDirectoryHandle for the workspace
 
-    public fs!: Fs; // TODO : initialize properly with a fake class that mimics Fs methods but throws errors or forces setting workspace first. (Or something else?)
+    public fs!: Fs; // TODO : (see setWorkspaceDirHandle method below) initialize properly with a fake class that mimics Fs methods but throws errors or forces setting workspace first. (Or something else?)
     public view!: LeoView;
+    public controller!: LeoController;
 
     constructor() { }
 
     public setView(view: LeoView) {
         this.view = view;
+    }
+
+    public setController(controller: LeoController) {
+        this.controller = controller;
     }
 
     public setWorkspaceDirHandle(handle: FileSystemDirectoryHandle) {

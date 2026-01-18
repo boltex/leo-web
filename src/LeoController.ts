@@ -1329,7 +1329,8 @@ export class LeoController {
     }
 
     // Migration to a real Leo core. redo base methods to use LeoJS's core API.
-    private buildRowsRenderTreeLeo(): void {
+    public buildRowsRenderTreeLeo(): void {
+        console.log('buildRowsRenderTreeLeo called');
         const view = this.view;
         let root = null;
         if (g.app.windowList[g.app.gui.frameIndex]) {
