@@ -2859,9 +2859,6 @@ export class LoadManager {
      */
     public async openWorkBook(): Promise<Commands | undefined> {
 
-        // TODO !
-        // void vscode.window.showInformationMessage('TODO : openWorkBook');
-        console.log(' TODO openWorkBook ( new outline instead! ) ');
         // ! NEEDED ? --> USE A NEW EMPTY FILE INSTEAD ??
 
         const lm: LoadManager = this;
