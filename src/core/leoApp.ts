@@ -2818,9 +2818,7 @@ export class LoadManager {
         // Enable redraws.
         g.app.disable_redraw = false;
 
-        const allowNoDocumentStart = false; // ! TODO: FIX THIS EXPERIMENTAL FLAG !
-
-        if (!c1 && !allowNoDocumentStart) {
+        if (!c1) {
             // Open or create a workbook.
             try {
                 c1 = await lm.openWorkBook();
@@ -2831,7 +2829,7 @@ export class LoadManager {
             }
         }
         c = c1;
-        if (!c && !allowNoDocumentStart) {
+        if (!c) {
             // Leo is out of options: Force an immediate exit.
             return false;
         }
