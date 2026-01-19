@@ -604,6 +604,15 @@ export class NullGui extends LeoGui {
         //
     }
 
+    public selectOpenedLeoFile(index: number): Promise<unknown> {
+        this.oops();
+        return Promise.resolve();
+    }
+    public closeLeoFile(index: number): Promise<unknown> {
+        this.oops();
+        return Promise.resolve();
+    }
+
     public override widget_name(widget: any): string {
         if (g.unitTesting) {
             return 'body'; // ! LEO-WEB : Edit Commands Always happen in body.

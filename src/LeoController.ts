@@ -6,6 +6,7 @@ import { TreeNode, FlatRow, FlatRowLeo } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
+import { Constants } from "./constants";
 
 export class LeoController {
     private model: LeoModel;
@@ -72,8 +73,8 @@ export class LeoController {
     private setupBodyPaneHandlers() {
         const view = this.view;
         view.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
-        view.BODY_PANE.addEventListener("beforeinput", utils.preventDefault); // Block text changes
-        view.BODY_PANE.addEventListener("paste", utils.preventDefault); // Block text changes
+        // view.BODY_PANE.addEventListener("beforeinput", utils.preventDefault); // Block text changes
+        // view.BODY_PANE.addEventListener("paste", utils.preventDefault); // Block text changes
 
     }
 
@@ -313,6 +314,33 @@ export class LeoController {
         });
     }
 
+    public setupDocumentTabsAndHandlers() {
+        // First call the view method to clear existing tabs
+        this.view.clearDocumentTabs();
+
+        // call view to create the document-tabs, and setup handlers
+        for (const frame of g.app.windowList) {
+            // Create dom elements for each tab
+            const c = frame.c;
+            const filename = c.fileName();
+            const isNamed: boolean = !!filename;
+
+            const tab = this.view.createDocumentTab(isNamed ? utils.getFileFromPath(filename) : Constants.UNTITLED_FILE_NAME, frame === g.app.windowList[g.app.gui.frameIndex]);
+            // now setup handlers for the tab to call g.app.gui.selectOpenedLeoDocument(index)
+            const index = g.app.windowList.indexOf(frame);
+            tab.addEventListener("click", () => {
+                g.app.gui.selectOpenedLeoFile(index);
+            });
+            // Add handler to the close button inside the tab
+            const closeBtn = tab.querySelector(".close-btn");
+            closeBtn?.addEventListener("click", (e) => {
+                e.stopPropagation(); // prevent triggering the tab click event
+                g.app.gui.closeLeoFile(index);
+            });
+
+        }
+    }
+
     // * Controller Methods (Event Handlers) *
     public async initialize() {
         const view = this.view;
@@ -457,6 +485,18 @@ export class LeoController {
         if (e.key === 'Tab') {
             e.preventDefault();
             this.view.OUTLINE_PANE.focus();
+        }
+        // check for undo/redo and prevent it for now (later: implement undo/redo)
+        if (e.key.toLowerCase() === 'z' && e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey) {
+            console.log('Undo shortcut detected');
+            e.preventDefault();
+        }
+        if (
+            (e.key.toLowerCase() === 'y' && e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey) ||
+            (e.key.toLowerCase() === 'z' && e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey)
+        ) {
+            console.log('Redo shortcut detected');
+            e.preventDefault();
         }
     }
 
@@ -1351,10 +1391,10 @@ export class LeoController {
                 !this.model.hoistStack.length,
                 c.p,
                 null // TODO: Implement initialFindNode tracking in Leo core
-
             );
             view.setTreeDataLeo(rows);
         } else {
+            view.setTreeDataLeo([]);
             console.warn("No active Leo document found for building render tree.");
         }
     }
@@ -1369,12 +1409,7 @@ export class LeoController {
 
         const flatRowsLeo: FlatRowLeo[] = [];
         if (node) {
-            // A node is given, proceed to build the tree
-            if (!isRoot && !node.isVisible()) {
-                return flatRowsLeo; // Skip hidden nodes
-            }
             if (!isRoot) {
-
                 flatRowsLeo.push({
                     label: node.h,
                     depth: depth,
@@ -1397,7 +1432,6 @@ export class LeoController {
                     flatRowsLeo.push(...this.flattenTreeLeo(child, depth + (isRoot ? 0 : 1), false, selectedNode, initialFindNode));
                 }
             }
-
         } else {
             // No node given, start with hidden root node
             const c = g.app.windowList[g.app.gui.frameIndex].c;

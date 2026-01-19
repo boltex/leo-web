@@ -21,6 +21,8 @@ export class LeoView {
     private THEME_ICON: HTMLElement;
     public LAYOUT_TOGGLE: HTMLElement;
     public MENU_TOGGLE: HTMLElement;
+    public TOP_MENU: HTMLElement;
+    public DOCUMENT_TABS: HTMLElement;
     public TOP_MENU_TOGGLE: HTMLElement;
 
     public DEHOIST_BTN: HTMLButtonElement;
@@ -159,7 +161,10 @@ export class LeoView {
         this.THEME_ICON = document.getElementById('theme-icon')!;
         this.LAYOUT_TOGGLE = document.getElementById('layout-toggle')!;
         this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
+
         this.TOP_MENU_TOGGLE = document.getElementById("top-menu-toggle")!;
+        this.TOP_MENU = document.getElementById("top-menu")!;
+        this.DOCUMENT_TABS = document.getElementById("document-tabs")!;
 
         this.DEHOIST_BTN = document.getElementById('dehoist-btn')! as HTMLButtonElement;
         this.HOIST_BTN = document.getElementById('hoist-btn')! as HTMLButtonElement;
@@ -304,8 +309,33 @@ export class LeoView {
         this.renderTree(); // Re-render to apply icon changes
     }
 
+    clearDocumentTabs() {
+        // Implementation to clear document tabs (this.DOCUMENT_TABS)
+        this.DOCUMENT_TABS.innerHTML = "";
+    }
+
+    public createDocumentTab(title: string, isActive: boolean): HTMLDivElement {
+        // Implementation to create a new document tab in this.DOCUMENT_TABS
+        // such as those examples:
+        /*
+                <div class="document-tab active">Untitled<div class="close-btn"></div>
+                </div>
+                <div class="document-tab">myLeoDocument<div class="close-btn"></div>
+                </div>
+        */
+        const tab = document.createElement("div");
+        tab.className = "document-tab" + (isActive ? " active" : "");
+        tab.textContent = title;
+        this.DOCUMENT_TABS.appendChild(tab);
+        // add the close button
+        const closeBtn = document.createElement("div");
+        closeBtn.className = "close-btn";
+        tab.appendChild(closeBtn);
+        return tab;
+    }
+
     public buildMenu(entries: MenuEntry[], level = 0) {
-        const menu = level === 0 ? document.getElementById("top-menu")! : document.createElement("div");
+        const menu = level === 0 ? this.TOP_MENU : document.createElement("div");
 
         menu.className = "menu" + (level > 0 ? " submenu" : "");
 

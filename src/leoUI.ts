@@ -176,6 +176,18 @@ export class LeoUI extends NullGui {
         this.refreshDesc();
     }
 
+
+    public checkConfirmBeforeClose(): void {
+        let hasDirty = false;
+        for (const frame of g.app.windowList) {
+            if (frame.c.changed) {
+                hasDirty = true;
+            }
+        }
+        // TODO : SETUP BROWSER TO ASK BEFORE EXITING IF hasDirty IS TRUE, REMOVE IF FALSE
+    }
+
+
     /**
      * * Validate headline edit input box if active, or, Save body to the Leo app if its dirty.
      *   That is, only if a change has been made to the body 'document' so far
@@ -259,7 +271,14 @@ export class LeoUI extends NullGui {
 
     public refreshDocumentsPane(): void {
         // TODO : implement documents pane refresh
+        // The opened documents are in g.app.windowList.
+        // The selected document index is this.frameIndex,
+        // so the active document (LeoFrame) is g.app.windowList[this.frameIndex]
+        // a LeoFrame has a 'c' property which is the commander, and c.fileName() gives the filename.
+        workspace.controller.setupDocumentTabsAndHandlers();
+
     }
+
     public refreshUndoPane(): void {
         // TODO : implement undo pane refresh
     }
@@ -502,11 +521,16 @@ export class LeoUI extends NullGui {
      */
     private _setupNoOpenedLeoDocument(): void {
 
-        // TODO : implement UI setup for no opened Leo documents
-        console.log('TODO: _setupNoOpenedLeoDocument');
-
         this.leoStates.fileOpenedReady = false;
-
+        void this.checkConfirmBeforeClose();
+        this.leoStates.fileOpenedReady = false;
+        this.lastSelectedNode = undefined;
+        this._refreshOutline(RevealType.NoReveal);
+        this.refreshDocumentsPane();
+        this.refreshButtonsPane();
+        this.refreshUndoPane();
+        // Empty body pane
+        workspace.view.setBody('', false);
     }
 
     /**
@@ -901,6 +925,73 @@ export class LeoUI extends NullGui {
 
         return Promise.resolve();
     }
+
+
+    /**
+     * * Switches Leo document directly by index number.
+     */
+    public async selectOpenedLeoFile(index: number): Promise<unknown> {
+
+        if (this.frameIndex === index) {
+            // already selected
+            return Promise.resolve();
+        }
+
+        await this.triggerBodySave(true);
+        this.frameIndex = index;
+        // Like we just opened or made a new file
+        if (g.app.windowList.length) {
+            this.setupRefresh(
+                this.finalFocus,
+                {
+                    tree: true,
+                    body: true,
+                    documents: true,
+                    buttons: true,
+                    states: true,
+                    goto: true
+
+                }
+            );
+            const result = this.launchRefresh();
+            this.loadSearchSettings();
+            return result;
+        } else {
+            void this.launchRefresh(); // dont wait for it
+            console.error('Select Opened Leo File Error');
+            return Promise.reject('Select Opened Leo File Error');
+        }
+
+    }
+
+    public async closeLeoFile(index?: number): Promise<unknown> {
+        // If no index, find current
+        if (index === undefined) {
+            index = this.frameIndex;
+        }
+
+        if (index < 0 || index >= g.app.windowList.length) {
+            return Promise.reject('closeLeoDocument: index out of range');
+        }
+        await this.triggerBodySave(true);
+
+        const c = g.app.windowList[index].c;
+        const w_closed = await c.close();
+
+        this.setupRefresh(Focus.Body, {
+            tree: true,
+            body: true,
+            goto: true,
+            documents: true,
+            buttons: true,
+            states: true
+        });
+
+        void this.launchRefresh(); // start to refresh first
+        return this.loadSearchSettings();
+
+    }
+
 
     /**
      * Show info window about requiring leoID to start
