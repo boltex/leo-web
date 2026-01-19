@@ -628,6 +628,10 @@ export class LeoView {
         }
     }
 
+    public setHasOpenedDocuments(hasOpened: boolean) {
+        this.HTML_ELEMENT.setAttribute('data-no-opened-documents', hasOpened ? 'false' : 'true');
+    }
+
     public showTab(tabName: string) {
         // Set HTML_ELEMENT attributes. CSS rules will show/hide tabs based on these.
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);

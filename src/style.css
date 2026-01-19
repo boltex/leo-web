@@ -59,6 +59,11 @@
   --input-dialog-display: none;
   /* quickpick-dialog */
   --quickpick-dialog-display: none;
+  /* document tabs visibility */
+  --top-bar-height: 52px;
+  --doc-tabs-display: flex;
+  --collapse-all-btn-display: inline-flex;
+  --menu-toggle-line-height: 54px;
 }
 
 [data-active-tab="log"] {
@@ -179,6 +184,13 @@
   --quickpick-dialog-display: flex;
 }
 
+[data-no-opened-documents="true"] {
+  --top-bar-height: 26px;
+  --doc-tabs-display: none;
+  --collapse-all-btn-display: none;
+  --menu-toggle-line-height: 27px;
+}
+
 html {
   font-size: 100%; /* Default to browser's base font size, typically 16px */
 }
@@ -218,7 +230,7 @@ html {
   background: var(--menu-bg-color);
   border-bottom: 1px solid var(--menu-border-color);
   padding: 0;
-  height: 52px;
+  height: var(--top-bar-height);
   font-family: var(--menu-font-family);
   font-size: 0.875rem;
   user-select: none;
@@ -237,7 +249,7 @@ html {
 /* Document Tabs */
 #document-tabs {
   flex-shrink: 0;
-  display: flex;
+  display: var(--doc-tabs-display);
   gap: 2px;
   height: 26px;
   padding: 0;
@@ -298,7 +310,7 @@ html {
   font-size: 24px;
   padding: 0px 16px;
   height: 100%;
-  line-height: 54px;
+  line-height: var(--menu-toggle-line-height);
   border-left: 1px solid var(--menu-border-color);
 }
 
@@ -483,6 +495,7 @@ body.dragging-cross {
 }
 
 #collapse-all-btn {
+  display: var(--collapse-all-btn-display);
   position: fixed;
   z-index: 100;
   opacity: 0;
@@ -714,7 +727,9 @@ body.dragging-secondary .node {
   position: relative;
   left: 16px;
   transform-origin: 50% 50%;
-  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1), color 120ms;
+  transition:
+    transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1),
+    color 120ms;
 }
 
 .caret[data-expanded="true"]::after {
@@ -835,7 +850,10 @@ body.dragging-secondary .node {
   position: relative;
   top: 0;
   left: 0;
-  transition: top 0.3s ease, left 0.3s ease, transform 0.3s ease;
+  transition:
+    top 0.3s ease,
+    left 0.3s ease,
+    transform 0.3s ease;
 }
 
 #dehoist-btn:active #dehoist-icon {
@@ -952,7 +970,9 @@ body.dragging-secondary .node {
   font-size: 0.8rem;
   padding: 4px 8px;
   border-radius: 6px 6px 0 0; /* tab-like top rounding */
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
 }
 
 #log-pane-tabs .tab:hover {
@@ -1237,7 +1257,9 @@ a:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
   z-index: 2000;
   text-align: center;
   font-family: sans-serif;

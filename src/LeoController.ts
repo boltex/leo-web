@@ -315,6 +315,8 @@ export class LeoController {
     }
 
     public setupDocumentTabsAndHandlers() {
+        this.view.setHasOpenedDocuments(g.app.windowList.length > 0);
+
         // First call the view method to clear existing tabs
         this.view.clearDocumentTabs();
 
