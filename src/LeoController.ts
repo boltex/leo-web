@@ -315,7 +315,11 @@ export class LeoController {
     }
 
     public setupDocumentTabsAndHandlers() {
-        this.view.setHasOpenedDocuments(g.app.windowList.length > 0);
+        const hasOpenedDocuments = g.app.windowList.length > 0;
+        this.view.setHasOpenedDocuments(hasOpenedDocuments);
+
+        // Set body pane contenteditable based on whether there are opened documents
+        this.view.BODY_PANE.contentEditable = hasOpenedDocuments ? "plaintext-only" : "false";
 
         // First call the view method to clear existing tabs
         this.view.clearDocumentTabs();
