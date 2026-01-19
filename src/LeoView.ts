@@ -310,19 +310,10 @@ export class LeoView {
     }
 
     clearDocumentTabs() {
-        // Implementation to clear document tabs (this.DOCUMENT_TABS)
         this.DOCUMENT_TABS.innerHTML = "";
     }
 
     public createDocumentTab(title: string, isActive: boolean): HTMLDivElement {
-        // Implementation to create a new document tab in this.DOCUMENT_TABS
-        // such as those examples:
-        /*
-                <div class="document-tab active">Untitled<div class="close-btn"></div>
-                </div>
-                <div class="document-tab">myLeoDocument<div class="close-btn"></div>
-                </div>
-        */
         const tab = document.createElement("div");
         tab.className = "document-tab" + (isActive ? " active" : "");
         tab.textContent = title;
