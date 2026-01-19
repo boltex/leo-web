@@ -281,6 +281,10 @@ html {
   height: 12px;
   margin-left: 8px;
   position: relative;
+  border-radius: 50%;
+  color: var(--menu-color);
+  background-color: var(--resizer-color);
+  cursor: pointer;
 }
 
 .close-btn::before {
@@ -290,8 +294,13 @@ html {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 12px;
-  color: var(--menu-color);
-  cursor: pointer;
+  /* color: var(--menu-color);
+  cursor: pointer; */
+}
+
+.close-btn:hover {
+  background-color: var(--resizer-color);
+  color: var(--find-placeholder-color);
 }
 
 /* Top Menu */
