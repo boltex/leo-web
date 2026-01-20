@@ -2,11 +2,62 @@ import { Position } from "./core/leoNodes";
 import { LeoModel } from "./LeoModel";
 import { LeoView } from "./LeoView";
 import * as g from './core/leoGlobals';
-import { TreeNode, FlatRow, FlatRowLeo } from "./types";
+import { TreeNode, FlatRow, FlatRowLeo, MenuEntry } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
+
+const defaultTitle = "Leo Editor for the web";
+
+const menuData: MenuEntry[] = [
+    {
+        label: "File",
+        entries: [
+            { label: "Open...", action: "open" },
+            {
+                label: "Export",
+                entries: [
+                    { label: "As PDF...", action: "export_pdf" },
+                    { label: "As Image...", action: "export_img" },
+                ],
+            },
+            { label: "Exit", action: "exit" },
+        ],
+    },
+    {
+        label: "Edit",
+        entries: [
+            { label: "Undo", action: "undo" },
+            { label: "Redo", action: "redo" },
+            { label: "Cut", action: "cut" },
+            { label: "Copy", action: "copy" },
+            { label: "Paste", action: "paste" },
+        ],
+    },
+    {
+        label: "View",
+        entries: [
+            { label: "Zoom In", action: "zoom_in" },
+            { label: "Zoom Out", action: "zoom_out" },
+            {
+                label: "Orientation",
+                entries: [
+                    { label: "Portrait", action: "orient_portrait" },
+                    { label: "Landscape", action: "orient_landscape" },
+                ],
+            },
+            { label: "Fullscreen", action: "fullscreen" },
+        ],
+    },
+    {
+        label: "Help",
+        entries: [
+            { label: "Documentation", action: "docs" },
+            { label: "About", action: "about" },
+        ],
+    },
+];
 
 export class LeoController {
     private model: LeoModel;
@@ -34,9 +85,11 @@ export class LeoController {
             // 'End': () => this.gotoLastVisibleNode()
         };
 
-        view.buildMenu(model.menuData);
-        view.initializeThemeAndLayout(model.defaultTitle); // gets ratios from localStorage and applies layout and theme
+        view.buildMenu(menuData);
+        view.initializeThemeAndLayout(defaultTitle); // gets ratios from localStorage and applies layout and theme
     }
+
+
 
 
     // * Controller Methods (Initialization & Setup) *
@@ -335,7 +388,7 @@ export class LeoController {
             // now setup handlers for the tab to call g.app.gui.selectOpenedLeoDocument(index)
             const index = g.app.windowList.indexOf(frame);
             tab.addEventListener("click", () => {
-                g.app.gui.selectOpenedLeoFile(index);
+                g.app.gui.selectOpenedLeoDocument(index);
             });
             // Add handler to the close button inside the tab
             const closeBtn = tab.querySelector(".close-btn");

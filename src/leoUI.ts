@@ -6,11 +6,12 @@ import { IdleTime } from "./core/idle_time";
 import * as utils from "./utils";
 import { Uri, workspace } from "./workspace";
 import { Commands } from "./core/leoCommands";
-import { CommandOptions, ConfigSetting, Focus, LeoPackageStates, QuickPickItem, QuickPickItemKind, QuickPickOptions, ReqRefresh, RevealType } from "./types";
+import { ChooseDocumentItem, CommandOptions, ConfigSetting, Focus, LeoDocument, LeoPackageStates, QuickPickItem, QuickPickItemKind, QuickPickOptions, ReqRefresh, RevealType } from "./types";
 import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
+import { Range } from "./body";
 
 /**
  * Creates and manages instances of the UI elements along with their events
@@ -105,32 +106,6 @@ export class LeoUI extends NullGui {
 
     }
 
-    /**
-     * * Bind the log output to the log pane of the web UI
-     */
-    public createLogPane(): void {
-        if (!this._leoLogPane) {
-            // * Log pane instantiation
-            this._leoLogPane = true;
-            workspace.view.addToLogPane('', true); // Clear log pane
-            console.log("Log pane created.");
-            if (g.logBuffer.length) {
-                const buffer = g.logBuffer;
-                while (buffer.length > 0) {
-                    // Pop the bottom one and append it
-                    g.es_print(buffer.shift()!);
-                }
-            }
-        }
-    }
-
-    public override addLogPaneEntry(p_message: string): void {
-        if (this._leoLogPane) {
-            workspace.view.addToLogPane(p_message);
-        } else {
-            g.logBuffer.push(p_message);
-        }
-    }
 
     /**
      * * Set all remaining local objects, set ready flag(s) and refresh all panels
@@ -159,6 +134,81 @@ export class LeoUI extends NullGui {
         this.leoStates.leojsStartupDone = true;
 
     }
+
+    /**
+     * Make all key and commands bindings
+     */
+    public makeAllBindings(): void {
+        // TODO : implement key and command bindings
+        console.log('TODO ! makeAllBindings called to setup key and command bindings');
+    }
+
+
+    /**
+     * Handles the calls from the DocumentLinkProvider for clicks on UNLs.
+     */
+    public async handleUnl(p_arg: { unl: string }): Promise<void> {
+        if (!g.app.windowList.length) {
+            // No file opened: exit
+            g.es('Handle Unl: No Commanders opened');
+            return;
+        }
+        const c = g.app.windowList[this.frameIndex].c;
+        await this.triggerBodySave(true);
+        try {
+
+            if (p_arg.unl) {
+                this.setupRefresh(
+                    Focus.Body, // Finish in body pane given explicitly because last focus was in input box.
+                    {
+                        tree: true,
+                        body: true,
+                        goto: true,
+                        states: true,
+                        documents: true,
+                        buttons: true
+                    }
+                );
+                await g.openUrlOnClick(c, p_arg.unl);
+                void this.launchRefresh();
+                this.loadSearchSettings();
+
+            } else {
+                console.log('NO ARGUMENT FOR HANDLE URL! ', p_arg);
+            }
+        }
+        catch (e) {
+            console.log('FAILED HANDLE URL! ', p_arg);
+        }
+    }
+
+    /**
+     * * Bind the log output to the log pane of the web UI
+     */
+    public createLogPane(): void {
+        if (!this._leoLogPane) {
+            // * Log pane instantiation
+            this._leoLogPane = true;
+            workspace.view.addToLogPane('', true); // Clear log pane
+            console.log("Log pane created.");
+            if (g.logBuffer.length) {
+                const buffer = g.logBuffer;
+                while (buffer.length > 0) {
+                    // Pop the bottom one and append it
+                    g.es_print(buffer.shift()!);
+                }
+            }
+        }
+    }
+
+    public override addLogPaneEntry(p_message: string): void {
+        if (this._leoLogPane) {
+            workspace.view.addToLogPane(p_message);
+        } else {
+            g.logBuffer.push(p_message);
+        }
+    }
+
 
     /**
      * * Sets the outline pane top bar string message or refreshes with existing title if no title passed
@@ -233,11 +283,17 @@ export class LeoUI extends NullGui {
         if (!this._selectionDirty || !this._selection) {
             return;
         }
-        // TODO : implement body selection saving
 
+        // Prepare scroll data separately
+        let scroll: number;
+        if (this._selectionGnx === this._scrollGnx && this._scrollDirty) {
+            scroll = this._scroll?.start.line || 0;
+        } else {
+            scroll = 0;
+        }
 
-        // save the cursor selection, supports both body and detached bodies
-        this._bodySaveSelection();
+        let gnx: string | undefined;
+        let c: Commands | undefined;
     }
 
     /**
@@ -245,6 +301,8 @@ export class LeoUI extends NullGui {
      * @returns a promise that resolves when the complete saving process is finished
      */
     private _bodySaveDocument(): Thenable<boolean> {
+        // TODO !
+        console.log('TODO ! _bodySaveDocument called to save body text to Leo');
         return Promise.resolve(true);
     }
 
@@ -414,6 +472,22 @@ export class LeoUI extends NullGui {
         // TODO
         console.log('TODO ! _refreshOutline called with reveal type:', p_revealType);
         workspace.controller.buildRowsRenderTreeLeo();
+    }
+
+    /**
+     * * Called by UI when the user selects in the tree (click or 'open aside' through context menu)
+     * @param p_node is the position node selected in the tree
+     * @param p_internalCall Flag used to indicate the selection is forced, and NOT originating from user interaction
+     * @returns thenable for reveal to finish or select position to finish
+     */
+    public async selectTreeNode(
+        p_node: Position,
+        p_internalCall?: boolean,
+    ): Promise<unknown> {
+        // TODO
+        console.log('TODO ! selectTreeNode called with node:', p_node, ' internalCall:', p_internalCall);
+        return Promise.resolve();
+
     }
 
     private _tryApplyNodeToBody(node: Position, p_forceShow: boolean, p_showBodyNoFocus: boolean): void {
@@ -930,7 +1004,7 @@ export class LeoUI extends NullGui {
     /**
      * * Switches Leo document directly by index number.
      */
-    public async selectOpenedLeoFile(index: number): Promise<unknown> {
+    public async selectOpenedLeoDocument(index: number): Promise<unknown> {
 
         if (this.frameIndex === index) {
             // already selected
@@ -964,6 +1038,180 @@ export class LeoUI extends NullGui {
 
     }
 
+    private _showHeadlineInputBox(p_options: any): Thenable<string> {
+
+        // TODO : implement headline input box, inserts a node, sets its label editable until enter or escape and returns the new headline string
+        console.log('TODO ! _showHeadlineInputBox called with options:', p_options);
+        return Promise.resolve('newHeadline');
+    }
+
+    /**
+     * * Asks for a headline label to be entered and creates (inserts) a new node under the current, or specified, node
+     * @param p_node specified under which node to insert, or leave undefined to use whichever is currently selected
+     * @param p_fromOutline Signifies that the focus was, and should be brought back to, the outline
+     * @param p_asChild Insert as child instead of as sibling
+     * @returns Thenable that resolves when done
+     */
+    public async insertNode(p_node: Position | undefined, p_fromOutline: boolean, p_asChild: boolean): Promise<unknown> {
+
+        let w_finalFocus: Focus = p_fromOutline ? Focus.Outline : Focus.Body; // Use w_fromOutline for where we intend to leave focus when done with the insert
+
+        await this.triggerBodySave(true);
+
+        // * if node has child and is expanded: turn p_asChild to true!
+        const w_headlineInputOptions: any = {
+            ignoreFocusOut: false,
+            value: Constants.USER_MESSAGES.DEFAULT_HEADLINE,
+            valueSelection: undefined,
+            prompt: p_asChild ? Constants.USER_MESSAGES.PROMPT_INSERT_CHILD : Constants.USER_MESSAGES.PROMPT_INSERT_NODE
+        };
+
+        const p_newHeadline = await this._showHeadlineInputBox(w_headlineInputOptions);
+
+        this.lastCommandTimer = process.hrtime();
+        if (this.commandTimer === undefined) {
+            this.commandTimer = this.lastCommandTimer;
+        }
+        this.lastCommandRefreshTimer = this.lastCommandTimer;
+        if (this.commandRefreshTimer === undefined) {
+            this.commandRefreshTimer = this.lastCommandTimer;
+        }
+
+        const c = g.app.windowList[this.frameIndex].c;
+
+        let value: any = undefined;
+        const p = p_node ? p_node : c.p;
+
+        const w_refreshType: ReqRefresh = { documents: true, buttons: true, states: true };
+
+        w_refreshType.tree = true;
+        w_refreshType.body = true;
+
+        if (p.__eq__(c.p)) {
+            w_refreshType.body = true;
+            this.setupRefresh(w_finalFocus, w_refreshType);
+            this._insertAndSetHeadline(p_newHeadline, p_asChild); // no need for re-selection
+        } else {
+            const old_p = c.p;  // c.p is old already selected
+            c.selectPosition(p); // p is now the new one to be operated on
+            this._insertAndSetHeadline(p_newHeadline, p_asChild);
+            // Only if 'keep' old position was needed (specified with a p_node parameter), and old_p still exists
+            if (!!p_node && c.positionExists(old_p)) {
+                // no need to refresh body
+                this.setupRefresh(w_finalFocus, w_refreshType);
+                c.selectPosition(old_p);
+            } else {
+                old_p._childIndex = old_p._childIndex + 1;
+                if (!!p_node && c.positionExists(old_p)) {
+                    // no need to refresh body
+                    this.setupRefresh(w_finalFocus, w_refreshType);
+                    c.selectPosition(old_p);
+                } else {
+                    w_refreshType.body = true;
+                    this.setupRefresh(w_finalFocus, w_refreshType);
+                }
+            }
+        }
+        if (this.trace) {
+            if (this.lastCommandTimer) {
+                console.log('lastCommandTimer', utils.getDurationMs(this.lastCommandTimer));
+            }
+        }
+        this.lastCommandTimer = undefined;
+
+        void this.launchRefresh();
+
+        return value;
+
+    }
+
+    /**
+     * * Perform insert and rename commands
+     */
+    private _insertAndSetHeadline(p_name?: string, p_asChild?: boolean): any {
+        const LEOCMD = Constants.LEO_COMMANDS;
+        const w_command = p_asChild ? LEOCMD.INSERT_CHILD_PNODE : LEOCMD.INSERT_PNODE;
+        const c = g.app.windowList[this.frameIndex].c;
+        const u = c.undoer;
+        let value: any = c.doCommandByName(w_command);
+        if (!p_name) {
+            return value;
+        }
+        if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
+            return;  // The hook claims to have handled the event.
+        }
+        const undoData = u.beforeChangeHeadline(c.p);
+        c.setHeadString(c.p, p_name);  // Set v.h *after* calling the undoer's before method.
+        if (!c.changed) {
+            c.setChanged();
+        }
+        u.afterChangeHeadline(c.p, 'Edit Headline', undoData);
+        g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
+        return value;
+    }
+
+
+    /**
+     * * Cycle opened documents
+     */
+    public async tabCycle(): Promise<unknown> {
+        await this.triggerBodySave(true);
+
+        let w_chosenIndex;
+        const w_files = g.app.windowList;
+
+        if (w_files && w_files.length && w_files.length > 1) {
+            if (this.frameIndex === w_files.length - 1) {
+                w_chosenIndex = 0;
+            } else {
+                w_chosenIndex = this.frameIndex + 1;
+            }
+        } else {
+            // "Only one, or no opened documents"
+            return undefined;
+        }
+
+        this.finalFocus = Focus.Outline;
+        return this.selectOpenedLeoDocument(w_chosenIndex);
+    }
+
+    /**
+    * * Creates a new Leo file
+    * @returns the promise started after it's done creating the frame and commander
+    */
+    public async newLeoFile(): Promise<unknown> {
+        await this.triggerBodySave(true);
+
+        // this.showBodyIfClosed = true;
+        // this.showOutlineIfClosed = true;
+
+        this.setupRefresh(Focus.NoChange, {
+            tree: true,
+            body: true,
+            goto: true,
+            documents: true,
+            buttons: true,
+            states: true
+        });
+
+        if (!this.leoStates.fileOpenedReady) {
+            if (g.app.loadManager) {
+                await g.app.loadManager.openEmptyLeoFile(this);
+            }
+        } else {
+            await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
+            await this.triggerBodySave(true);
+            const c = g.app.windowList[this.frameIndex].c;
+            await c.new(this);
+            setTimeout(() => {
+                void utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, false);
+            }, 60);
+        }
+        this.loadSearchSettings();
+        return this.launchRefresh();
+    }
+
+
     public async closeLeoFile(index?: number): Promise<unknown> {
         // If no index, find current
         if (index === undefined) {
@@ -992,6 +1240,204 @@ export class LeoUI extends NullGui {
 
     }
 
+
+    /**
+     * * Sets up the call to the 'open-outline' command and its possible file url parameter.
+     * @param p_leoFileUri optional uri for specifying a file, if missing, a dialog will open
+     * @returns A promise that resolves when done trying to open the file
+     */
+    public async openLeoFile(p_uri?: Uri): Promise<unknown> {
+
+        if (p_uri) {
+            if (!!p_uri.fsPath && p_uri.fsPath.trim()) {
+                // valid: pass!
+            } else {
+                p_uri = undefined; // clear uri
+            }
+        }
+
+        if (!this.leoStates.fileOpenedReady) {
+            // override with given argument
+            let fileName: string;
+
+            // make sure it's a real uri because vscode may send selected
+            // node from other tree that has this command in title
+
+            if (p_uri && p_uri?.fsPath?.trim() && g.app.loadManager) {
+                fileName = p_uri.fsPath;
+            } else {
+                fileName = await this.runOpenFileDialog(
+                    undefined,
+                    "Open",
+                    [
+                        ["Leo files", "*.leojs *.leo *.db"],
+                        ["Python files", "*.py"],
+                        ["All files", "*"]
+                    ]
+                );
+            }
+            if (fileName && g.app.loadManager) {
+                await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
+                const commander = await g.app.loadManager.loadLocalFile(fileName, this);
+                if (!commander) {
+                    void workspace.view.showInformationMessage('can not open:' + '"' + fileName + '"');
+                    return Promise.resolve();
+                }
+                // this.showBodyIfClosed = true;
+                // this.showOutlineIfClosed = true;
+                this.setupRefresh(this.finalFocus, {
+                    tree: true,
+                    body: true,
+                    goto: true,
+                    states: true,
+                    documents: true,
+                    buttons: true
+                });
+                void this.launchRefresh();
+                setTimeout(() => {
+                    void utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, false);
+                }, 60);
+            } else {
+                return Promise.resolve();
+            }
+        } else {
+            await this.triggerBodySave(true);
+            const c = g.app.windowList[this.frameIndex].c;
+            await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
+            await c.open_outline(p_uri);
+            // this.showBodyIfClosed = true;
+            // this.showOutlineIfClosed = true;
+            this.setupRefresh(this.finalFocus, {
+                tree: true,
+                body: true,
+                goto: true,
+                states: true,
+                documents: true,
+                buttons: true
+            });
+            setTimeout(() => {
+                void utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, false);
+            }, 60);
+            void this.launchRefresh();
+        }
+        return this.loadSearchSettings();
+    }
+
+
+    /**
+     * * Asks for file name and path, then saves the Leo file
+     * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
+     * @returns a promise from saving the file results.
+     */
+    public async saveAsLeoFile(p_fromOutline?: boolean): Promise<unknown> {
+        await this.triggerBodySave(true);
+
+        const c = g.app.windowList[this.frameIndex].c;
+
+        this.setupRefresh(
+            p_fromOutline ? Focus.Outline : Focus.Body,
+            {
+                tree: true,
+                states: true,
+                documents: true
+            }
+        );
+
+        await c.saveAs();
+        void this.launchRefresh();
+        return;
+    }
+
+    /**
+     * * Asks for .leojs file name and path, then saves the JSON Leo file
+     * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
+     * @returns a promise from saving the file results.
+     */
+    public async saveAsLeoJsFile(p_fromOutline?: boolean): Promise<unknown> {
+        await this.triggerBodySave(true);
+
+        const c = g.app.windowList[this.frameIndex].c;
+
+        this.setupRefresh(
+            p_fromOutline ? Focus.Outline : Focus.Body,
+            {
+                tree: true,
+                states: true,
+                documents: true
+            }
+        );
+
+        // ! THIS WOULD DO A 'SAVE TO' INSTEAD OF 'SAVE AS' !
+        // await c.save_as_leojs();
+
+        // * DO THIS INSTEAD !
+        let fileName = await g.app.gui.runSaveFileDialog(
+            c,
+            'Save As JSON (.leojs)',
+            [['Leo JSON files', '*.leojs']],
+        );
+        if (!fileName) {
+            return;
+        }
+        if (!fileName.endsWith('.leojs')) {
+            fileName = `${fileName}.leojs`;
+        }
+        await c.save(fileName);
+
+        void this.launchRefresh();
+        return;
+    }
+
+
+    /**
+     * * Show switch document 'QuickPick' dialog and switch file if selection is made, or just return if no files are opened.
+     * @returns A promise that resolves with a textEditor of the selected node's body from the newly selected document
+     */
+    public async switchLeoFile(): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+
+        const w_entries: ChooseDocumentItem[] = []; // Entries to offer as choices.
+        let w_index: number = 0;
+        const w_files: LeoDocument[] = g.app.windowList.map((p_frame) => {
+            const s = p_frame.c.fileName();
+            const w_filename = s ? utils.getFileFromPath(s) : Constants.UNTITLED_FILE_NAME;
+            return {
+                name: w_filename,
+                index: w_index++,
+                changed: p_frame.c.isChanged(),
+                selected: g.app.windowList[this.frameIndex] === p_frame,
+            };
+        });
+        w_index = 0; // reset w_index
+        let w_chosenDocument: ChooseDocumentItem | undefined;
+        if (w_files && w_files.length) {
+            w_files.forEach(function (p_filePath: LeoDocument) {
+                w_entries.push({
+                    label: w_index.toString(),
+                    description: p_filePath.name
+                        ? p_filePath.name
+                        : Constants.UNTITLED_FILE_NAME,
+                    value: w_index,
+                });
+                w_index++;
+            });
+            const w_pickOptions: QuickPickOptions = {
+                placeHolder: Constants.USER_MESSAGES.CHOOSE_OPENED_FILE,
+            };
+            w_chosenDocument = await workspace.view.showQuickPick(w_entries, w_pickOptions) as ChooseDocumentItem | undefined;
+        } else {
+            // "No opened documents"
+            return Promise.resolve(undefined);
+        }
+        if (w_chosenDocument) {
+            return Promise.resolve(this.selectOpenedLeoDocument(w_chosenDocument.value));
+        } else {
+            // Canceled
+            return Promise.resolve(undefined);
+        }
+
+    }
 
     /**
      * Show info window about requiring leoID to start

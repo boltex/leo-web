@@ -604,7 +604,7 @@ export class NullGui extends LeoGui {
         //
     }
 
-    public selectOpenedLeoFile(index: number): Promise<unknown> {
+    public selectOpenedLeoDocument(index: number): Promise<unknown> {
         this.oops();
         return Promise.resolve();
     }

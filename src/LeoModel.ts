@@ -1,7 +1,6 @@
 import { TreeNode, NodeData, MenuEntry } from './types';
 
 export class LeoModel {
-    public defaultTitle = "Leo Editor for the web";
     public genTimestamp = "1234567890"; // For uniqueness of saved localstorage data.
     public tree: TreeNode = {
         "gnx": 0,
@@ -98,56 +97,6 @@ export class LeoModel {
             "bodyString": "Last node of the tree's natural tree order.\n"
         }
     };
-
-    public menuData: MenuEntry[] = [
-        {
-            label: "File",
-            entries: [
-                { label: "Open...", action: "open" },
-                {
-                    label: "Export",
-                    entries: [
-                        { label: "As PDF...", action: "export_pdf" },
-                        { label: "As Image...", action: "export_img" },
-                    ],
-                },
-                { label: "Exit", action: "exit" },
-            ],
-        },
-        {
-            label: "Edit",
-            entries: [
-                { label: "Undo", action: "undo" },
-                { label: "Redo", action: "redo" },
-                { label: "Cut", action: "cut" },
-                { label: "Copy", action: "copy" },
-                { label: "Paste", action: "paste" },
-            ],
-        },
-        {
-            label: "View",
-            entries: [
-                { label: "Zoom In", action: "zoom_in" },
-                { label: "Zoom Out", action: "zoom_out" },
-                {
-                    label: "Orientation",
-                    entries: [
-                        { label: "Portrait", action: "orient_portrait" },
-                        { label: "Landscape", action: "orient_landscape" },
-                    ],
-                },
-                { label: "Fullscreen", action: "fullscreen" },
-            ],
-        },
-        {
-            label: "Help",
-            entries: [
-                { label: "Documentation", action: "docs" },
-                { label: "About", action: "about" },
-            ],
-        },
-    ];
-
 
     // Note: Also use buildClones and buildParentRefs
     // to add icon member to data entries as needed:
