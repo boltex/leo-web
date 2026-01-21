@@ -897,7 +897,7 @@ export class LeoView {
             return new Promise((resolve, reject) => {
                 return this.showMessageDialog(
                     '📁 Choose a Workspace',
-                    { detail: 'Leo-Web needs permission to read and write files in a folder of your choice.', },
+                    { detail: 'Leo-Web needs permission to read and write files.', },
                     'Choose Folder'
                 ).then((result) => {
                     if (result === 'Choose Folder') {
