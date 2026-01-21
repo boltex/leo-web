@@ -144,6 +144,7 @@ export class LeoView {
 
     public minWidth = 20;
     public minHeight = 20;
+    private _commands: Record<string, (...args: any[]) => any> = {};
 
     constructor() {
 
@@ -228,6 +229,13 @@ export class LeoView {
         // Build the menu
         this.topLevelItems.length = 0;
         this.topLevelSubmenus.clear();
+    }
+
+    public setCommands(commands: [string, (...args: any[]) => any][]) {
+
+        for (const [name, func] of commands) {
+            this._commands[name] = func;
+        }
     }
 
     public renderTree = () => {
@@ -383,10 +391,14 @@ export class LeoView {
                 }
             } else if (entry.action) {
                 item.addEventListener("click", () => {
-                    console.log("Action triggered:", entry.action);
                     this.closeAllSubmenus();
                     this.restoreLastFocusedElement();
                     this.activeTopMenu = null;
+                    console.log("Action triggered:", entry.action);
+                    if (entry.action && this._commands[entry.action as string]) {
+                        this._commands[entry.action as string]()
+                    }
+
                 });
             }
 

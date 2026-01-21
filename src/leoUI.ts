@@ -12,6 +12,7 @@ import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
 import { Range } from "./body";
+import { makeAllBindings } from "./commandBindings";
 
 /**
  * Creates and manages instances of the UI elements along with their events
@@ -139,10 +140,8 @@ export class LeoUI extends NullGui {
      * Make all key and commands bindings
      */
     public makeAllBindings(): void {
-        // TODO : implement key and command bindings
-        console.log('TODO ! makeAllBindings called to setup key and command bindings');
+        makeAllBindings(this, workspace.controller);
     }
-
 
     /**
      * Handles the calls from the DocumentLinkProvider for clicks on UNLs.

@@ -9,20 +9,43 @@ import { workspace } from "./workspace";
 import { Constants } from "./constants";
 
 const defaultTitle = "Leo Editor for the web";
+const CMD = Constants.COMMANDS;
 
 const menuData: MenuEntry[] = [
     {
         label: "File",
         entries: [
-            { label: "Open...", action: "open" },
+            { label: "New", action: CMD.NEW_FILE },
+            { label: "Open-File", action: CMD.OPEN_FILE },
+            { label: "Recent Files", action: CMD.RECENT_FILES },
+            { label: "Save...", action: CMD.SAVE_FILE },
+            { label: "Save As...", action: CMD.SAVE_AS_FILE },
+            { label: "Save As .leojs (JSON)...", action: CMD.SAVE_AS_LEOJS },
+            { label: "Save As .leo (XML)...", action: CMD.SAVE_AS_FILE },
+            { label: "Revert To Saved", action: CMD.REVERT },
             {
-                label: "Export",
+                label: "Read/Write Files",
                 entries: [
-                    { label: "As PDF...", action: "export_pdf" },
-                    { label: "As Image...", action: "export_img" },
+                    { label: "Read-File-Into-Node", action: CMD.READ_FILE_INTO_NODE },
+                    { label: "Write-File-From-Node", action: CMD.WRITE_FILE_FROM_NODE },
+                    { label: "Write @<file> Nodes", action: CMD.WRITE_AT_FILE_NODES },
+                    { label: "Write Dirty @<file> Nodes", action: CMD.WRITE_DIRTY_AT_FILE_NODES },
+
                 ],
             },
-            { label: "Exit", action: "exit" },
+            { label: "Import Any File...", action: CMD.IMPORT_ANY_FILE, },
+            {
+                label: "Export Files",
+                entries: [
+                    { label: "Export Outline...", action: CMD.EXPORT_HEADLINES },
+                    { label: "Flatten Selected Outline...", action: CMD.FLATTEN_OUTLINE },
+                    { label: "Outline To CWEB...", action: CMD.OUTLINE_TO_CWEB },
+                    { label: "Outline To NOWEB...", action: CMD.OUTLINE_TO_NOWEB },
+                    { label: "Remove Sentinels", action: CMD.REMOVE_SENTINELS },
+                    { label: "Weave", action: CMD.WEAVE },
+                ],
+            },
+
         ],
     },
     {
@@ -64,6 +87,7 @@ export class LeoController {
     private view: LeoView;
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
     private outlinePaneKeyMap: { [key: string]: () => void };
+    private _commands: [string, (...args: any[]) => any][] = [];
 
     constructor(model: LeoModel, view: LeoView) {
         this.model = model;
@@ -89,8 +113,9 @@ export class LeoController {
         view.initializeThemeAndLayout(defaultTitle); // gets ratios from localStorage and applies layout and theme
     }
 
-
-
+    public setCommands(commands: [string, (...args: any[]) => any][]) {
+        this.view.setCommands(commands);
+    }
 
     // * Controller Methods (Initialization & Setup) *
     public initializeInteractions() {
