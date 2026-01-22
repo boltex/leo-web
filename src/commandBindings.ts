@@ -41,6 +41,12 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
 
     const commands: [string, (...args: any[]) => any][] = [
 
+
+
+        [CMD.CUT_TEXT, () => leoUI.cutText()],
+        [CMD.COPY_TEXT, () => leoUI.copyText()],
+        [CMD.PASTE_TEXT, () => leoUI.pasteText()],
+
         [CMD.SHOW_WELCOME, () => leoUI.showSettings()],
         [CMD.SHOW_SETTINGS, () => leoUI.showSettings()],
         // [CMD.SHOW_OUTLINE, () => p_leoUI.showOutline(true)], // Also focuses on outline

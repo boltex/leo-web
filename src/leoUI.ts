@@ -1174,6 +1174,22 @@ export class LeoUI extends NullGui {
         return this.selectOpenedLeoDocument(w_chosenIndex);
     }
 
+    public async cutText(): Promise<unknown> {
+        // TODO : This is for body pane text only!
+        workspace.view.showToast('Cut Text: TODO Implement');
+        return Promise.resolve();
+    }
+    public async copyText(): Promise<unknown> {
+        // TODO : This is for body pane text only!
+        workspace.view.showToast('Copy Text: TODO Implement');
+        return Promise.resolve();
+    }
+    public async pasteText(): Promise<unknown> {
+        // TODO : This is for body pane text only!
+        workspace.view.showToast('Paste Text: TODO Implement');
+        return Promise.resolve();
+    }
+
     /**
     * * Creates a new Leo file
     * @returns the promise started after it's done creating the frame and commander

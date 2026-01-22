@@ -251,6 +251,12 @@ export class Constants {
      * All commands this expansion exposes to the user via GUI/keybindings in package.json
      */
     public static COMMANDS = {
+
+        // Frame body text commands 
+        CUT_TEXT: Constants.NAME + ".cutText",
+        COPY_TEXT: Constants.NAME + ".copyText",
+        PASTE_TEXT: Constants.NAME + ".pasteText",
+
         // Access to the Settings/Welcome Webview
         SHOW_WELCOME: Constants.NAME + ".showWelcomePage", // Always available: not in the commandPalette section of package.json
         SHOW_SETTINGS: Constants.NAME + ".showSettingsPage", // Always available: not in the commandPalette section of package.json
