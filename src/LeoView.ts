@@ -724,6 +724,11 @@ export class LeoView {
                 if (prefs.layout) {
                     this.applyLayout(prefs.layout);
                 }
+                if (prefs.menuVisible && !this.isMenuShown) {
+                    this.toggleMenu();
+                    // Starts with menu shown but has yet to open a document
+                    this.setHasOpenedDocuments(false);
+                }
             } catch (e) {
                 console.error('Error loading layout preferences:', e);
             }
@@ -731,6 +736,12 @@ export class LeoView {
             this.applyTheme(this.currentTheme);
             this.applyLayout(this.currentLayout);
         }
+    }
+
+    public equalSizedPanes(): void {
+        this.mainRatio = 0.5;
+        this.secondaryRatio = 0.5;
+        this.updatePanelSizes();
     }
 
     public applyTheme(theme: string) {

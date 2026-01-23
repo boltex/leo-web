@@ -41,7 +41,11 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
 
     const commands: [string, (...args: any[]) => any][] = [
 
+        ["todo", () => leoUI.todo()], // will popup a toast message
 
+        [CMD.HORIZONTAL_LAYOUT, () => leoUI.applyLayout('horizontal')],
+        [CMD.VERTICAL_LAYOUT, () => leoUI.applyLayout('vertical')],
+        [CMD.EQUAL_SIZED_PANES, () => leoUI.equalSizedPanes()],
 
         [CMD.CUT_TEXT, () => leoUI.cutText()],
         [CMD.COPY_TEXT, () => leoUI.copyText()],

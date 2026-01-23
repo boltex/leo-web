@@ -107,6 +107,16 @@ export class LeoUI extends NullGui {
 
     }
 
+    public applyLayout(orientation: string): void {
+        workspace.view.applyLayout(orientation);
+    }
+    public equalSizedPanes(): void {
+        workspace.view.equalSizedPanes();
+    }
+
+    public todo(): void {
+        workspace.view.showInformationMessage("TODO: Not yet implemented.");
+    }
 
     /**
      * * Set all remaining local objects, set ready flag(s) and refresh all panels

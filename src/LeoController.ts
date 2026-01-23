@@ -134,16 +134,16 @@ const menuData: MenuEntry[] = [
     {
         label: "Window",
         entries: [
-            { label: "Equal Sized Panes", action: "todo" },
-            { label: "Horizontal Window Layout", action: "todo" },
-            { label: "Vertical Window Layout", action: "todo" },
+            { label: "Equal Sized Panes", action: CMD.EQUAL_SIZED_PANES },
+            { label: "Horizontal Window Layout", action: CMD.HORIZONTAL_LAYOUT },
+            { label: "Vertical Window Layout", action: CMD.VERTICAL_LAYOUT },
         ],
     },
     {
         label: "Help",
         entries: [
-            { label: "Documentation", action: "docs" },
-            { label: "About", action: "about" },
+            { label: "Documentation", action: "todo" },
+            { label: "About", action: "todo" },
         ],
     },
 ];
@@ -1399,7 +1399,8 @@ export class LeoController {
             mainRatio: view.mainRatio,
             secondaryRatio: view.secondaryRatio,
             theme: view.currentTheme,
-            layout: view.currentLayout
+            layout: view.currentLayout,
+            menuVisible: view.isMenuShown
         };
         utils.safeLocalStorageSet('layoutPreferences', JSON.stringify(layoutPreferences));
     }

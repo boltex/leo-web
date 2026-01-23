@@ -257,6 +257,11 @@ export class Constants {
         COPY_TEXT: Constants.NAME + ".copyText",
         PASTE_TEXT: Constants.NAME + ".pasteText",
 
+        // Window/UI
+        HORIZONTAL_LAYOUT: Constants.NAME + ".horizontalLayout",
+        VERTICAL_LAYOUT: Constants.NAME + ".verticalLayout",
+        EQUAL_SIZED_PANES: Constants.NAME + ".equalSizedPanes",
+
         // Access to the Settings/Welcome Webview
         SHOW_WELCOME: Constants.NAME + ".showWelcomePage", // Always available: not in the commandPalette section of package.json
         SHOW_SETTINGS: Constants.NAME + ".showSettingsPage", // Always available: not in the commandPalette section of package.json
