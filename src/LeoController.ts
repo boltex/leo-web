@@ -365,26 +365,39 @@ export class LeoController {
         view.updateMarkedButtonStates(model.marked.size > 0);
         view.showTab("log");
 
-        // Prompt user to select workspace directory
         let dirHandle: FileSystemDirectoryHandle | null = null;
-        while (!dirHandle) {
-            // Retry until a valid directory is selected
-            dirHandle = await view.requestWorkspaceDirectory().catch(e => {
-                console.warn('Error selecting workspace directory:', e);
-                return null;
-            });
+
+        // 1 Try restoring previous workspace
+        try {
+            const saved = await workspace.loadWorkspaceDirHandle();
+            if (saved && await workspace.ensurePermission(saved)) {
+                dirHandle = saved;
+            }
+        } catch (e) {
+            console.warn("Failed to restore workspace:", e);
         }
 
-        console.log('Workspace directory selected:', dirHandle);
+        // 2 Fallback: prompt user
+        while (!dirHandle) {
+            dirHandle = await view.requestWorkspaceDirectory().catch(e => {
+                console.warn("Error selecting workspace directory:", e);
+                return null;
+            });
+
+            if (dirHandle) {
+                await workspace.saveWorkspaceDirHandle(dirHandle);
+            }
+        }
+
+        // 3 Commit workspace
         workspace.setWorkspaceDirHandle(dirHandle);
+        console.log("Workspace ready:", dirHandle);
 
-        // Continue bootstrapping: Initialize controller after workspace is set
+        // 4 Continue bootstrapping
         this.initializeInteractions();
-
-        // Finish startup by setting focus to outline pane
         view.OUTLINE_PANE.focus();
-
     }
+
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
         if (e.detail === 2) {

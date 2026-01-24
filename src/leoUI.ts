@@ -105,7 +105,27 @@ export class LeoUI extends NullGui {
             Constants.REFRESH_DEBOUNCE_DELAY
         );
 
+        window.addEventListener('beforeunload', this.onBeforeUnload);
     }
+
+    private onBeforeUnload = (event: BeforeUnloadEvent) => {
+
+        // Loop all opened commanders and check for dirty ones
+        let someDirty = false;
+        for (const c of g.app.commanders()) {
+            if (c.changed) {
+                someDirty = true;
+                break;
+            }
+        }
+        if (!someDirty) {
+            return;
+        }
+
+        // If reached this point, some documents are dirty: ask for confirmation
+        event.preventDefault();
+        event.returnValue = '';
+    };
 
     public applyLayout(orientation: string): void {
         workspace.view.applyLayout(orientation);
@@ -117,6 +137,29 @@ export class LeoUI extends NullGui {
     public todo(): void {
         workspace.view.showInformationMessage("TODO: Not yet implemented.");
     }
+
+    public async chooseNewWorkspace(): Promise<boolean> {
+        // Perform the 'quit' command to force asking to save unsaved changes
+        // Then clear the workspace from db and force-refresh the page to restart leojs
+        // This will have the effect of closing all opened documents and then asking for a new workspace
+        for (const c of g.app.commanders()) {
+            const allow = c.exists && g.app.closeLeoWindow(c.frame);
+            if (!allow) {
+                return Promise.resolve(false);
+            }
+        }
+
+        workspace.clearWorkspace().catch((e) => {
+            console.error('Error clearing workspace:', e);
+        });
+
+        // Reload the page to restart leojs
+        window.location.reload();
+
+
+        return Promise.resolve(true);
+    }
+
 
     /**
      * * Set all remaining local objects, set ready flag(s) and refresh all panels

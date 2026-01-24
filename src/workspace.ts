@@ -1,6 +1,21 @@
+import { openDB } from "idb";
 import { LeoController } from "./LeoController";
 import { LeoView } from "./LeoView";
 import { FileStat } from "./types";
+
+const DB_NAME = "leo-workspace";
+const DB_VERSION = 1;
+const STORE_HANDLES = "handles";
+
+async function openWorkspaceDB() {
+    return openDB(DB_NAME, DB_VERSION, {
+        upgrade(db) {
+            if (!db.objectStoreNames.contains(STORE_HANDLES)) {
+                db.createObjectStore(STORE_HANDLES);
+            }
+        }
+    });
+}
 
 export class Uri {
     // Absolute, root-anchored path (e.g., "/folder/sub/file.txt")
@@ -173,6 +188,48 @@ class Workspace {
         const uri = new Uri(path);
         return uri;
     }
+
+    public async clearWorkspace(): Promise<void> {
+        const db = await openWorkspaceDB();
+        await db.delete(STORE_HANDLES, "current");
+        this.workspaceDirHandle = null;
+        // Optional: replace fs with a guard that throws until a new workspace is set
+        this.fs = undefined as unknown as Fs;
+    }
+
+    public async saveWorkspaceDirHandle(
+        handle: FileSystemDirectoryHandle
+    ) {
+        const db = await openWorkspaceDB();
+        await db.put(STORE_HANDLES, handle, "current");
+    }
+
+
+    public async loadWorkspaceDirHandle():
+        Promise<FileSystemDirectoryHandle | null> {
+
+        const db = await openWorkspaceDB();
+        const handle = await db.get(STORE_HANDLES, "current");
+        return handle ?? null;
+    }
+
+    public async ensurePermission(
+        handle: FileSystemDirectoryHandle
+    ): Promise<boolean> {
+
+        const opts: FileSystemHandlePermissionDescriptor = { mode: "readwrite" };
+
+        if ((await handle.queryPermission(opts)) === "granted") {
+            return true;
+        }
+
+        if ((await handle.requestPermission(opts)) === "granted") {
+            return true;
+        }
+
+        return false;
+    }
+
 
 }
 
