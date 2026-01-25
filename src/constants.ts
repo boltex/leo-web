@@ -261,6 +261,7 @@ export class Constants {
         HORIZONTAL_LAYOUT: Constants.NAME + ".horizontalLayout",
         VERTICAL_LAYOUT: Constants.NAME + ".verticalLayout",
         EQUAL_SIZED_PANES: Constants.NAME + ".equalSizedPanes",
+        CHOOSE_NEW_WORKSPACE: Constants.NAME + ".chooseNewWorkspace",
 
         // Access to the Settings/Welcome Webview
         SHOW_WELCOME: Constants.NAME + ".showWelcomePage", // Always available: not in the commandPalette section of package.json

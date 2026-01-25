@@ -331,6 +331,10 @@ export class LeoController {
         // First call the view method to clear existing tabs
         this.view.clearDocumentTabs();
 
+        if (g.app.windowList.length === 0) {
+            this.view.setWindowTitle(defaultTitle);
+        }
+
         // call view to create the document-tabs, and setup handlers
         for (const frame of g.app.windowList) {
             // Create dom elements for each tab
@@ -361,7 +365,6 @@ export class LeoController {
                 e.stopPropagation(); // prevent triggering the tab click event
                 g.app.gui.closeLeoFile(index);
             });
-
         }
     }
 

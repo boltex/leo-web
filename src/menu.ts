@@ -7,7 +7,7 @@ export const menuData: MenuEntry[] = [
     {
         label: "File",
         entries: [
-            { label: "Choose New Workspace...", action: "todo" },
+            { label: "Choose New Workspace...", action: CMD.CHOOSE_NEW_WORKSPACE },
             { label: "New", action: CMD.NEW_FILE },
             { label: "Open-File", action: CMD.OPEN_FILE },
             { label: "Recent Files", action: CMD.RECENT_FILES },

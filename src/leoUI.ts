@@ -647,7 +647,6 @@ export class LeoUI extends NullGui {
      * * Setup UI for having no opened Leo documents
      */
     private _setupNoOpenedLeoDocument(): void {
-
         this.leoStates.fileOpenedReady = false;
         void this.checkConfirmBeforeClose();
         this.leoStates.fileOpenedReady = false;
