@@ -355,6 +355,9 @@ html {
 }
 
 .menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: relative;
   padding: 5px 14px;
   cursor: default;
@@ -382,10 +385,20 @@ html {
   background: var(--selected-bg);
 }
 
+.menu-label {
+  flex-grow: 1;
+}
+
+.menu-shortcut {
+  margin-left: 16px;
+  font-size: 0.75rem;
+  color: var(--menu-caret-color);
+  opacity: 0.8;
+}
+
 .menu-item.has-sub::after {
   content: "▶";
   font-size: 0.7rem;
-  float: right;
   margin-left: 8px;
   color: var(--menu-caret-color);
 }

@@ -341,7 +341,20 @@ export class LeoView {
         for (const entry of entries) {
             const item = document.createElement("div");
             item.className = "menu-item";
-            item.textContent = entry.label;
+
+            // Create label span
+            const labelSpan = document.createElement("span");
+            labelSpan.className = "menu-label";
+            labelSpan.textContent = entry.label;
+            item.appendChild(labelSpan);
+
+            // Add keyboard shortcut if present and no subentries
+            if (entry.keyboardShortcut && !entry.entries) {
+                const shortcutSpan = document.createElement("span");
+                shortcutSpan.className = "menu-shortcut";
+                shortcutSpan.textContent = entry.keyboardShortcut;
+                item.appendChild(shortcutSpan);
+            }
 
             item.addEventListener("mouseenter", () => {
                 if (this.focusedMenuItem && this.focusedMenuItem !== item) {

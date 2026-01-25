@@ -9,9 +9,9 @@ export const menuData: MenuEntry[] = [
         entries: [
             { label: "Choose New Workspace...", action: CMD.CHOOSE_NEW_WORKSPACE },
             { label: "New", action: CMD.NEW_FILE },
-            { label: "Open-File", action: CMD.OPEN_FILE },
+            { label: "Open-File", action: CMD.OPEN_FILE, keyboardShortcut: "Ctrl+O" },
             { label: "Recent Files", action: CMD.RECENT_FILES },
-            { label: "Save...", action: CMD.SAVE_FILE },
+            { label: "Save...", action: CMD.SAVE_FILE, keyboardShortcut: "Ctrl+S" },
             { label: "Save As...", action: CMD.SAVE_AS_FILE },
             { label: "Save As .leojs (JSON)...", action: CMD.SAVE_AS_LEOJS },
             { label: "Save As .leo (XML)...", action: CMD.SAVE_AS_FILE },

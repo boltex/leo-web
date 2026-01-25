@@ -58,6 +58,7 @@ export interface FlatRowLeo {
 export interface MenuEntry {
     label: string;
     action?: string;
+    keyboardShortcut?: string;
     entries?: MenuEntry[];
 }
 export interface FileStat {
