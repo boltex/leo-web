@@ -580,7 +580,8 @@ export class LeoUI extends NullGui {
      */
     private _triggerGetStates(): void {
 
-        const c = g.app.windowList[this.frameIndex].c;
+        const frame = g.app.windowList[this.frameIndex];
+        const c = frame.c;
 
         if (this._refreshType.states) {
             this._refreshType.states = false;
@@ -624,7 +625,7 @@ export class LeoUI extends NullGui {
         }
         // Set leoChanged and leoOpenedFilename
         this.leoStates.leoChanged = c.changed;
-        this.leoStates.leoOpenedFileName = c.fileName();
+        this.leoStates.leoOpenedFileName = frame.getTitle();
 
         this.refreshBodyStates(); // Set language and wrap states, if different.
 
@@ -663,9 +664,9 @@ export class LeoUI extends NullGui {
      * * A Leo file was opened: setup UI accordingly.
      */
     private _setupOpenedLeoDocument(): void {
-        console.log('in _setupOpenedLeoDocument');
-        const c = g.app.windowList[this.frameIndex].c;
-        this.leoStates.leoOpenedFileName = c.fileName();
+        const frame = g.app.windowList[this.frameIndex];
+        const c = frame.c;
+        this.leoStates.leoOpenedFileName = frame.getTitle();
         this.leoStates.leoChanged = c.changed;
 
         // * Startup flag
@@ -1264,6 +1265,7 @@ export class LeoUI extends NullGui {
 
         if (!this.leoStates.fileOpenedReady) {
             if (g.app.loadManager) {
+                g.app.numberOfUntitledWindows += 1; // To create unique names.
                 await g.app.loadManager.openEmptyLeoFile(this);
             }
         } else {

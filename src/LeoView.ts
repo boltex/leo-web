@@ -702,8 +702,11 @@ export class LeoView {
         }, 1500);
     }
 
-    public initializeThemeAndLayout(defaultTitle: string) {
-        document.title = defaultTitle;
+    public setWindowTitle(title: string) {
+        document.title = title;
+    }
+
+    public initializeThemeAndLayout() {
         this.loadThemeAndLayoutPreferences();
     }
 

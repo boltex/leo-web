@@ -293,7 +293,7 @@ export class Commands {
         }
 
         // Create the gui frame.
-        const title = this.computeWindowTitle();
+        const title = this.computeTabTitle();
         if (!g.app.initing) {
             g.doHook("before-create-leo-frame", { c: c });
         }
@@ -407,7 +407,7 @@ export class Commands {
         }
         // Return 'untitled' or 'untitled{n}
         const n = g.app.numberOfUntitledWindows;
-        const n_s = n === 1 ? '' : n.toString();
+        const n_s = n < 2 ? '' : n.toString();
         const title = `untitled${n_s}`;
         return title;
     }
@@ -434,22 +434,6 @@ export class Commands {
             title = fn;
         }
         return title;
-
-        // return `${branch_s}${name_s}`;
-
-        // let title: string;
-        // if (fileName) {
-        //     title = g.computeWindowTitle(fileName);
-        // } else {
-        //     let s = 'untitled';
-        //     let n = g.app.numberOfUntitledWindows;
-        //     if (n > 0) {
-        //         s += n.toString();
-        //     }
-        //     title = g.computeWindowTitle(s);
-        //     g.app.numberOfUntitledWindows = n + 1;
-        // }
-        // return title;
     }
     //@+node:felix.20251214160339.425: *4* c.initConfigSettings
     /**

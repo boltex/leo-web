@@ -2859,14 +2859,14 @@ export class LoadManager {
      */
     public async openWorkBook(): Promise<Commands | undefined> {
 
-        // ! NEEDED ? --> USE A NEW EMPTY FILE INSTEAD ??
-
         const lm: LoadManager = this;
 
+        if (g.unitTesting || g.app.batchMode) {
+            return undefined;
+        }
         /*
         # Never create a workbook during unit tests or in batch mode.
-        if g.unitTesting or g.app.batchMode:
-            return None
+        
         fn = self.computeWorkbookFileName()
         exists = fn and os.path.exists(fn)
         if not fn:
@@ -2892,7 +2892,9 @@ export class LoadManager {
         return c
         */
         const fn: string = '';
+        g.app.numberOfUntitledWindows += 1; // To create unique names.
         const c = await lm.loadLocalFile(fn, g.app.gui);
+
         if (!c) {
             return undefined;
         }

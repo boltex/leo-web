@@ -38,7 +38,8 @@ export class LeoController {
         };
 
         view.buildMenu(menuData);
-        view.initializeThemeAndLayout(defaultTitle); // gets ratios from localStorage and applies layout and theme
+        view.setWindowTitle(defaultTitle)
+        view.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
     }
 
     public setCommands(commands: [string, (...args: any[]) => any][]) {
@@ -334,10 +335,21 @@ export class LeoController {
         for (const frame of g.app.windowList) {
             // Create dom elements for each tab
             const c = frame.c;
+            const title = frame.getTitle();
             const filename = c.fileName();
-            const isNamed: boolean = !!filename;
+            let label = filename ? utils.getFileFromPath(filename) : title;
+            const isActive = frame === g.app.windowList[g.app.gui.frameIndex]
 
-            const tab = this.view.createDocumentTab(isNamed ? utils.getFileFromPath(filename) : Constants.UNTITLED_FILE_NAME, frame === g.app.windowList[g.app.gui.frameIndex]);
+            if (c.changed) {
+                label = "* " + label;
+            }
+
+            const tab = this.view.createDocumentTab(label, isActive);
+            // If active, also set the broswer's title
+            if (isActive) {
+                this.view.setWindowTitle(label);
+            }
+
             // now setup handlers for the tab to call g.app.gui.selectOpenedLeoDocument(index)
             const index = g.app.windowList.indexOf(frame);
             tab.addEventListener("click", () => {
