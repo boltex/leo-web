@@ -344,6 +344,70 @@ export class LeoView {
         tab.appendChild(closeBtn);
         return tab;
     }
+    public showHtmlInNewTab(htmlContent: string, title: string) {
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+
+            // Check current theme and set colors accordingly
+            const isDark = this.currentTheme === 'dark';
+            const bodyBg = isDark ? '#1e1e2e' : '#fff';
+            const bodyColor = isDark ? '#cdd6f4' : '#222';
+            const preBg = isDark ? '#2a2536' : '#f5f5f5';
+            const linkColor = isDark ? '#929bda' : '#0b5ed7';
+
+            newWindow.document.open();
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                <meta charset="utf-8">
+                <title>${title}</title>
+                <style>
+                    body {
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                                "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    font-size: 16px;
+                    line-height: 1.55;
+                    padding: 1.25rem;
+                    color: ${bodyColor};
+                    background: ${bodyBg};
+                    }
+
+                    h1, h2, h3, h4 {
+                    margin-top: 1.4em;
+                    }
+
+                    pre, code {
+                    font-family: ui-monospace, SFMono-Regular, Consolas,
+                                "Liberation Mono", Menlo, monospace;
+                    }
+
+                    pre {
+                    background: ${preBg};
+                    padding: 0.75rem;
+                    border-radius: 4px;
+                    overflow-x: auto;
+                    }
+
+                    a {
+                    color: ${linkColor};
+                    text-decoration: none;
+                    }
+
+                    a:hover {
+                    text-decoration: underline;
+                    }
+                </style>
+                </head>
+                <body>
+                ${htmlContent}
+                </body>
+                </html>
+                `);
+            newWindow.document.close();
+            newWindow.focus();
+        }
+    }
 
     public buildMenu(entries: MenuEntry[], level = 0) {
         const menu = level === 0 ? this.TOP_MENU : document.createElement("div");

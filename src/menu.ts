@@ -81,7 +81,7 @@ export const menuData: MenuEntry[] = [
     {
         label: "Search",
         entries: [
-            { label: "Help for Find Commands", action: "todo" },
+            { label: "Help for Find Commands", action: CMD.HELP_FOR_FIND_COMMANDS },
             { label: "Goto Global Line", action: "todo" },
             { label: "Start Search", action: "todo" },
             { label: "Find Next", action: "todo" },

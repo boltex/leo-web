@@ -58,7 +58,8 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
             <Alt-X>help-for-keystroke<Enter>
         `;
         //@-<< define md_s >>
-        this.c.putHelpFor(md_s);
+        this.c.putHelpFor(md_s, "Leo's help system");
+
     }
     //@+node:felix.20251214160853.470: *3* helpForCommand & helpers
     @cmd('help-for-command', 'Prompts for a command name and prints the help message for that command.')
@@ -207,7 +208,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
                 `;
                 //@-<< set s to about help-for-command >>
             }
-            c.putHelpFor(s);
+            c.putHelpFor(s, "help for command...");
         }
     }
     //@+node:felix.20251214160853.474: *4* replaceBindingPatterns
@@ -366,7 +367,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         `;
         //@-<< define s >>
         s = s.replace(/\\/g, '');
-        this.c.putHelpFor(s);
+        this.c.putHelpFor(s, "Creating External Files");
     }
     //@+node:felix.20251214160853.477: *3* helpForFindCommands
     @cmd('help-for-find-commands', 'Explains Leo\'s find commands.')
@@ -419,7 +420,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         `;
 
         //@-<< define s >>
-        this.c.putHelpFor(s);
+        this.c.putHelpFor(s, "Finding & Replacing Text");
     }
     //@+node:felix.20251214160853.480: *3* helpForMinibuffer
     @cmd('help-for-minibuffer', 'Print a messages telling you how to get started with Leo.')
@@ -440,7 +441,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         Use the help-for-command command to see documentation for a particular command.
         `;
         //@-<< define s >>
-        c.putHelpFor(s);
+        c.putHelpFor(s, "Minibuffer");
     }
     //@+node:felix.20251214160853.482: *3* helpForScripting
     @cmd('help-for-scripting', 'Shows a tutorial about scripting Leo.')
@@ -650,7 +651,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
             g.warning(*args,**keys)
         `;
         //@-<< define s >>
-        this.c.putHelpFor(s);
+        this.c.putHelpFor(s, 'Scripting');
     }
     //@+node:felix.20251214160853.484: *3* helpForSettings
     @cmd('help-for-settings', 'Explains Leo\'s settings.')
@@ -676,7 +677,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
         `;
         //@-<< define s >>
-        this.c.putHelpFor(s);
+        this.c.putHelpFor(s, "Leo's Settings");
     }
     //@+node:felix.20251214160853.486: *3* help.showSettings
     @cmd(
@@ -754,7 +755,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         );
 
         const s = result.join('\n');
-        this.c.putHelpFor(s);
+        this.c.putHelpFor(s, "Buttons & Commands");
 
     }
     //@+node:felix.20251214160853.489: *3* printCommands
@@ -771,7 +772,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         }
 
         const s = '# ' + tabName + '\n\n' + data.join('\n');
-        this.c.putHelpFor(s);
+        this.c.putHelpFor(s, "Commands");
 
     }
 
@@ -793,7 +794,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         }
 
         const s = '# ' + tabName + '\n\n' + data.join('\n');
-        this.c.putHelpFor(s);
+        this.c.putHelpFor(s, "Commands with Documentation");
 
     }
 

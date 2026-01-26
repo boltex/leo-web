@@ -1,3 +1,5 @@
+import * as showdown from "showdown";
+
 import { NullGui } from "./core/leoGui";
 import * as g from './core/leoGlobals';
 import { Constants } from "./constants";
@@ -64,6 +66,9 @@ export class LeoUI extends NullGui {
         this._lastSelectedNodeTS = utils.performanceNow();
     }
 
+    // * Help Panel
+    public showdownConverter: showdown.Converter;
+
     // * Selection & scroll
     private _selectionDirty: boolean = false; // Flag set when cursor selection is changed
     private _selectionGnx: string = ''; // Packaged into 'BodySelectionInfo' structures, sent to Leo
@@ -104,6 +109,9 @@ export class LeoUI extends NullGui {
             this._launchRefresh,
             Constants.REFRESH_DEBOUNCE_DELAY
         );
+
+        // * Help panel helper
+        this.showdownConverter = new showdown.Converter();
 
         window.addEventListener('beforeunload', this.onBeforeUnload);
     }
@@ -194,6 +202,18 @@ export class LeoUI extends NullGui {
      */
     public makeAllBindings(): void {
         makeAllBindings(this, workspace.controller);
+    }
+
+    public showSettings(): Promise<unknown> {
+        // TODO !
+        console.log('TODO ! showSettings called to show settings UI');
+        return Promise.resolve();
+    }
+
+    public put_help(c: Commands, s: string, short_title: string): void {
+        s = g.dedent(s.trimEnd());
+        s = this.showdownConverter.makeHtml(s);
+        workspace.view.showHtmlInNewTab(s, short_title);
     }
 
     /**

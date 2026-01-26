@@ -445,6 +445,7 @@ export class Constants {
         GOTO_NAV_FIRST: Constants.NAME + ".gotoNavFirst",
         GOTO_NAV_LAST: Constants.NAME + ".gotoNavLast",
 
+        HELP_FOR_FIND_COMMANDS: Constants.NAME + ".helpForFindCommands",
         START_SEARCH: Constants.NAME + ".startSearch",
         SEARCH_BACKWARD: Constants.NAME + ".searchBackward",
         RE_SEARCH: Constants.NAME + ".reSearch",
@@ -519,6 +520,8 @@ export class Constants {
         WRITE_FILE_FROM_NODE: "write-file-from-node",
 
         // * Search operations
+
+        HELP_FOR_FIND_COMMANDS: "help-for-find-commands",
         START_SEARCH: "start-search",
         FIND_ALL: "find-all",
         // FIND_NEXT: "!find_next",
