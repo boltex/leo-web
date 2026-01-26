@@ -258,6 +258,8 @@ export class Constants {
         PASTE_TEXT: Constants.NAME + ".pasteText",
 
         // Window/UI
+        LIGHT_THEME: Constants.NAME + ".lightTheme",
+        DARK_THEME: Constants.NAME + ".darkTheme",
         HORIZONTAL_LAYOUT: Constants.NAME + ".horizontalLayout",
         VERTICAL_LAYOUT: Constants.NAME + ".verticalLayout",
         EQUAL_SIZED_PANES: Constants.NAME + ".equalSizedPanes",
@@ -446,6 +448,7 @@ export class Constants {
         GOTO_NAV_LAST: Constants.NAME + ".gotoNavLast",
 
         HELP_FOR_FIND_COMMANDS: Constants.NAME + ".helpForFindCommands",
+        HELP_FOR_MINIBUFFER: Constants.NAME + ".helpForMinibuffer",
         START_SEARCH: Constants.NAME + ".startSearch",
         SEARCH_BACKWARD: Constants.NAME + ".searchBackward",
         RE_SEARCH: Constants.NAME + ".reSearch",
@@ -522,6 +525,7 @@ export class Constants {
         // * Search operations
 
         HELP_FOR_FIND_COMMANDS: "help-for-find-commands",
+        HELP_FOR_MINIBUFFER: "help-for-minibuffer",
         START_SEARCH: "start-search",
         FIND_ALL: "find-all",
         // FIND_NEXT: "!find_next",

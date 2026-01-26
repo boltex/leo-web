@@ -135,6 +135,13 @@ export class LeoUI extends NullGui {
         event.returnValue = '';
     };
 
+    public lightTheme(): void {
+        workspace.view.applyTheme('light');
+    }
+    public darkTheme(): void {
+        workspace.view.applyTheme('dark');
+    }
+
     public applyLayout(orientation: string): void {
         workspace.view.applyLayout(orientation);
     }

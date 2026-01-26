@@ -44,7 +44,10 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         ["todo", () => leoUI.todo()], // will popup a toast message
 
         [CMD.HELP_FOR_FIND_COMMANDS, () => leoUI.command(LEOCMD.HELP_FOR_FIND_COMMANDS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.HELP_FOR_MINIBUFFER, () => leoUI.command(LEOCMD.HELP_FOR_MINIBUFFER, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
 
+        [CMD.LIGHT_THEME, () => leoUI.lightTheme()],
+        [CMD.DARK_THEME, () => leoUI.darkTheme()],
         [CMD.HORIZONTAL_LAYOUT, () => leoUI.applyLayout('horizontal')],
         [CMD.VERTICAL_LAYOUT, () => leoUI.applyLayout('vertical')],
         [CMD.EQUAL_SIZED_PANES, () => leoUI.equalSizedPanes()],
