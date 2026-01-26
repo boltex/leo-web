@@ -86,6 +86,7 @@ export class LeoView {
     public focusedMenuItem: HTMLDivElement | null = null;
     public topLevelItems: HTMLDivElement[] = [];
     public topLevelSubmenus = new Map();
+    private resizeTimeout: number | undefined;
 
     private _flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
     public get flatRows(): FlatRow[] | null {
@@ -140,7 +141,6 @@ export class LeoView {
     public isDialogOpen = false;
 
     private __activeFocusTrap: (() => void) | null = null;
-
 
     public minWidth = 20;
     public minHeight = 20;
@@ -229,6 +229,18 @@ export class LeoView {
         // Build the menu
         this.topLevelItems.length = 0;
         this.topLevelSubmenus.clear();
+
+        window.addEventListener('resize', () => {
+            if (this.resizeTimeout !== undefined) {
+                window.clearTimeout(this.resizeTimeout);
+            }
+
+            this.resizeTimeout = window.setTimeout(() => {
+                if (this.activeTopMenu) {
+                    this.repositionOpenMenus();
+                }
+            }, 100); // debounce delay in ms
+        });
     }
 
     public setCommands(commands: [string, (...args: any[]) => any][]) {
@@ -392,8 +404,8 @@ export class LeoView {
                     });
                 } else {
                     item.addEventListener("mouseenter", () => {
-                        this.positionSubmenu(item, sub, level);
                         sub.classList.add("visible");
+                        this.positionSubmenu(item, sub, level);
                     });
                     item.addEventListener("mouseleave", (e) => {
                         const related = e.relatedTarget as Node | null;
@@ -429,6 +441,103 @@ export class LeoView {
         return menu;
     }
 
+    private constrainToViewport(
+        submenu: HTMLElement,
+        level: number
+    ): void {
+        const rect = submenu.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const minTop = 25; // Keep top bar visible
+        const minLeft = 0; // Left edge of viewport
+
+        // Horizontal constraint - shift left if extending past right edge
+        if (rect.right > viewportWidth) {
+            const overflow = rect.right - viewportWidth;
+            const newLeft = Math.max(minLeft, parseFloat(submenu.style.left) - overflow);
+            submenu.style.left = `${newLeft}px`;
+        }
+
+        // Also check if too far left (shouldn't happen but just in case)
+        if (rect.left < minLeft) {
+            submenu.style.left = `${minLeft}px`;
+        }
+
+        // Vertical constraint - shift up if extending past bottom edge
+        if (rect.bottom > viewportHeight) {
+            const overflow = rect.bottom - viewportHeight;
+
+            if (level === 0) {
+                // Level 0: position:fixed, use positive coordinates
+                const newTop = Math.max(minTop, parseFloat(submenu.style.top) - overflow);
+                submenu.style.top = `${newTop}px`;
+            } else {
+                // Level > 0: position:relative, shift up with negative values
+                const currentTop = parseFloat(submenu.style.top) || 0;
+                const newTop = currentTop - overflow;
+                submenu.style.top = `${newTop}px`;
+            }
+        }
+
+        // Also check if too high (shouldn't happen for level 0, but can for nested)
+        if (rect.top < minTop) {
+            if (level === 0) {
+                submenu.style.top = `${minTop}px`;
+            } else {
+                // For relative positioned submenus, calculate how much to shift down
+                const overflow = minTop - rect.top;
+                const currentTop = parseFloat(submenu.style.top) || 0;
+                submenu.style.top = `${currentTop + overflow}px`;
+            }
+        }
+    }
+
+    private repositionOpenMenus(): void {
+        // Find all visible submenus
+        const visibleSubmenus = document.querySelectorAll('.submenu.visible');
+
+        visibleSubmenus.forEach((submenu) => {
+            const menuItem = this.findParentMenuItem(submenu);
+            if (menuItem) {
+                const level = this.getMenuLevel(submenu);
+                this.positionSubmenu(menuItem as HTMLDivElement, submenu as HTMLElement, level);
+            }
+        });
+    }
+
+    private findParentMenuItem(submenu: Element): HTMLDivElement | null {
+        // For level 0 submenus attached to body, search in topLevelSubmenus map
+        for (const [menuItem, sub] of this.topLevelSubmenus.entries()) {
+            if (sub === submenu) {
+                return menuItem as HTMLDivElement;
+            }
+        }
+
+        // For nested submenus, the parent is the containing menu-item
+        const parentItem = submenu.parentElement?.closest('.menu-item');
+        return parentItem as HTMLDivElement | null;
+    }
+
+    private getMenuLevel(submenu: Element): number {
+        // Level 0 submenus are attached to document.body
+        if (submenu.parentElement === document.body) {
+            return 0;
+        }
+
+        // Count how many .submenu ancestors this submenu has
+        let level = 1;
+        let parent = submenu.parentElement;
+
+        while (parent) {
+            if (parent.classList.contains('submenu')) {
+                level++;
+            }
+            parent = parent.parentElement;
+        }
+
+        return level;
+    }
+
     public openTopMenu(item: HTMLDivElement, sub: HTMLElement | null, level: number) {
         this.closeAllSubmenus();
         this.activeTopMenu = item;
@@ -459,6 +568,7 @@ export class LeoView {
             submenu.style.top = "0px";
         }
         submenu.style.display = "";
+        setTimeout(() => this.constrainToViewport(submenu, level), 0)
     }
 
     public closeAllSubmenus() {
@@ -477,13 +587,12 @@ export class LeoView {
         this.focusedMenuItem = null;
     }
 
-
     public focusMenuItem(item: HTMLDivElement | null) {
         if (!item) return; // Safety check
         if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
         item.classList.add("focused");
         this.focusedMenuItem = item;
-        item.scrollIntoView({ block: "nearest" });
+        // item.scrollIntoView({ block: "nearest" }); // Commented out because menut items can lay outside the window
         document.querySelectorAll(".menu-item.sub-active").forEach(el =>
             el.classList.remove("sub-active")
         );
@@ -528,7 +637,6 @@ export class LeoView {
             this.OUTLINE_PANE.scrollTop = nodePosition - viewportHeight + this.ROW_HEIGHT;
         }
     }
-
 
     public highlightMatchInHeadline(startIndex: number, endIndex: number) {
         // Use the global selectedLabelElement which is already set after selectAndOrToggleAndRedraw
@@ -608,8 +716,6 @@ export class LeoView {
         }
         this.TRIGGER_AREA.style.width = ((visibleButtonCount * 40) + 10) + 'px';
     }
-
-
 
     // * Button states
     public updateMarkedButtonStates(hasMarkedNodes: boolean) {
@@ -918,7 +1024,6 @@ export class LeoView {
                     });
             });
 
-
         } else {
             // ok, continue with the normal flow
             return new Promise((resolve, reject) => {
@@ -939,8 +1044,6 @@ export class LeoView {
                         reject('User cancelled directory selection.');
                     }
                 });
-
-
             });
         }
 

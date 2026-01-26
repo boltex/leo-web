@@ -372,7 +372,7 @@ export class LeoController {
     public async initialize() {
         const view = this.view;
         const model = this.model;
-        this.initializeInteractions(); // sets up event handlers and button focus prevention
+        // outline-find-container is initially hidden to prevent FOUC
         view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
 
