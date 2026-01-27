@@ -1452,8 +1452,8 @@ export class LeoController {
                     hasChildren: node.hasChildren(),
                     isExpanded: node.isExpanded(),
                     node: node,
-                    isSelected: node === selectedNode,
-                    isAncestor: selectedNode ? node.isAncestorOf(selectedNode) : false,
+                    isSelected: !!selectedNode && node.__eq__(selectedNode),
+                    isAncestor: !!selectedNode && node.isAncestorOf(selectedNode),
                     isInitialFind: false, // TODO: (later stage) Implement initial find state tracking in Leo core
                     icon: (+(!!node.isDirty()) << 3) |
                         (+node.isCloned() << 2) |
