@@ -149,16 +149,23 @@ export class LeoUI extends NullGui {
         workspace.view.equalSizedPanes();
     }
 
+    public showDocumentation(): void {
+        // Open Leo Web documentation URL in new browser tab (for now, github repo)
+        const docUrl = 'https://github.com/boltex/leo-web/';
+        window.open(docUrl, '_blank');
+    }
+
     public todo(): void {
         workspace.view.showInformationMessage("TODO: Not yet implemented.");
     }
 
     public async chooseNewWorkspace(): Promise<boolean> {
-        // Perform the 'quit' command to force asking to save unsaved changes
+        // Perform the 'quit' command to force asking to save unsaved changeswwwwwwwwwwww
         // Then clear the workspace from db and force-refresh the page to restart leojs
         // This will have the effect of closing all opened documents and then asking for a new workspace
         for (const c of g.app.commanders()) {
-            const allow = c.exists && g.app.closeLeoWindow(c.frame);
+            const closed = await g.app.closeLeoWindow(c.frame)
+            const allow = c.exists && closed;
             if (!allow) {
                 return Promise.resolve(false);
             }
@@ -1267,6 +1274,11 @@ export class LeoUI extends NullGui {
     public async pasteText(): Promise<unknown> {
         // TODO : This is for body pane text only!
         workspace.view.showToast('Paste Text: TODO Implement');
+        return Promise.resolve();
+    }
+    public async selectAllText(): Promise<unknown> {
+        // TODO : This is for body pane text only!
+        workspace.view.showToast('Select All Text: TODO Implement');
         return Promise.resolve();
     }
 

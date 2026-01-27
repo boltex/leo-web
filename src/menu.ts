@@ -49,14 +49,14 @@ export const menuData: MenuEntry[] = [
             { label: "Cut", action: CMD.CUT_TEXT, keyboardShortcut: "Ctrl+X" },
             { label: "Copy", action: CMD.COPY_TEXT, keyboardShortcut: "Ctrl+C" },
             { label: "Paste", action: CMD.PASTE_TEXT, keyboardShortcut: "Ctrl+V" },
-            { label: "Select All", action: "todo", keyboardShortcut: "Ctrl+A" },
+            { label: "Select All", action: CMD.SELECT_ALL_TEXT, keyboardShortcut: "Ctrl+A" },
             //
             {
                 label: "Edit Headline", entries: [
-                    { label: "Capitalize-Headline", action: "todo" },
-                    { label: "Edit-Headline", action: "todo", keyboardShortcut: "Ctrl+H" },
-                    { label: "End-Edit-Headline", action: "todo", keyboardShortcut: "ENTER" },
-                    { label: "Insert-Headline-Time", action: "todo" },
+                    { label: "Capitalize-Headline", action: CMD.CAPITALIZE_HEADLINE },
+                    { label: "Edit-Headline", action: CMD.EDIT_HEADLINE, keyboardShortcut: "Ctrl+H" },
+                    { label: "End-Edit-Headline", action: CMD.END_EDIT_HEADLINE, keyboardShortcut: "ENTER" },
+                    { label: "Insert-Headline-Time", action: CMD.INSERT_HEADLINE_TIME },
                 ]
             },
             // { label: "Edit Text", entries: [
@@ -64,16 +64,16 @@ export const menuData: MenuEntry[] = [
             // ]},
             {
                 label: "Format Text", entries: [
-                    { label: "Insert-Body-Time", action: "todo" },
-                    { label: "Reformat-Paragraph", action: "todo" },
-                    { label: "Rst3", action: "todo" },
+                    { label: "Insert-Body-Time", action: CMD.INSERT_BODY_TIME },
+                    { label: "Reformat-Paragraph", action: CMD.REFORMAT_PARAGRAPH },
+                    { label: "Rst3", action: CMD.RST3 },
 
                 ]
             },
             {
                 label: "Select Chapters", entries: [
-                    { label: "Chapter-Select", action: "todo" },
-                    { label: "Chapter-Select-Main", action: "todo" },
+                    { label: "Chapter-Select", action: CMD.CHAPTER_SELECT },
+                    { label: "Chapter-Select-Main", action: CMD.CHAPTER_MAIN },
                 ]
             },
         ],
@@ -82,34 +82,34 @@ export const menuData: MenuEntry[] = [
         label: "Search",
         entries: [
             { label: "Help for Find Commands", action: CMD.HELP_FOR_FIND_COMMANDS },
-            { label: "Goto Global Line", action: "todo", keyboardShortcut: "Alt+G" },
-            { label: "Start Search", action: "todo", keyboardShortcut: "Ctrl+F" },
-            { label: "Find Next", action: "todo", keyboardShortcut: "F3" },
-            { label: "Find Previous", action: "todo", keyboardShortcut: "F2" },
-            { label: "Replace", action: "todo", keyboardShortcut: "Ctrl+=" },
-            { label: "Replace Then Find", action: "todo", keyboardShortcut: "Ctrl+-" },
-            { label: "Replace All", action: "todo" },
+            { label: "Goto Global Line", action: CMD.GOTO_GLOBAL_LINE, keyboardShortcut: "Alt+G" },
+            { label: "Start Search", action: CMD.START_SEARCH, keyboardShortcut: "Ctrl+F" },
+            { label: "Find Next", action: CMD.FIND_NEXT, keyboardShortcut: "F3" },
+            { label: "Find Previous", action: CMD.FIND_PREVIOUS, keyboardShortcut: "F2" },
+            { label: "Replace", action: CMD.REPLACE, keyboardShortcut: "Ctrl+=" },
+            { label: "Replace Then Find", action: CMD.REPLACE_THEN_FIND, keyboardShortcut: "Ctrl+-" },
+            { label: "Replace All", action: CMD.REPLACE_ALL },
             {
                 label: "Clone-Find Commands",
                 entries: [
-                    { label: "Clone-Find-All", action: "todo" },
-                    { label: "Clone-Find-All-Flattened", action: "todo" },
-                    { label: "Clone-Find-All-Flattened-marked", action: "todo" },
-                    { label: "Clone-Find-Parents", action: "todo" },
-                    { label: "Clone-Find-Tag", action: "todo" },
+                    { label: "Clone-Find-All", action: CMD.CLONE_FIND_ALL },
+                    { label: "Clone-Find-All-Flattened", action: CMD.CLONE_FIND_ALL_FLATTENED },
+                    { label: "Clone-Find-All-Flattened-marked", action: CMD.CLONE_FIND_FLATTENED_MARKED },
+                    { label: "Clone-Find-Parents", action: CMD.CLONE_FIND_PARENTS },
+                    { label: "Clone-Find-Tag", action: CMD.CLONE_FIND_TAG },
                 ]
             },
             {
                 label: "Set Search Settings",
                 entries: [
-                    { label: "Set Find-Everywhere", action: "todo", keyboardShortcut: "Alt+Ctrl+E" },
-                    { label: "Set Find-Node-Only", action: "todo", keyboardShortcut: "Alt+Ctrl+N" },
-                    { label: "Set Find-Suboutline-Only", action: "todo", keyboardShortcut: "Alt+Ctrl+S" },
-                    { label: "Toggle Ignore-Case", action: "todo", keyboardShortcut: "Alt+Ctrl+I" },
-                    { label: "Toggle Mark-Changes", action: "todo", keyboardShortcut: "Alt+Ctrl+C" },
-                    { label: "Toggle Mark-Finds", action: "todo", keyboardShortcut: "Alt+Ctrl+F" },
-                    { label: "Toggle Regex", action: "todo", keyboardShortcut: "Alt+Ctrl+X" },
-                    { label: "Toggle Word", action: "todo", keyboardShortcut: "Alt+Ctrl+W" },
+                    { label: "Set Find-Everywhere", action: CMD.SET_FIND_EVERYWHERE_OPTION, keyboardShortcut: "Alt+Ctrl+E" },
+                    { label: "Set Find-Node-Only", action: CMD.SET_FIND_NODE_ONLY_OPTION, keyboardShortcut: "Alt+Ctrl+N" },
+                    { label: "Set Find-Suboutline-Only", action: CMD.SET_FIND_SUBOUTLINE_ONLY_OPTION, keyboardShortcut: "Alt+Ctrl+S" },
+                    { label: "Toggle Ignore-Case", action: CMD.TOGGLE_FIND_IGNORE_CASE_OPTION, keyboardShortcut: "Alt+Ctrl+I" },
+                    { label: "Toggle Mark-Changes", action: CMD.TOGGLE_FIND_MARK_CHANGES_OPTION, keyboardShortcut: "Alt+Ctrl+C" },
+                    { label: "Toggle Mark-Finds", action: CMD.TOGGLE_FIND_MARK_FINDS_OPTION, keyboardShortcut: "Alt+Ctrl+F" },
+                    { label: "Toggle Regex", action: CMD.TOGGLE_FIND_REGEXP_OPTION, keyboardShortcut: "Alt+Ctrl+X" },
+                    { label: "Toggle Word", action: CMD.TOGGLE_FIND_WORD_OPTION, keyboardShortcut: "Alt+Ctrl+W" },
                 ]
             },
         ],
@@ -117,28 +117,28 @@ export const menuData: MenuEntry[] = [
     {
         label: "Settings",
         entries: [
-            { label: "Open LeoSettings.leo", action: "todo" },
-            { label: "Reload Settings", action: "todo" },
+            { label: "Open LeoSettings.leo", action: CMD.OPEN_LEO_SETTINGS },
+            { label: "Reload Settings", action: CMD.RELOAD_SETTINGS },
         ],
     },
     {
         label: "Outline",
         entries: [
-            { label: "Clone-Node", action: "todo", keyboardShortcut: "Ctrl+`" },
-            { label: "Delete-Node", action: "todo", keyboardShortcut: "Delete" },
-            { label: "Insert-Node", action: "todo", keyboardShortcut: "Ctrl+I, Shift+Insert" },
-            { label: "Insert-Child", action: "todo", keyboardShortcut: "Ctrl+Insert" },
-            { label: "Cut-Node", action: "todo", keyboardShortcut: "Ctrl+Shift+X" },
-            { label: "Copy-Node", action: "todo", keyboardShortcut: "Ctrl+Shift+C" },
-            { label: "Paste-Node", action: "todo", keyboardShortcut: "Ctrl+Shift+V" },
-            { label: "Paste Node As Clone", action: "todo" },
-            { label: "Demote Siblings", action: "todo", keyboardShortcut: "Ctrl+]" },
-            { label: "Promote Children", action: "todo", keyboardShortcut: "Ctrl+[" },
-            { label: "Refresh From Disk", action: "todo" },
+            { label: "Clone-Node", action: CMD.CLONE_SELECTION, keyboardShortcut: "Ctrl+`" },
+            { label: "Delete-Node", action: CMD.DELETE_SELECTION, keyboardShortcut: "Delete" },
+            { label: "Insert-Node", action: CMD.INSERT_SELECTION, keyboardShortcut: "Ctrl+I, Shift+Insert" },
+            { label: "Insert-Child", action: CMD.INSERT_CHILD_SELECTION, keyboardShortcut: "Ctrl+Insert" },
+            { label: "Cut-Node", action: CMD.CUT_SELECTION, keyboardShortcut: "Ctrl+Shift+X" },
+            { label: "Copy-Node", action: CMD.COPY_SELECTION, keyboardShortcut: "Ctrl+Shift+C" },
+            { label: "Paste-Node", action: CMD.PASTE_SELECTION, keyboardShortcut: "Ctrl+Shift+V" },
+            { label: "Paste Node As Clone", action: CMD.PASTE_CLONE_SELECTION },
+            { label: "Demote Siblings", action: CMD.DEMOTE_SELECTION, keyboardShortcut: "Ctrl+]" },
+            { label: "Promote Children", action: CMD.PROMOTE_SELECTION, keyboardShortcut: "Ctrl+[" },
+            { label: "Refresh From Disk", action: CMD.REFRESH_FROM_DISK_SELECTION },
             {
                 label: "Expand/Contract Nodes", entries: [
-                    { label: "Contract-All", action: "todo", keyboardShortcut: "Alt+-" },
-                    { label: "Contract-All-Other-Nodes", action: "todo" },
+                    { label: "Contract-All", action: CMD.CONTRACT_ALL, keyboardShortcut: "Alt+-" },
+                    { label: "Contract-All-Other-Nodes", action: CMD.CONTRACT_ALL_OTHER_NODES, keyboardShortcut: "Ctrl+Alt+-" },
                     { label: "Contract-Node", action: "todo", keyboardShortcut: "Alt+[" },
                     { label: "Contract-Parent", action: "todo" },
                     { label: "Contract-Or-Go-Left", action: "todo", keyboardShortcut: "Left, Alt+Left" },
@@ -226,8 +226,8 @@ export const menuData: MenuEntry[] = [
         label: "Run",
         entries: [
             { label: "Help For Minibuffer", action: CMD.HELP_FOR_MINIBUFFER },
-            { label: "Execute Script", action: "todo", keyboardShortcut: "Ctrl+B" },
-            { label: "Full Command", action: "todo", keyboardShortcut: "Alt+X" },
+            { label: "Execute Script", action: CMD.EXECUTE, keyboardShortcut: "Ctrl+B" },
+            { label: "Full Command", action: CMD.MINIBUFFER, keyboardShortcut: "Alt+X" },
         ],
     },
     {
@@ -243,8 +243,8 @@ export const menuData: MenuEntry[] = [
     {
         label: "Help",
         entries: [
-            { label: "Documentation", action: "todo" },
-            { label: "About", action: "todo" },
+            { label: "Documentation", action: CMD.DOCUMENTATION },
+            { label: "About", action: CMD.ABOUT_LEO },
         ],
     },
 ];

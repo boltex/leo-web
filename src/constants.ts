@@ -256,8 +256,14 @@ export class Constants {
         CUT_TEXT: Constants.NAME + ".cutText",
         COPY_TEXT: Constants.NAME + ".copyText",
         PASTE_TEXT: Constants.NAME + ".pasteText",
+        SELECT_ALL_TEXT: Constants.NAME + ".selectAllText",
+
+        OPEN_LEO_SETTINGS: Constants.NAME + ".openLeoSettings",
+        RELOAD_SETTINGS: Constants.NAME + ".reloadSettings",
 
         // Window/UI
+        DOCUMENTATION: Constants.NAME + ".documentation",
+        ABOUT_LEO: Constants.NAME + ".aboutLeo",
         LIGHT_THEME: Constants.NAME + ".lightTheme",
         DARK_THEME: Constants.NAME + ".darkTheme",
         HORIZONTAL_LAYOUT: Constants.NAME + ".horizontalLayout",
@@ -344,6 +350,7 @@ export class Constants {
         SORT_CHILDREN_FO: Constants.NAME + ".sortChildrenSelectionFromOutline",
         SORT_SIBLING: Constants.NAME + ".sortSiblingsSelection",
         SORT_SIBLING_FO: Constants.NAME + ".sortSiblingsSelectionFromOutline",
+        CONTRACT_ALL_OTHER_NODES: Constants.NAME + ".contractAllOtherNodes", // From command Palette
         CONTRACT_ALL: Constants.NAME + ".contractAll", // From command Palette
         CONTRACT_ALL_FO: Constants.NAME + ".contractAllFromOutline", // from button, return focus on OUTLINE
         PREV_NODE: Constants.NAME + ".prev",
@@ -447,6 +454,14 @@ export class Constants {
         GOTO_NAV_FIRST: Constants.NAME + ".gotoNavFirst",
         GOTO_NAV_LAST: Constants.NAME + ".gotoNavLast",
 
+        CAPITALIZE_HEADLINE: Constants.NAME + ".capitalizeHeadline",
+        EDIT_HEADLINE: Constants.NAME + ".editHeadline",
+        END_EDIT_HEADLINE: Constants.NAME + ".endEditHeadline",
+        INSERT_HEADLINE_TIME: Constants.NAME + ".insertHeadlineTime",
+        INSERT_BODY_TIME: Constants.NAME + ".insertBodyTime",
+        REFORMAT_PARAGRAPH: Constants.NAME + ".reformatParagraph",
+        RST3: Constants.NAME + ".rst3",
+
         HELP_FOR_FIND_COMMANDS: Constants.NAME + ".helpForFindCommands",
         HELP_FOR_MINIBUFFER: Constants.NAME + ".helpForMinibuffer",
         START_SEARCH: Constants.NAME + ".startSearch",
@@ -500,6 +515,8 @@ export class Constants {
      */
     public static LEO_COMMANDS = {
 
+        ABOUT_LEO: "about-leo",
+
         // * File Commands
         // NEW: 'new', // newLeoFile used instead
         // OPEN_OUTLINE: 'open_outline', // openLeoFile used instead
@@ -522,8 +539,16 @@ export class Constants {
         WEAVE: "weave",
         WRITE_FILE_FROM_NODE: "write-file-from-node",
 
-        // * Search operations
+        // * Edit Operations
+        CAPITALIZE_HEADLINE: "capitalize-headline",
+        EDIT_HEADLINE: "edit-headline",
+        END_EDIT_HEADLINE: "end-edit-headline",
+        INSERT_HEADLINE_TIME: "insert-headline-time",
+        INSERT_BODY_TIME: "insert-body-time",
+        REFORMAT_PARAGRAPH: "reformat-paragraph",
+        RST3: "rst3",
 
+        // * Search operations
         HELP_FOR_FIND_COMMANDS: "help-for-find-commands",
         HELP_FOR_MINIBUFFER: "help-for-minibuffer",
         START_SEARCH: "start-search",
@@ -593,6 +618,7 @@ export class Constants {
         GOTO_NEXT_CLONE: "goto-next-clone",
         CONTRACT_OR_GO_LEFT: "contract-or-go-left",
         EXPAND_AND_GO_RIGHT: "expand-and-go-right",
+        CONTRACT_ALL_OTHER_NODES: "contract-all-other-nodes",
         CONTRACT_ALL: "contract-all",
         // * Mark Operations
         TOGGLE_MARK: "toggle-mark",

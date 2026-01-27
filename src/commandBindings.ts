@@ -43,6 +43,17 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
 
         ["todo", () => leoUI.todo()], // will popup a toast message
 
+        [CMD.ABOUT_LEO, () => leoUI.command(LEOCMD.ABOUT_LEO, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.DOCUMENTATION, () => leoUI.showDocumentation()],
+
+        [CMD.CAPITALIZE_HEADLINE, () => leoUI.command(LEOCMD.CAPITALIZE_HEADLINE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
+        [CMD.EDIT_HEADLINE, () => leoUI.command(LEOCMD.EDIT_HEADLINE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
+        [CMD.END_EDIT_HEADLINE, () => leoUI.command(LEOCMD.END_EDIT_HEADLINE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
+        [CMD.INSERT_HEADLINE_TIME, () => leoUI.command(LEOCMD.INSERT_HEADLINE_TIME, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
+        [CMD.INSERT_BODY_TIME, () => leoUI.command(LEOCMD.INSERT_BODY_TIME, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.REFORMAT_PARAGRAPH, () => leoUI.command(LEOCMD.REFORMAT_PARAGRAPH, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.RST3, () => leoUI.command(LEOCMD.RST3, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+
         [CMD.HELP_FOR_FIND_COMMANDS, () => leoUI.command(LEOCMD.HELP_FOR_FIND_COMMANDS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.HELP_FOR_MINIBUFFER, () => leoUI.command(LEOCMD.HELP_FOR_MINIBUFFER, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
 
@@ -56,6 +67,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.CUT_TEXT, () => leoUI.cutText()],
         [CMD.COPY_TEXT, () => leoUI.copyText()],
         [CMD.PASTE_TEXT, () => leoUI.pasteText()],
+        [CMD.SELECT_ALL_TEXT, () => leoUI.selectAllText()],
 
         [CMD.SHOW_WELCOME, () => leoUI.showSettings()],
         [CMD.SHOW_SETTINGS, () => leoUI.showSettings()],
@@ -154,6 +166,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.SELECT_NODE, (p_outlineNode: any) => leoUI.selectTreeNode(p_outlineNode.position, false)], // Select is NOT a Position! TODO : FIX THIS TYPE ISSUE
         // [CMD.OPEN_ASIDE, (p_position?: Position) => p_leoUI.openAside(p_position)],
 
+        [CMD.CONTRACT_ALL_OTHER_NODES, () => leoUI.command(LEOCMD.CONTRACT_ALL_OTHER_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
         [CMD.CONTRACT_ALL, () => leoUI.command(LEOCMD.CONTRACT_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
         [CMD.CONTRACT_ALL_FO, () => leoUI.command(LEOCMD.CONTRACT_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
 
