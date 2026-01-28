@@ -8,7 +8,20 @@ import { IdleTime } from "./core/idle_time";
 import * as utils from "./utils";
 import { Uri, workspace } from "./workspace";
 import { Commands } from "./core/leoCommands";
-import { ChooseDocumentItem, CommandOptions, ConfigSetting, Focus, LeoDocument, LeoPackageStates, QuickPickItem, QuickPickItemKind, QuickPickOptions, ReqRefresh, RevealType } from "./types";
+import {
+    ChooseDocumentItem,
+    CommandOptions,
+    ConfigSetting,
+    Focus,
+    LeoDocument,
+    LeoPackageStates,
+    QuickPickItem,
+    QuickPickItemKind,
+    QuickPickOptions,
+    ReqRefresh,
+    RevealType,
+    UnlType
+} from "./types";
 import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
@@ -1234,6 +1247,131 @@ export class LeoUI extends NullGui {
         u.afterChangeHeadline(c.p, 'Edit Headline', undoData);
         g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
         return value;
+    }
+
+
+    /**
+     * Replaces the system's clipboard with the given string
+     * @param s actual string content to go onto the clipboard
+     * @returns a promise that resolves when the string is put on the clipboard
+     */
+    public replaceClipboardWith(s: string): Thenable<string> {
+        this.clipboardContents = s; // also set immediate clipboard string
+        return navigator.clipboard.writeText(s).then(() => { return s; });
+    }
+
+    /**
+     * Asynchronous clipboards getter
+     * Get the system's clipboard contents and returns a promise
+     * Also puts it in the global clipboardContents variable
+     * @returns a promise of the clipboard string content
+     */
+    public asyncGetTextFromClipboard(): Thenable<string> {
+        return navigator.clipboard.readText().then((s) => {
+            // also set immediate clipboard string for possible future read
+            this.clipboardContents = s;
+            return this.getTextFromClipboard();
+        });
+    }
+
+    /**
+     * Returns clipboard content
+    */
+    public getTextFromClipboard(): string {
+        return this.clipboardContents;
+    }
+
+    /**
+     * Put UNL of current node on the clipboard. 
+     * @para optional unlType to specify type.
+     */
+    public unlToClipboard(unlType?: UnlType): Thenable<string> {
+        let unl = "";
+        const c = g.app.windowList[this.frameIndex].c;
+        const p = c.p;
+        if (!p.v) {
+            return Promise.resolve('');
+        }
+        if (unlType) {
+            switch (unlType) {
+                case 'shortGnx':
+                    unl = p.get_short_gnx_UNL();
+                    break;
+                case 'fullGnx':
+                    unl = p.get_full_gnx_UNL();
+                    break;
+                case 'shortLegacy':
+                    unl = p.get_short_legacy_UNL();
+                    break;
+                case 'fullLegacy':
+                    unl = p.get_full_legacy_UNL();
+                    break;
+            }
+        } else {
+            unl = c.frame.computeStatusUnl(p);
+        }
+        return this.replaceClipboardWith(unl);
+    }
+
+    /**
+     * Mimic vscode's CTRL+P to find any position by it's headline
+     */
+    public async goAnywhere(): Promise<unknown> {
+        await this.triggerBodySave(true);
+
+        const allPositions: { label: string; description?: string; position?: Position; }[] = [];
+        // Options for date to look like : Saturday, September 17, 2016
+        const dateOptions: Intl.DateTimeFormatOptions = { weekday: "long", year: 'numeric', month: "long", day: 'numeric' };
+        const c = g.app.windowList[this.frameIndex].c;
+
+        // 'true' parameter because each position is kept individually for the time the QuickPick control is opened
+        for (const p_position of c.all_unique_positions(true)) {
+
+            let description = p_position.gnx; // Defaults as gnx.
+            const w_gnxParts = description.split('.');
+            const dateString = w_gnxParts[1] ? w_gnxParts[1] : "";
+
+            if (dateString && w_gnxParts.length === 3 && dateString.length === 14 && /^\d+$/.test(dateString)) {
+                // legit 3 part numeric gnx, so build a string date
+                const w_year = +dateString.substring(0, 4); // unary + operator to convert the strings to numbers.
+                const w_month = +dateString.substring(4, 6);
+                const w_day = +dateString.substring(6, 8);
+                const w_date = new Date(w_year, w_month - 1, w_day);
+                description = `by ${w_gnxParts[0]} on ${w_date.toLocaleDateString("en-US", dateOptions)}`;
+            }
+            allPositions.push({
+                label: p_position.h,
+                position: p_position,
+                description: description
+            });
+        };
+
+        // Add Nav tab special commands
+        const w_options: QuickPickOptions = {
+            placeHolder: Constants.USER_MESSAGES.SEARCH_POSITION_BY_HEADLINE
+        };
+
+        const picked = (await workspace.view.showQuickPick(allPositions, w_options)) as QuickPickItem & { position: Position };;
+
+        if (picked && picked.label && picked.position) {
+            if (c.positionExists(picked.position)) {
+                c.selectPosition(picked.position);  // set this node as selection
+            }
+            this.setupRefresh(
+                Focus.Body, // Finish in body pane given explicitly because last focus was in input box.
+                {
+                    tree: true,
+                    body: true,
+                    // documents: false,
+                    // buttons: false,
+                    states: true,
+                }
+            );
+            void this.launchRefresh();
+        }
+
+        return Promise.resolve(undefined); // Canceled
+
     }
 
 
