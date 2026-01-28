@@ -4,7 +4,10 @@ A web-based version of the Leo Editor - a structured document editor that allows
 
 ## About
 
-This project is a TypeScript single-page application that brings the Leo Editor experience to the web. Leo Editor is known for its unique approach to organizing documents through an outline-based structure, making it perfect for complex documentation, note-taking, and content organization.
+This project is a TypeScript single-page application that brings the Leo experience to the web. Leo is known for its unique approach to organizing documents through an outline-based structure, making it perfect for complex documentation, note-taking, programming and content organization.
+
+> See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
+or on [github](https://github.com/leo-editor/leo-editor).
 
 ## Contributing
 
