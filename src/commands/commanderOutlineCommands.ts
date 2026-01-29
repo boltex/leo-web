@@ -1027,12 +1027,20 @@ export class CommanderOutlineCommands {
         }
     }
     //@+node:felix.20251214160853.172: *4* c_oc.goNextVisitedNode
+    @commander_command(
+        'goto-next-history-node',
+        'Go to the next node in the history list.'
+    )
     @commander_command('go-forward', 'Select the next visited node.')
     public goNextVisitedNode(this: Commands): void {
         const c: Commands = this;
         c.nodeHistory.goNext();
     }
     //@+node:felix.20251214160853.173: *4* c_oc.goPrevVisitedNode
+    @commander_command(
+        'goto-prev-history-node',
+        'Go to the previous node in the history list.'
+    )
     @commander_command('go-back', 'Select the previously visited node.')
     public goPrevVisitedNode(this: Commands): void {
         const c: Commands = this;

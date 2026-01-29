@@ -139,85 +139,85 @@ export const menuData: MenuEntry[] = [
                 label: "Expand/Contract Nodes", entries: [
                     { label: "Contract-All", action: CMD.CONTRACT_ALL, keyboardShortcut: "Alt+-" },
                     { label: "Contract-All-Other-Nodes", action: CMD.CONTRACT_ALL_OTHER_NODES, keyboardShortcut: "Ctrl+Alt+-" },
-                    { label: "Contract-Node", action: "todo", keyboardShortcut: "Alt+[" },
-                    { label: "Contract-Parent", action: "todo" },
-                    { label: "Contract-Or-Go-Left", action: "todo", keyboardShortcut: "Left, Alt+Left" },
+                    { label: "Contract-Node", action: CMD.CONTRACT_NODE, keyboardShortcut: "Alt+[" },
+                    { label: "Contract-Parent", action: CMD.CONTRACT_PARENT },
+                    { label: "Contract-Or-Go-Left", action: CMD.CONTRACT_OR_GO_LEFT, keyboardShortcut: "Left, Alt+Left" },
                     //
-                    { label: "Expand-Prev-Level", action: "todo" },
-                    { label: "Expand-Next-Level", action: "todo" },
-                    { label: "Expand-And-Go-Right", action: "todo", keyboardShortcut: "Right, Alt+Right" },
-                    { label: "Expand-Or-Go-Right", action: "todo" },
+                    { label: "Expand-Prev-Level", action: CMD.EXPAND_PREV_LEVEL },
+                    { label: "Expand-Next-Level", action: CMD.EXPAND_NEXT_LEVEL },
+                    { label: "Expand-And-Go-Right", action: CMD.EXPAND_AND_GO_RIGHT, keyboardShortcut: "Right, Alt+Right" },
+                    { label: "Expand-Or-Go-Right", action: CMD.EXPAND_OR_GO_RIGHT },
                     //
-                    { label: "Expand-To-Level-1", action: "todo" },
-                    { label: "Expand-To-Level-2", action: "todo" },
-                    { label: "Expand-To-Level-3", action: "todo" },
-                    { label: "Expand-To-Level-4", action: "todo" },
-                    { label: "Expand-To-Level-5", action: "todo" },
-                    { label: "Expand-To-Level-6", action: "todo" },
-                    { label: "Expand-To-Level-7", action: "todo" },
-                    { label: "Expand-To-Level-8", action: "todo" },
+                    { label: "Expand-To-Level-1", action: CMD.EXPAND_TO_LEVEL_1 },
+                    { label: "Expand-To-Level-2", action: CMD.EXPAND_TO_LEVEL_2 },
+                    { label: "Expand-To-Level-3", action: CMD.EXPAND_TO_LEVEL_3 },
+                    { label: "Expand-To-Level-4", action: CMD.EXPAND_TO_LEVEL_4 },
+                    { label: "Expand-To-Level-5", action: CMD.EXPAND_TO_LEVEL_5 },
+                    { label: "Expand-To-Level-6", action: CMD.EXPAND_TO_LEVEL_6 },
+                    { label: "Expand-To-Level-7", action: CMD.EXPAND_TO_LEVEL_7 },
+                    { label: "Expand-To-Level-8", action: CMD.EXPAND_TO_LEVEL_8 },
                     //
-                    { label: "Expand-All", action: "todo" },
-                    { label: "Expand-Node", action: "todo", keyboardShortcut: "Alt+]" },
+                    { label: "Expand-All", action: CMD.EXPAND_ALL },
+                    { label: "Expand-Node", action: CMD.EXPAND_NODE, keyboardShortcut: "Alt+]" },
                 ]
             },
             {
                 label: "Go To Nodes", entries: [
-                    { label: "Find-Next-Clone", action: "todo" },
-                    { label: "Goto-First-Node", action: "todo" },
-                    { label: "Goto-First-Visible", action: "todo", keyboardShortcut: "Alt+Home" },
-                    { label: "Goto-First-Sibling", action: "todo" },
+                    { label: "Find-Next-Clone", action: CMD.FIND_NEXT_CLONE },
+                    { label: "Goto-First-Node", action: CMD.GOTO_FIRST_NODE },
+                    { label: "Goto-First-Visible", action: CMD.GOTO_FIRST_VISIBLE, keyboardShortcut: "Alt+Home" },
+                    { label: "Goto-First-Sibling", action: CMD.GOTO_FIRST_SIBLING },
                     //
-                    { label: "Goto-Next-Changed", action: "todo" },
-                    { label: "Goto-Next-Clone", action: "todo", keyboardShortcut: "Alt+N" },
-                    { label: "Goto-Next-Marked", action: "todo" },
-                    { label: "Goto-Next-Node", action: "todo" },
-                    { label: "Goto-Next-Sibling", action: "todo" },
-                    { label: "Goto-Next-Visible", action: "todo", keyboardShortcut: "Down, Alt+Down" },
-                    { label: "Go-Forward", action: "todo" },
+                    { label: "Goto-Next-Changed", action: CMD.GOTO_NEXT_CHANGED },
+                    { label: "Goto-Next-Clone", action: CMD.GOTO_NEXT_CLONE, keyboardShortcut: "Alt+N" },
+                    { label: "Goto-Next-Marked", action: CMD.GOTO_NEXT_MARKED },
+                    { label: "Goto-Next-Node", action: CMD.GOTO_NEXT_NODE },
+                    { label: "Goto-Next-Sibling", action: CMD.GOTO_NEXT_SIBLING },
+                    { label: "Goto-Next-Visible", action: CMD.GOTO_NEXT_VISIBLE, keyboardShortcut: "Down, Alt+Down" },
+                    { label: "Go-Forward", action: CMD.GO_FORWARD },
                     //
-                    { label: "Goto-Parent", action: "todo" },
+                    { label: "Goto-Parent", action: CMD.GOTO_PARENT },
                     //
-                    { label: "Goto-Prev-Node", action: "todo" },
-                    { label: "Goto-Prev-Sibling", action: "todo" },
-                    { label: "Goto-Prev-Visible", action: "todo", keyboardShortcut: "Up, Alt+Up" },
-                    { label: "Go-Back", action: "todo" },
+                    { label: "Goto-Prev-Node", action: CMD.GOTO_PREV_NODE },
+                    { label: "Goto-Prev-Sibling", action: CMD.GOTO_PREV_SIBLING },
+                    { label: "Goto-Prev-Visible", action: CMD.GOTO_PREV_VISIBLE, keyboardShortcut: "Up, Alt+Up" },
+                    { label: "Go-Back", action: CMD.GO_BACK },
                     //
-                    { label: "Goto-Last-Node", action: "todo" },
-                    { label: "Goto-Last-Sibling", action: "todo" },
-                    { label: "Goto-Last-Visible", action: "todo", keyboardShortcut: "Alt+End" },
+                    { label: "Goto-Last-Node", action: CMD.GOTO_LAST_NODE },
+                    { label: "Goto-Last-Sibling", action: CMD.GOTO_LAST_SIBLING },
+                    { label: "Goto-Last-Visible", action: CMD.GOTO_LAST_VISIBLE, keyboardShortcut: "Alt+End" },
                 ]
             },
             {
                 label: "Hoist/Dehoist Nodes", entries: [
-                    { label: "Hoist", action: "todo" },
-                    { label: "De-Hoist", action: "todo" },
+                    { label: "Hoist", action: CMD.HOIST_SELECTION },
+                    { label: "De-Hoist", action: CMD.DEHOIST },
 
                 ]
             },
             {
                 label: "Mark Nodes", entries: [
-                    { label: "Clone-Marked-Nodes", action: "todo" },
-                    { label: "Toggle Mark", action: "todo", keyboardShortcut: "Ctrl+M" },
-                    { label: "Mark-Subheads", action: "todo" },
-                    { label: "Mark-Changed-Items", action: "todo" },
-                    { label: "Unmark-All", action: "todo" },
+                    { label: "Clone-Marked-Nodes", action: CMD.CLONE_MARKED_NODES },
+                    { label: "Toggle Mark", action: CMD.MARK_SELECTION, keyboardShortcut: "Ctrl+M" },
+                    { label: "Mark-Subheads", action: CMD.MARK_SUBHEADS },
+                    { label: "Mark-Changed-Items", action: CMD.MARK_CHANGED_ITEMS },
+                    { label: "Unmark-All", action: CMD.UNMARK_ALL },
 
                 ]
             },
             {
                 label: "Move Nodes", entries: [
-                    { label: "Move-Outline-Down", action: "todo", keyboardShortcut: "Shift+Down, Alt+Shift+Down, Ctrl+D" },
-                    { label: "Move-Outline-Left", action: "todo", keyboardShortcut: "Shift+Left, Alt+Shift+Left, Ctrl+L" },
-                    { label: "Move-Outline-Right", action: "todo", keyboardShortcut: "Shift+Right, Alt+Shift+Right, Ctrl+R" },
-                    { label: "Move-Outline-Up", action: "todo", keyboardShortcut: "Shift+Up, Alt+Shift+Up, Ctrl+U" },
+                    { label: "Move-Outline-Down", action: CMD.MOVE_DOWN_SELECTION, keyboardShortcut: "Shift+Down, Alt+Shift+Down, Ctrl+D" },
+                    { label: "Move-Outline-Left", action: CMD.MOVE_LEFT_SELECTION, keyboardShortcut: "Shift+Left, Alt+Shift+Left, Ctrl+L" },
+                    { label: "Move-Outline-Right", action: CMD.MOVE_RIGHT_SELECTION, keyboardShortcut: "Shift+Right, Alt+Shift+Right, Ctrl+R" },
+                    { label: "Move-Outline-Up", action: CMD.MOVE_UP_SELECTION, keyboardShortcut: "Shift+Up, Alt+Shift+Up, Ctrl+U" },
 
                 ]
             },
             {
                 label: "Sort Nodes", entries: [
-                    { label: "Sort-Children", action: "todo" },
-                    { label: "Sort-Siblings", action: "todo", keyboardShortcut: "Alt+A" },
+                    { label: "Sort-Children", action: CMD.SORT_CHILDREN },
+                    { label: "Sort-Siblings", action: CMD.SORT_SIBLINGS, keyboardShortcut: "Alt+A" },
                 ]
             },
         ],

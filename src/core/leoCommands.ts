@@ -3737,9 +3737,7 @@ export class Commands {
         }
         c.expansionNode = c.p.copy();
         c.expansionLevel = max_level + 1;
-        if (c.expansionLevel !== old_expansion_level) {
-            c.redraw();
-        }
+        c.redraw();
         /*
         // It's always useful to announce the level.
         // c.k.setLabelBlue('level: %s' % (max_level+1))
