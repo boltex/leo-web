@@ -449,6 +449,14 @@ export class LeoUI extends NullGui {
         // TODO : implement buttons pane refresh
     }
 
+    public showOutline(): void {
+        workspace.view.OUTLINE_PANE.focus();
+    }
+    public showBody(): void {
+        workspace.view.BODY_PANE.focus();
+    }
+
+
     /**
      * * Setup global refresh options
      * @param p_finalFocus Flag for focus to be placed in outline

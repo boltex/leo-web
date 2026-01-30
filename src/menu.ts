@@ -60,7 +60,7 @@ export const menuData: MenuEntry[] = [
                 ]
             },
             // { label: "Edit Text", entries: [
-
+            // TODO : Edit menu entries when body pane is implemented
             // ]},
             {
                 label: "Format Text", entries: [

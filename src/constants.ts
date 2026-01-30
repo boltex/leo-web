@@ -331,6 +331,7 @@ export class Constants {
         GOTO_NEXT_VISIBLE: Constants.NAME + ".gotoNextVisible",
         GOTO_PREV_VISIBLE: Constants.NAME + ".gotoPrevVisible",
         GOTO_NEXT_MARKED: Constants.NAME + ".gotoNextMarked",
+        GOTO_PREV_MARKED: Constants.NAME + ".gotoPrevMarked",
         GOTO_NEXT_CLONE: Constants.NAME + ".gotoNextClone",
         GOTO_NEXT_CLONE_SELECTION: Constants.NAME + ".gotoNextCloneSelection",
         GOTO_NEXT_CLONE_SELECTION_FO: Constants.NAME + ".gotoNextCloneSelectionFromOutline",
@@ -644,7 +645,7 @@ export class Constants {
         GOTO_NEXT_VISIBLE: "goto-next-visible",
         GOTO_PREV_VISIBLE: "goto-prev-visible",
         GOTO_NEXT_MARKED: "goto-next-marked",
-        // GOTO_PREV_MARKED: "goto-prev-marked", // ! Not in Leo's menu
+        GOTO_PREV_MARKED: "goto-prev-marked",
         GOTO_NEXT_CLONE: "goto-next-clone",
         CONTRACT_OR_GO_LEFT: "contract-or-go-left",
         EXPAND_AND_GO_RIGHT: "expand-and-go-right",

@@ -9,6 +9,12 @@ This project is a TypeScript single-page application that brings the Leo experie
 > See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
 > or on [github](https://github.com/leo-editor/leo-editor).
 
+## Limitations
+
+Leo-Web does not support .db files. Including sqlite-wasm would significantly increase load times, and the goal is to keep Leo-Web light and fast.
+
+Absolute paths are not supported in leo-web. Use relative paths exclusively for external files.
+
 ## Contributing
 
 ### Prerequisites

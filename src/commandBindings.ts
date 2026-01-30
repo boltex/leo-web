@@ -75,9 +75,9 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
 
         [CMD.SHOW_WELCOME, () => leoUI.showSettings()],
         [CMD.SHOW_SETTINGS, () => leoUI.showSettings()],
-        // [CMD.SHOW_OUTLINE, () => p_leoUI.showOutline(true)], // Also focuses on outline
+        [CMD.SHOW_OUTLINE, () => leoUI.showOutline()], // Also focuses on outline
         [CMD.SHOW_LOG, () => leoUI.showLogPane()],
-        // [CMD.SHOW_BODY, () => p_leoUI.showBody(false, undefined)], // Also focuses on body
+        [CMD.SHOW_BODY, () => leoUI.showBody()], // Also focuses on body
         [CMD.EXECUTE, () => leoUI.command(LEOCMD.EXECUTE_SCRIPT, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
 
         // [CMD.SHORT_GNX_UNL_TO_CLIPBOARD, () => p_leoUI.unlToClipboard("shortGnx")], // Not referenced in package.json
@@ -208,6 +208,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.GO_BACK, () => leoUI.command(LEOCMD.GOTO_PREV_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })], // Uses same GOTO_PREV_HISTORY command
         [CMD.GOTO_LAST_NODE, () => leoUI.command(LEOCMD.GOTO_LAST_NODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
 
+        [CMD.GOTO_PREV_MARKED, () => leoUI.command(LEOCMD.GOTO_PREV_MARKED, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.GOTO_NEXT_MARKED, () => leoUI.command(LEOCMD.GOTO_NEXT_MARKED, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.GOTO_FIRST_SIBLING, () => leoUI.command(LEOCMD.GOTO_FIRST_SIBLING, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.GOTO_LAST_SIBLING, () => leoUI.command(LEOCMD.GOTO_LAST_SIBLING, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
@@ -286,7 +287,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.UNDO, () => leoUI.command(LEOCMD.UNDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
         [CMD.UNDO_FO, () => leoUI.command(LEOCMD.UNDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
 
-        // [CMD.REVERT_TO_UNDO, (p_undo: LeoUndoNode) => p_leoUI.revertToUndo(p_undo)],
+        // [CMD.REVERT_TO_UNDO, (p_undo: LeoUndoNode) => p_leoUI.revertToUndo(p_undo)], // Repeat undos/redo to given undo node.
 
         [CMD.COPY_MARKED, () => leoUI.command(LEOCMD.COPY_MARKED, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
         [CMD.DIFF_MARKED_NODES, () => leoUI.command(LEOCMD.DIFF_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],

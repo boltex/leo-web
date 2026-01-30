@@ -16,6 +16,7 @@ export class LeoController {
     private view: LeoView;
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
     private outlinePaneKeyMap: { [key: string]: () => void };
+    private _commands: Record<string, (...args: any[]) => any> = {};
 
     constructor(model: LeoModel, view: LeoView) {
         this.model = model;
@@ -43,7 +44,19 @@ export class LeoController {
     }
 
     public setCommands(commands: [string, (...args: any[]) => any][]) {
-        this.view.setCommands(commands);
+        for (const [name, func] of commands) {
+            this._commands[name] = func;
+        }
+    }
+
+    public doCommand(commandName: string, ...args: any[]) {
+        const command = this._commands[commandName];
+        if (command) {
+            console.log(`Executing command: ${commandName}`, ...args);
+            command(...args);
+        } else {
+            console.warn(`Command not found: ${commandName}`);
+        }
     }
 
     // * Controller Methods (Initialization & Setup) *
@@ -105,19 +118,19 @@ export class LeoController {
         const view = this.view;
         console.log('Setting up button handlers');
 
-        // * Outline Actions (TODO: connect these methods) *
-        // view.COLLAPSE_ALL_BTN.addEventListener('click', this.collapseAll);
-        // view.HOIST_BTN.addEventListener('click', this.hoistNode);
-        // view.DEHOIST_BTN.addEventListener('click', this.dehoistNode);
-        // view.PREV_BTN.addEventListener('click', this.previousHistory);
-        // view.NEXT_BTN.addEventListener('click', this.nextHistory);
-        // view.TOGGLE_MARK_BTN.addEventListener('click', this.toggleMarkCurrentNode);
-        // view.NEXT_MARKED_BTN.addEventListener('click', this.gotoNextMarkedNode);
-        // view.PREV_MARKED_BTN.addEventListener('click', this.gotoPrevMarkedNode);
-        // view.ACTION_MARK.addEventListener('click', this.toggleMarkCurrentNode);
-        // view.ACTION_UNMARK.addEventListener('click', this.toggleMarkCurrentNode); // Same action
-        // view.ACTION_HOIST.addEventListener('click', this.hoistNode);
-        // view.ACTION_DEHOIST.addEventListener('click', this.dehoistNode);
+        // * Outline Actions *
+        view.COLLAPSE_ALL_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.CONTRACT_ALL) });
+        view.HOIST_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.HOIST) });
+        view.DEHOIST_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DEHOIST) });
+        view.PREV_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GO_BACK) });
+        view.NEXT_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GO_FORWARD) });
+        view.TOGGLE_MARK_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
+        view.NEXT_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_NEXT_MARKED) });
+        view.PREV_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_PREV_MARKED) });
+        view.ACTION_MARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
+        view.ACTION_UNMARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
+        view.ACTION_HOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.HOIST) });
+        view.ACTION_DEHOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DEHOIST) });
 
         // * Interface Only Actions *
         view.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
