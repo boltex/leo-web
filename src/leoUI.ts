@@ -576,9 +576,21 @@ export class LeoUI extends NullGui {
          * @param p_revealType Facultative reveal type to specify type of reveal when the 'selected node' is encountered
          */
     private _refreshOutline(p_revealType?: RevealType): void {
-        // TODO
-        console.log('TODO ! _refreshOutline called with reveal type:', p_revealType);
+        // TODO : simplify reveal system which is a remnant of LeoJS, Leo-Web only needs to know where to leave focus after refresh
+
+        if (p_revealType !== undefined && p_revealType.valueOf() >= this._revealType.valueOf()) { // To check if selected node should self-select while redrawing whole tree
+            this._revealType = p_revealType; // To be read/cleared (in arrayToLeoNodesArray instead of directly by nodes)
+        }
         workspace.controller.buildRowsRenderTreeLeo();
+        if (this._revealType !== undefined) {
+            const focusTree = (this._revealType.valueOf() >= RevealType.RevealSelectFocus.valueOf());
+            if (focusTree) {
+                // set focus to outline pane
+                this.showOutline();
+            }
+
+            this._revealType = RevealType.NoReveal; // Clear after use
+        }
     }
 
     /**
