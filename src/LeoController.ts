@@ -8,6 +8,7 @@ import * as utils from './utils';
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
 import { menuData } from "./menu";
+import { keybindings } from "./keybindings";
 
 const defaultTitle = "Leo Editor for the web";
 
@@ -15,28 +16,11 @@ export class LeoController {
     private model: LeoModel;
     private view: LeoView;
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
-    private outlinePaneKeyMap: { [key: string]: () => void };
     private _commands: Record<string, (...args: any[]) => any> = {};
 
     constructor(model: LeoModel, view: LeoView) {
         this.model = model;
         this.view = view;
-
-        console.log('todo: replace with real leo commands');
-        this.outlinePaneKeyMap = {
-            'Enter': () => view.BODY_PANE.focus(),
-            'Tab': () => view.BODY_PANE.focus(),
-
-            // ' ': () => this.toggleSelected(),
-            // 'ArrowUp': () => this.selectVisBack(),
-            // 'ArrowDown': () => this.selectVisNext(),
-            // 'ArrowLeft': () => this.contractNodeOrGoToParent(),
-            // 'ArrowRight': () => this.expandNodeAndGoToFirstChild(),
-            // 'PageUp': () => this.gotoFirstSiblingOrParent(),
-            // 'PageDown': () => this.gotoLastSiblingOrVisNext(),
-            // 'Home': () => this.gotoFirstVisibleNode(),
-            // 'End': () => this.gotoLastVisibleNode()
-        };
 
         view.buildMenu(menuData);
         view.setWindowTitle(defaultTitle)
@@ -521,29 +505,96 @@ export class LeoController {
     }
 
     private handleOutlinePaneKeyDown = (e: KeyboardEvent) => {
-        const handler: (() => void) | undefined = this.outlinePaneKeyMap[e.key as keyof typeof this.outlinePaneKeyMap];
-        if (handler && !e.ctrlKey && !e.altKey && !e.metaKey) {
-            e.preventDefault();
-            handler();
+        // Build key string representation (e.g., "ctrl+shift+q", "shift+alt+left")
+        const parts: string[] = [];
+
+        if (e.ctrlKey) parts.push('ctrl');
+        if (e.altKey) parts.push('alt');
+        if (e.shiftKey) parts.push('shift');
+        if (e.metaKey) parts.push('meta');
+
+        // Normalize the key name to lowercase
+        let key = e.key.toLowerCase();
+
+        // Handle special cases for consistency with keybindings
+        if (key === ' ') key = 'space';
+
+        parts.push(key);
+
+        const keyString = parts.join('+');
+
+        console.log('Outline pane key pressed:', keyString);
+
+        // Find matching keybinding for outline pane
+        // const platform = navigator.platform.toLowerCase();
+        // const isMac = platform.includes('mac');
+        // const isLinux = platform.includes('linux');
+
+        for (const keybind of keybindings) {
+            if (!keybind.outline) continue;
+            let targetKey = keybind.key;
+
+            // // Determine which key property to check based on platform
+            // if (isMac && keybind.mac) {
+            //     targetKey = keybind.mac;
+            // } else if (isLinux && keybind.linux) {
+            //     targetKey = keybind.linux;
+            // } else if (!isMac && !isLinux && keybind.win) {
+            //     targetKey = keybind.win;
+            // }
+
+            if (targetKey.toLowerCase() === keyString) {
+                e.preventDefault();
+                this.doCommand(keybind.command);
+                return;
+            }
         }
     }
 
     private handleBodyPaneKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            this.view.OUTLINE_PANE.focus();
-        }
-        // check for undo/redo and prevent it for now (later: implement undo/redo)
-        if (e.key.toLowerCase() === 'z' && e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey) {
-            console.log('Undo shortcut detected');
-            e.preventDefault();
-        }
-        if (
-            (e.key.toLowerCase() === 'y' && e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey) ||
-            (e.key.toLowerCase() === 'z' && e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey)
-        ) {
-            console.log('Redo shortcut detected');
-            e.preventDefault();
+        // Build key string representation (e.g., "ctrl+shift+q", "shift+alt+left")
+        const parts: string[] = [];
+
+        if (e.ctrlKey) parts.push('ctrl');
+        if (e.altKey) parts.push('alt');
+        if (e.shiftKey) parts.push('shift');
+        if (e.metaKey) parts.push('meta');
+
+        // Normalize the key name to lowercase
+        let key = e.key.toLowerCase();
+
+        // Handle special cases for consistency with keybindings
+        if (key === ' ') key = 'space';
+
+        parts.push(key);
+
+        const keyString = parts.join('+');
+
+        console.log('Body pane key pressed:', keyString);
+
+        // Find matching keybinding for outline pane
+        // const platform = navigator.platform.toLowerCase();
+        // const isMac = platform.includes('mac');
+        // const isLinux = platform.includes('linux');
+
+        for (const keybind of keybindings) {
+            if (!keybind.body) continue;
+            let targetKey = keybind.key;
+
+            // // Determine which key property to check based on platform
+            // if (isMac && keybind.mac) {
+            //     targetKey = keybind.mac;
+            // } else if (isLinux && keybind.linux) {
+            //     targetKey = keybind.linux;
+            // } else if (!isMac && !isLinux && keybind.win) {
+            //     targetKey = keybind.win;
+            // }
+
+            if (targetKey.toLowerCase() === keyString) {
+                e.preventDefault();
+                this.doCommand(keybind.command);
+                return;
+            }
         }
     }
 

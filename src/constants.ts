@@ -22,9 +22,8 @@ export class Constants {
     public static UNTITLED_FILE_NAME: string = "untitled";
 
     public static LOCAL_STORAGE_KEY: string = "leoWebConfig";
-    public static REFRESH_DEBOUNCE_DELAY: number = 50;
-    public static STATES_DEBOUNCE_DELAY: number = 60;
-
+    public static REFRESH_DEBOUNCE_DELAY: number = 0;
+    public static STATES_DEBOUNCE_DELAY: number = 40;
 
     /**
      * Supported Languages

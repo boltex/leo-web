@@ -164,7 +164,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_DOWN_SELECTION,
-        key: "shift+alt+down",
+        key: "shift+alt+arrowdown",
         outline: true,
     },
     {
@@ -182,7 +182,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_LEFT_SELECTION,
-        key: "shift+alt+left",
+        key: "shift+alt+arrowleft",
         outline: true,
     },
     {
@@ -200,7 +200,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_RIGHT_SELECTION,
-        key: "shift+alt+right",
+        key: "shift+alt+arrowright",
         outline: true,
     },
     {
@@ -218,7 +218,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_UP_SELECTION,
-        key: "shift+alt+up",
+        key: "shift+alt+arrowup",
         outline: true,
     },
     {
@@ -525,48 +525,48 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.GOTO_NEXT_VISIBLE,
-        key: "down",
+        key: "arrowdown",
         outline: true,
     },
     {
         command: CMD.GOTO_NEXT_VISIBLE,
-        key: "alt+down",
+        key: "alt+arrowdown",
         outline: true,
         body: true,
         find: true
     },
     {
         command: CMD.GOTO_PREV_VISIBLE,
-        key: "up",
+        key: "arrowup",
         outline: true,
     },
     {
         command: CMD.GOTO_PREV_VISIBLE,
-        key: "alt+up",
+        key: "alt+arrowup",
         outline: true,
         body: true,
         find: true
     },
     {
         command: CMD.CONTRACT_OR_GO_LEFT,
-        key: "left",
+        key: "arrowleft",
         outline: true,
     },
     {
         command: CMD.CONTRACT_OR_GO_LEFT,
-        key: "alt+left",
+        key: "alt+arrowleft",
         outline: true,
         body: true,
         find: true
     },
     {
         command: CMD.EXPAND_AND_GO_RIGHT,
-        key: "right",
+        key: "arrowright",
         outline: true,
     },
     {
         command: CMD.EXPAND_AND_GO_RIGHT,
-        key: "alt+right",
+        key: "alt+arrowright",
         outline: true,
         body: true,
         find: true
