@@ -601,11 +601,31 @@ export class LeoUI extends NullGui {
      */
     public async selectTreeNode(
         p_node: Position,
-        p_internalCall?: boolean,
+        isDoubleClick: boolean,
     ): Promise<unknown> {
         // TODO
-        console.log('TODO ! selectTreeNode called with node:', p_node, ' internalCall:', p_internalCall);
-        return Promise.resolve();
+        console.log('TODO ! selectTreeNode called with node:', p_node, ' isDoubleClick:', isDoubleClick);
+
+        const c = p_node.v.context;
+
+        await this.triggerBodySave(true); // Needed for self-selection to avoid 'cant save file is newer...'
+
+        if (!isDoubleClick) {
+            if (g.doHook("headclick1", { c: c, p: p_node, v: p_node })) {
+                // returned not falsy, so skip the rest
+                return Promise.resolve();
+            }
+
+        }
+
+        this.leoStates.setSelectedNodeFlags(p_node);
+
+        c.selectPosition(p_node);
+        console.log('HAS SELECTED POSITION!');
+
+        g.doHook("headclick2", { c: c, p: p_node, v: p_node });
+        // * Apply the node to the body text without waiting for the selection promise to resolve
+        return this._tryApplyNodeToBody(p_node, false, this.config.treeKeepFocus);
 
     }
 
@@ -966,6 +986,7 @@ export class LeoUI extends NullGui {
                 }
             );
             // not awaited
+            console.log('TODO: FIX EASTER EGG GOTO LINE:', lastInput);
             c.editCommands.gotoGlobalLine(Number(lastInput)).then((p_gotoResult) => {
                 if (p_gotoResult[0]) {
                     void this.launchRefresh();

@@ -2,6 +2,7 @@ import { set } from 'lodash';
 import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions, FlatRowLeo } from './types';
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
+import { Position } from './core/leoNodes';
 
 export class LeoView {
     // Elements
@@ -87,15 +88,6 @@ export class LeoView {
     public topLevelItems: HTMLDivElement[] = [];
     public topLevelSubmenus = new Map();
     private resizeTimeout: number | undefined;
-
-    private _flatRows: FlatRow[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
-    public get flatRows(): FlatRow[] | null {
-        return this._flatRows;
-    }
-    public setTreeData(rows: FlatRow[]) {
-        this._flatRows = rows;
-        this.renderTree();
-    }
 
     private _flatRowsLeo: FlatRowLeo[] | null = null; // Array of nodes currently visible in the outline pane, null at init time to not trigger render
     public get flatRowsLeo(): FlatRowLeo[] | null {
@@ -243,10 +235,10 @@ export class LeoView {
     }
 
     public renderTree = () => {
-        if (!this._flatRows && !this._flatRowsLeo) {
+        if (!this._flatRowsLeo) {
             return; // Not initialized yet
         }
-        const flatRows = this._flatRows || this._flatRowsLeo!;
+        const flatRows = this._flatRowsLeo!;
 
         // Render visible rows only
         const scrollTop = this.OUTLINE_PANE.scrollTop;
@@ -673,10 +665,10 @@ export class LeoView {
         this.BODY_PANE.innerHTML = text;
     }
 
-    public scrollNodeIntoView(node: TreeNode) {
-        if (!this._flatRows) return; // Not initialized yet
+    public scrollNodeIntoView(node: Position) {
+        if (!this._flatRowsLeo) return; // Not initialized yet
 
-        const selectedIndex = this._flatRows.findIndex(row => row.node === node);
+        const selectedIndex = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
         if (selectedIndex === -1) return; // Not found (shouldn't happen)
         const nodePosition = selectedIndex * this.ROW_HEIGHT;
 

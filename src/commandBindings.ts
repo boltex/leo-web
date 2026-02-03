@@ -167,8 +167,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.SET_UA, () => leoUI.command(LEOCMD.SET_UA, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         // Called by nodes in the tree when selected either by mouse, or with enter
-        [CMD.SELECT_NODE, (p_outlineNode: any) => leoUI.selectTreeNode(p_outlineNode.position, false)], // Select is NOT a Position! TODO : FIX THIS TYPE ISSUE
-        // [CMD.OPEN_ASIDE, (p_position?: Position) => p_leoUI.openAside(p_position)],
+        [CMD.SELECT_NODE, (p_node: Position, p_doubleClick: boolean) => leoUI.selectTreeNode(p_node, p_doubleClick)], // Select is NOT a Position! TODO : FIX THIS TYPE ISSUE
 
         [CMD.CONTRACT_ALL_OTHER_NODES, () => leoUI.command(LEOCMD.CONTRACT_ALL_OTHER_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
         [CMD.CONTRACT_ALL, () => leoUI.command(LEOCMD.CONTRACT_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
