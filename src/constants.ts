@@ -485,7 +485,6 @@ export class Constants {
         GOTO_NAV_LAST: Constants.NAME + ".gotoNavLast",
 
         CAPITALIZE_HEADLINE: Constants.NAME + ".capitalizeHeadline",
-        EDIT_HEADLINE: Constants.NAME + ".editHeadline",
         END_EDIT_HEADLINE: Constants.NAME + ".endEditHeadline",
         INSERT_HEADLINE_TIME: Constants.NAME + ".insertHeadlineTime",
         INSERT_BODY_TIME: Constants.NAME + ".insertBodyTime",
@@ -571,7 +570,6 @@ export class Constants {
 
         // * Edit Operations
         CAPITALIZE_HEADLINE: "capitalize-headline",
-        EDIT_HEADLINE: "edit-headline",
         END_EDIT_HEADLINE: "end-edit-headline",
         INSERT_HEADLINE_TIME: "insert-headline-time",
         INSERT_BODY_TIME: "insert-body-time",

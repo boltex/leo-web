@@ -118,7 +118,7 @@ export const keybindings: Keybinding[] = [
         find: true
     },
     {
-        command: CMD.EDIT_HEADLINE,
+        command: CMD.HEADLINE_SELECTION,
         key: "ctrl+h",
         mac: "cmd+h",
         outline: true,

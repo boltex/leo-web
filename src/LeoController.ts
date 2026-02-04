@@ -37,7 +37,7 @@ export class LeoController {
     public doCommand(commandName: string, ...args: any[]): any {
         const command = this._commands[commandName];
         if (command) {
-            console.log(`Executing command: ${commandName}`, ...args);
+            // console.log(`Executing command: ${commandName}`, ...args);
             return command(...args);
         } else {
             console.warn(`Command not found: ${commandName}`);
@@ -441,12 +441,13 @@ export class LeoController {
             // Both toggle and select in one operation
             this.selectAndOrToggleAndRedraw(
                 !row.node.__eq__(c.p) ? row.node : null,
-                row.node
+                row.node,
+                event.ctrlKey
             );
         } else {
             // Rest of the node (including icon and text)
-            if (!row.node.__eq__(c.p)) {
-                this.selectAndOrToggleAndRedraw(row.node); // Just selection
+            if (!row.node.__eq__(c.p) || event.ctrlKey) {
+                this.selectAndOrToggleAndRedraw(row.node, null, event.ctrlKey); // Just selection
             }
         }
     }
@@ -454,6 +455,7 @@ export class LeoController {
     private handleOutlinePaneDblClick = (event: MouseEvent) => {
         const view = this.view;
         const target = event.target as Element;
+
 
         // Currently Selected Document's Commander
         const c = g.app.windowList[g.app.gui.frameIndex].c;
@@ -467,14 +469,9 @@ export class LeoController {
 
             const rowIndex = Math.floor(parseInt(nodeEl.style.top) / view.ROW_HEIGHT);
             if (rowIndex >= 0 && rowIndex < view.flatRowsLeo!.length) {
-                const row = view.flatRowsLeo![rowIndex]!;
-                if (row.hasChildren) {
-                    // Handle both selection and toggle in one update
-                    this.selectAndOrToggleAndRedraw(
-                        !row.node.__eq__(c.p) ? row.node : null,
-                        row.node
-                    );
-                }
+                // const row = view.flatRowsLeo![rowIndex]!;
+                // Double click should trigger 'rename/edit' headline
+                this.doCommand(Constants.COMMANDS.HEADLINE_SELECTION);
             }
         }
     }
@@ -851,30 +848,63 @@ export class LeoController {
     }
 
     private refreshHoistButtonStates(): void {
-        const model = this.model;
-        const isCurrentlyHoisted = model.hoistStack.length > 0 && model.hoistStack[model.hoistStack.length - 1] === model.selectedNode;
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const p = c.p;
+        let w_canHoist = true;
+        let w_topIsChapter = false;
+        if (c.hoistStack.length) {
+            const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
+            w_topIsChapter = w_ph.h.startsWith('@chapter ');
+            if (p.__eq__(w_ph)) {
+                // p is already the hoisted node
+                w_canHoist = false;
+            }
+        } else {
+            // not hoisted, was it the single top child of the real root?
+            if (c.rootPosition()!.__eq__(p) && c.hiddenRootNode.children.length === 1) {
+                w_canHoist = false;
+            }
+        }
         this.view.updateHoistButtonStates(
-            !model.selectedNode || !model.hasChildren(model.selectedNode) || isCurrentlyHoisted,
-            model.hoistStack.length === 0
+            w_canHoist,
+            !!c.hoistStack.length
         );
     }
 
     private refreshContextMenuState(): void {
-        const model = this.model;
-        const hasSelectedNode = !!model.selectedNode;
-        const isCurrentlyHoisted = model.hoistStack.length > 0 && hasSelectedNode && model.hoistStack[model.hoistStack.length - 1] === model.selectedNode;
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const p = c.p;
+        const isMarked = p.isMarked();
+        const hasChildren = p.hasChildren();
+        let w_canHoist = true;
+        let w_topIsChapter = false;
+        if (c.hoistStack.length) {
+            const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
+            w_topIsChapter = w_ph.h.startsWith('@chapter ');
+            if (p.__eq__(w_ph)) {
+                // p is already the hoisted node
+                w_canHoist = false;
+            }
+        } else {
+            // not hoisted, was it the single top child of the real root?
+            if (c.rootPosition()!.__eq__(p) && c.hiddenRootNode.children.length === 1) {
+                w_canHoist = false;
+            }
+        }
+
         this.view.updateContextMenuState(
-            hasSelectedNode && !model.marked.has(model.selectedNode!.gnx),
-            hasSelectedNode && model.marked.has(model.selectedNode!.gnx),
-            hasSelectedNode && model.hasChildren(model.selectedNode!) && !isCurrentlyHoisted,
-            model.hoistStack.length > 0
+            !isMarked,
+            isMarked,
+            w_canHoist,
+            !!c.hoistStack.length
         );
+
     }
 
-    private selectAndOrToggleAndRedraw(newSelectedNode: Position | null = null, nodeToToggle: Position | null = null) {
+    private selectAndOrToggleAndRedraw(newSelectedNode: Position | null = null, nodeToToggle: Position | null = null, isCtrlClick: boolean = false) {
         let result: any;
         if (newSelectedNode) {
-            result = this.doCommand(Constants.COMMANDS.SELECT_NODE, newSelectedNode);
+            result = this.doCommand(Constants.COMMANDS.SELECT_NODE, newSelectedNode, isCtrlClick);
         }
 
         if (nodeToToggle) {

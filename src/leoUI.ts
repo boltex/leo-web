@@ -601,27 +601,71 @@ export class LeoUI extends NullGui {
      */
     public async selectTreeNode(
         p_node: Position,
-        isDoubleClick: boolean,
+        isCtrlClick: boolean,
     ): Promise<unknown> {
-        // TODO
-        console.log('TODO ! selectTreeNode called with node:', p_node, ' isDoubleClick:', isDoubleClick);
 
         const c = p_node.v.context;
 
         await this.triggerBodySave(true); // Needed for self-selection to avoid 'cant save file is newer...'
 
-        if (!isDoubleClick) {
+        if (!isCtrlClick) {
             if (g.doHook("headclick1", { c: c, p: p_node, v: p_node })) {
                 // returned not falsy, so skip the rest
                 return Promise.resolve();
             }
 
+        } else {
+            // Ctrl-Click: 
+            this.lastSelectedNodeTime = undefined;
+
+            if (g.doHook("icondclick1", { c: c, p: p_node, v: p_node })) {
+                // returned not falsy, so skip the rest
+                return Promise.resolve();
+            }
+
+            // If headline starts with @url call g.openUrl, if @mime call g.open_mimetype
+            const w_headline = p_node.h;
+            let openPromise;
+            if (w_headline.trim().startsWith("@url ")) {
+                openPromise = g.openUrl(p_node);
+            } else if (w_headline.trim().startsWith("@mime ")) {
+                openPromise = g.open_mimetype(p_node.v.context, p_node);
+            }
+
+            if (openPromise) {
+                await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
+                setTimeout(() => {
+                    void utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, false);
+                }, 60);
+                await openPromise.then(() => {
+                    g.doHook("icondclick2", { c: c, p: p_node, v: p_node });
+                });
+                // Slight delay to help finish opening possible new document/file.
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        this.setupRefresh(
+                            Focus.Outline,
+                            {
+                                tree: true,
+                                body: true,
+                                goto: true,
+                                states: true,
+                                documents: true,
+                                buttons: true
+                            }
+                        );
+                        resolve(this.launchRefresh());
+                    }, 30);
+                });
+            }
+            // Ctrl click didn't trigger a special action, so just return.
+            g.doHook("icondclick2", { c: c, p: p_node, v: p_node });
+            return Promise.resolve();
         }
 
         this.leoStates.setSelectedNodeFlags(p_node);
 
         c.selectPosition(p_node);
-        console.log('HAS SELECTED POSITION!');
 
         g.doHook("headclick2", { c: c, p: p_node, v: p_node });
         // * Apply the node to the body text without waiting for the selection promise to resolve

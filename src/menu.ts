@@ -54,7 +54,7 @@ export const menuData: MenuEntry[] = [
             {
                 label: "Edit Headline", entries: [
                     { label: "Capitalize-Headline", action: CMD.CAPITALIZE_HEADLINE },
-                    { label: "Edit-Headline", action: CMD.EDIT_HEADLINE, keyboardShortcut: "Ctrl+H" },
+                    { label: "Edit-Headline", action: CMD.HEADLINE_SELECTION, keyboardShortcut: "Ctrl+H" },
                     { label: "End-Edit-Headline", action: CMD.END_EDIT_HEADLINE, keyboardShortcut: "ENTER" },
                     { label: "Insert-Headline-Time", action: CMD.INSERT_HEADLINE_TIME },
                 ]

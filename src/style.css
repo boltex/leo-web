@@ -510,6 +510,7 @@ body.dragging-cross {
   overflow-x: hidden;
   overflow-y: auto;
   font-family: sans-serif;
+  user-select: none;
 }
 
 #spacer {

@@ -51,8 +51,6 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.DOCUMENTATION, () => leoUI.showDocumentation()],
 
         [CMD.CAPITALIZE_HEADLINE, () => leoUI.command(LEOCMD.CAPITALIZE_HEADLINE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
-        [CMD.EDIT_HEADLINE, () => leoUI.command(LEOCMD.EDIT_HEADLINE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
-        [CMD.END_EDIT_HEADLINE, () => leoUI.command(LEOCMD.END_EDIT_HEADLINE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
         [CMD.INSERT_HEADLINE_TIME, () => leoUI.command(LEOCMD.INSERT_HEADLINE_TIME, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
         [CMD.INSERT_BODY_TIME, () => leoUI.command(LEOCMD.INSERT_BODY_TIME, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.NoChange })],
         [CMD.REFORMAT_PARAGRAPH, () => leoUI.command(LEOCMD.REFORMAT_PARAGRAPH, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.NoChange })],
@@ -167,7 +165,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.SET_UA, () => leoUI.command(LEOCMD.SET_UA, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         // Called by nodes in the tree when selected either by mouse, or with enter
-        [CMD.SELECT_NODE, (p_node: Position, p_doubleClick: boolean) => leoUI.selectTreeNode(p_node, p_doubleClick)], // Select is NOT a Position! TODO : FIX THIS TYPE ISSUE
+        [CMD.SELECT_NODE, (p_node: Position, p_CtrlClick: boolean) => leoUI.selectTreeNode(p_node, p_CtrlClick)],
 
         [CMD.CONTRACT_ALL_OTHER_NODES, () => leoUI.command(LEOCMD.CONTRACT_ALL_OTHER_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
         [CMD.CONTRACT_ALL, () => leoUI.command(LEOCMD.CONTRACT_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
