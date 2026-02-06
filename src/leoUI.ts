@@ -253,7 +253,7 @@ export class LeoUI extends NullGui {
             return;
         }
         const c = g.app.windowList[this.frameIndex].c;
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
         try {
 
             if (p_arg.unl) {
@@ -343,7 +343,7 @@ export class LeoUI extends NullGui {
      * @param p_forcedVsCodeSave Flag to also have vscode 'save' the content of this editor through the filesystem
      * @returns a promise that resolves when the possible saving process is finished
      */
-    public triggerBodySave(p_forcedVsCodeSave?: boolean, p_fromFocusChange?: boolean): Thenable<unknown> {
+    public triggerBodySave(p_forcedVsCodeSave?: boolean, p_fromFocusChange?: boolean): void {
 
         // * Check if headline edit input box is active. Validate it with current value.
         // TODO : implement headline edit box check and validation
@@ -362,15 +362,11 @@ export class LeoUI extends NullGui {
         // }
 
         // * Save body to Leo if a change has been made to the body 'document' so far
-        let q_savePromise: Thenable<boolean>;
         if (this._editorTouched) {
             this._editorTouched = false;
-            q_savePromise = this._bodySaveDocument();
-        } else {
-            q_savePromise = Promise.resolve(true);
+            this._bodySaveDocument();
         }
 
-        return q_savePromise;
     }
 
     /**
@@ -399,10 +395,9 @@ export class LeoUI extends NullGui {
      * * Sets new body text on leo's side.
      * @returns a promise that resolves when the complete saving process is finished
      */
-    private _bodySaveDocument(): Thenable<boolean> {
+    private _bodySaveDocument(): void {
         // TODO !
         console.log('TODO ! _bodySaveDocument called to save body text to Leo');
-        return Promise.resolve(true);
     }
 
     /**
@@ -606,7 +601,7 @@ export class LeoUI extends NullGui {
 
         const c = p_node.v.context;
 
-        await this.triggerBodySave(true); // Needed for self-selection to avoid 'cant save file is newer...'
+        this.triggerBodySave(true); // Needed for self-selection to avoid 'cant save file is newer...'
 
         if (!isCtrlClick) {
             if (g.doHook("headclick1", { c: c, p: p_node, v: p_node })) {
@@ -842,7 +837,7 @@ export class LeoUI extends NullGui {
             this.commandRefreshTimer = this.lastCommandTimer;
         }
 
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
 
         const c = g.app.windowList[this.frameIndex].c;
@@ -922,7 +917,7 @@ export class LeoUI extends NullGui {
      */
     public async minibuffer(): Promise<unknown> {
 
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
         const c = g.app.windowList[this.frameIndex].c;
         const commands: QuickPickItem[] = [];
         const cDict = c.commandsDict;
@@ -1060,7 +1055,7 @@ export class LeoUI extends NullGui {
     private async _showMinibufferHistory(p_choices: QuickPickItem[]): Promise<unknown> {
 
         // Wait for _isBusyTriggerSave resolve because the full body save may change available commands
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         const c = g.app.windowList[this.frameIndex].c;
 
@@ -1165,7 +1160,7 @@ export class LeoUI extends NullGui {
      */
     public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
 
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         const c = g.app.windowList[this.frameIndex].c;
 
@@ -1197,7 +1192,7 @@ export class LeoUI extends NullGui {
             return Promise.resolve();
         }
 
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
         this.frameIndex = index;
         // Like we just opened or made a new file
         if (g.app.windowList.length) {
@@ -1242,7 +1237,7 @@ export class LeoUI extends NullGui {
 
         let w_finalFocus: Focus = p_fromOutline ? Focus.Outline : Focus.Body; // Use w_fromOutline for where we intend to leave focus when done with the insert
 
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         // * if node has child and is expanded: turn p_asChild to true!
         const w_headlineInputOptions: any = {
@@ -1404,7 +1399,7 @@ export class LeoUI extends NullGui {
      * Mimic vscode's CTRL+P to find any position by it's headline
      */
     public async goAnywhere(): Promise<unknown> {
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         const allPositions: { label: string; description?: string; position?: Position; }[] = [];
         // Options for date to look like : Saturday, September 17, 2016
@@ -1466,7 +1461,7 @@ export class LeoUI extends NullGui {
      * * Cycle opened documents
      */
     public async tabCycle(): Promise<unknown> {
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         let w_chosenIndex;
         const w_files = g.app.windowList;
@@ -1512,7 +1507,7 @@ export class LeoUI extends NullGui {
     * @returns the promise started after it's done creating the frame and commander
     */
     public async newLeoFile(): Promise<unknown> {
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         // this.showBodyIfClosed = true;
         // this.showOutlineIfClosed = true;
@@ -1533,7 +1528,7 @@ export class LeoUI extends NullGui {
             }
         } else {
             await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
-            await this.triggerBodySave(true);
+            this.triggerBodySave(true);
             const c = g.app.windowList[this.frameIndex].c;
             await c.new(this);
             setTimeout(() => {
@@ -1554,7 +1549,7 @@ export class LeoUI extends NullGui {
         if (index < 0 || index >= g.app.windowList.length) {
             return Promise.reject('closeLeoDocument: index out of range');
         }
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         const c = g.app.windowList[index].c;
         const w_closed = await c.close();
@@ -1634,7 +1629,7 @@ export class LeoUI extends NullGui {
                 return Promise.resolve();
             }
         } else {
-            await this.triggerBodySave(true);
+            this.triggerBodySave(true);
             const c = g.app.windowList[this.frameIndex].c;
             await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
             await c.open_outline(p_uri);
@@ -1663,7 +1658,7 @@ export class LeoUI extends NullGui {
      * @returns a promise from saving the file results.
      */
     public async saveAsLeoFile(p_fromOutline?: boolean): Promise<unknown> {
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         const c = g.app.windowList[this.frameIndex].c;
 
@@ -1687,7 +1682,7 @@ export class LeoUI extends NullGui {
      * @returns a promise from saving the file results.
      */
     public async saveAsLeoJsFile(p_fromOutline?: boolean): Promise<unknown> {
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         const c = g.app.windowList[this.frameIndex].c;
 
@@ -1728,7 +1723,7 @@ export class LeoUI extends NullGui {
      */
     public async switchLeoFile(): Promise<unknown> {
 
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
 
         const w_entries: ChooseDocumentItem[] = []; // Entries to offer as choices.
         let w_index: number = 0;
