@@ -158,8 +158,17 @@ class Workspace {
     public fs!: Fs; // TODO : (see setWorkspaceDirHandle method below) initialize properly with a fake class that mimics Fs methods but throws errors or forces setting workspace first. (Or something else?)
     public view!: LeoView;
     public controller!: LeoController;
+    private _context: any = {}; // Arbitrary context data
 
     constructor() { }
+
+    public setContext(key: string, value: any): void {
+        this._context[key] = value;
+    }
+
+    public getContext(key: string): any {
+        return this._context[key];
+    }
 
     public setView(view: LeoView) {
         this.view = view;

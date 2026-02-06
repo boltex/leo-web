@@ -1,4 +1,5 @@
 import { Constants } from "./constants";
+import { workspace } from "./workspace";
 // import { Position } from "./core/leoNodes";
 type Position = any;
 
@@ -277,6 +278,8 @@ export function isHexColor(p_hexString: string): boolean {
 export function setContext(p_key: string, p_value: any): Thenable<unknown> {
 
     // return vscode.commands.executeCommand(Constants.VSCODE_COMMANDS.SET_CONTEXT, p_key, p_value);
-    return Promise.resolve(); // TODO : implement setContext
+    workspace.setContext(p_key, p_value);
+
+    return Promise.resolve();
 }
 
