@@ -1486,7 +1486,7 @@ export class LeoController {
             const rows = this.flattenTreeLeo(
                 root,
                 0,
-                !this.model.hoistStack.length,
+                !c.hoistStack.length,
                 c.p,
                 null // TODO: Implement initialFindNode tracking in Leo core
             );
