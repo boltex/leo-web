@@ -630,6 +630,8 @@ export class LeoUI extends NullGui {
                 openPromise = g.openUrl(p_node);
             } else if (w_headline.trim().startsWith("@mime ")) {
                 openPromise = g.open_mimetype(p_node.v.context, p_node);
+            } else if (w_headline.startsWith("unl:")) {
+                openPromise = g.openUrlHelper(c, w_headline);
             }
 
             if (openPromise) {
