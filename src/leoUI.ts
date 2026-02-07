@@ -422,13 +422,7 @@ export class LeoUI extends NullGui {
     }
 
     public refreshDocumentsPane(): void {
-        // TODO : implement documents pane refresh
-        // The opened documents are in g.app.windowList.
-        // The selected document index is this.frameIndex,
-        // so the active document (LeoFrame) is g.app.windowList[this.frameIndex]
-        // a LeoFrame has a 'c' property which is the commander, and c.fileName() gives the filename.
         workspace.controller.setupDocumentTabsAndHandlers();
-
     }
 
     public refreshUndoPane(): void {
@@ -479,16 +473,16 @@ export class LeoUI extends NullGui {
         console.log('Launching UI refresh with options:', this._refreshType, ' finalFocus:', this.finalFocus);
 
 
-        // check states for having at least a document opened
+        // Check states for having at least a document opened
         if (this.leoStates.leoReady && this.leoStates.fileOpenedReady) {
-            // Had some opened
+            // Had some opened...
             if (!g.app.windowList.length) {
-                return this._setupNoOpenedLeoDocument(); // All closed now!
+                return this._setupNoOpenedLeoDocument(); // ...But all closed now!
             }
         }
 
 
-        // Maybe first refresh after opening
+        // Maybe this is the first refresh after opening?
         if (this.leoStates.leoReady && !this.leoStates.fileOpenedReady) {
             // Was all closed
             if (g.app.windowList.length) {
@@ -502,10 +496,8 @@ export class LeoUI extends NullGui {
         }
 
         // Consider last command finished since the refresh cycle is starting
-        if (this.trace) {
-            if (this.commandTimer !== undefined) {
-                console.log('commandTimer', utils.getDurationMs(this.commandTimer));
-            }
+        if (this.trace && this.commandTimer !== undefined) {
+            console.log('commandTimer: ' + utils.getDurationMs(this.commandTimer));
         }
         this.commandTimer = undefined;
 
@@ -757,6 +749,13 @@ export class LeoUI extends NullGui {
 
         this.refreshBodyStates(); // Set language and wrap states, if different.
 
+        // In LeoJs, its vscode host used the context keys to show/hide buttons 
+        // and menu items, so we need to refresh those when states are updated.
+        // TODO !
+        // workspace.blablabla...refresh buttons and menu items visibility based on new context keys values
+
+
+        // Refresh other panes if needed
         if (this._refreshType.documents) {
             this._refreshType.documents = false;
             this.refreshDocumentsPane();

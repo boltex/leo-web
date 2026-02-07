@@ -320,6 +320,11 @@ export class LeoController {
     }
 
     public setupDocumentTabsAndHandlers() {
+        // The opened documents are in g.app.windowList.
+        // The selected document index is this.frameIndex,
+        // so the active document (LeoFrame) is g.app.windowList[this.frameIndex]
+        // a LeoFrame has a 'c' property which is the commander, and c.fileName() gives the filename.
+
         const hasOpenedDocuments = g.app.windowList.length > 0;
         this.view.setHasOpenedDocuments(hasOpenedDocuments);
 
@@ -605,47 +610,11 @@ export class LeoController {
         const view = this.view;
         if (view.isDialogOpen) return; // Prevent handling when a dialog is open
 
+        // TODO : Remove this method if not needed when the rest of leo's core is integrated in this UI,
+        // since most keybindings should be handled in the outline or body panes. 
+        // For now, we can keep it for global shortcuts like opening settings, or for debugging.
         console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
-        // if (e.key.toLowerCase() === 'f' && e.ctrlKey && !e.altKey && !e.metaKey) {
-        //     e.preventDefault();
-        //     this.startFind();
-        // } else if (e.key.toLowerCase() === 'm' && e.ctrlKey && !e.altKey && !e.metaKey) {
-        //     e.preventDefault();
-        //     this.toggleMarkCurrentNode();
-        // } else if (e.key === 'F2') {
-        //     e.preventDefault();
-        //     this.findPrevious();
-        // } else if (e.key === 'F3') {
-        //     e.preventDefault();
-        //     this.findNext();
-        // } else if (e.key === '-' && e.altKey && !e.ctrlKey && !e.metaKey) {
-        //     e.preventDefault();
-        //     this.collapseAll();
-        // } else if (e.altKey && !e.ctrlKey && !e.metaKey) {
-        //     // Handle Alt+Arrow keys globally
-        //     switch (e.key) {
-        //         case 'ArrowUp':
-        //             e.preventDefault();
-        //             view.OUTLINE_PANE.focus();
-        //             this.selectVisBack();
-        //             break;
-        //         case 'ArrowDown':
-        //             e.preventDefault();
-        //             view.OUTLINE_PANE.focus();
-        //             this.selectVisNext();
-        //             break;
-        //         case 'ArrowLeft':
-        //             e.preventDefault();
-        //             view.OUTLINE_PANE.focus();
-        //             this.contractNodeOrGoToParent();
-        //             break;
-        //         case 'ArrowRight':
-        //             e.preventDefault();
-        //             view.OUTLINE_PANE.focus();
-        //             this.expandNodeAndGoToFirstChild();
-        //             break;
-        //     }
-        // }
+
     }
 
     private handleDrag = utils.throttle((e) => {
@@ -875,7 +844,6 @@ export class LeoController {
         const c = g.app.windowList[g.app.gui.frameIndex].c;
         const p = c.p;
         const isMarked = p.isMarked();
-        const hasChildren = p.hasChildren();
         let w_canHoist = true;
         let w_topIsChapter = false;
         if (c.hoistStack.length) {
@@ -927,385 +895,17 @@ export class LeoController {
 
     }
 
-    private computeBody(node: Position): [string, boolean] {
-        // Look for a line in the text starting with "@wrap" or "@nowrap",
-        // if not found, check the parent of node recursively.
-        // Note: wrap is default so only need to check for nowrap
-        let currentNode = node;
-        let nowrapFound = false;
-        while (currentNode.hasParent()) { // Make sure to stop at the hidden root node
-            const body = this.model.data[currentNode.gnx]?.bodyString || "";
-            const wrapMatch = body.match(/^\s*@wrap\s*$/m);
-            const nowrapMatch = body.match(/^\s*@nowrap\s*$/m);
-            if (wrapMatch) {
-                break;  // Stop searching if @wrap (default) is found
-            }
-            if (nowrapMatch) {
-                nowrapFound = true;
-                break;  // Stop searching if @nowrap is found
-            }
-            currentNode = currentNode.getParent();
-        }
-        let text = this.model.data[node.gnx]?.bodyString || "";
-        text = text.replace(this.urlRegex, url => {
-            return `<a href="${url}" target="_blank" contenteditable="plaintext-only" rel="noopener noreferrer">${url}</a>`;
-        });
-        return [text, !nowrapFound];
-    }
-
     // * Controller Methods (Search Orchestration) *
     private startFind() {
-        const view = this.view;
-        const model = this.model;
-        model.initialFindNode = null; // If null, find next will set this, used with "Suboutline Only" find radio option (value: suboutline)
-        view.showTab("find");
-        view.FIND_INPUT.focus();
-        view.FIND_INPUT.select();
-        this.buildRowsRenderTreeLeo(); // To show or remove initial-find highlight
+        // TODO : Remove or implement for leo's core into this UI.
     }
 
     private findNext() {
-        // const view = this.view;
-        // const model = this.model;
-        // if (!model.selectedNode) return; // No selection, nothing to search from
-        // const searchText = view.FIND_INPUT.value.trim();
-        // if (!searchText) {
-        //     view.showToast('Empty find pattern', 1500);
-        //     return; // Empty search, do nothing
-        // }
-
-        // const searchInBody = view.OPT_BODY.checked;
-        // const searchInHeadlines = view.OPT_HEADLINE.checked;
-        // const ignoreCase = view.OPT_IGNORECASE.checked;
-        // const isRegexp = view.OPT_REGEXP.checked;
-        // const wholeWord = view.OPT_WHOLE.checked;
-        // const markFind = view.OPT_MARK.checked;
-        // if (!searchInBody && !searchInHeadlines) {
-        //     view.showToast('not searching headline or body', 2000);
-        //     return; // Nothing to search in
-        // }
-        // if (!model.initialFindNode) {
-        //     model.initialFindNode = model.selectedNode; // Set initial find node if not already set
-        // }
-
-        // let selectedRadioValue = this.getFindScope();
-
-        // let pattern; // Create regex pattern based on search options
-        // try {
-        //     if (isRegexp) {
-        //         pattern = searchText;
-        //     } else {
-        //         pattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special regex characters
-        //         if (wholeWord) {
-        //             pattern = '\\b' + pattern + '\\b'; // Add word boundaries if whole word option is enabled
-        //         }
-        //     }
-        //     const flags = ignoreCase ? 'gi' : 'g';
-        //     const regex = new RegExp(pattern, flags);
-
-        //     const startIndex = model.allNodesInOrder.indexOf(model.selectedNode);
-        //     if (startIndex === -1) return;
-
-        //     const totalNodes = model.allNodesInOrder.length;
-        //     let currentIndex = startIndex; // start from current selection
-
-        //     while (currentIndex < totalNodes) {
-        //         const node = model.allNodesInOrder[currentIndex]!;
-        //         if (selectedRadioValue === 'suboutline' && (model.initialFindNode !== node && model.isAncestorOf(model.initialFindNode, node) === false)) {
-        //             break; // Reached outside suboutline of initialFindNode
-        //         }
-
-        //         let headString = model.data[node.gnx]?.headString || "";
-        //         let body = model.data[node.gnx]?.bodyString || "";
-
-        //         // If searching headlines, check there first, but skip if the focus in in the body pane and its the currently selected node
-        //         if (searchInHeadlines && headString && !(node === model.selectedNode && view.findFocus() === 2)) {
-        //             regex.lastIndex = 0; // Reset regex state
-        //             let startOffset = 0;
-        //             // If this is the currently selected node, check for current selection range existing in selectedLabelElement with getSelection()
-        //             // and only search after that range. Keep that offset, if any, and apply it to the match index later.
-        //             if (node === model.selectedNode && view.selectedLabelElement) {
-        //                 const selection = window.getSelection()!;
-        //                 if (selection.rangeCount > 0) {
-        //                     const range = selection.getRangeAt(0);
-        //                     if (view.selectedLabelElement.contains(range.commonAncestorContainer)) {
-        //                         // Selection is inside the headline span
-        //                         startOffset = range.endOffset;
-        //                         headString = headString.substring(startOffset);
-        //                     }
-        //                 }
-        //             }
-
-        //             const match = regex.exec(headString);
-
-        //             if (match) {
-        //                 // If 'mark find' is checked, mark the found node if not already marked
-        //                 if (markFind) {
-        //                     if (!model.marked.has(node.gnx)) {
-        //                         model.marked.add(node.gnx);
-        //                         if (model.data[node.gnx]) {
-        //                             model.data[node.gnx]!.icon = (model.data[node.gnx]!.icon || 0) | 2; // Set marked bit
-        //                         }
-        //                     }
-        //                 }
-        //                 this.selectAndOrToggleAndRedraw(node); // This also calls scrollSelectedNodeIntoView
-
-        //                 // Focus outline pane and highlight match
-        //                 if (view.findFocus() !== 1) {
-        //                     view.OUTLINE_PANE.focus();
-        //                 }
-
-        //                 // Highlight the match in the headline using selectedLabelElement
-        //                 setTimeout(() => {
-        //                     view.highlightMatchInHeadline(match.index + startOffset, match.index + startOffset + match[0].length);
-        //                 });
-
-        //                 return;
-        //             }
-        //         }
-
-        //         if (searchInBody && body) {
-        //             regex.lastIndex = 0; // Reset regex state
-
-        //             // If this is the currently selected node, check for current selection range existing in BODY_PANE with getSelection()
-        //             // and only search after that range. Keep that offset, if any, and apply it to the match index later.
-        //             let startOffset = 0;
-        //             if (node === model.selectedNode && view.BODY_PANE) {
-        //                 const selection = window.getSelection()!;
-        //                 if (selection.rangeCount > 0) {
-        //                     const range = selection.getRangeAt(0);
-        //                     if (view.BODY_PANE.contains(range.commonAncestorContainer)) {
-        //                         // Compute global offset across all text nodes in BODY_PANE
-        //                         startOffset = utils.getGlobalOffset(view.BODY_PANE, range.endContainer, range.endOffset);
-        //                         body = body.substring(startOffset);
-        //                     }
-        //                 }
-        //             }
-
-        //             const match = regex.exec(body);
-        //             if (match) {
-        //                 if (markFind) {
-        //                     if (!model.marked.has(node.gnx)) {
-        //                         model.marked.add(node.gnx);
-        //                         if (model.data[node.gnx]) {
-        //                             model.data[node.gnx]!.icon = (model.data[node.gnx]!.icon || 0) | 2; // Set marked bit
-        //                         }
-        //                     }
-        //                 }
-        //                 this.selectAndOrToggleAndRedraw(node); // This also calls scrollSelectedNodeIntoView
-        //                 if (view.findFocus() !== 2) {
-        //                     view.BODY_PANE.focus();
-        //                 }
-        //                 setTimeout(() => {
-        //                     view.highlightMatchInBody(match.index + startOffset, match.index + startOffset + match[0].length);
-        //                 });
-        //                 return;
-        //             }
-        //         }
-        //         if (selectedRadioValue === 'nodeonly') {
-        //             break; // Only search current node
-        //         }
-        //         currentIndex++;
-        //     }
-
-        //     let searchedParams = [];
-        //     if (searchInHeadlines) searchedParams.push('head');
-        //     if (searchInBody) searchedParams.push('body');
-        //     view.showToast(`Not found: (${searchedParams.join(", ")}) ${searchText}`, 1500);
-
-        // } catch (e: any) {
-        //     view.showToast('Invalid search pattern: ' + e.message, 2000);
-        // }
-
+        // TODO : Remove or implement for leo's core into this UI.
     }
 
     private findPrevious() {
-        // const view = this.view;
-        // const model = this.model;
-        // if (!model.selectedNode) return; // No selection, nothing to search from
-        // const searchText = view.FIND_INPUT.value.trim();
-        // if (!searchText) {
-        //     view.showToast('Empty find pattern', 1500);
-        //     return; // Empty search, do nothing
-        // }
-
-        // const searchInBody = view.OPT_BODY.checked;
-        // const searchInHeadlines = view.OPT_HEADLINE.checked;
-        // const ignoreCase = view.OPT_IGNORECASE.checked;
-        // const isRegexp = view.OPT_REGEXP.checked;
-        // const wholeWord = view.OPT_WHOLE.checked;
-        // const markFind = view.OPT_MARK.checked;
-        // if (!searchInBody && !searchInHeadlines) {
-        //     view.showToast('not searching headline or body', 2000);
-        //     return; // Nothing to search in
-        // }
-        // if (!model.initialFindNode) {
-        //     model.initialFindNode = model.selectedNode; // Set initial find node if not already set
-        // }
-
-        // let selectedRadioValue = this.getFindScope();
-
-        // let pattern; // Create regex pattern based on search options
-        // try {
-        //     if (isRegexp) {
-        //         pattern = searchText;
-        //     } else {
-        //         pattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special regex characters
-        //         if (wholeWord) {
-        //             pattern = '\\b' + pattern + '\\b'; // Add word boundaries if whole word option is enabled
-        //         }
-        //     }
-        //     const flags = ignoreCase ? 'gi' : 'g';
-        //     const regex = new RegExp(pattern, flags);
-
-        //     const startIndex = model.allNodesInOrder.indexOf(model.selectedNode);
-        //     if (startIndex === -1) return;
-
-        //     // Helper function to find the last match in a string
-        //     const findLastMatch = (str: string) => {
-        //         let lastMatchIndex = -1;
-        //         let lastMatchLength = 0;
-
-        //         let match;
-        //         while ((match = regex.exec(str)) !== null) {
-        //             lastMatchIndex = match.index;
-        //             lastMatchLength = match[0].length;
-        //             // Prevent infinite loop for zero-width matches
-        //             if (regex.lastIndex === match.index) regex.lastIndex++;
-        //         }
-
-        //         return lastMatchIndex !== -1 ? { index: lastMatchIndex, length: lastMatchLength } : null;
-        //     }
-
-        //     // First, check the current node with respect to the current selection
-        //     const node = model.selectedNode;
-        //     let headString = model.data[node.gnx]?.headString || "";
-        //     let body = model.data[node.gnx]?.bodyString || "";
-
-        //     // Get current selection info
-        //     const selection = window.getSelection() as Selection;
-        //     let headlineOffset = Infinity;
-        //     let bodyOffset = Infinity;
-
-        //     if (selection.rangeCount > 0) {
-        //         const range = selection.getRangeAt(0);
-        //         if (view.selectedLabelElement && view.selectedLabelElement.contains(range.commonAncestorContainer)) {
-        //             // Selection is in headline — safe, no <a> tags
-        //             headlineOffset = range.startOffset;
-
-        //         } else if (view.BODY_PANE.contains(range.commonAncestorContainer)) {
-        //             // Selection is in body — compute global offset across text nodes
-        //             bodyOffset = utils.getGlobalOffset(view.BODY_PANE, range.startContainer, range.startOffset);
-        //         }
-        //     }
-
-        //     const currentFocus = view.findFocus();
-
-        //     // Check current node based on focus
-        //     if (currentFocus === 2 && searchInBody && body) {
-        //         // If focused in body, check body first
-        //         const limitedBody = body.substring(0, bodyOffset);
-        //         const match = findLastMatch(limitedBody);
-
-        //         if (match) {
-        //             if (markFind && !model.marked.has(node.gnx)) {
-        //                 model.marked.add(node.gnx);
-        //                 if (model.data[node.gnx]) {
-        //                     model.data[node.gnx]!.icon = (model.data[node.gnx]!.icon || 0) | 2; // Set marked bit
-        //                 }
-        //             }
-        //             this.selectAndOrToggleAndRedraw(node);
-        //             view.BODY_PANE.focus();
-        //             setTimeout(() => {
-        //                 view.highlightMatchInBody(match.index, match.index + match.length);
-        //             });
-        //             return;
-        //         }
-        //     }
-
-        //     // Check headline if appropriate
-        //     if (searchInHeadlines && headString) {
-        //         const limitedHeadline = currentFocus !== 2 ? headString.substring(0, headlineOffset) : headString;
-        //         const match = findLastMatch(limitedHeadline);
-
-        //         if (match) {
-        //             if (markFind && !model.marked.has(node.gnx)) {
-        //                 model.marked.add(node.gnx);
-        //                 if (model.data[node.gnx]) {
-        //                     model.data[node.gnx]!.icon = (model.data[node.gnx]!.icon || 0) | 2; // Set marked bit
-        //                 }
-        //             }
-        //             this.selectAndOrToggleAndRedraw(node);
-        //             view.OUTLINE_PANE.focus();
-        //             setTimeout(() => {
-        //                 view.highlightMatchInHeadline(match.index, match.index + match.length);
-        //             });
-        //             return;
-        //         }
-        //     }
-
-        //     // Continue searching through previous nodes if no match was found in current node
-        //     let currentIndex = startIndex - 1;
-
-        //     while (currentIndex >= 0) {
-        //         const node = model.allNodesInOrder[currentIndex]!;
-        //         if (selectedRadioValue === 'nodeonly') {
-        //             break; // Only search current node
-        //         }
-        //         if (selectedRadioValue === 'suboutline' && (model.initialFindNode !== node && model.isAncestorOf(model.initialFindNode, node) === false)) {
-        //             break; // Reached outside suboutline of initialFindNode
-        //         }
-        //         let headString = model.data[node.gnx]?.headString || "";
-        //         let body = model.data[node.gnx]?.bodyString || "";
-        //         // In previous nodes, check body first (since we're going backward)
-        //         if (searchInBody && body) {
-        //             const match = findLastMatch(body);
-        //             if (match) {
-        //                 if (markFind && !model.marked.has(node.gnx)) {
-        //                     model.marked.add(node.gnx);
-        //                     if (model.data[node.gnx]) {
-        //                         model.data[node.gnx]!.icon = (model.data[node.gnx]!.icon || 0) | 2; // Set marked bit
-        //                     }
-        //                 }
-        //                 this.selectAndOrToggleAndRedraw(node);
-        //                 view.BODY_PANE.focus();
-        //                 setTimeout(() => {
-        //                     view.highlightMatchInBody(match.index, match.index + match.length);
-        //                 });
-        //                 return;
-        //             }
-        //         }
-
-        //         // Then check headline
-        //         if (searchInHeadlines && headString) {
-        //             const match = findLastMatch(headString);
-
-        //             if (match) {
-        //                 if (markFind && !model.marked.has(node.gnx)) {
-        //                     model.marked.add(node.gnx);
-        //                     if (model.data[node.gnx]) {
-        //                         model.data[node.gnx]!.icon = (model.data[node.gnx]!.icon || 0) | 2; // Set marked bit
-        //                     }
-        //                 }
-
-        //                 this.selectAndOrToggleAndRedraw(node);
-        //                 view.OUTLINE_PANE.focus();
-        //                 setTimeout(() => {
-        //                     view.highlightMatchInHeadline(match.index, match.index + match.length);
-        //                 });
-        //                 return;
-        //             }
-        //         }
-        //         currentIndex--;
-        //     }
-
-        //     let searchedParams = [];
-        //     if (searchInHeadlines) searchedParams.push('head');
-        //     if (searchInBody) searchedParams.push('body');
-        //     view.showToast(`Not found: (${searchedParams.join(", ")}) ${searchText}`, 1500);
-        // } catch (e: any) {
-        //     view.showToast('Invalid search pattern: ' + e.message, 2000);
-        // }
+        // TODO : Remove or implement for leo's core into this UI.
     }
 
     // * Controller Methods (Persistence) *
@@ -1343,53 +943,6 @@ export class LeoController {
             expanded: expandedPositions
         };
         utils.safeLocalStorageSet(model.genTimestamp, JSON.stringify(dataToSave));
-    }
-
-    private loadDocumentStateFromLocalStorage(): TreeNode | null {
-        // returns the selected node if found, otherwise null
-        const model = this.model;
-        let initialSelectedNode = null;
-        const savedData = utils.safeLocalStorageGet(model.genTimestamp);
-        if (savedData) {
-            try {
-                const parsedData = JSON.parse(savedData);
-                // Start by rebuilding marked set and their related node icons
-                if (parsedData && Array.isArray(parsedData.marked)) {
-                    model.marked.clear();
-                    parsedData.marked.forEach((gnx: number) => {
-                        model.marked.add(gnx);
-                        // Update icon state to reflect marked status
-                        if (model.data[gnx]) {
-                            model.data[gnx].icon = (model.data[gnx].icon || 0) | 2; // Set marked bit
-                        }
-                    });
-                }
-                // If document stated data is found, rebuild hoist stack, expanded set, and selected node
-                if (parsedData && Array.isArray(parsedData.expanded) && Array.isArray(parsedData.hoistStack) && typeof parsedData.selected === 'number') {
-                    const expandedPositions = parsedData.expanded;
-                    let expandedPositionsIndex = 0;
-                    const hoistPositions = parsedData.hoistStack;
-                    const selectedPosition = parsedData.selected;
-                    for (const hoisted of hoistPositions) {
-                        if (hoisted >= 0 && hoisted < model.allNodesInOrder.length) {
-                            model.hoistStack.push(model.allNodesInOrder[hoisted]!);
-                        }
-                    }
-                    for (const node of expandedPositions) {
-                        if (node >= 0 && node < model.allNodesInOrder.length) {
-                            model.expanded.add(model.allNodesInOrder[node]!);
-                        }
-                    }
-                    if (selectedPosition >= 0 && selectedPosition < model.allNodesInOrder.length) {
-                        initialSelectedNode = model.allNodesInOrder[selectedPosition]!;
-                    }
-                }
-                return initialSelectedNode;
-            } catch (e) {
-                console.error('Error loading document state from localStorage:', e);
-            }
-        }
-        return null;
     }
 
     private saveLayoutPreferences() {
@@ -1544,22 +1097,6 @@ export class LeoController {
             }
         }
         return flatRowsLeo;
-    }
-
-
-    private computeIsInitialFind(
-        node: TreeNode,
-        initialFindNode: TreeNode | null,
-        selectedNode: TreeNode | null
-    ): boolean {
-        const findScope = this.getFindScope();
-        if (findScope === 'node' && node === selectedNode) {
-            return true;
-        }
-        if (findScope === 'suboutline' && initialFindNode) {
-            return node === initialFindNode || this.model.isAncestorOf(initialFindNode, node);
-        }
-        return false;
     }
 
     private getFindScope(): string {
