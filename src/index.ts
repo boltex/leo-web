@@ -7,7 +7,6 @@ import './style.css';
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager, PreviousSettings } from './core/leoApp';
 
-import { LeoModel } from './LeoModel';
 import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 import { Uri, workspace } from "./workspace";
@@ -43,10 +42,9 @@ class LeoWebApp {
     private async setupApp(): Promise<void> {
 
         // Initialize the MVC components
-        const model = new LeoModel(); // The model will ultimately be the same core as LeoJS
         const view = new LeoView();
 
-        const controller = new LeoController(model, view);
+        const controller = new LeoController(view);
         workspace.setView(view);
         workspace.setController(controller);
 

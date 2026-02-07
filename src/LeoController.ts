@@ -1,5 +1,4 @@
 import { Position } from "./core/leoNodes";
-import { LeoModel } from "./LeoModel";
 import { LeoView } from "./LeoView";
 import * as g from './core/leoGlobals';
 import { TreeNode, FlatRow, FlatRowLeo } from "./types";
@@ -14,13 +13,12 @@ import { result } from "lodash";
 const defaultTitle = "Leo Editor for the web";
 
 export class LeoController {
-    private model: LeoModel;
     private view: LeoView;
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
     private _commands: Record<string, (...args: any[]) => any> = {};
 
-    constructor(model: LeoModel, view: LeoView) {
-        this.model = model;
+    constructor(view: LeoView) {
+
         this.view = view;
 
         view.buildMenu(menuData);
@@ -154,7 +152,8 @@ export class LeoController {
     }
 
     private refreshButtonVisibility = () => {
-        this.view.updateButtonVisibility(this.model.marked.size > 0, this.model.navigationHistory.length > 1);
+        // this.view.updateButtonVisibility(this.model.marked.size > 0, this.model.navigationHistory.length > 1);
+        // TODO : Implement or remove when the rest of leo's core is integrated in this UI.
     }
 
     private setupTopMenuHandlers() {
@@ -313,8 +312,9 @@ export class LeoController {
         const findScopeRadios = view.getFindScopeRadios();
         findScopeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                this.model.initialFindNode = null; // Reset initial find node when scope changes
-                this.buildRowsRenderTreeLeo(); // Re-render to update node highlighting
+                // TODO : Implement or remove when the rest of leo's core is integrated in this UI.
+                // initialFindNode = null; // Reset initial find node when scope changes
+                // this.buildRowsRenderTreeLeo(); // Re-render to update node highlighting
             });
         });
     }
@@ -374,13 +374,12 @@ export class LeoController {
     // * Controller Methods (Event Handlers) *
     public async initialize() {
         const view = this.view;
-        const model = this.model;
+
         // outline-find-container is initially hidden to prevent FOUC
         view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
 
         view.setupButtonContainerAutoHide();
-        view.updateMarkedButtonStates(model.marked.size > 0);
         view.showTab("log");
 
         let dirHandle: FileSystemDirectoryHandle | null = null;
@@ -917,32 +916,7 @@ export class LeoController {
     }
 
     private saveDocumentStateToLocalStorage() {
-        const model = this.model;
-        // Use the allNodesInOrder tree, the full list from the top as if all nodes were expanded,
-        // to note the position of hoisted node(s), expanded node(s), and the currently selected node.
-        let hoistStackPositions = []; // empty means no hoist
-        for (const hoisted of model.hoistStack) {
-            const pos = model.allNodesInOrder.indexOf(hoisted);
-            if (pos !== -1) {
-                hoistStackPositions.push(pos);
-            }
-        }
-        const expandedPositions = [];
-        for (const node of model.expanded) {
-            const pos = model.allNodesInOrder.indexOf(node);
-            if (pos !== -1) {
-                expandedPositions.push(pos);
-            }
-        }
-        const selectedPosition = model.allNodesInOrder.indexOf(model.selectedNode!); // -1 means no selection
-        const markedArray = Array.from(model.marked); // Marked are the gnx keys, not numeric positions from allNodesInOrder
-        const dataToSave = {
-            marked: markedArray,
-            hoistStack: hoistStackPositions,
-            selected: selectedPosition,
-            expanded: expandedPositions
-        };
-        utils.safeLocalStorageSet(model.genTimestamp, JSON.stringify(dataToSave));
+        // TODO : Implement or remove when the rest of leo's core is integrated in this UI.
     }
 
     private saveLayoutPreferences() {
