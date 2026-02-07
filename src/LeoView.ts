@@ -133,6 +133,7 @@ export class LeoView {
     public isDialogOpen = false;
 
     private __activeFocusTrap: (() => void) | null = null;
+    private __preDialogFocusedElement: HTMLElement | null = null;
 
     public minWidth = 20;
     public minHeight = 20;
@@ -1353,9 +1354,34 @@ export class LeoView {
         });
     }
 
+    private _restorePreDialogFocus(): void {
+        if (this.__preDialogFocusedElement && this.__preDialogFocusedElement['focus']) {
+            // Use setTimeout to ensure dialog is fully closed before restoring focus
+            setTimeout(() => {
+                // first check if another dialog did not instantly open and capture focus again, in which case we should not restore focus to the previous element as it would steal focus from the new dialog. We can check this by seeing if __preDialogFocusedElement is still the same, if it was overwritten by a new dialog opening, it would be different or null.
+                if (this.isDialogOpen) {
+                    return;
+                }
+                // Check if element is still in DOM and visible
+                const rect = this.__preDialogFocusedElement!.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0 && document.body.contains(this.__preDialogFocusedElement!)) {
+                    this.__preDialogFocusedElement!.focus();
+                }
+                this.__preDialogFocusedElement = null;
+            }, 0);
+        }
+    }
+
     private _processDialogQueue(): void {
         if (this.__dialogQueue.length === 0 || this.isDialogOpen) {
             return;
+        }
+
+        // Capture the currently focused element before opening the dialog
+        // (check first if last dialog really finished closing and that 
+        // focus was restored, and thus this.__preDialogFocusedElement was restored to null, to avoid overwriting it with the dialog's own focus)
+        if (!this.__preDialogFocusedElement && document.activeElement instanceof HTMLElement) {
+            this.__preDialogFocusedElement = document.activeElement;
         }
 
         this.isDialogOpen = true;
@@ -1404,6 +1430,7 @@ export class LeoView {
             btn.onclick = () => {
                 this._cleanupFocusTrap();
                 this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+                this._restorePreDialogFocus();
                 this.isDialogOpen = false;
                 dialog.resolve(label);
                 setTimeout(() => this._processDialogQueue(), 100);
@@ -1444,6 +1471,7 @@ export class LeoView {
             const inputValue = this.INPUT_DIALOG_INPUT.value;
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+            this._restorePreDialogFocus();
             this.isDialogOpen = false;
             dialog.resolve(inputValue);
             setTimeout(() => this._processDialogQueue(), 100);
@@ -1484,6 +1512,7 @@ export class LeoView {
             const inputValue = this.INPUT_DIALOG_INPUT.value;
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+            this._restorePreDialogFocus();
             // Remove the 'hidden-button' class from OK button for future dialogs
             this.INPUT_DIALOG_BTN.classList.remove('hidden-button');
             this.isDialogOpen = false;
@@ -1589,6 +1618,7 @@ export class LeoView {
 
                 li.onclick = () => {
                     this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
+                    this._restorePreDialogFocus();
                     if (options?.onDidSelectItem) {
                         options.onDidSelectItem(item);
                     }
@@ -1635,6 +1665,7 @@ export class LeoView {
         const closeDialog = (returnValue: QuickPickItem | string | null) => {
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
+            this._restorePreDialogFocus();
             this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
             this.QUICKPICK_DIALOG_INPUT.oninput = null;
             this.isDialogOpen = false;
@@ -1764,6 +1795,7 @@ export class LeoView {
             }
 
             const fileHandles = await window.showOpenFilePicker(properOptions);
+            this._restorePreDialogFocus();
 
             // Check that all chosen files are inside the workspace directory
             const workspaceDir = workspace.getWorkspaceDirHandle();
@@ -1790,6 +1822,7 @@ export class LeoView {
             this.isDialogOpen = false;
             dialog.resolve(null);
             setTimeout(() => this._processDialogQueue(), 100);
+            this._restorePreDialogFocus();
         }
     }
 
@@ -1839,6 +1872,7 @@ export class LeoView {
             }
 
             const fileHandle = await window.showSaveFilePicker(properOptions);
+            this._restorePreDialogFocus();
 
             // Check that the chosen file is inside the workspace directory
             const workspaceDir = workspace.getWorkspaceDirHandle();
@@ -1863,6 +1897,7 @@ export class LeoView {
             this.isDialogOpen = false;
             dialog.resolve(null);
             setTimeout(() => this._processDialogQueue(), 100);
+            this._restorePreDialogFocus();
         }
     }
 

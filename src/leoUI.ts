@@ -494,7 +494,7 @@ export class LeoUI extends NullGui {
             if (g.app.windowList.length) {
                 this._setupOpenedLeoDocument();
                 // Has a commander opened, but wait for UI!
-                await this.leoStates.qLastContextChange;
+                // await this.leoStates.qLastContextChange; // Was in LeoJS, needed in Leo-Web?
             } else {
                 // First time starting: not even an untitled nor workbook.leo
                 return;

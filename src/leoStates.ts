@@ -11,8 +11,6 @@ import { Position } from "./core/leoNodes";
  */
 export class LeoStates {
 
-    public qLastContextChange: Thenable<unknown>; // Promise that the last state change is applied
-
     /**
      * Used mostly for leojsOutline ViewsWelcome content
      */
@@ -22,7 +20,7 @@ export class LeoStates {
     }
     set leojsStartupDone(p_value: boolean) {
         this._leojsStartupDone = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_STARTUP_DONE, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_STARTUP_DONE, p_value);
     }
 
     /**
@@ -34,7 +32,7 @@ export class LeoStates {
     }
     set leoReady(p_value: boolean) {
         this._leoReady = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_READY, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_READY, p_value);
     }
 
     /**
@@ -46,7 +44,7 @@ export class LeoStates {
     }
     set leoIdUnset(p_value: boolean) {
         this._leoIdUnset = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_ID_UNSET, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_ID_UNSET, p_value);
     }
 
     /**
@@ -58,7 +56,7 @@ export class LeoStates {
     }
     set fileOpenedReady(p_value: boolean) {
         this._fileOpenedReady = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.TREE_OPENED, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.TREE_OPENED, p_value);
         this._leoUI.setTreeViewTitle();
     }
 
@@ -72,10 +70,10 @@ export class LeoStates {
     set leoOpenedFileName(p_name: string) {
         if (p_name && p_name.length) {
             this._leoOpenedFileName = p_name;
-            this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.TREE_TITLED, true);
+            utils.setContext(Constants.CONTEXT_FLAGS.TREE_TITLED, true);
         } else {
             this._leoOpenedFileName = "";
-            this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.TREE_TITLED, false);
+            utils.setContext(Constants.CONTEXT_FLAGS.TREE_TITLED, false);
         }
         this._leoUI.setTreeViewTitle();
     }
@@ -93,7 +91,7 @@ export class LeoStates {
             this._leoUI.refreshDocumentsPane();
         }
         this._leoChanged = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CHANGED, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CHANGED, p_value);
         this._leoUI.setTreeViewTitle();
     }
 
@@ -106,7 +104,7 @@ export class LeoStates {
     }
     set leoCanUndo(p_value: boolean) {
         this._leoCanUndo = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_UNDO, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_UNDO, p_value);
     }
 
     /**
@@ -118,7 +116,7 @@ export class LeoStates {
     }
     set leoCanRedo(p_value: boolean) {
         this._leoCanRedo = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_REDO, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_REDO, p_value);
     }
 
     /**
@@ -130,7 +128,7 @@ export class LeoStates {
     }
     set leoCanGoBack(p_value: boolean) {
         this._leoCanGoBack = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_BACK, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_BACK, p_value);
     }
 
     /**
@@ -142,7 +140,7 @@ export class LeoStates {
     }
     set leoCanGoNext(p_value: boolean) {
         this._leoCanGoNext = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_NEXT, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_NEXT, p_value);
     }
 
     /**
@@ -154,7 +152,7 @@ export class LeoStates {
     }
     set leoCanDemote(p_value: boolean) {
         this._leoCanDemote = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_DEMOTE, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_DEMOTE, p_value);
     }
 
     /**
@@ -166,7 +164,7 @@ export class LeoStates {
     }
     set leoCanPromote(p_value: boolean) {
         this._leoCanPromote = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_PROMOTE, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_PROMOTE, p_value);
     }
 
     /**
@@ -178,7 +176,7 @@ export class LeoStates {
     }
     set leoCanDehoist(p_value: boolean) {
         this._leoCanDehoist = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_DEHOIST, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_DEHOIST, p_value);
     }
 
     /**
@@ -190,7 +188,7 @@ export class LeoStates {
     }
     set leoTopHoistChapter(p_value: boolean) {
         this._leoTopHoistChapter = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_TOP_HOIST_CHAPTER, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_TOP_HOIST_CHAPTER, p_value);
     }
 
     private _leoEditHeadline: boolean = false;
@@ -199,7 +197,7 @@ export class LeoStates {
     }
     set leoEditHeadline(p_value: boolean) {
         this._leoEditHeadline = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_EDIT_HEADLINE, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_EDIT_HEADLINE, p_value);
     }
 
     // * 'states' flags about current selection, for visibility and commands availability
@@ -209,7 +207,7 @@ export class LeoStates {
     }
     set leoMarked(p_value: boolean) {
         this._leoMarked = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_MARKED, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_MARKED, p_value);
     }
 
     private _leoCloned: boolean = false;
@@ -218,7 +216,7 @@ export class LeoStates {
     }
     set leoCloned(p_value: boolean) {
         this._leoCloned = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_CLONE, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_CLONE, p_value);
     }
 
     private _leoDirty: boolean = false;
@@ -227,7 +225,7 @@ export class LeoStates {
     }
     set leoDirty(p_value: boolean) {
         this._leoDirty = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_DIRTY, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_DIRTY, p_value);
     }
 
     private _leoEmpty: boolean = false;
@@ -236,7 +234,7 @@ export class LeoStates {
     }
     set leoEmpty(p_value: boolean) {
         this._leoEmpty = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_EMPTY, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_EMPTY, p_value);
     }
 
     private _leoChild: boolean = false;
@@ -245,7 +243,7 @@ export class LeoStates {
     }
     set leoChild(p_value: boolean) {
         this._leoChild = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_CHILD, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_CHILD, p_value);
     }
 
     private _leoAtFile: boolean = false;
@@ -254,7 +252,7 @@ export class LeoStates {
     }
     set leoAtFile(p_value: boolean) {
         this._leoAtFile = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_ATFILE, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_ATFILE, p_value);
     }
 
     private _leoAtLeoFile: boolean = false;
@@ -263,7 +261,7 @@ export class LeoStates {
     }
     set leoAtLeoFile(p_value: boolean) {
         this._leoAtLeoFile = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_ATLEOFILE, p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_ATLEOFILE, p_value);
     }
 
     // * Special is-root 'state' flag about current selection, for visibility and commands availability
@@ -273,14 +271,10 @@ export class LeoStates {
     }
     set leoRoot(p_value: boolean) {
         this._leoRoot = p_value;
-        this.qLastContextChange = utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_HOIST, !p_value);
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_HOIST, !p_value);
     }
 
-    constructor(
-        private _leoUI: LeoUI
-    ) {
-        this.qLastContextChange = Promise.resolve(); // Temporary.
-    }
+    constructor(private _leoUI: LeoUI) { }
 
     public setSelectedNodeFlags(p_node: Position): void {
         this.leoMarked = p_node.isMarked();
