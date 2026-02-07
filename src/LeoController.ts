@@ -152,8 +152,14 @@ export class LeoController {
     }
 
     private refreshButtonVisibility = () => {
-        // this.view.updateButtonVisibility(this.model.marked.size > 0, this.model.navigationHistory.length > 1);
-        // TODO : Implement or remove when the rest of leo's core is integrated in this UI.
+        let hasMarked = false;
+        let hasHistory = false;
+
+        // get hasMarked and hasHistory from workspace.getContext, which are updated by the LeoModel when the state changes
+        // TODO!
+
+        this.view.updateButtonVisibility(hasMarked, hasHistory);
+
     }
 
     private setupTopMenuHandlers() {

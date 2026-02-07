@@ -39,7 +39,6 @@ export class LeoUI extends NullGui {
 
     // * Log Pane
     protected _leoLogPane: boolean = false;
-    private _currentOutlineTitle: string = "";
 
     // * Timers
     public refreshTimer: [number, number] | undefined; // until the selected node is found - even if already started refresh
@@ -308,24 +307,6 @@ export class LeoUI extends NullGui {
         }
     }
 
-
-    /**
-     * * Sets the outline pane top bar string message or refreshes with existing title if no title passed
-     * @param p_title new string to replace the current title
-     */
-    public setTreeViewTitle(p_title?: string): void {
-        const w_changed = this.leoStates.fileOpenedReady && this.leoStates.leoOpenedFileName && this.leoStates.leoChanged ? "*" : "";
-        if (p_title) {
-            this._currentOutlineTitle = p_title;
-        }
-        let w_title = this._currentOutlineTitle + w_changed;
-
-        // TODO : Set/Change outline pane/web-page title"
-
-        this.refreshDesc();
-    }
-
-
     public checkConfirmBeforeClose(): void {
         let hasDirty = false;
         for (const frame of g.app.windowList) {
@@ -398,27 +379,6 @@ export class LeoUI extends NullGui {
     private _bodySaveDocument(): void {
         // TODO !
         console.log('TODO ! _bodySaveDocument called to save body text to Leo');
-    }
-
-    /**
-     * Set filename as description
-     */
-    public refreshDesc(): void {
-        let titleDesc = "";
-
-        if (this.leoStates.fileOpenedReady) {
-
-            const s = this.leoStates.leoOpenedFileName;
-            const w_filename = s ? utils.getFileFromPath(s) : Constants.UNTITLED_FILE_NAME;
-            let w_path = "";
-            const n = s ? s.lastIndexOf(w_filename) : -1;
-            if (n >= 0 && n + w_filename.length >= s.length) {
-                w_path = s.substring(0, n);
-            }
-            titleDesc = w_filename + (w_path ? " in " + w_path : '');
-        }
-        // TODO : Set/Change outline pane/web-page description"
-
     }
 
     public refreshDocumentsPane(): void {
@@ -677,7 +637,7 @@ export class LeoUI extends NullGui {
         const w_wrap = !!c.getWrap(p);
         if (g.useSyntaxColoring(p)) {
 
-            // DEPRECATED leojs old colorizer language detection--------
+            // DEPRECATED:  leojs old colorizer language detection
             // const aList = g.get_directives_dict_list(p);
             // const d = g.scanAtCommentAndAtLanguageDirectives(aList);
             // w_language =
@@ -685,7 +645,6 @@ export class LeoUI extends NullGui {
             //     || g.getLanguageFromAncestorAtFileNode(p)
             //     || c.config.getLanguage('target-language')
             //     || 'plain';
-            // ---------------------------------------------------------
 
             // * as per original Leo's leoColorizer.py
             w_language = c.getLanguage(p) || c.config.getLanguage('target-language');
@@ -702,11 +661,13 @@ export class LeoUI extends NullGui {
 
         const frame = g.app.windowList[this.frameIndex];
         const c = frame.c;
+        const states = this.leoStates;
+        const view = workspace.view;
 
         if (this._refreshType.states) {
             this._refreshType.states = false;
             const p = c.p;
-            // TODO : set status bar info
+            // TODO : set status bar info? (If any, and if implemented in the web UI)
             // if (this._leoStatusBar && p && p.v) {
             //     const unl = c.frame.computeStatusUnl(p);
             //     this._leoStatusBar.setString(unl);
@@ -714,6 +675,13 @@ export class LeoUI extends NullGui {
             // }
             let w_canHoist = true;
             let w_topIsChapter = false;
+            let w_hasMarked = false;
+            for (const v of c.all_unique_nodes()) {
+                if (v.isMarked()) {
+                    w_hasMarked = true;
+                    break;
+                }
+            }
             if (c.hoistStack.length) {
                 const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
                 w_topIsChapter = w_ph.h.startsWith('@chapter ');
@@ -737,23 +705,23 @@ export class LeoUI extends NullGui {
                 canPromote: c.canPromote(), // Selected node can have its children promoted
                 canDehoist: c.canDehoist(), // Document is currently hoisted and can be de-hoisted
                 canHoist: w_canHoist,
-                topIsChapter: w_topIsChapter
+                topIsChapter: w_topIsChapter,
+                hasMarked: w_hasMarked,
                 // 
             };
-            this.leoStates.setLeoStateFlags(w_states);
+            states.setLeoStateFlags(w_states);
             this.refreshUndoPane();
         }
         // Set leoChanged and leoOpenedFilename
-        this.leoStates.leoChanged = c.changed;
-        this.leoStates.leoOpenedFileName = frame.getTitle();
+        states.leoChanged = c.changed;
+        states.leoOpenedFileName = frame.getTitle();
 
         this.refreshBodyStates(); // Set language and wrap states, if different.
 
-        // In LeoJs, its vscode host used the context keys to show/hide buttons 
-        // and menu items, so we need to refresh those when states are updated.
-        // TODO !
-        // workspace.blablabla...refresh buttons and menu items visibility based on new context keys values
-
+        view.updateMarkedButtonStates(states.leoHasMarked);
+        view.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
+        view.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        view.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
 
         // Refresh other panes if needed
         if (this._refreshType.documents) {

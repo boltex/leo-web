@@ -270,6 +270,7 @@ export interface LeoPackageStates {
     canDehoist: boolean; // Leo Document is currently hoisted and can be de-hoisted
     canHoist: boolean; // Selected node is not the first top node already root
     topIsChapter: boolean; // Top of the hoisted outline is an @chapter node
+    hasMarked: boolean; // Has at least one marked node in the outline
 }
 
 /**

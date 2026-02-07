@@ -57,7 +57,6 @@ export class LeoStates {
     set fileOpenedReady(p_value: boolean) {
         this._fileOpenedReady = p_value;
         utils.setContext(Constants.CONTEXT_FLAGS.TREE_OPENED, p_value);
-        this._leoUI.setTreeViewTitle();
     }
 
     /**
@@ -75,7 +74,6 @@ export class LeoStates {
             this._leoOpenedFileName = "";
             utils.setContext(Constants.CONTEXT_FLAGS.TREE_TITLED, false);
         }
-        this._leoUI.setTreeViewTitle();
     }
 
     /**
@@ -92,7 +90,6 @@ export class LeoStates {
         }
         this._leoChanged = p_value;
         utils.setContext(Constants.CONTEXT_FLAGS.LEO_CHANGED, p_value);
-        this._leoUI.setTreeViewTitle();
     }
 
     /**
@@ -189,6 +186,15 @@ export class LeoStates {
     set leoTopHoistChapter(p_value: boolean) {
         this._leoTopHoistChapter = p_value;
         utils.setContext(Constants.CONTEXT_FLAGS.LEO_TOP_HOIST_CHAPTER, p_value);
+    }
+
+    private _leoHasMarked: boolean = false;
+    get leoHasMarked(): boolean {
+        return this._leoHasMarked;
+    }
+    set leoHasMarked(p_value: boolean) {
+        this._leoHasMarked = p_value;
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_HAS_MARKED, p_value);
     }
 
     private _leoEditHeadline: boolean = false;
@@ -298,5 +304,6 @@ export class LeoStates {
         this.leoCanDehoist = p_states.canDehoist;
         this.leoRoot = !p_states.canHoist;
         this.leoTopHoistChapter = p_states.topIsChapter;
+        this.leoHasMarked = p_states.hasMarked;
     }
 }

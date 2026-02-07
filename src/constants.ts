@@ -198,6 +198,7 @@ export class Constants {
         LEO_CAN_HOIST: "leoWebCanHoist", // isNotRoot equivalent, Computed by hand
         LEO_TOP_HOIST_CHAPTER: "leoWebTopHoistChapter",
         LEO_EDIT_HEADLINE: "leoWebEditHeadline",
+        LEO_HAS_MARKED: "leoWebHasMarked",
 
         // 'states' flags about current selection, for visibility and commands availability
         SELECTED_MARKED: "leoWebMarked", // no need for unmarked here, use !leoWebMarked
