@@ -732,6 +732,7 @@ export class LeoView {
         }
     }
 
+    // * Button states
     public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean) => {
         this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked);
         this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked);
@@ -762,20 +763,19 @@ export class LeoView {
         this.TRIGGER_AREA.style.width = ((visibleButtonCount * 40) + 10) + 'px';
     }
 
-    // * Button states
     public updateMarkedButtonStates(hasMarkedNodes: boolean) {
         this.NEXT_MARKED_BTN.disabled = !hasMarkedNodes;
         this.PREV_MARKED_BTN.disabled = !hasMarkedNodes;
     }
 
     public updateHoistButtonStates(hoist: boolean, deHoist: boolean) {
-        this.HOIST_BTN.disabled = hoist;
-        this.DEHOIST_BTN.disabled = deHoist;
+        this.HOIST_BTN.disabled = !hoist;
+        this.DEHOIST_BTN.disabled = !deHoist;
     }
 
     public updateHistoryButtonStates(previous: boolean, next: boolean) {
-        this.PREV_BTN.disabled = previous;
-        this.NEXT_BTN.disabled = next;
+        this.PREV_BTN.disabled = !previous;
+        this.NEXT_BTN.disabled = !next;
     }
 
     public updateContextMenuState(mark: boolean, unmark: boolean, hoist: boolean, dehoist: boolean) {

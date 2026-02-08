@@ -15,6 +15,7 @@ import {
     Focus,
     LeoDocument,
     LeoPackageStates,
+    LeoSearchSettings,
     QuickPickItem,
     QuickPickItemKind,
     QuickPickOptions,
@@ -66,6 +67,7 @@ export class LeoUI extends NullGui {
         this._lastRefreshNodeTS = utils.performanceNow();
     }
 
+    // * Outline Pane
     private _lastSelectedNode: Position | undefined;
     public lastSelectedNodeTime: number | undefined = 0; // Falsy means not set
     private _lastSelectedNodeTS: number = 0;
@@ -77,6 +79,13 @@ export class LeoUI extends NullGui {
         this._lastSelectedNode = p_ap;
         this._lastSelectedNodeTS = utils.performanceNow();
     }
+
+    // * Find panel
+    private _findNeedsFocus: number = 0; // 0 none, 1 find, 2 nav
+    private _lastSettingsUsed: LeoSearchSettings | undefined; // Last settings loaded / saved for current document
+    public findFocusTree = false;
+    public findHeadlineRange: [number, number] = [0, 0];
+    public findHeadlinePosition: Position | undefined;
 
     // * Help Panel
     public showdownConverter: showdown.Converter;
@@ -542,21 +551,21 @@ export class LeoUI extends NullGui {
 
     /**
      * * Called by UI when the user selects in the tree (click or 'open aside' through context menu)
-     * @param p_node is the position node selected in the tree
-     * @param p_internalCall Flag used to indicate the selection is forced, and NOT originating from user interaction
+     * @param node is the position node selected in the tree
+     * @param isCtrlClick is true if the click was a Ctrl-Click, which triggers different hooks and behavior
      * @returns thenable for reveal to finish or select position to finish
      */
     public async selectTreeNode(
-        p_node: Position,
+        node: Position,
         isCtrlClick: boolean,
     ): Promise<unknown> {
 
-        const c = p_node.v.context;
+        const c = node.v.context;
 
         this.triggerBodySave(true); // Needed for self-selection to avoid 'cant save file is newer...'
 
         if (!isCtrlClick) {
-            if (g.doHook("headclick1", { c: c, p: p_node, v: p_node })) {
+            if (g.doHook("headclick1", { c: c, p: node, v: node })) {
                 // returned not falsy, so skip the rest
                 return Promise.resolve();
             }
@@ -565,18 +574,18 @@ export class LeoUI extends NullGui {
             // Ctrl-Click: 
             this.lastSelectedNodeTime = undefined;
 
-            if (g.doHook("icondclick1", { c: c, p: p_node, v: p_node })) {
+            if (g.doHook("icondclick1", { c: c, p: node, v: node })) {
                 // returned not falsy, so skip the rest
                 return Promise.resolve();
             }
 
             // If headline starts with @url call g.openUrl, if @mime call g.open_mimetype
-            const w_headline = p_node.h;
+            const w_headline = node.h;
             let openPromise;
             if (w_headline.trim().startsWith("@url ")) {
-                openPromise = g.openUrl(p_node);
+                openPromise = g.openUrl(node);
             } else if (w_headline.trim().startsWith("@mime ")) {
-                openPromise = g.open_mimetype(p_node.v.context, p_node);
+                openPromise = g.open_mimetype(node.v.context, node);
             } else if (w_headline.startsWith("unl:")) {
                 openPromise = g.openUrlHelper(c, w_headline);
             }
@@ -587,7 +596,7 @@ export class LeoUI extends NullGui {
                     void utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, false);
                 }, 60);
                 await openPromise.then(() => {
-                    g.doHook("icondclick2", { c: c, p: p_node, v: p_node });
+                    g.doHook("icondclick2", { c: c, p: node, v: node });
                 });
                 // Slight delay to help finish opening possible new document/file.
                 return new Promise((resolve) => {
@@ -608,23 +617,43 @@ export class LeoUI extends NullGui {
                 });
             }
             // Ctrl click didn't trigger a special action, so just return.
-            g.doHook("icondclick2", { c: c, p: p_node, v: p_node });
+            g.doHook("icondclick2", { c: c, p: node, v: node });
             return Promise.resolve();
         }
 
-        this.leoStates.setSelectedNodeFlags(p_node);
+        this.leoStates.setSelectedNodeFlags(node);
 
-        c.selectPosition(p_node);
+        c.selectPosition(node);
 
-        g.doHook("headclick2", { c: c, p: p_node, v: p_node });
+        if (this.findFocusTree) {
+            // had a range but now refresh from other than find/replace
+            // So make sure tree is also refreshed.
+            this.findFocusTree = false;
+            this.setupRefresh(
+                Focus.Outline,
+                {
+                    tree: true,
+                    body: true,
+                    // documents: false,
+                    // buttons: false,
+                    // states: false,
+                }
+            );
+            g.doHook("headclick2", { c: c, p: node, v: node });
+            return this._launchRefresh();
+        }
+        this._refreshType.states = true;
+        this.getStates();
+
+        g.doHook("headclick2", { c: c, p: node, v: node });
         // * Apply the node to the body text without waiting for the selection promise to resolve
-        return this._tryApplyNodeToBody(p_node, false, this.config.treeKeepFocus);
+        return this._tryApplyNodeToBody(node, false, this.config.treeKeepFocus);
 
     }
 
     private _tryApplyNodeToBody(node: Position, p_forceShow: boolean, p_showBodyNoFocus: boolean): void {
         // TODO
-        console.log('TODO ! _tryApplyNodeToBody called with node:', node, ' forceShow:', p_forceShow, ' showBodyNoFocus:', p_showBodyNoFocus);
+        // console.log('TODO ! _tryApplyNodeToBody called with node:', node, ' forceShow:', p_forceShow, ' showBodyNoFocus:', p_showBodyNoFocus);
     }
 
 
@@ -718,6 +747,7 @@ export class LeoUI extends NullGui {
 
         this.refreshBodyStates(); // Set language and wrap states, if different.
 
+        view.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
         view.updateMarkedButtonStates(states.leoHasMarked);
         view.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         view.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
