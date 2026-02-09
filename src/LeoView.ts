@@ -465,12 +465,36 @@ export class LeoView {
                     });
                 }
             } else if (entry.action) {
-                item.addEventListener("click", () => {
-                    this.closeAllSubmenus();
-                    this.restoreLastFocusedElement();
-                    this.activeTopMenu = null;
-                    workspace.controller.doCommand(entry.action as string);
-                });
+                // First check for enabledFlagsSet and enabledFlagsClear to determine if the item should be enabled
+                let enabled = true;
+                if (entry.enabledFlagsSet) {
+                    for (const flag of entry.enabledFlagsSet) {
+                        if (!workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (enabled && entry.enabledFlagsClear) {
+                    for (const flag of entry.enabledFlagsClear) {
+                        if (workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (!enabled) {
+                    item.classList.add("disabled");
+                } else {
+                    // Only now do we add the click listener if the item is enabled, to avoid unnecessary listeners on disabled items
+                    item.addEventListener("click", () => {
+                        this.closeAllSubmenus();
+                        this.restoreLastFocusedElement();
+                        this.activeTopMenu = null;
+                        workspace.controller.doCommand(entry.action as string);
+                    });
+                }
+
             }
 
             if (level === 0) {

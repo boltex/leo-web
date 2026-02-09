@@ -1,14 +1,13 @@
 import { Position } from "./core/leoNodes";
 import { LeoView } from "./LeoView";
 import * as g from './core/leoGlobals';
-import { TreeNode, FlatRow, FlatRowLeo } from "./types";
+import { FlatRowLeo } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
 import { menuData } from "./menu";
 import { keybindings } from "./keybindings";
-import { result } from "lodash";
 
 const defaultTitle = "Leo Editor for the web";
 
@@ -556,6 +555,32 @@ export class LeoController {
             // }
 
             if (targetKey.toLowerCase() === keyString) {
+
+                // First check for enabledFlagsSet and enabledFlagsClear to determine
+                // if the command should run based on the current state of the application.
+                // For example, some commands might only be active when a node is selected, 
+                // or when there are marked nodes, etc. This allows context-sensitive keybindings.
+                let enabled = true;
+                if (keybind.enabledFlagsSet) {
+                    for (const flag of keybind.enabledFlagsSet) {
+                        if (!workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (enabled && keybind.enabledFlagsClear) {
+                    for (const flag of keybind.enabledFlagsClear) {
+                        if (workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (!enabled) {
+                    continue;
+                }
+
                 e.preventDefault();
                 this.doCommand(keybind.command);
                 return;

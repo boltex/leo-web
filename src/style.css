@@ -407,6 +407,17 @@ html {
   padding: 5px 12px;
 }
 
+.menu-item.disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.menu-item.disabled .menu-label,
+.menu-item.disabled .menu-shortcut {
+  color: var(--find-placeholder-color);
+}
+
 .icon0 {
   background-image: url('data:image/svg+xml;utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path d="M0 4v9h15.15V4zm1 1h13.15v7H1z" fill="%234d4d4d"/></svg>');
 }

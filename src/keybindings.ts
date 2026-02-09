@@ -1,15 +1,5 @@
 import { Constants } from "./constants";
-
-type Keybinding = {
-    command: string;
-    key: string;
-    win?: string; // Only if different from key
-    mac?: string; // Only if different from key
-    linux?: string; // Only if different from key
-    outline?: boolean; // Whether this binding is active in the outline pane
-    body?: boolean; // Whether this binding is active in the body pane
-    find?: boolean; // Whether this binding is active in the find pane
-};
+import { Keybinding } from "./types";
 
 const CMD = Constants.COMMANDS;
 
