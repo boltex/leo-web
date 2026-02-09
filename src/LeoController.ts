@@ -1023,6 +1023,8 @@ export class LeoController {
                 c.p,
                 null // TODO: Implement initialFindNode tracking in Leo core
             );
+            // Clear list of positions to animate at the end of the render, since they have now been rendered
+            g.app.gui.positionsToAnimate = [];
             view.setTreeDataLeo(rows);
         } else {
             view.setTreeDataLeo([]);
@@ -1041,10 +1043,19 @@ export class LeoController {
         const flatRowsLeo: FlatRowLeo[] = [];
         if (node) {
             if (!isRoot) {
+                let toggled = false;
+                for (let i = 0; i < g.app.gui.positionsToAnimate.length; i++) {
+                    if (g.app.gui.positionsToAnimate[i].__eq__(node)) {
+                        toggled = true;
+                        // Remove from the list to avoid duplicate toggling
+                        g.app.gui.positionsToAnimate.splice(i, 1);
+                        break;
+                    }
+                }
                 flatRowsLeo.push({
                     label: node.h,
                     depth: depth,
-                    toggled: false, // Reset each time
+                    toggled: toggled,
                     hasChildren: node.hasChildren(),
                     isExpanded: node.isExpanded(),
                     node: node,

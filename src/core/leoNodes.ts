@@ -2600,6 +2600,7 @@ export class Position {
      */
     public contract(): void {
         const p: Position = this;
+        g.app.gui.positionsToAnimate.push(p);
         const v: VNode = this.v;
         v.expandedPositions = v.expandedPositions.filter((z) => !z.__eq__(p));
         v.contract();
@@ -2607,6 +2608,7 @@ export class Position {
 
     public expand(): void {
         const p: Position = this;
+        g.app.gui.positionsToAnimate.push(p);
         const v: VNode = this.v;
         v.expandedPositions = v.expandedPositions.filter((z) => !z.__eq__(p));
         let isBreak: boolean = false;

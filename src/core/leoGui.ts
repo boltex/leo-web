@@ -39,6 +39,7 @@ export class LeoGui {
     public root: Position | undefined;
     public script: string | undefined;
     public scriptFileName: string | undefined;
+    public positionsToAnimate: Position[]; // Redraw cycle should animate these positions and clear this list.
 
     // * For Leo-Web
     // the index of current document frame in g.app.windowList, mostly to get c, and the title, openDirectory, etc.
@@ -74,7 +75,7 @@ export class LeoGui {
         this.root = undefined;
         this.script = undefined;
         this.scriptFileName = undefined;
-
+        this.positionsToAnimate = []; // Redraw cycle should animate these positions and clear this list.
         this.splashScreen = undefined;
         this.utils = undefined;
 
