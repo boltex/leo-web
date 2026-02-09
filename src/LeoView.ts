@@ -1,8 +1,9 @@
-import { set } from 'lodash';
-import { TreeNode, FlatRow, MenuEntry, FilePath, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions, FlatRowLeo } from './types';
+import { MenuEntry, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions, FlatRowLeo } from './types';
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
 import { Position } from './core/leoNodes';
+
+type QuickPickInternalItem = QuickPickItem & { renderedLabel?: string };
 
 export class LeoView {
     // Elements
@@ -1585,14 +1586,18 @@ export class LeoView {
 
                 if (item.kind === -1) {
                     li.classList.add('separator');
-                    li.textContent = item.label;
                     this.QUICKPICK_DIALOG_LIST.appendChild(li);
                     return;
                 }
 
                 const labelSpan = document.createElement('span');
                 labelSpan.className = 'quick-pick-label';
-                labelSpan.textContent = item.label;
+                if ((item as QuickPickInternalItem).renderedLabel) {
+                    labelSpan.innerHTML = (item as QuickPickInternalItem).renderedLabel!;
+                } else {
+                    labelSpan.textContent = item.label;
+                }
+
                 li.appendChild(labelSpan);
 
                 if (item.description) {
@@ -1612,7 +1617,7 @@ export class LeoView {
                 if (index === selectedIndex) {
                     li.classList.add('selected');
                     setTimeout(() => {
-                        li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        li.scrollIntoView({ block: 'nearest', behavior: this.QUICKPICK_DIALOG_INPUT.value ? 'smooth' : 'instant' });
                     }, 0);
                 }
 
@@ -1645,11 +1650,42 @@ export class LeoView {
                         return true;
                     }
                     const labelMatch = item.label.toLowerCase().includes(filterText);
+
+                    // if filter match label, build renderedLabel with <mark> tags around the first instance of the match, to be used in rendering the list, so that users can see why the item is showing up in the list.
+                    // We will only mark the label, and not description or details for simplicity.
+                    if (labelMatch) {
+                        const regex = new RegExp(`(${filterText.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'i');
+                        (item as QuickPickInternalItem).renderedLabel = item.label.replace(regex, '<mark>$1</mark>');
+                    } else {
+                        (item as QuickPickInternalItem).renderedLabel = undefined;
+                    }
+
                     const descMatch = item.description?.toLowerCase().includes(filterText) || false;
                     const detailMatch = item.detail?.toLowerCase().includes(filterText) || false;
                     return labelMatch || descMatch || detailMatch;
                 });
             }
+
+            // Sort filtered items: prioritize items which label start with filterText
+            filteredItems.sort((a, b) => {
+                // Keep separators and alwaysShow items in their original positions
+                if (a.kind === -1 || b.kind === -1) return 0;
+                if (a.alwaysShow && b.alwaysShow) return 0;
+                if (a.alwaysShow) return -1;
+                if (b.alwaysShow) return 1;
+
+                const aLabel = a.label.toLowerCase();
+                const bLabel = b.label.toLowerCase();
+                const aStartsWith = aLabel.startsWith(filterText);
+                const bStartsWith = bLabel.startsWith(filterText);
+
+                // Items starting with filterText come first
+                if (aStartsWith && !bStartsWith) return -1;
+                if (!aStartsWith && bStartsWith) return 1;
+
+                // Both start or both don't start - maintain original order (stable sort)
+                return 0;
+            });
 
             selectedIndex = -1;
             for (let i = 0; i < filteredItems.length; i++) {

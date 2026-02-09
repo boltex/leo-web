@@ -1480,6 +1480,14 @@ a:hover {
   font-weight: 500;
 }
 
+mark {
+  background-color: var(--find-selection);
+  color: var(--body-pane-color);
+  font-weight: 600;
+  padding: 0;
+  border-radius: 2px;
+}
+
 .quick-pick-list li .quick-pick-description {
   display: inline;
   margin-left: 8px;
