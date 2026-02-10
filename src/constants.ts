@@ -206,6 +206,9 @@ export class Constants {
         SELECTED_DIRTY: "leoWebDirty",
         SELECTED_EMPTY: "leoWebEmpty",
         SELECTED_CHILD: "leoWebChild", // Has children
+        SELECTED_EXPANDED: "leoWebExpanded", // Has children and is expanded
+        SELECTED_EXPANDED_OR_HAS_PARENT: "leoWebExpandedOrHasParent", // Is expanded or has parent (not root)
+        SELECTED_HAS_PARENT: "leoWebHasParent", // Is not direct child of root
         SELECTED_ATFILE: "leoWebAtFile", // Can be refreshed
         SELECTED_ATLEOFILE: "leoWebAtLeoFile", // Can be used with 'open-at-leo-file' command
 

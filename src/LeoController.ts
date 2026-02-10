@@ -563,6 +563,7 @@ export class LeoController {
                 let enabled = true;
                 if (keybind.enabledFlagsSet) {
                     for (const flag of keybind.enabledFlagsSet) {
+                        // just check for falsy here since some may be non-boolean (like selected node id, or undefined)
                         if (!workspace.getContext(flag)) {
                             enabled = false;
                             break;
@@ -571,6 +572,7 @@ export class LeoController {
                 }
                 if (enabled && keybind.enabledFlagsClear) {
                     for (const flag of keybind.enabledFlagsClear) {
+                        // just check for truthy here since some may be non-boolean (like selected node id, or undefined)
                         if (workspace.getContext(flag)) {
                             enabled = false;
                             break;

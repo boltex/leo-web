@@ -3,6 +3,7 @@ import { LeoUI } from "./leoUI";
 import { Constants } from "./constants";
 import { LeoPackageStates } from "./types";
 import { Position } from "./core/leoNodes";
+import { has } from "lodash";
 
 /**
  * * Global states service
@@ -270,6 +271,32 @@ export class LeoStates {
         utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_ATLEOFILE, p_value);
     }
 
+    private _leoExpanded: boolean = false;
+    get leoExpanded(): boolean {
+        return this._leoExpanded;
+    }
+    set leoExpanded(p_value: boolean) {
+        this._leoExpanded = p_value;
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_EXPANDED, p_value);
+    }
+    private _leoHasParent: boolean = false;
+    get leoHasParent(): boolean {
+        return this._leoHasParent;
+    }
+    set leoHasParent(p_value: boolean) {
+        this._leoHasParent = p_value;
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_HAS_PARENT, p_value);
+    }
+    // Add SELECTED_EXPANDED_OR_HAS_PARENT
+    private _leoExpandedOrHasParent: boolean = false;
+    get leoExpandedOrHasParent(): boolean {
+        return this._leoExpandedOrHasParent;
+    }
+    set leoExpandedOrHasParent(p_value: boolean) {
+        this._leoExpandedOrHasParent = p_value;
+        utils.setContext(Constants.CONTEXT_FLAGS.SELECTED_EXPANDED_OR_HAS_PARENT, p_value);
+    }
+
     // * Special is-root 'state' flag about current selection, for visibility and commands availability
     private _leoRoot: boolean = false;
     get leoRoot(): boolean {
@@ -283,14 +310,20 @@ export class LeoStates {
     constructor(private _leoUI: LeoUI) { }
 
     public setSelectedNodeFlags(p_node: Position): void {
+        const hasParent = p_node.hasParent();
+        const isExpanded = p_node.isExpanded();
+        const hasChildren = p_node.hasChildren();
         this.leoMarked = p_node.isMarked();
         this.leoCloned = p_node.isCloned();
         this.leoDirty = p_node.isDirty();
         this.leoEmpty = !p_node.v.hasBody();
-        this.leoChild = p_node.hasChildren();
+        this.leoChild = hasChildren;
         this.leoAtFile = !p_node.isAtLeoNode() && p_node.isAnyAtFileNode();
         this.leoAtLeoFile = p_node.isAtLeoNode();
         this.leoRoot = p_node._isRoot;
+        this.leoExpanded = isExpanded && hasChildren;
+        this.leoHasParent = hasParent;
+        this.leoExpandedOrHasParent = isExpanded || hasParent;
     }
 
     public setLeoStateFlags(p_states: LeoPackageStates): void {
