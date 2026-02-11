@@ -29,6 +29,7 @@ import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
 import { Range } from "./body";
 import { makeAllBindings } from "./commandBindings";
+import { menuData } from "./menu";
 
 /**
  * Creates and manages instances of the UI elements along with their events
@@ -752,6 +753,7 @@ export class LeoUI extends NullGui {
         view.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         view.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
         view.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
+        view.refreshMenu(menuData);
 
         // Refresh other panes if needed
         if (this._refreshType.documents) {
@@ -772,11 +774,18 @@ export class LeoUI extends NullGui {
      * * Setup UI for having no opened Leo documents
      */
     private _setupNoOpenedLeoDocument(): void {
-        this.leoStates.fileOpenedReady = false;
         void this.checkConfirmBeforeClose();
         this.leoStates.fileOpenedReady = false;
         this.lastSelectedNode = undefined;
         this._refreshOutline(RevealType.NoReveal);
+        const states = this.leoStates;
+        const view = workspace.view;
+        view.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
+        view.updateMarkedButtonStates(states.leoHasMarked);
+        view.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
+        view.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        view.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
+        view.refreshMenu(menuData);
         this.refreshDocumentsPane();
         this.refreshButtonsPane();
         this.refreshUndoPane();
@@ -836,6 +845,10 @@ export class LeoUI extends NullGui {
 
         this.triggerBodySave(true);
 
+        if (g.app.windowList.length === 0) {
+            void workspace.view.showInformationMessage("No document opened. Please open a Leo file to execute commands.");
+            return Promise.resolve();
+        }
 
         const c = g.app.windowList[this.frameIndex].c;
         this.setupRefresh(p_options.finalFocus, p_options.refreshType);

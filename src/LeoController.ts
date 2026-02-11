@@ -154,8 +154,8 @@ export class LeoController {
         let hasMarked = false;
         let hasHistory = false;
 
-        // get hasMarked and hasHistory from workspace.getContext, which are updated by the LeoModel when the state changes
-        // TODO!
+        hasMarked = workspace.getContext(Constants.CONTEXT_FLAGS.LEO_HAS_MARKED) || false;
+        hasHistory = workspace.getContext(Constants.CONTEXT_FLAGS.LEO_CAN_BACK) || workspace.getContext(Constants.CONTEXT_FLAGS.LEO_CAN_NEXT) || false;
 
         this.view.updateButtonVisibility(hasMarked, hasHistory);
 
@@ -367,6 +367,13 @@ export class LeoController {
             tab.addEventListener("click", () => {
                 g.app.gui.selectOpenedLeoDocument(index);
             });
+            // Also setup handler for middle-click to close the document
+            tab.addEventListener("auxclick", (e) => {
+                if (e.button === 1) { // Middle click
+                    e.preventDefault();
+                    g.app.gui.closeLeoFile(index);
+                }
+            });
             // Add handler to the close button inside the tab
             const closeBtn = tab.querySelector(".close-btn");
             closeBtn?.addEventListener("click", (e) => {
@@ -524,6 +531,11 @@ export class LeoController {
         if (e.shiftKey) parts.push('shift');
         if (e.metaKey) parts.push('meta');
 
+        // Block if its CTRL+S evven if its not enabled 
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+        }
+
         // Normalize the key name to lowercase
         let key = e.key.toLowerCase();
 
@@ -533,8 +545,6 @@ export class LeoController {
         parts.push(key);
 
         const keyString = parts.join('+');
-
-        console.log('Outline pane key pressed:', keyString);
 
         // Find matching keybinding for outline pane
         // const platform = navigator.platform.toLowerCase();
@@ -588,6 +598,7 @@ export class LeoController {
                 return;
             }
         }
+
     }
 
     private handleBodyPaneKeyDown = (e: KeyboardEvent) => {
@@ -598,6 +609,11 @@ export class LeoController {
         if (e.altKey) parts.push('alt');
         if (e.shiftKey) parts.push('shift');
         if (e.metaKey) parts.push('meta');
+
+        // Block if its CTRL+S evven if its not enabled 
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+        }
 
         // Normalize the key name to lowercase
         let key = e.key.toLowerCase();
@@ -630,6 +646,34 @@ export class LeoController {
             // }
 
             if (targetKey.toLowerCase() === keyString) {
+
+                // First check for enabledFlagsSet and enabledFlagsClear to determine
+                // if the command should run based on the current state of the application.
+                // For example, some commands might only be active when a node is selected, 
+                // or when there are marked nodes, etc. This allows context-sensitive keybindings.
+                let enabled = true;
+                if (keybind.enabledFlagsSet) {
+                    for (const flag of keybind.enabledFlagsSet) {
+                        // just check for falsy here since some may be non-boolean (like selected node id, or undefined)
+                        if (!workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (enabled && keybind.enabledFlagsClear) {
+                    for (const flag of keybind.enabledFlagsClear) {
+                        // just check for truthy here since some may be non-boolean (like selected node id, or undefined)
+                        if (workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (!enabled) {
+                    continue;
+                }
+
                 e.preventDefault();
                 this.doCommand(keybind.command);
                 return;

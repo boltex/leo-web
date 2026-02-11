@@ -4,6 +4,10 @@ import { Constants } from "./constants";
 const CMD = Constants.COMMANDS;
 const FLAGS = Constants.CONTEXT_FLAGS;
 
+// Menu "enabled flags" are more restrictive than for keybindings, because we want 
+// to disable menu entries until they are actually usable, to inform users about when
+// they can use them, even though the commands themselves also check for the necessary flags before executing.
+
 export const menuData: MenuEntry[] = [
     {
         label: "File",
@@ -87,7 +91,7 @@ export const menuData: MenuEntry[] = [
     {
         label: "Search",
         entries: [
-            { label: "Help for Find Commands", action: CMD.HELP_FOR_FIND_COMMANDS },
+            { label: "Help for Find Commands", action: CMD.HELP_FOR_FIND_COMMANDS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
             { label: "Goto Global Line", action: CMD.GOTO_GLOBAL_LINE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+G" },
             { label: "Start Search", action: CMD.START_SEARCH, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+F" },
             { label: "Find Next", action: CMD.FIND_NEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "F3" },
@@ -101,7 +105,7 @@ export const menuData: MenuEntry[] = [
                     { label: "Clone-Find-All", action: CMD.CLONE_FIND_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Clone-Find-All-Flattened", action: CMD.CLONE_FIND_ALL_FLATTENED, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Clone-Find-All-Flattened-marked", action: CMD.CLONE_FIND_FLATTENED_MARKED, enabledFlagsSet: [FLAGS.TREE_OPENED] },
-                    { label: "Clone-Find-Parents", action: CMD.CLONE_FIND_PARENTS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Clone-Find-Parents", action: CMD.CLONE_FIND_PARENTS, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_CLONE] },
                     { label: "Clone-Find-Tag", action: CMD.CLONE_FIND_TAG, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                 ]
             },
@@ -138,9 +142,9 @@ export const menuData: MenuEntry[] = [
             { label: "Copy-Node", action: CMD.COPY_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+C" },
             { label: "Paste-Node", action: CMD.PASTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+V" },
             { label: "Paste Node As Clone", action: CMD.PASTE_CLONE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED] },
-            { label: "Demote Siblings", action: CMD.DEMOTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+]" },
-            { label: "Promote Children", action: CMD.PROMOTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+[" },
-            { label: "Refresh From Disk", action: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "Demote Siblings", action: CMD.DEMOTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_DEMOTE], keyboardShortcut: "Ctrl+]" },
+            { label: "Promote Children", action: CMD.PROMOTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_PROMOTE], keyboardShortcut: "Ctrl+[" },
+            { label: "Refresh From Disk", action: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.NODE_ATFILE] },
             {
                 label: "Expand/Contract Nodes", entries: [
                     { label: "Contract-All", action: CMD.CONTRACT_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+-" },
@@ -207,7 +211,6 @@ export const menuData: MenuEntry[] = [
                     { label: "Mark-Subheads", action: CMD.MARK_SUBHEADS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Mark-Changed-Items", action: CMD.MARK_CHANGED_ITEMS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Unmark-All", action: CMD.UNMARK_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_HAS_MARKED] },
-
                 ]
             },
             {
@@ -230,7 +233,7 @@ export const menuData: MenuEntry[] = [
     {
         label: "Run",
         entries: [
-            { label: "Help For Minibuffer", action: CMD.HELP_FOR_MINIBUFFER },
+            { label: "Help For Minibuffer", action: CMD.HELP_FOR_MINIBUFFER, enabledFlagsSet: [FLAGS.TREE_OPENED] },
             { label: "Execute Script", action: CMD.EXECUTE, keyboardShortcut: "Ctrl+B", enabledFlagsSet: [FLAGS.TREE_OPENED] },
             { label: "Full Command", action: CMD.MINIBUFFER, keyboardShortcut: "Alt+X", enabledFlagsSet: [FLAGS.TREE_OPENED] },
         ],
@@ -249,7 +252,7 @@ export const menuData: MenuEntry[] = [
         label: "Help",
         entries: [
             { label: "Documentation", action: CMD.DOCUMENTATION },
-            { label: "About", action: CMD.ABOUT_LEO },
+            { label: "About", action: CMD.ABOUT_LEO, enabledFlagsSet: [FLAGS.TREE_OPENED] },
         ],
     },
 ];

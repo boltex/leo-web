@@ -39,6 +39,7 @@ export interface MenuEntry {
     enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
     entries?: MenuEntry[]; // Submenu entries
+    domElementRef?: HTMLElement; // Reference to the DOM element for this menu entry, used for disabled state.
 }
 export type Keybinding = {
     command: string;

@@ -485,14 +485,18 @@ export class LeoView {
                 }
                 if (!enabled) {
                     item.classList.add("disabled");
-                } else {
-                    // Only now do we add the click listener if the item is enabled, to avoid unnecessary listeners on disabled items
-                    item.addEventListener("click", () => {
-                        this.closeAllSubmenus();
-                        this.restoreLastFocusedElement();
-                        this.activeTopMenu = null;
-                        workspace.controller.doCommand(entry.action as string);
-                    });
+                }
+
+                item.addEventListener("click", () => {
+                    this.closeAllSubmenus();
+                    this.restoreLastFocusedElement();
+                    this.activeTopMenu = null;
+                    workspace.controller.doCommand(entry.action as string);
+                });
+
+                if (entry.enabledFlagsSet || entry.enabledFlagsClear) {
+                    // Has a condition so save the DOM element reference for later updates
+                    entry.domElementRef = item;
                 }
 
             }
@@ -509,6 +513,44 @@ export class LeoView {
         }
 
         return menu;
+    }
+
+    public refreshMenu(entries: MenuEntry[], level = 0) {
+        // Go through the menu and for each entry with enabledFlagsSet or enabledFlagsClear, check the conditions and update the disabled state
+        for (const entry of entries) {
+            if (entry.entries) {
+                // Recursively process submenus
+                this.refreshMenu(entry.entries, level + 1);
+            } else if (entry.domElementRef) {
+                // This item has conditions, check them and update disabled state
+                let enabled = true;
+
+                if (entry.enabledFlagsSet) {
+                    for (const flag of entry.enabledFlagsSet) {
+                        if (!workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (enabled && entry.enabledFlagsClear) {
+                    for (const flag of entry.enabledFlagsClear) {
+                        if (workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+
+                // Update the DOM element's disabled state
+                if (enabled) {
+                    entry.domElementRef.classList.remove("disabled");
+                } else {
+                    entry.domElementRef.classList.add("disabled");
+                }
+            }
+        }
     }
 
     private constrainToViewport(

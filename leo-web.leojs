@@ -726,7 +726,7 @@
     "felix.20251211000618.1": "import { Position } from \"./core/leoNodes\";\n// import { RClick } from \"./core/mod_scripting\";\n\nimport { Uri } from \"./workspace\";\n\n// For now, these imports are commented out until implemented.\ntype RClick = any;\n\n@language typescript\n@tabwidth -4\n@others\n",
     "felix.20251214225420.1": "export interface MessageOptions {\n\n    /**\n        * Indicates that this message should be modal.\n        */\n    modal?: boolean;\n\n    /**\n        * Human-readable detail message that is rendered less prominent. _Note_ that detail\n        * is only shown for modal messages.\n        */\n    detail?: string;\n}\n\n",
     "felix.20251211213151.1": "export interface FlatRowLeo {\n    label: string;\n    depth: number;\n    toggled: boolean; // Will make it render with toggled class\n    hasChildren: boolean;\n    isExpanded: boolean;\n    node: Position;\n    isSelected: boolean;\n    isAncestor: boolean;      // Is ancestor of selected node\n    isInitialFind: boolean;   // Used for find scope highlighting\n    icon: number;             // Icon number for the node\n}\n",
-    "felix.20251211213155.1": "export interface MenuEntry {\n    label: string;\n    action?: string; // Command to execute when the entry is selected\n    keyboardShortcut?: string;\n    enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled\n    enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled\n    entries?: MenuEntry[]; // Submenu entries\n}\n",
+    "felix.20251211213155.1": "export interface MenuEntry {\n    label: string;\n    action?: string; // Command to execute when the entry is selected\n    keyboardShortcut?: string;\n    enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled\n    enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled\n    entries?: MenuEntry[]; // Submenu entries\n    domElementRef?: HTMLElement; // Reference to the DOM element for this menu entry, used for disabled state.\n}\n",
     "felix.20260208204728.1": "export type Keybinding = {\n    command: string;\n    key: string;\n    win?: string; // Only if different from key\n    mac?: string; // Only if different from key\n    linux?: string; // Only if different from key\n    outline?: boolean; // Whether this binding is active in the outline pane\n    body?: boolean; // Whether this binding is active in the body pane\n    find?: boolean; // Whether this binding is active in the find pane\n    enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled\n    enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled\n};\n\n",
     "felix.20251211213200.1": "export interface FileStat {\n    type: 'file' | 'directory';\n    size?: number;\n    mtime?: number;\n    permissions?: FilePermission;\n}\n",
     "felix.20251215225409.1": "/**\n    * Permissions of a file.\n    */\nexport enum FilePermission {\n    /**\n        * The file is readonly.\n        *\n        * *Note:* All `FileStat` from a `FileSystemProvider` that is registered with\n        * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`\n        * is set. As a consequence, it is not possible to have a readonly file system provider\n        * registered where some `FileStat` are not readonly.\n        */\n    Readonly = 1\n};\n\n",
@@ -780,7 +780,7 @@
       "_mod_time": 1769737976.969
     },
     "felix.20251103000914.1": {
-      "_mod_time": 1770603249.822
+      "_mod_time": 1770782910.663
     },
     "felix.20251103000934.1": {
       "_mod_time": 1769393282.509
@@ -798,7 +798,7 @@
       "_mod_time": 1770353563.827
     },
     "felix.20251211000618.1": {
-      "_mod_time": 1770603177.403
+      "_mod_time": 1770773858.122
     }
   }
 }
