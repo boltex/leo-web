@@ -856,7 +856,6 @@ export class LeoUI extends NullGui {
         let value: any = undefined;
         const p = p_options.node ? p_options.node : c.p;
 
-
         let w_offset = 0;
         if (p_options.keepSelection) {
             if (Constants.OLD_POS_OFFSETS.DELETE.includes(p_cmd)) {

@@ -11,9 +11,27 @@ This project is a TypeScript single-page application that brings the Leo experie
 
 ## Limitations
 
-Leo-Web does not support .db files. Including sqlite-wasm would significantly increase load times, and the goal is to keep Leo-Web light and fast.
+To keep Leo-Web light and fast, it does not support .db files.
 
-Absolute paths are not supported in leo-web. Use relative paths exclusively for external files.
+Absolute paths are not supported with the browser's file api. Use relative paths exclusively for external files.
+
+`Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
+
+## Current Features
+
+- Complete UI implementation with outline, log, settings, and find panes
+- Leo's core integrated with menu system, keybindings, and mouse controls in the outline
+- Full outline pane with node selection, expansion/collapse, marking, and hoisting
+- Multiple document support with tabbed interface
+- Theme and layout customization
+- Drag-to-resize panes with persistent preferences
+- Context menus and keyboard shortcuts
+
+### Not Yet Implemented
+
+- Headline editing in the outline pane
+- Body pane text editing
+- Find/replace functionality
 
 ## Contributing
 
