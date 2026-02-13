@@ -730,7 +730,23 @@ export class LeoView {
         } else {
             this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
         }
+
+        // Escape the text to prevent HTML injection, <, >, &, etc. but preserve newlines and spaces
+        text = this._escapeBodyText(text);
+
         this.BODY_PANE.innerHTML = text;
+    }
+
+    private _escapeBodyText(text: string): string {
+        return text.replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    public getBody(): string {
+        return this.BODY_PANE.textContent || "";
     }
 
     public scrollNodeIntoView(node: Position) {
