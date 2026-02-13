@@ -689,7 +689,7 @@ export class LeoController {
         // TODO : Remove this method if not needed when the rest of leo's core is integrated in this UI,
         // since most keybindings should be handled in the outline or body panes. 
         // For now, we can keep it for global shortcuts like opening settings, or for debugging.
-        console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
+        // console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
 
     }
 

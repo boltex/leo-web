@@ -9,6 +9,7 @@ import * as utils from "./utils";
 import { Uri, workspace } from "./workspace";
 import { Commands } from "./core/leoCommands";
 import {
+    BodySelectionInfo,
     ChooseDocumentItem,
     CommandOptions,
     ConfigSetting,
@@ -27,7 +28,7 @@ import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
-import { Range } from "./body";
+import { Range, Selection } from "./body";
 import { makeAllBindings } from "./commandBindings";
 import { menuData } from "./menu";
 
@@ -438,10 +439,8 @@ export class LeoUI extends NullGui {
      * * Launches refresh for UI components and context states (Debounced)
      */
     public async _launchRefresh(): Promise<unknown> {
-        // TODO : implement actual refresh of UI components based on this._refreshType and this.finalFocus
 
-        console.log('Launching UI refresh with options:', this._refreshType, ' finalFocus:', this.finalFocus);
-
+        // console.log('Launching UI refresh with options:', this._refreshType, ' finalFocus:', this.finalFocus);
 
         // Check states for having at least a document opened
         if (this.leoStates.leoReady && this.leoStates.fileOpenedReady) {
@@ -653,8 +652,107 @@ export class LeoUI extends NullGui {
     }
 
     private _tryApplyNodeToBody(node: Position, p_forceShow: boolean, p_showBodyNoFocus: boolean): void {
-        // TODO
-        // console.log('TODO ! _tryApplyNodeToBody called with node:', node, ' forceShow:', p_forceShow, ' showBodyNoFocus:', p_showBodyNoFocus);
+
+        // In LeoJS, this required a bunch of helper methods because the body pane itself was not readily available and the body text was not directly settable,
+        // so it required to find the right "editor" object in the DOM, then set its value, then restore scroll and selection, etc.   
+        // Here in Leo-Web, the body pane is always readily available and we can directly set its content and send it the scroll and selection info,
+        // so this should be more straightforward.
+
+        const c = g.app.windowList[this.frameIndex].c;
+        const p = c.p;
+
+        if (!node.__eq__(c.p)) {
+            // Oh, should never happen
+            console.error('Trying to apply a node to body that is different from the selected one! This should not happen. Node:', node, ' Selected:', c.p);
+        }
+
+        const [w_language, w_wrap] = this._getBodyLanguage(node);
+        // 1- set body text and wrap
+        workspace.view.setBody(p.b, w_wrap);
+
+        // 2- set language and wrap for syntax coloring along with selection and scroll info to be used for restoring selection and scroll after setting the body text
+        const insert = p.v.insertSpot;
+        const start = p.v.selectionStart;
+        const end = p.v.selectionStart + p.v.selectionLength;
+        const scroll = p.v.scrollBarSpot;
+
+        let w_leoBodySel: BodySelectionInfo = {
+            "gnx": p.v.gnx,
+            "scroll": scroll,
+            "insert": this._row_col_pv_dict(insert, p.v.b),
+            "start": this._row_col_pv_dict(start, p.v.b),
+            "end": this._row_col_pv_dict(end, p.v.b)
+        };
+        const wrapper = c.frame.body.wrapper;
+        const test_insert = wrapper.getInsertPoint();
+        let test_start, test_end;
+        [test_start, test_end] = wrapper.getSelectionRange(true);
+
+        // ! OVERRIDE !
+        w_leoBodySel = {
+            "gnx": p.v.gnx,
+            "scroll": scroll,
+            "insert": this._row_col_wrapper_dict(test_insert, wrapper),
+            "start": this._row_col_wrapper_dict(test_start, wrapper),
+            "end": this._row_col_wrapper_dict(test_end, wrapper)
+        };
+
+        // Cursor position and selection range
+        const w_activeRow: number = w_leoBodySel.insert.line;
+        const w_activeCol: number = w_leoBodySel.insert.col;
+        let w_anchorLine: number = w_leoBodySel.start.line;
+        let w_anchorCharacter: number = w_leoBodySel.start.col;
+
+        if (w_activeRow === w_anchorLine && w_activeCol === w_anchorCharacter) {
+            // Active insertion same as start selection, so use the other ones
+            w_anchorLine = w_leoBodySel.end.line;
+            w_anchorCharacter = w_leoBodySel.end.col;
+        }
+
+        const w_selection = new Selection(
+            w_anchorLine,
+            w_anchorCharacter,
+            w_activeRow,
+            w_activeCol
+        );
+
+        // Build scroll position from selection range.
+        const w_scrollRange = new Range(
+            w_activeRow,
+            w_activeCol,
+            w_activeRow,
+            w_activeCol
+        );
+
+        // TODO: Use w_language, w_selection and w_scrollRange to set syntax coloring, selection and scroll in the body pane.
+
+    }
+
+    /**
+     * Utility to convert a string index into a line, col dict
+     */
+    private _row_col_pv_dict(i: number, s: string): { line: number, col: number, index: number } {
+        if (!i) {
+            i = 0; // prevent none type
+        }
+        // BUG: this uses current selection wrapper only, use
+        // g.convertPythonIndexToRowCol instead !
+        let line: number;
+        let col: number;
+        [line, col] = g.convertPythonIndexToRowCol(s, i);
+        return { "line": line, "col": col, "index": i };
+    };
+
+    /**
+     * Converts from wrapper text index to line /col
+     */
+    private _row_col_wrapper_dict(i: number, wrapper: StringTextWrapper): { "line": number, "col": number, "index": number } {
+        if (!i) {
+            i = 0; // prevent none type
+        }
+        let line, col;
+        [line, col] = wrapper.toPythonIndexRowCol(i);
+        return { "line": line, "col": col, "index": i };
     }
 
 
@@ -1887,7 +1985,7 @@ export class LeoUI extends NullGui {
         this.focusWidget = widget;
         const w_widgetName = this.widget_name(widget);
         // TODO : implement focus change in web UI
-        console.log(`Focus set to widget: ${w_widgetName}`);
+        // console.log(`Focus set to widget: ${w_widgetName}`);
     }
 
     public get_focus(c?: Commands): StringTextWrapper {
