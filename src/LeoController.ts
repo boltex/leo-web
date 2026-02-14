@@ -51,6 +51,7 @@ export class LeoController {
     private setupEventHandlers() {
         this.setupOutlinePaneHandlers();
         this.setupBodyPaneHandlers();
+        this.setupLogPaneHandlers();
         this.setupResizerHandlers();
         this.setupWindowHandlers();
         this.setupButtonHandlers();
@@ -78,6 +79,11 @@ export class LeoController {
         // view.BODY_PANE.addEventListener("beforeinput", utils.preventDefault); // Block text changes
         // view.BODY_PANE.addEventListener("paste", utils.preventDefault); // Block text changes
 
+    }
+
+    private setupLogPaneHandlers() {
+        const view = this.view;
+        view.LOG_PANE.addEventListener('keydown', this.handleLogPaneKeyDown);
     }
 
     private setupResizerHandlers() {
@@ -531,8 +537,16 @@ export class LeoController {
         if (e.shiftKey) parts.push('shift');
         if (e.metaKey) parts.push('meta');
 
-        // Block if its CTRL+S evven if its not enabled 
+        // Block if its CTRL+S even if its not enabled 
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+        }
+        // Block if its UNDO or REDO (ctrl+z, ctrl+shift+z, ctrl+y) even if they are not enabled, 
+        // to prevent interfering with browser shortcuts
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+            e.preventDefault();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
             e.preventDefault();
         }
 
@@ -610,7 +624,7 @@ export class LeoController {
         if (e.shiftKey) parts.push('shift');
         if (e.metaKey) parts.push('meta');
 
-        // Block if its CTRL+S evven if its not enabled 
+        // Block if its CTRL+S even if its not enabled 
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
             e.preventDefault();
         }
@@ -679,6 +693,25 @@ export class LeoController {
                 return;
             }
         }
+    }
+
+    private handleLogPaneKeyDown = (e: KeyboardEvent) => {
+        // Similar implementation to the other keydown handlers, but for the log pane if needed.
+        // For now, we don't have specific keybindings for the log pane, but this can be implemented in the future.
+
+        // Block if its CTRL+S even if its not enabled 
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+        }
+        // Block if its UNDO or REDO (ctrl+z, ctrl+shift+z, ctrl+y) even if they are not enabled, 
+        // to prevent interfering with browser shortcuts
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+            e.preventDefault();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+            e.preventDefault();
+        }
+
     }
 
     // Global key handlers (work anywhere)

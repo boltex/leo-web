@@ -236,6 +236,21 @@ export class LeoView {
         });
     }
 
+    public setEditorTouchedCallback(callback: (textDocumentChange: any) => void) {
+        // Listen for any user interaction that indicates the body pane has been changed. This can include input events, paste events, and cut events.
+
+        this.BODY_PANE.addEventListener('input', (e) => {
+            callback(e);
+        });
+        this.BODY_PANE.addEventListener('paste', (e) => {
+            callback(e);
+        });
+        this.BODY_PANE.addEventListener('cut', (e) => {
+            callback(e);
+        });
+
+    }
+
     public renderTree = () => {
         if (!this._flatRowsLeo) {
             return; // Not initialized yet

@@ -215,6 +215,10 @@ export class LeoUI extends NullGui {
             g.app.windowList[this.frameIndex].startupWindow = true;
         }
 
+        workspace.view.setEditorTouchedCallback((textDocumentChange) =>
+            this._onDocumentChanged(textDocumentChange)
+        );
+
         // TODO: other startup tasks...
 
         if (g.app.windowList.length) {
@@ -329,6 +333,11 @@ export class LeoUI extends NullGui {
     }
 
 
+    private _onDocumentChanged(textDocumentChange: any): void {
+        // TODO : implement document change handling, such as marking the document as dirty, enabling save button, etc.
+        console.log('TODO ! _onDocumentChanged called to handle document change events', textDocumentChange);
+    }
+
     /**
      * * Validate headline edit input box if active, or, Save body to the Leo app if its dirty.
      *   That is, only if a change has been made to the body 'document' so far
@@ -358,6 +367,7 @@ export class LeoUI extends NullGui {
             this._editorTouched = false;
             this._bodySaveDocument();
         }
+        this._bodySaveSelection();
 
     }
 
