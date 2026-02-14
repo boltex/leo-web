@@ -236,19 +236,34 @@ export class LeoView {
         });
     }
 
-    public setEditorTouchedCallback(callback: (textDocumentChange: any) => void) {
-        // Listen for any user interaction that indicates the body pane has been changed. This can include input events, paste events, and cut events.
-
+    public setEditorTouchedCallback(callback: (change: { type: string; content: string | null }) => void) {
         this.BODY_PANE.addEventListener('input', (e) => {
-            callback(e);
+            const inputEvent = e as InputEvent;
+            callback({
+                type: inputEvent.inputType,
+                content: inputEvent.data
+            });
         });
         this.BODY_PANE.addEventListener('paste', (e) => {
-            callback(e);
+            const clipboardEvent = e as ClipboardEvent;
+            callback({
+                type: 'paste',
+                content: clipboardEvent.clipboardData?.getData('text/plain') ?? null
+            });
         });
         this.BODY_PANE.addEventListener('cut', (e) => {
-            callback(e);
+            const clipboardEvent = e as ClipboardEvent;
+            callback({
+                type: 'cut',
+                content: clipboardEvent.clipboardData?.getData('text/plain') ?? null
+            });
         });
+    }
 
+    public setBodyFocusOutCallback(callback: () => void) {
+        this.BODY_PANE.addEventListener('blur', () => {
+            callback();
+        });
     }
 
     public renderTree = () => {
@@ -740,16 +755,19 @@ export class LeoView {
     }
 
     public setBody(text: string, wrap: boolean) {
+        this.setBodyWrap(wrap);
+        // Escape the text to prevent HTML injection, <, >, &, etc. but preserve newlines and spaces
+        text = this._escapeBodyText(text);
+
+        this.BODY_PANE.innerHTML = text;
+    }
+
+    public setBodyWrap(wrap: boolean) {
         if (wrap) {
             this.BODY_PANE.style.whiteSpace = "pre-wrap"; // Wrap text
         } else {
             this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
         }
-
-        // Escape the text to prevent HTML injection, <, >, &, etc. but preserve newlines and spaces
-        text = this._escapeBodyText(text);
-
-        this.BODY_PANE.innerHTML = text;
     }
 
     private _escapeBodyText(text: string): string {

@@ -69,19 +69,6 @@ export class LeoUI extends NullGui {
         this._lastRefreshNodeTS = utils.performanceNow();
     }
 
-    // * Outline Pane
-    private _lastSelectedNode: Position | undefined;
-    public lastSelectedNodeTime: number | undefined = 0; // Falsy means not set
-    private _lastSelectedNodeTS: number = 0;
-    get lastSelectedNode(): Position | undefined {
-        return this._lastSelectedNode;
-    }
-    set lastSelectedNode(p_ap: Position | undefined) {
-        // Needs undefined type because it cannot be set in the constructor
-        this._lastSelectedNode = p_ap;
-        this._lastSelectedNodeTS = utils.performanceNow();
-    }
-
     // * Find panel
     private _findNeedsFocus: number = 0; // 0 none, 1 find, 2 nav
     private _lastSettingsUsed: LeoSearchSettings | undefined; // Last settings loaded / saved for current document
@@ -100,7 +87,10 @@ export class LeoUI extends NullGui {
     private _scrollGnx: string = '';
     private _scroll: Range | undefined;
 
+    // * Body pane
     private _editorTouched: boolean = false; // Signifies that the body editor DOM element has been modified by the user since last save
+    private _bodyStatesTimer: NodeJS.Timeout | undefined;
+
 
     // * Debounced method used to get states for UI display flags (commands such as undo, redo, save, ...)
     public getStates: (() => void);
@@ -219,6 +209,10 @@ export class LeoUI extends NullGui {
             this._onDocumentChanged(textDocumentChange)
         );
 
+        workspace.view.setBodyFocusOutCallback(() => {
+            this.triggerBodySave(true, true);
+        });
+
         // TODO: other startup tasks...
 
         if (g.app.windowList.length) {
@@ -333,9 +327,66 @@ export class LeoUI extends NullGui {
     }
 
 
-    private _onDocumentChanged(textDocumentChange: any): void {
+    private _onDocumentChanged(textDocumentChange: { type: string; content: string | null }): void {
         // TODO : implement document change handling, such as marking the document as dirty, enabling save button, etc.
         console.log('TODO ! _onDocumentChanged called to handle document change events', textDocumentChange);
+        const c = g.app.windowList[this.frameIndex].c;
+
+        this._editorTouched = true; // To make sure to transfer content to Leo even if all undone
+
+        const w_bodyText = workspace.view.getBody();
+        const w_hasBody = !!w_bodyText.length;
+        const w_iconChanged = (!c.p.isDirty() || (!!c.p.bodyString().length === !w_hasBody))
+        if (!this.leoStates.leoChanged || w_iconChanged) {
+            // Document pane icon needs refresh (changed) and/or outline icon changed
+            this._bodySaveDocument()
+
+            if (w_iconChanged) {
+                this.findFocusTree = false;
+                // NOT incrementing this.treeID to keep ids intact
+                // NoReveal since we're keeping the same id.
+                this._refreshOutline(RevealType.NoReveal);
+            }
+
+            if (!this.leoStates.leoChanged) {
+                // also refresh document panel (icon may be dirty now)
+                this.leoStates.leoChanged = true;
+                this.refreshDocumentsPane();
+            }
+        }
+
+        // * If body changed a line with and '@' directive refresh body states
+        if (textDocumentChange.content?.includes('@')) {
+            this.debouncedRefreshBodyStates(100);
+        }
+
+    }
+
+    /**
+ * * Refresh body states after a small debounced delay.
+ */
+    public debouncedRefreshBodyStates(p_delay?: number) {
+
+        if (!p_delay) {
+            p_delay = 0;
+        }
+
+        if (this._bodyStatesTimer) {
+            clearTimeout(this._bodyStatesTimer);
+        }
+        if (p_delay === 0) {
+            if (this.leoStates.fileOpenedReady) {
+                void this._bodySaveDocument();
+            }
+            this.refreshBodyStates();
+        } else {
+            this._bodyStatesTimer = setTimeout(() => {
+                if (this.leoStates.fileOpenedReady) {
+                    void this._bodySaveDocument();
+                }
+                this.refreshBodyStates();
+            }, p_delay);
+        }
     }
 
     /**
@@ -398,8 +449,33 @@ export class LeoUI extends NullGui {
      * @returns a promise that resolves when the complete saving process is finished
      */
     private _bodySaveDocument(): void {
-        // TODO !
-        console.log('TODO ! _bodySaveDocument called to save body text to Leo');
+
+        const body = workspace.view.getBody();
+        const c = g.app.windowList[this.frameIndex].c;
+        const u = c.undoer;
+        const wrapper = c.frame.body.wrapper;
+        const w_v = c.p.v;
+
+        // ok we got a valid p.
+        const bunch = u.beforeChangeNodeContents(c.p);
+        c.p.v.setBodyString(body);
+        u.afterChangeNodeContents(c.p, "Body Text", bunch);
+
+        wrapper.setAllText(body);
+        if (!c.isChanged()) {
+            c.setChanged();
+        }
+        if (!c.p.v.isDirty()) {
+            c.p.setDirty();
+        }
+        // this.clearHeadlineSelection();
+
+        g.doHook("bodykey2", { c: c, v: w_v });
+
+        this._bodySaveSelection();
+        this._refreshType.states = true;
+        this.getStates();
+
     }
 
     public refreshDocumentsPane(): void {
@@ -409,12 +485,22 @@ export class LeoUI extends NullGui {
     public refreshUndoPane(): void {
         // TODO : implement undo pane refresh
     }
+
     public refreshBodyStates(): void {
-        // TODO : implement body states refresh
+        const c = g.app.windowList[this.frameIndex].c;
+        let w_language = this._getBodyLanguage(c.p);
+
+        // Set document language (TODO after the base of Leo-Web works)
+        // this._setBodyLanguage(w_language);
+
+        // Set document wrap
+        workspace.view.setBodyWrap(w_language[1]);
     }
+
     public refreshGotoPane(): void {
         // TODO : implement goto pane refresh
     }
+
     public refreshButtonsPane(): void {
         // TODO : implement buttons pane refresh
     }
@@ -422,10 +508,10 @@ export class LeoUI extends NullGui {
     public showOutline(): void {
         workspace.view.OUTLINE_PANE.focus();
     }
+
     public showBody(): void {
         workspace.view.BODY_PANE.focus();
     }
-
 
     /**
      * * Setup global refresh options
@@ -511,7 +597,7 @@ export class LeoUI extends NullGui {
             this._refreshType.body = false;
             let w_showBodyNoFocus: boolean = this.finalFocus.valueOf() !== Focus.Body; // Will preserve focus where it is without forcing into the body pane if true
 
-            this._tryApplyNodeToBody(this._refreshNode || this.lastSelectedNode!, false, w_showBodyNoFocus);
+            this._tryApplyNodeToBody(this._refreshNode, false, w_showBodyNoFocus);
         }
 
         // getStates will check if documents, buttons and states flags are set and refresh accordingly
@@ -575,15 +661,15 @@ export class LeoUI extends NullGui {
         this.triggerBodySave(true); // Needed for self-selection to avoid 'cant save file is newer...'
 
         if (!isCtrlClick) {
+            // Is not Ctrl-Click, so normal headline click
             if (g.doHook("headclick1", { c: c, p: node, v: node })) {
                 // returned not falsy, so skip the rest
                 return Promise.resolve();
             }
 
         } else {
-            // Ctrl-Click: 
-            this.lastSelectedNodeTime = undefined;
-
+            // Is Ctrl-Click, try to open url if headline starts with @url or @mime, or unl: and then skip the rest of the selection process,
+            // otherwise just return without doing anything (except the "icondclick2" hook) since Ctrl-Click is meant to trigger side effects, not selection.
             if (g.doHook("icondclick1", { c: c, p: node, v: node })) {
                 // returned not falsy, so skip the rest
                 return Promise.resolve();
@@ -884,7 +970,6 @@ export class LeoUI extends NullGui {
     private _setupNoOpenedLeoDocument(): void {
         void this.checkConfirmBeforeClose();
         this.leoStates.fileOpenedReady = false;
-        this.lastSelectedNode = undefined;
         this._refreshOutline(RevealType.NoReveal);
         const states = this.leoStates;
         const view = workspace.view;
