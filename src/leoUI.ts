@@ -85,11 +85,11 @@ export class LeoUI extends NullGui {
     private _selection: Selection | undefined; // also packaged into 'BodySelectionInfo'
     private _scrollDirty: boolean = false; // Flag set when cursor selection is changed
     private _scrollGnx: string = '';
-    private _scroll: Range | undefined;
+    private _scroll: number | undefined;
 
     // * Body pane
     private _editorTouched: boolean = false; // Signifies that the body editor DOM element has been modified by the user since last save
-    private _bodyStatesTimer: NodeJS.Timeout | undefined;
+    private _bodyStatesTimer: ReturnType<typeof setTimeout> | undefined;
 
 
     // * Debounced method used to get states for UI display flags (commands such as undo, redo, save, ...)
@@ -204,6 +204,14 @@ export class LeoUI extends NullGui {
         if (g.app.windowList[this.frameIndex]) {
             g.app.windowList[this.frameIndex].startupWindow = true;
         }
+
+        // * React to change in selection, cursor position and scroll position
+        workspace.view.setChangeTextEditorSelectionCallback((event) =>
+            this._onChangeEditorSelection(event)
+        );
+        workspace.view.setChangeTextEditorScrollCallback((event) =>
+            this._onChangeEditorScroll(event)
+        );
 
         workspace.view.setEditorTouchedCallback((textDocumentChange) =>
             this._onDocumentChanged(textDocumentChange)
@@ -326,12 +334,44 @@ export class LeoUI extends NullGui {
         // TODO : SETUP BROWSER TO ASK BEFORE EXITING IF hasDirty IS TRUE, REMOVE IF FALSE
     }
 
-
-    private _onDocumentChanged(textDocumentChange: { type: string; content: string | null }): void {
-        // TODO : implement document change handling, such as marking the document as dirty, enabling save button, etc.
-        console.log('TODO ! _onDocumentChanged called to handle document change events', textDocumentChange);
+    /**
+     * * Handles detection of the active editor's selection change or cursor position
+     * @param p_event a change event containing the active editor's selection, if any.
+     */
+    private _onChangeEditorSelection(p_event: Selection): void {
         const c = g.app.windowList[this.frameIndex].c;
 
+        // For now, just log what we got, we'll implement it later
+        console.log('Selection change event detected:', p_event);
+
+        if (p_event) {
+            this._selectionDirty = true;
+            this._selection = p_event;
+            this._selectionGnx = c.p.gnx;
+        }
+    }
+
+    /**
+     * * Handles detection of the active editor's scroll position changes
+     * @param p_event a change event containing the active editor's visible range, if any.
+     */
+    private _onChangeEditorScroll(p_event: number): void {
+        const c = g.app.windowList[this.frameIndex].c;
+
+        // For now, just log what we got, we'll implement it later
+        console.log('Scroll event detected:', p_event);
+
+        if (p_event != null) {
+            this._scrollDirty = true;
+            this._scroll = p_event;
+            this._scrollGnx = c.p.gnx;
+        }
+    }
+
+
+    private _onDocumentChanged(textDocumentChange: { type: string; content: string | null }): void {
+
+        const c = g.app.windowList[this.frameIndex].c;
         this._editorTouched = true; // To make sure to transfer content to Leo even if all undone
 
         const w_bodyText = workspace.view.getBody();
@@ -435,13 +475,72 @@ export class LeoUI extends NullGui {
         // Prepare scroll data separately
         let scroll: number;
         if (this._selectionGnx === this._scrollGnx && this._scrollDirty) {
-            scroll = this._scroll?.start.line || 0;
+            scroll = this._scroll || 0;
         } else {
             scroll = 0;
         }
 
         let gnx: string | undefined;
         let c: Commands | undefined;
+
+        c = g.app.windowList[this.frameIndex].c;
+        gnx = this._selectionGnx;
+
+        const start = {
+            line: this._selection.start.line || 0,
+            col: this._selection.start.character || 0,
+        };
+        const end = {
+            line: this._selection.end.line || 0,
+            col: this._selection.end.character || 0,
+        };
+        const active = {
+            line: this._selection.active.line || 0,
+            col: this._selection.active.character || 0,
+        };
+        if (!c || !gnx) {
+            return;
+        }
+        let p: Position | undefined;
+        if (c.p.gnx === gnx) {
+            p = c.p;
+        } else {
+            // find p.
+            for (let p_p of c.all_positions()) {
+                if (p_p.v.gnx === gnx) {
+                    p = p_p;
+                    break;
+                }
+            }
+        }
+        if (!p) {
+            return;
+        }
+
+        // - "start":  The start of the selection.
+        // - "end":    The end of the selection.
+        // - "active": The insert point. Must be either start or end.
+        // - "scroll": An optional scroll position.
+
+        const v = p.v;
+        const wrapper = c.frame.body.wrapper;
+        const insert = g.convertRowColToPythonIndex(v.b, active['line'], active['col']);
+        const startSel = g.convertRowColToPythonIndex(v.b, start['line'], start['col']);
+        const endSel = g.convertRowColToPythonIndex(v.b, end['line'], end['col']);
+
+        // If it's the currently selected node set the wrapper's states too
+        if (p.__eq__(c.p)) {
+            wrapper.setSelectionRange(startSel, endSel, insert);
+            wrapper.setYScrollPosition(scroll);
+        }
+        // Always set vnode attrs.
+        v.scrollBarSpot = scroll;
+        v.insertSpot = insert;
+        v.selectionStart = startSel < endSel ? startSel : endSel;
+        v.selectionLength = Math.abs(startSel - endSel);
+
+        this._scrollDirty = false;
+        this._selectionDirty = false;
     }
 
     /**
@@ -510,7 +609,59 @@ export class LeoUI extends NullGui {
     }
 
     public showBody(): void {
-        workspace.view.BODY_PANE.focus();
+        console.log('SHOWBODY')
+        // TODO : set selection , sroll should instead be set in 
+        const c = g.app.windowList[this.frameIndex].c;
+        const p = c.p;
+
+        const insert = p.v.insertSpot;
+        const start = p.v.selectionStart;
+        const end = p.v.selectionStart + p.v.selectionLength;
+        const scroll = p.v.scrollBarSpot;
+
+        let w_leoBodySel: BodySelectionInfo = {
+            "gnx": p.v.gnx,
+            "scroll": scroll,
+            "insert": this._row_col_pv_dict(insert, p.v.b),
+            "start": this._row_col_pv_dict(start, p.v.b),
+            "end": this._row_col_pv_dict(end, p.v.b)
+        };
+        const wrapper = c.frame.body.wrapper;
+        const test_insert = wrapper.getInsertPoint();
+        let test_start, test_end;
+        [test_start, test_end] = wrapper.getSelectionRange(true);
+
+        // ! OVERRIDE !
+        w_leoBodySel = {
+            "gnx": p.v.gnx,
+            "scroll": scroll,
+            "insert": this._row_col_wrapper_dict(test_insert, wrapper),
+            "start": this._row_col_wrapper_dict(test_start, wrapper),
+            "end": this._row_col_wrapper_dict(test_end, wrapper)
+        };
+
+        // Cursor position and selection range
+        const w_activeRow: number = w_leoBodySel.insert.line;
+        const w_activeCol: number = w_leoBodySel.insert.col;
+        let w_anchorLine: number = w_leoBodySel.start.line;
+        let w_anchorCharacter: number = w_leoBodySel.start.col;
+
+        if (w_activeRow === w_anchorLine && w_activeCol === w_anchorCharacter) {
+            // Active insertion same as start selection, so use the other ones
+            w_anchorLine = w_leoBodySel.end.line;
+            w_anchorCharacter = w_leoBodySel.end.col;
+        }
+
+        const w_selection = new Selection(
+            w_anchorLine,
+            w_anchorCharacter,
+            w_activeRow,
+            w_activeCol
+        );
+
+        workspace.view.setBodySelection(w_selection);
+
+        // workspace.view.BODY_PANE.focus();
     }
 
     /**
@@ -765,63 +916,9 @@ export class LeoUI extends NullGui {
         const [w_language, w_wrap] = this._getBodyLanguage(node);
         // 1- set body text and wrap
         workspace.view.setBody(p.b, w_wrap);
-
-        // 2- set language and wrap for syntax coloring along with selection and scroll info to be used for restoring selection and scroll after setting the body text
-        const insert = p.v.insertSpot;
-        const start = p.v.selectionStart;
-        const end = p.v.selectionStart + p.v.selectionLength;
+        this._setBodyLanguage(w_language);
         const scroll = p.v.scrollBarSpot;
-
-        let w_leoBodySel: BodySelectionInfo = {
-            "gnx": p.v.gnx,
-            "scroll": scroll,
-            "insert": this._row_col_pv_dict(insert, p.v.b),
-            "start": this._row_col_pv_dict(start, p.v.b),
-            "end": this._row_col_pv_dict(end, p.v.b)
-        };
-        const wrapper = c.frame.body.wrapper;
-        const test_insert = wrapper.getInsertPoint();
-        let test_start, test_end;
-        [test_start, test_end] = wrapper.getSelectionRange(true);
-
-        // ! OVERRIDE !
-        w_leoBodySel = {
-            "gnx": p.v.gnx,
-            "scroll": scroll,
-            "insert": this._row_col_wrapper_dict(test_insert, wrapper),
-            "start": this._row_col_wrapper_dict(test_start, wrapper),
-            "end": this._row_col_wrapper_dict(test_end, wrapper)
-        };
-
-        // Cursor position and selection range
-        const w_activeRow: number = w_leoBodySel.insert.line;
-        const w_activeCol: number = w_leoBodySel.insert.col;
-        let w_anchorLine: number = w_leoBodySel.start.line;
-        let w_anchorCharacter: number = w_leoBodySel.start.col;
-
-        if (w_activeRow === w_anchorLine && w_activeCol === w_anchorCharacter) {
-            // Active insertion same as start selection, so use the other ones
-            w_anchorLine = w_leoBodySel.end.line;
-            w_anchorCharacter = w_leoBodySel.end.col;
-        }
-
-        const w_selection = new Selection(
-            w_anchorLine,
-            w_anchorCharacter,
-            w_activeRow,
-            w_activeCol
-        );
-
-        // Build scroll position from selection range.
-        const w_scrollRange = new Range(
-            w_activeRow,
-            w_activeCol,
-            w_activeRow,
-            w_activeCol
-        );
-
-        // TODO: Use w_language, w_selection and w_scrollRange to set syntax coloring, selection and scroll in the body pane.
-
+        workspace.view.setBodyScroll(scroll);
     }
 
     /**
@@ -876,6 +973,13 @@ export class LeoUI extends NullGui {
         }
 
         return [w_language, w_wrap];
+    }
+
+    private _setBodyLanguage(w_language: string): void {
+        // TODO : implement body language setting in the web UI, 
+        // which should trigger syntax coloring changes in the body pane
+        // something like workspace.view.setBodyLanguage(w_language) that will be implemented later, after the base of Leo-Web works.
+        console.log('Setting body language to: ', w_language);
     }
 
     /**

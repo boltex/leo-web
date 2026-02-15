@@ -55,7 +55,7 @@ export class IdleTime {
     public enabled: boolean; // True: run the timer continuously.
     public handler: (it: IdleTime) => any; // The user-provided idle-time handler.
     public waiting_for_idle: boolean; // True if we have already waited for the minimum delay.
-    public timer: NodeJS.Timeout | undefined; // for setTimeout or setInterval instead of QtCore.QTimer();
+    public timer: ReturnType<typeof setTimeout> | undefined; // for setTimeout or setInterval instead of QtCore.QTimer();
 
     //@+others
     //@+node:felix.20251214160339.9: *3* IdleTime.__init__

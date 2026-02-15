@@ -2,6 +2,7 @@ import { MenuEntry, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, Me
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
 import { Position } from './core/leoNodes';
+import * as body from './body'
 
 type QuickPickInternalItem = QuickPickItem & { renderedLabel?: string };
 
@@ -139,6 +140,11 @@ export class LeoView {
     public minWidth = 20;
     public minHeight = 20;
 
+    private _changeSelectionTimer: ReturnType<typeof setTimeout> | undefined;
+    private _changeScrollTimer: ReturnType<typeof setTimeout> | undefined;
+
+
+
     constructor() {
 
         this.MAIN_CONTAINER = document.getElementById("main-container")!;
@@ -234,6 +240,168 @@ export class LeoView {
                 }
             }, 100); // debounce delay in ms
         });
+    }
+
+    // private getNodePath(node: Node): number[] {
+    //     const path: number[] = [];
+    //     let current: Node | null = node;
+    //     while (current && current !== this.BODY_PANE) {
+    //         const parent: Node | null = current.parentNode;
+    //         if (!parent) break;
+    //         const index = Array.prototype.indexOf.call(parent.childNodes, current);
+    //         path.unshift(index);
+    //         current = parent;
+    //     }
+    //     return path;
+    // }
+
+    public setChangeTextEditorSelectionCallback(callback: (selection: body.Selection) => void) {
+        const handleSelectionChange = () => {
+
+            if (this._changeSelectionTimer) {
+                clearTimeout(this._changeSelectionTimer);
+            }
+
+            this._changeSelectionTimer = setTimeout(() => {
+                const domSelection = document.getSelection();
+                if (!domSelection || domSelection.rangeCount === 0) return;
+
+                // Check if the selection is within the BODY_PANE
+                const range = domSelection.getRangeAt(0);
+                if (!this.BODY_PANE.contains(range.commonAncestorContainer)) {
+                    return; // Selection is not in the body pane
+                }
+
+                // Convert DOM selection to Position/Selection objects
+                const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
+                const activePos = this.offsetToPosition(domSelection.focusOffset, domSelection.focusNode);
+
+                const selection = new body.Selection(anchorPos, activePos);
+                callback(selection);
+            }, 50); // debounce delay in ms
+
+        };
+
+        // Listen on document, not on BODY_PANE
+        document.addEventListener('selectionchange', handleSelectionChange);
+    }
+
+    // Helper method to convert DOM offset to Position
+    private offsetToPosition(offset: number, node: Node | null): body.Position {
+        if (!node) return new body.Position(0, 0);
+
+        const bodyText = this.BODY_PANE.innerText;
+        const beforeNode = this.getTextBeforeNode(node);
+        const totalOffset = beforeNode.length + offset;
+
+        // Convert absolute offset to line/character
+        const lines = bodyText.substring(0, totalOffset).split('\n');
+        const line = lines.length - 1;
+        const character = lines[lines.length - 1].length;
+
+        return new body.Position(line, character);
+    }
+
+    private getTextBeforeNode(node: Node): string {
+        // Implementation to get all text before the given node within BODY_PANE
+        // This is a simplified version - you may need to refine based on your DOM structure
+        let text = '';
+        const walker = document.createTreeWalker(
+            this.BODY_PANE,
+            NodeFilter.SHOW_TEXT,
+            null
+        );
+
+        let currentNode;
+        while (currentNode = walker.nextNode()) {
+            if (currentNode === node) break;
+            text += currentNode.textContent || '';
+        }
+
+        return text;
+    }
+
+    public setChangeTextEditorScrollCallback(callback: (event: number) => void) {
+        this.BODY_PANE.addEventListener('scroll', (e) => {
+            if (this._changeScrollTimer) {
+                clearTimeout(this._changeScrollTimer);
+            }
+            this._changeScrollTimer = setTimeout(() => {
+
+                callback(this.BODY_PANE.scrollTop);
+
+            }, 100); // debounce delay in ms
+        });
+    }
+
+    public setBodyScroll(scroll: number) {
+        this.BODY_PANE.scrollTop = scroll;
+    }
+
+    public setBodySelection(selection: body.Selection) {
+        // Convert body.Selection to DOM Range and set it in the BODY_PANE
+        const range = document.createRange();
+        const { anchor, active } = selection;
+        const anchorInfo = this.positionToNodeOffset(anchor);
+        const activeInfo = this.positionToNodeOffset(active);
+
+        range.setStart(anchorInfo.node, anchorInfo.offset);
+        range.setEnd(activeInfo.node, activeInfo.offset);
+
+        const selectionObj = window.getSelection();
+        if (selectionObj) {
+            selectionObj.removeAllRanges();
+            selectionObj.addRange(range);
+        }
+    }
+
+    public positionToNodeOffset(position: body.Position): { node: Node; offset: number } {
+        // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
+        const bodyText = this.BODY_PANE.innerText;
+        const lines = bodyText.split('\n');
+        let charCount = 0;
+        for (let i = 0; i < position.line; i++) {
+            charCount += lines[i].length + 1; // +1 for the newline character
+        }
+        charCount += position.character;
+
+        // Find the corresponding DOM node and offset
+        const walker = document.createTreeWalker(
+            this.BODY_PANE,
+            NodeFilter.SHOW_TEXT,
+            null
+        );
+
+        let currentNode;
+        let accumulatedLength = 0;
+        while (currentNode = walker.nextNode()) {
+            const nodeLength = currentNode.textContent?.length || 0;
+            if (accumulatedLength + nodeLength >= charCount) {
+                return { node: currentNode, offset: charCount - accumulatedLength };
+            }
+            accumulatedLength += nodeLength;
+        }
+
+        // Fallback to the end of BODY_PANE
+        return { node: this.BODY_PANE, offset: this.BODY_PANE.childNodes.length };
+    }
+
+    public scrollSelectedNodeIntoView(selectedNode: Position) {
+        if (!selectedNode || !this._flatRowsLeo) return; // Not initialized yet
+        const flatRows = this._flatRowsLeo;
+
+        const selectedIndex = flatRows.findIndex(row => row.node.__eq__(selectedNode));
+        if (selectedIndex === -1) return; // Not found (shouldn't happen)
+        const nodePosition = selectedIndex * this.ROW_HEIGHT;
+
+        const scrollTop = this.OUTLINE_PANE.scrollTop;
+        const viewportHeight = this.OUTLINE_PANE.clientHeight;
+
+        if (nodePosition < scrollTop) {
+            this.OUTLINE_PANE.scrollTop = nodePosition;
+        } else if (nodePosition + this.ROW_HEIGHT > scrollTop + viewportHeight) {
+            this.OUTLINE_PANE.scrollTop = nodePosition - viewportHeight + this.ROW_HEIGHT;
+        }
     }
 
     public setEditorTouchedCallback(callback: (change: { type: string; content: string | null }) => void) {

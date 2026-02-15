@@ -235,11 +235,11 @@ export class SqlitePickleShare {
     public conn: Database | undefined;
     public init: Promise<Database>;
     public cache: Record<string, any>;
-    public commitTimeout: NodeJS.Timeout | undefined;
+    public commitTimeout: ReturnType<typeof setTimeout> | undefined;
     public watcher: any | undefined;
     private _needWatchSetup = false;
     private _selfChanged = false;
-    private _refreshTimeout: NodeJS.Timeout | undefined;
+    private _refreshTimeout: ReturnType<typeof setTimeout> | undefined;
 
     // Allow index signature to allow any arbitrary property
     [key: string]: any;
