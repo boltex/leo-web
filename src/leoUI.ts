@@ -609,8 +609,6 @@ export class LeoUI extends NullGui {
     }
 
     public showBody(): void {
-        console.log('SHOWBODY')
-        // TODO : set selection , sroll should instead be set in 
         const c = g.app.windowList[this.frameIndex].c;
         const p = c.p;
 
@@ -659,9 +657,7 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
-        workspace.view.setBodySelection(w_selection);
-
-        // workspace.view.BODY_PANE.focus();
+        workspace.view.setBodySelection(w_selection); // This sets focus to the body pane as well
     }
 
     /**
@@ -687,8 +683,6 @@ export class LeoUI extends NullGui {
      */
     public async _launchRefresh(): Promise<unknown> {
 
-        // console.log('Launching UI refresh with options:', this._refreshType, ' finalFocus:', this.finalFocus);
-
         // Check states for having at least a document opened
         if (this.leoStates.leoReady && this.leoStates.fileOpenedReady) {
             // Had some opened...
@@ -697,14 +691,11 @@ export class LeoUI extends NullGui {
             }
         }
 
-
         // Maybe this is the first refresh after opening?
         if (this.leoStates.leoReady && !this.leoStates.fileOpenedReady) {
             // Was all closed
             if (g.app.windowList.length) {
                 this._setupOpenedLeoDocument();
-                // Has a commander opened, but wait for UI!
-                // await this.leoStates.qLastContextChange; // Was in LeoJS, needed in Leo-Web?
             } else {
                 // First time starting: not even an untitled nor workbook.leo
                 return;
@@ -735,20 +726,17 @@ export class LeoUI extends NullGui {
 
         if (this._refreshType.tree) {
             this._refreshType.tree = false;
-            this._refreshType.node = false; // Also clears node
-            // TODO : implement outline/tree refresh with this._refreshNode and w_revealType
             this._refreshOutline(w_revealType);
-        } else if (this._refreshType.node && this._refreshNode) {
-            // * Force single node "refresh" by revealing it, instead of "refreshing" it
-            this._refreshType.node = false;
+        }
+
+        if (this._refreshNode) {
             this.leoStates.setSelectedNodeFlags(this._refreshNode);
         }
 
         if (this._refreshType.body) {
             this._refreshType.body = false;
             let w_showBodyNoFocus: boolean = this.finalFocus.valueOf() !== Focus.Body; // Will preserve focus where it is without forcing into the body pane if true
-
-            this._tryApplyNodeToBody(this._refreshNode, false, w_showBodyNoFocus);
+            this._tryApplyNodeToBody(this._refreshNode, w_showBodyNoFocus);
         }
 
         // getStates will check if documents, buttons and states flags are set and refresh accordingly
@@ -899,11 +887,11 @@ export class LeoUI extends NullGui {
 
         g.doHook("headclick2", { c: c, p: node, v: node });
         // * Apply the node to the body text without waiting for the selection promise to resolve
-        return this._tryApplyNodeToBody(node, false, this.config.treeKeepFocus);
+        return this._tryApplyNodeToBody(node, this.config.treeKeepFocus);
 
     }
 
-    private _tryApplyNodeToBody(node: Position, p_forceShow: boolean, p_showBodyNoFocus: boolean): void {
+    private _tryApplyNodeToBody(node: Position, showBodyNoFocus: boolean): void {
 
         // In LeoJS, this required a bunch of helper methods because the body pane itself was not readily available and the body text was not directly settable,
         // so it required to find the right "editor" object in the DOM, then set its value, then restore scroll and selection, etc.   
@@ -924,6 +912,12 @@ export class LeoUI extends NullGui {
         this._setBodyLanguage(w_language);
         const scroll = p.v.scrollBarSpot;
         workspace.view.setBodyScroll(scroll);
+
+        if (!showBodyNoFocus) {
+            // Set focus to body pane
+            this.showBody();
+        }
+
     }
 
     /**

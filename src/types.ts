@@ -216,7 +216,7 @@ export const enum RevealType {
  * * Required Refresh Dictionary of "elements to refresh" flags
  */
 export interface ReqRefresh {
-    node?: boolean; // Reveal received selected node (Navigation only, no tree change)
+
     tree?: boolean; // Tree needs refresh
     body?: boolean; // Body needs refresh
     excludeDetached?: boolean; // Body needs refresh EXCLUDE DETACHED
