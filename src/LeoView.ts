@@ -924,6 +924,7 @@ export class LeoView {
 
     public setBody(text: string, wrap: boolean) {
         this.setBodyWrap(wrap);
+
         // Escape the text to prevent HTML injection, <, >, &, etc. but preserve newlines and spaces
         text = this._escapeBodyText(text);
 
@@ -931,11 +932,7 @@ export class LeoView {
     }
 
     public setBodyWrap(wrap: boolean) {
-        if (wrap) {
-            this.BODY_PANE.style.whiteSpace = "pre-wrap"; // Wrap text
-        } else {
-            this.BODY_PANE.style.whiteSpace = "pre"; // No wrapping
-        }
+        this.HTML_ELEMENT.setAttribute('data-body-wrap', wrap ? 'true' : 'false');
     }
 
     private _escapeBodyText(text: string): string {
@@ -1413,11 +1410,6 @@ export class LeoView {
         return new Promise<undefined>((resolve) => {
             this.__toastResolvers.push(resolve);
         });
-    }
-
-    public showBody(text: string, wrap: boolean) {
-        this.HTML_ELEMENT.setAttribute('data-body-wrap', wrap ? 'true' : 'false');
-        this.BODY_PANE.innerHTML = text;
     }
 
     public addToLogPane(message: string, replace = false) {

@@ -666,14 +666,14 @@ export class LeoUI extends NullGui {
 
     /**
      * * Setup global refresh options
-     * @param p_finalFocus Flag for focus to be placed in outline
+     * @param p_finalFocus kind of pane for focus to be placed after refresh, if any. If not specified, focus will be preserved.
      * @param p_refreshType Refresh flags for each UI part
     */
     public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh, p_preserveRange?: boolean): void {
         if (p_preserveRange) {
             this.refreshPreserveRange = true; // Will be cleared after a refresh cycle.
         }
-        // Set final "focus-placement" EITHER true or false
+        // Set final "focus-placement"
         this.finalFocus = p_finalFocus;
 
         if (p_refreshType) {
@@ -779,7 +779,6 @@ export class LeoUI extends NullGui {
          * @param p_revealType Facultative reveal type to specify type of reveal when the 'selected node' is encountered
          */
     private _refreshOutline(p_revealType?: RevealType): void {
-        // TODO : simplify reveal system which is a remnant of LeoJS, Leo-Web only needs to know where to leave focus after refresh
 
         if (p_revealType !== undefined && p_revealType.valueOf() >= this._revealType.valueOf()) { // To check if selected node should self-select while redrawing whole tree
             this._revealType = p_revealType; // To be read/cleared (in arrayToLeoNodesArray instead of directly by nodes)
@@ -791,7 +790,13 @@ export class LeoUI extends NullGui {
                 // set focus to outline pane
                 this.showOutline();
             }
-
+            if (this._revealType.valueOf() >= RevealType.Reveal.valueOf()) {
+                // should reveal selected node in the tree, so scroll to it if needed
+                if (g.app.windowList.length) {
+                    const c = g.app.windowList[this.frameIndex].c;
+                    workspace.view.scrollNodeIntoView(c.p);
+                }
+            }
             this._revealType = RevealType.NoReveal; // Clear after use
         }
     }
