@@ -17,10 +17,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
     const NO_REFRESH: ReqRefresh = {};
     const REFRESH_NODE_BODY: ReqRefresh = {
 
-        // TODO : Make sure the next line is really needed in leo-web
-        tree: true, // NOTE: FOR NOW IN LEO-WEB, body refresh also needs tree refresh to update icons
-
-        node: true, // Reveal the returned 'selected position' without changes to the tree
+        tree: true, // IN LEO-WEB, body refresh also needs tree refresh to update icons
         body: true, // Goto/select another node needs the body pane refreshed
         states: true
     };

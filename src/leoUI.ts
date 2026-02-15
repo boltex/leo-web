@@ -107,6 +107,7 @@ export class LeoUI extends NullGui {
 
         // * Setup States
         this.leoStates = new LeoStates(this);
+
         // * Get configuration settings
         this.config = new Config();
 
@@ -657,6 +658,7 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
+        console.log("SETTING BODY FOCUS!");
         workspace.view.setBodySelection(w_selection); // This sets focus to the body pane as well
     }
 
@@ -886,13 +888,15 @@ export class LeoUI extends NullGui {
         this.getStates();
 
         g.doHook("headclick2", { c: c, p: node, v: node });
+
         // * Apply the node to the body text without waiting for the selection promise to resolve
-        return this._tryApplyNodeToBody(node, this.config.treeKeepFocus);
+        // In Leo-Web, no 'this.config.treeKeepFocus' to check for, we keep focus in outline.
+        return this._tryApplyNodeToBody(node, true);
 
     }
 
     private _tryApplyNodeToBody(node: Position, showBodyNoFocus: boolean): void {
-
+        console.log('Trying to apply node to body: ', node.h, ' with showBodyNoFocus: ', showBodyNoFocus);
         // In LeoJS, this required a bunch of helper methods because the body pane itself was not readily available and the body text was not directly settable,
         // so it required to find the right "editor" object in the DOM, then set its value, then restore scroll and selection, etc.   
         // Here in Leo-Web, the body pane is always readily available and we can directly set its content and send it the scroll and selection info,
@@ -1540,7 +1544,8 @@ export class LeoUI extends NullGui {
      */
     public async insertNode(p_node: Position | undefined, p_fromOutline: boolean, p_asChild: boolean): Promise<unknown> {
 
-        let w_finalFocus: Focus = p_fromOutline ? Focus.Outline : Focus.Body; // Use w_fromOutline for where we intend to leave focus when done with the insert
+        // let w_finalFocus: Focus = p_fromOutline ? Focus.Outline : Focus.Body; // Use w_fromOutline for where we intend to leave focus when done with the insert
+        const w_finalFocus = Focus.Outline; // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
 
         this.triggerBodySave(true);
 
