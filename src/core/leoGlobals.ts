@@ -1510,7 +1510,6 @@ export async function createHiddenCommander(
     try {
         const exists = await os_path_exists(fn);
         if (app.loadManager!.isLeoFile(fn) && exists) {
-            // await c.fileCommands.openLeoFile(fn, true, true);
             const lm = app.loadManager!;
             const c = lm.openFileByName(fn, app.nullGui);
             return c;

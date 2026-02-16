@@ -1150,6 +1150,15 @@ export class LeoUI extends NullGui {
             return Promise.resolve();
         }
 
+        if (p_options.finalFocus === Focus.NoChange) {
+            // Get the current focus (body outline, or other will be noChange)
+            if (workspace.view.isOutlineFocused()) {
+                p_options.finalFocus = Focus.Outline;
+            } else if (workspace.view.isBodyFocused()) {
+                p_options.finalFocus = Focus.Body;
+            }
+        }
+
         const c = g.app.windowList[this.frameIndex].c;
         this.setupRefresh(p_options.finalFocus, p_options.refreshType);
 
@@ -1501,12 +1510,20 @@ export class LeoUI extends NullGui {
             return Promise.resolve();
         }
 
+        let finalFocus = Focus.NoChange; // 
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.view.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.view.isBodyFocused()) {
+            finalFocus = Focus.Body;
+        }
+
         this.triggerBodySave(true);
         this.frameIndex = index;
         // Like we just opened or made a new file
         if (g.app.windowList.length) {
             this.setupRefresh(
-                this.finalFocus,
+                finalFocus,
                 {
                     tree: true,
                     body: true,
@@ -1787,7 +1804,6 @@ export class LeoUI extends NullGui {
             return undefined;
         }
 
-        this.finalFocus = Focus.Outline;
         return this.selectOpenedLeoDocument(w_chosenIndex);
     }
 
@@ -1822,7 +1838,15 @@ export class LeoUI extends NullGui {
         // this.showBodyIfClosed = true;
         // this.showOutlineIfClosed = true;
 
-        this.setupRefresh(Focus.NoChange, {
+        let finalFocus = Focus.NoChange; // 
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.view.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.view.isBodyFocused()) {
+            finalFocus = Focus.Body;
+        }
+
+        this.setupRefresh(finalFocus, {
             tree: true,
             body: true,
             goto: true,
@@ -1861,10 +1885,18 @@ export class LeoUI extends NullGui {
         }
         this.triggerBodySave(true);
 
-        const c = g.app.windowList[index].c;
-        const w_closed = await c.close();
+        let finalFocus = Focus.NoChange; // 
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.view.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.view.isBodyFocused()) {
+            finalFocus = Focus.Body;
+        }
 
-        this.setupRefresh(Focus.Body, {
+        const c = g.app.windowList[index].c;
+        await c.close();
+
+        this.setupRefresh(finalFocus, {
             tree: true,
             body: true,
             goto: true,
@@ -1877,7 +1909,6 @@ export class LeoUI extends NullGui {
         return this.loadSearchSettings();
 
     }
-
 
     /**
      * * Sets up the call to the 'open-outline' command and its possible file url parameter.
@@ -1892,6 +1923,14 @@ export class LeoUI extends NullGui {
             } else {
                 p_uri = undefined; // clear uri
             }
+        }
+
+        let finalFocus = Focus.NoChange; // 
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.view.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.view.isBodyFocused()) {
+            finalFocus = Focus.Body;
         }
 
         if (!this.leoStates.fileOpenedReady) {
@@ -1923,7 +1962,7 @@ export class LeoUI extends NullGui {
                 }
                 // this.showBodyIfClosed = true;
                 // this.showOutlineIfClosed = true;
-                this.setupRefresh(this.finalFocus, {
+                this.setupRefresh(finalFocus, {
                     tree: true,
                     body: true,
                     goto: true,
@@ -1945,7 +1984,7 @@ export class LeoUI extends NullGui {
             await c.open_outline(p_uri);
             // this.showBodyIfClosed = true;
             // this.showOutlineIfClosed = true;
-            this.setupRefresh(this.finalFocus, {
+            this.setupRefresh(finalFocus, {
                 tree: true,
                 body: true,
                 goto: true,
@@ -1967,13 +2006,21 @@ export class LeoUI extends NullGui {
      * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
      * @returns a promise from saving the file results.
      */
-    public async saveAsLeoFile(p_fromOutline?: boolean): Promise<unknown> {
+    public async saveAsLeoFile(): Promise<unknown> {
         this.triggerBodySave(true);
+
+        let finalFocus = Focus.NoChange; // 
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.view.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.view.isBodyFocused()) {
+            finalFocus = Focus.Body;
+        }
 
         const c = g.app.windowList[this.frameIndex].c;
 
         this.setupRefresh(
-            p_fromOutline ? Focus.Outline : Focus.Body,
+            finalFocus,
             {
                 tree: true,
                 states: true,
@@ -1991,13 +2038,21 @@ export class LeoUI extends NullGui {
      * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
      * @returns a promise from saving the file results.
      */
-    public async saveAsLeoJsFile(p_fromOutline?: boolean): Promise<unknown> {
+    public async saveAsLeoJsFile(): Promise<unknown> {
         this.triggerBodySave(true);
 
         const c = g.app.windowList[this.frameIndex].c;
 
+        let finalFocus = Focus.NoChange; // 
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.view.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.view.isBodyFocused()) {
+            finalFocus = Focus.Body;
+        }
+
         this.setupRefresh(
-            p_fromOutline ? Focus.Outline : Focus.Body,
+            finalFocus,
             {
                 tree: true,
                 states: true,

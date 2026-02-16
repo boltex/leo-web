@@ -242,6 +242,18 @@ export class LeoView {
         });
     }
 
+    public isOutlineFocused(): boolean {
+        // Check if the currently focused element is within the outline pane (OUTLINE_PANE)
+        const activeElement = document.activeElement;
+        return activeElement !== null && this.OUTLINE_PANE.contains(activeElement);
+    }
+
+    public isBodyFocused(): boolean {
+        // Check if the currently focused element is within the body pane (BODY_PANE)
+        const activeElement = document.activeElement;
+        return activeElement !== null && this.BODY_PANE.contains(activeElement);
+    }
+
     // private getNodePath(node: Node): number[] {
     //     const path: number[] = [];
     //     let current: Node | null = node;

@@ -768,12 +768,6 @@ export class Commands {
         return g.app.gui.goAnywhere();
     }
 
-
-    //@+node:felix.20251214160339.453: *3* @cmd openAside
-    @cmd('open-aside', 'Open detached body pane on the side.')
-    public openAside(): Thenable<unknown> {
-        return g.app.gui.openAside();
-    }
     //@+node:felix.20251214160339.454: *3* @cmd showWelcomeSettings
     @cmd('show-welcome-settings', 'Open the Leo-Web welcome and settings screen.')
     public showSettings(): Thenable<unknown> {

@@ -298,7 +298,6 @@ export class Constants {
         SWITCH_FILE: Constants.NAME + ".switchLeoFile",
         NEW_FILE: Constants.NAME + ".newLeoFile",
         SAVE_FILE: Constants.NAME + ".saveLeoFile",
-        SAVE_FILE_FO: Constants.NAME + ".saveLeoFileFromOutline",
         SAVE_AS_FILE: Constants.NAME + ".saveAsLeoFile",
         SAVE_AS_LEOJS: Constants.NAME + ".saveAsLeoJsFile",
         CLOSE_FILE: Constants.NAME + ".closeLeoFile",
@@ -311,19 +310,15 @@ export class Constants {
         FULL_GNX_UNL_TO_CLIPBOARD: Constants.NAME + ".fullGnxUnlToClipboard",
         SHORT_LEGACY_UNL_TO_CLIPBOARD: Constants.NAME + "shortLegacyUnlToClipboard",
         FULL_LEGACY_UNL_TO_CLIPBOARD: Constants.NAME + "fullLegacyUnlToClipboard",
-        GIT_DIFF: Constants.NAME + ".gitDiff",
         TAB_CYCLE_NEXT: Constants.NAME + ".tabCycleNext",
         WRITE_AT_FILE_NODES: Constants.NAME + ".writeAtFileNodes",
-        WRITE_AT_FILE_NODES_FO: Constants.NAME + ".writeAtFileNodesFromOutline",
         WRITE_DIRTY_AT_FILE_NODES: Constants.NAME + ".writeDirtyAtFileNodes",
-        WRITE_DIRTY_AT_FILE_NODES_FO: Constants.NAME + ".writeDirtyAtFileNodesFromOutline",
         // At-buttons
         CLICK_BUTTON: Constants.NAME + ".clickButton",
         REMOVE_BUTTON: Constants.NAME + ".removeButton",
         GOTO_SCRIPT: Constants.NAME + ".gotoScript",
         // Outline Node User Interaction
         SELECT_NODE: Constants.NAME + ".selectTreeNode",
-        OPEN_ASIDE: Constants.NAME + ".openAside", // Opens aside a body pane locked to this gnx & commander.
         // Goto operations that always finish with focus in outline
         PAGE_UP: Constants.NAME + ".pageUp",
         PAGE_DOWN: Constants.NAME + ".pageDown",
@@ -337,26 +332,20 @@ export class Constants {
         GOTO_PREV_MARKED: Constants.NAME + ".gotoPrevMarked",
         GOTO_NEXT_CLONE: Constants.NAME + ".gotoNextClone",
         GOTO_NEXT_CLONE_SELECTION: Constants.NAME + ".gotoNextCloneSelection",
-        GOTO_NEXT_CLONE_SELECTION_FO: Constants.NAME + ".gotoNextCloneSelectionFromOutline",
         CONTRACT_OR_GO_LEFT: Constants.NAME + ".contractOrGoLeft",
         EXPAND_AND_GO_RIGHT: Constants.NAME + ".expandAndGoRight",
         // Leo Operations
         UNDO: Constants.NAME + ".undo", // From command Palette
-        UNDO_FO: Constants.NAME + ".undoFromOutline", // from button, return focus on OUTLINE
         REDO: Constants.NAME + ".redo", // From command Palette
-        REDO_FO: Constants.NAME + ".redoFromOutline", // from button, return focus on OUTLINE
         REVERT_TO_UNDO: Constants.NAME + ".revertToUndo",
         EXECUTE: Constants.NAME + ".executeScript",
         SHOW_BODY: Constants.NAME + ".showBody",
         SHOW_OUTLINE: Constants.NAME + ".showOutline",
         SHOW_LOG: Constants.NAME + ".showLogPane",
         SORT_CHILDREN: Constants.NAME + ".sortChildrenSelection",
-        SORT_CHILDREN_FO: Constants.NAME + ".sortChildrenSelectionFromOutline",
         SORT_SIBLINGS: Constants.NAME + ".sortSiblingsSelection",
-        SORT_SIBLINGS_FO: Constants.NAME + ".sortSiblingsSelectionFromOutline",
         CONTRACT_ALL_OTHER_NODES: Constants.NAME + ".contractAllOtherNodes", // From command Palette
         CONTRACT_ALL: Constants.NAME + ".contractAll", // From command Palette
-        CONTRACT_ALL_FO: Constants.NAME + ".contractAllFromOutline", // from button, return focus on OUTLINE
         // TODO : hook up
         CONTRACT_NODE: Constants.NAME + ".contractNode",
         CONTRACT_PARENT: Constants.NAME + ".contractParent",
@@ -388,9 +377,7 @@ export class Constants {
         GOTO_LAST_NODE: Constants.NAME + ".gotoLastNode",
 
         PREV_NODE: Constants.NAME + ".prev",
-        PREV_NODE_FO: Constants.NAME + ".prevFromOutline",
         NEXT_NODE: Constants.NAME + ".next",
-        NEXT_NODE_FO: Constants.NAME + ".nextFromOutline",
         // Commands from tree panel buttons or context: focus on OUTLINE
         SET_UA: Constants.NAME + ".setUa",
         MARK: Constants.NAME + ".mark",
@@ -436,29 +423,9 @@ export class Constants {
         REFRESH_FROM_DISK_SELECTION: Constants.NAME + ".refreshFromDiskSelection",
         OPEN_AT_LEO_FILE_SELECTION: Constants.NAME + ".openAtLeoFileSelection",
         // Commands from keyboard, while focus on OUTLINE (no need for COPY_SELECTION)
-        MARK_SELECTION_FO: Constants.NAME + ".markSelectionFromOutline",
-        UNMARK_SELECTION_FO: Constants.NAME + ".unmarkSelectionFromOutline",
-        CUT_SELECTION_FO: Constants.NAME + ".cutNodeSelectionFromOutline",
-        PASTE_SELECTION_FO: Constants.NAME + ".pasteNodeAtSelectionFromOutline",
-        PASTE_CLONE_SELECTION_FO: Constants.NAME + ".pasteNodeAsCloneAtSelectionFromOutline",
-        DELETE_SELECTION_FO: Constants.NAME + ".deleteSelectionFromOutline",
-        HEADLINE_SELECTION_FO: Constants.NAME + ".editSelectedHeadlineFromOutline",
-        MOVE_DOWN_SELECTION_FO: Constants.NAME + ".moveOutlineDownSelectionFromOutline",
-        MOVE_LEFT_SELECTION_FO: Constants.NAME + ".moveOutlineLeftSelectionFromOutline",
-        MOVE_RIGHT_SELECTION_FO: Constants.NAME + ".moveOutlineRightSelectionFromOutline",
-        MOVE_UP_SELECTION_FO: Constants.NAME + ".moveOutlineUpSelectionFromOutline",
-        INSERT_SELECTION_FO: Constants.NAME + ".insertNodeSelectionFromOutline",
-        INSERT_CHILD_SELECTION_FO: Constants.NAME + ".insertChildNodeSelectionFromOutline",
-        CLONE_SELECTION_FO: Constants.NAME + ".cloneNodeSelectionFromOutline",
-        PROMOTE_SELECTION_FO: Constants.NAME + ".promoteSelectionFromOutline",
-        DEMOTE_SELECTION_FO: Constants.NAME + ".demoteSelectionFromOutline",
-        REFRESH_FROM_DISK_SELECTION_FO: Constants.NAME + ".refreshFromDiskSelectionFromOutline",
-        OPEN_AT_LEO_FILE_SELECTION_FO: Constants.NAME + ".openAtLeoFileSelectionFromOutline",
         HOIST: Constants.NAME + ".hoistNode",
         HOIST_SELECTION: Constants.NAME + ".hoistSelection",
-        HOIST_SELECTION_FO: Constants.NAME + ".hoistSelectionFromOutline",
         DEHOIST: Constants.NAME + ".deHoist",
-        DEHOIST_FO: Constants.NAME + ".deHoistFromOutline",
         CHAPTER_NEXT: Constants.NAME + ".chapterNext",
         CHAPTER_BACK: Constants.NAME + ".chapterBack",
         CHAPTER_MAIN: Constants.NAME + ".chapterMain",
@@ -505,14 +472,10 @@ export class Constants {
         WORD_SEARCH_BACKWARD: Constants.NAME + ".wordSearchBackward",
         FIND_ALL: Constants.NAME + ".findAll",
         FIND_NEXT: Constants.NAME + ".findNext",
-        FIND_NEXT_FO: Constants.NAME + ".findNextFromOutline",
         FIND_PREVIOUS: Constants.NAME + ".findPrevious",
-        FIND_PREVIOUS_FO: Constants.NAME + ".findPreviousFromOutline",
         FIND_DEF: Constants.NAME + ".findDef",
         REPLACE: Constants.NAME + ".replace",
-        REPLACE_FO: Constants.NAME + ".replaceFromOutline",
         REPLACE_THEN_FIND: Constants.NAME + ".replaceThenFind",
-        REPLACE_THEN_FIND_FO: Constants.NAME + ".replaceThenFindFromOutline",
         REPLACE_ALL: Constants.NAME + ".replaceAll",
 
         CLONE_FIND_ALL: Constants.NAME + ".cloneFindAll",
@@ -622,7 +585,6 @@ export class Constants {
         EXECUTE_SCRIPT: "execute-script",
         REFRESH_FROM_DISK: "refresh-from-disk",
         OPEN_AT_LEO_FILE: "open-at-leo-file",
-        GIT_DIFF: "git-diff",
         // * Outline from body text
         EXTRACT: "extract",
         EXTRACT_NAMES: "extract-names",

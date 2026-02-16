@@ -16,7 +16,6 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
 
     const NO_REFRESH: ReqRefresh = {};
     const REFRESH_NODE_BODY: ReqRefresh = {
-
         tree: true, // IN LEO-WEB, body refresh also needs tree refresh to update icons
         body: true, // Goto/select another node needs the body pane refreshed
         states: true
@@ -38,11 +37,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         buttons: true
     };
 
-    // TODO : Uncomment those as they are implemented in leoUI :)
-
     const commands: [string, (...args: any[]) => any][] = [
-
-        ["todo", () => leoUI.todo()], // will popup a toast message
 
         [CMD.ABOUT_LEO, () => leoUI.command(LEOCMD.ABOUT_LEO, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.DOCUMENTATION, () => leoUI.showDocumentation()],
@@ -100,27 +95,20 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.SAVE_AS_FILE, () => leoUI.saveAsLeoFile()],
         [CMD.SAVE_AS_LEOJS, () => leoUI.saveAsLeoJsFile()],
         [CMD.SAVE_FILE, () => leoUI.saveLeoFile()],
-        [CMD.SAVE_FILE_FO, () => leoUI.saveLeoFile(true)],
 
         [CMD.SWITCH_FILE, () => leoUI.switchLeoFile()],
         [CMD.RECENT_FILES, () => leoUI.showRecentLeoFiles()],
 
-        [CMD.WRITE_AT_FILE_NODES, () => leoUI.command(LEOCMD.WRITE_AT_FILE_NODES, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.WRITE_AT_FILE_NODES_FO, () => leoUI.command(LEOCMD.WRITE_AT_FILE_NODES, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
-        [CMD.WRITE_DIRTY_AT_FILE_NODES, () => leoUI.command(LEOCMD.WRITE_DIRTY_AT_FILE_NODES, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.WRITE_DIRTY_AT_FILE_NODES_FO, () => leoUI.command(LEOCMD.WRITE_DIRTY_AT_FILE_NODES, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.WRITE_AT_FILE_NODES, () => leoUI.command(LEOCMD.WRITE_AT_FILE_NODES, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
+        [CMD.WRITE_DIRTY_AT_FILE_NODES, () => leoUI.command(LEOCMD.WRITE_DIRTY_AT_FILE_NODES, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         [CMD.SET_OPENED_FILE, (p_index: number) => leoUI.selectOpenedLeoDocument(p_index)],
 
-        [CMD.REFRESH_FROM_DISK, (p_node: Position) => leoUI.command(LEOCMD.REFRESH_FROM_DISK, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.REFRESH_FROM_DISK_SELECTION, () => leoUI.command(LEOCMD.REFRESH_FROM_DISK, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.REFRESH_FROM_DISK_SELECTION_FO, () => leoUI.command(LEOCMD.REFRESH_FROM_DISK, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.REFRESH_FROM_DISK, (p_node: Position) => leoUI.command(LEOCMD.REFRESH_FROM_DISK, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange, keepSelection: true })],
+        [CMD.REFRESH_FROM_DISK_SELECTION, () => leoUI.command(LEOCMD.REFRESH_FROM_DISK, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.OPEN_AT_LEO_FILE, (p_node: Position) => leoUI.command(LEOCMD.OPEN_AT_LEO_FILE, { node: p_node, refreshType: REFRESH_ALL, finalFocus: Focus.Outline })], // DO NOT KEEP SELECTION
-        [CMD.OPEN_AT_LEO_FILE_SELECTION, () => leoUI.command(LEOCMD.OPEN_AT_LEO_FILE, { refreshType: REFRESH_ALL, finalFocus: Focus.Body })],
-        [CMD.OPEN_AT_LEO_FILE_SELECTION_FO, () => leoUI.command(LEOCMD.OPEN_AT_LEO_FILE, { refreshType: REFRESH_ALL, finalFocus: Focus.Outline })],
-
-        [CMD.GIT_DIFF, () => leoUI.command(LEOCMD.GIT_DIFF, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
+        [CMD.OPEN_AT_LEO_FILE_SELECTION, () => leoUI.command(LEOCMD.OPEN_AT_LEO_FILE, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
 
         [CMD.TAB_CYCLE_NEXT, () => leoUI.tabCycle()],
 
@@ -138,7 +126,6 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
 
         [CMD.HEADLINE, (p_node: Position) => leoUI.editHeadline(p_node, true)],
         [CMD.HEADLINE_SELECTION, () => leoUI.editHeadline(U, false)],
-        [CMD.HEADLINE_SELECTION_FO, () => leoUI.editHeadline(U, true)],
 
         // cut/copy/paste/delete given node.
         [CMD.COPY, (p_node: Position) => leoUI.command(LEOCMD.COPY_PNODE, { node: p_node, refreshType: NO_REFRESH, finalFocus: Focus.Outline, keepSelection: true })],
@@ -149,47 +136,41 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
 
         // cut/copy/paste/delete current selection (self.commander.p)
         [CMD.COPY_SELECTION, () => leoUI.command(LEOCMD.COPY_PNODE, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
-        [CMD.CUT_SELECTION, () => leoUI.command(LEOCMD.CUT_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.CUT_SELECTION_FO, () => leoUI.command(LEOCMD.CUT_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.DELETE_SELECTION, () => leoUI.command(LEOCMD.DELETE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.DELETE_SELECTION_FO, () => leoUI.command(LEOCMD.DELETE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.CUT_SELECTION, () => leoUI.command(LEOCMD.CUT_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.DELETE_SELECTION, () => leoUI.command(LEOCMD.DELETE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.PASTE_AS_TEMPLATE, () => leoUI.command(LEOCMD.PASTE_AS_TEMPLATE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
-        [CMD.PASTE_CLONE_SELECTION, () => leoUI.command(LEOCMD.PASTE_CLONE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.PASTE_CLONE_SELECTION_FO, () => leoUI.command(LEOCMD.PASTE_CLONE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.PASTE_SELECTION, () => leoUI.command(LEOCMD.PASTE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.PASTE_SELECTION_FO, () => leoUI.command(LEOCMD.PASTE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.PASTE_CLONE_SELECTION, () => leoUI.command(LEOCMD.PASTE_CLONE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.PASTE_SELECTION, () => leoUI.command(LEOCMD.PASTE_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.SET_UA, () => leoUI.command(LEOCMD.SET_UA, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         // Called by nodes in the tree when selected either by mouse, or with enter
         [CMD.SELECT_NODE, (p_node: Position, p_CtrlClick: boolean) => leoUI.selectTreeNode(p_node, p_CtrlClick)],
 
-        [CMD.CONTRACT_ALL_OTHER_NODES, () => leoUI.command(LEOCMD.CONTRACT_ALL_OTHER_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.CONTRACT_ALL, () => leoUI.command(LEOCMD.CONTRACT_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.CONTRACT_ALL_FO, () => leoUI.command(LEOCMD.CONTRACT_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.CONTRACT_ALL_OTHER_NODES, () => leoUI.command(LEOCMD.CONTRACT_ALL_OTHER_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.CONTRACT_ALL, () => leoUI.command(LEOCMD.CONTRACT_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.CONTRACT_OR_GO_LEFT, () => leoUI.command(LEOCMD.CONTRACT_OR_GO_LEFT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.EXPAND_AND_GO_RIGHT, () => leoUI.command(LEOCMD.EXPAND_AND_GO_RIGHT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
 
-        [CMD.CONTRACT_NODE, (p_node?: Position) => leoUI.command(LEOCMD.CONTRACT_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.CONTRACT_PARENT, () => leoUI.command(LEOCMD.CONTRACT_PARENT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.CONTRACT_NODE, (p_node?: Position) => leoUI.command(LEOCMD.CONTRACT_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.CONTRACT_PARENT, () => leoUI.command(LEOCMD.CONTRACT_PARENT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.GOTO_NEXT_CLONE, (p_node: Position) => leoUI.command(LEOCMD.GOTO_NEXT_CLONE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.GOTO_NEXT_CLONE_SELECTION, () => leoUI.command(LEOCMD.GOTO_NEXT_CLONE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body, isNavigation: true })],
-        [CMD.GOTO_NEXT_CLONE_SELECTION_FO, () => leoUI.command(LEOCMD.GOTO_NEXT_CLONE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.EXPAND_PREV_LEVEL, () => leoUI.command(LEOCMD.EXPAND_PREV_LEVEL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.EXPAND_NEXT_LEVEL, () => leoUI.command(LEOCMD.EXPAND_NEXT_LEVEL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.EXPAND_OR_GO_RIGHT, () => leoUI.command(LEOCMD.EXPAND_OR_GO_RIGHT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
-        [CMD.EXPAND_TO_LEVEL_1, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_1, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_TO_LEVEL_2, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_2, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_TO_LEVEL_3, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_3, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_TO_LEVEL_4, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_4, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_TO_LEVEL_5, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_5, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_TO_LEVEL_6, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_6, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_TO_LEVEL_7, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_7, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_TO_LEVEL_8, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_8, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_ALL, () => leoUI.command(LEOCMD.EXPAND_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.EXPAND_NODE, (p_node?: Position) => leoUI.command(LEOCMD.EXPAND_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.EXPAND_TO_LEVEL_1, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_1, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_TO_LEVEL_2, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_2, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_TO_LEVEL_3, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_3, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_TO_LEVEL_4, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_4, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_TO_LEVEL_5, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_5, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_TO_LEVEL_6, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_6, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_TO_LEVEL_7, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_7, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_TO_LEVEL_8, () => leoUI.command(LEOCMD.EXPAND_TO_LEVEL_8, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_ALL, () => leoUI.command(LEOCMD.EXPAND_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.EXPAND_NODE, (p_node?: Position) => leoUI.command(LEOCMD.EXPAND_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.FIND_NEXT_CLONE, () => leoUI.command(LEOCMD.FIND_NEXT_CLONE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.GOTO_FIRST_NODE, () => leoUI.command(LEOCMD.GOTO_FIRST_NODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.GOTO_NEXT_CHANGED, () => leoUI.command(LEOCMD.GOTO_NEXT_CHANGED, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
@@ -214,88 +195,70 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.PAGE_UP, () => leoUI.command(LEOCMD.PAGE_UP, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
         [CMD.PAGE_DOWN, () => leoUI.command(LEOCMD.PAGE_DOWN, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Outline, isNavigation: true })],
 
-        [CMD.DEHOIST, () => leoUI.command(LEOCMD.DEHOIST, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.DEHOIST_FO, () => leoUI.command(LEOCMD.DEHOIST, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.DEHOIST, () => leoUI.command(LEOCMD.DEHOIST, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.HOIST, (p_node: Position) => leoUI.command(LEOCMD.HOIST_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.HOIST_SELECTION, () => leoUI.command(LEOCMD.HOIST_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.HOIST_SELECTION_FO, () => leoUI.command(LEOCMD.HOIST_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.HOIST_SELECTION, () => leoUI.command(LEOCMD.HOIST_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
-        [CMD.CHAPTER_NEXT, () => leoUI.command(LEOCMD.CHAPTER_NEXT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.CHAPTER_BACK, () => leoUI.command(LEOCMD.CHAPTER_BACK, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.CHAPTER_NEXT, () => leoUI.command(LEOCMD.CHAPTER_NEXT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.CHAPTER_BACK, () => leoUI.command(LEOCMD.CHAPTER_BACK, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.CHAPTER_MAIN, () => leoUI.command(LEOCMD.CHAPTER_MAIN, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.CHAPTER_SELECT, () => leoUI.command(LEOCMD.CHAPTER_SELECT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.INSERT, (p_node: Position) => leoUI.insertNode(p_node, true, false)],
         [CMD.INSERT_SELECTION, () => leoUI.insertNode(U, false, false)],
-        [CMD.INSERT_SELECTION_FO, () => leoUI.insertNode(U, true, false)],
 
         [CMD.INSERT_CHILD, (p_node: Position) => leoUI.insertNode(p_node, true, true)],
         [CMD.INSERT_CHILD_SELECTION, () => leoUI.insertNode(U, false, true)],
-        [CMD.INSERT_CHILD_SELECTION_FO, () => leoUI.insertNode(U, true, true)],
 
         [CMD.CLONE, (p_node: Position) => leoUI.command(LEOCMD.CLONE_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.CLONE_SELECTION, () => leoUI.command(LEOCMD.CLONE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.CLONE_SELECTION_FO, () => leoUI.command(LEOCMD.CLONE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.CLONE_SELECTION, () => leoUI.command(LEOCMD.CLONE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         [CMD.PROMOTE, (p_node: Position) => leoUI.command(LEOCMD.PROMOTE_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.PROMOTE_SELECTION, () => leoUI.command(LEOCMD.PROMOTE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.PROMOTE_SELECTION_FO, () => leoUI.command(LEOCMD.PROMOTE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.PROMOTE_SELECTION, () => leoUI.command(LEOCMD.PROMOTE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         [CMD.DEMOTE, (p_node: Position) => leoUI.command(LEOCMD.DEMOTE_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.DEMOTE_SELECTION, () => leoUI.command(LEOCMD.DEMOTE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.DEMOTE_SELECTION_FO, () => leoUI.command(LEOCMD.DEMOTE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.DEMOTE_SELECTION, () => leoUI.command(LEOCMD.DEMOTE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
-        [CMD.SORT_CHILDREN, () => leoUI.command(LEOCMD.SORT_CHILDREN, { refreshType: REFRESH_TREE, finalFocus: Focus.Body, keepSelection: true })],
-        [CMD.SORT_SIBLINGS, () => leoUI.command(LEOCMD.SORT_SIBLINGS, { refreshType: REFRESH_TREE, finalFocus: Focus.Body, keepSelection: true })],
-        [CMD.SORT_SIBLINGS_FO, () => leoUI.command(LEOCMD.SORT_SIBLINGS, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline, keepSelection: true })],
+        [CMD.SORT_CHILDREN, () => leoUI.command(LEOCMD.SORT_CHILDREN, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange, keepSelection: true })],
+        [CMD.SORT_SIBLINGS, () => leoUI.command(LEOCMD.SORT_SIBLINGS, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange, keepSelection: true })],
 
         [CMD.MARK, (p_node: Position) => leoUI.command(LEOCMD.TOGGLE_MARK, { node: p_node, refreshType: REFRESH_TREE, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.MARK_SELECTION, () => leoUI.command(LEOCMD.TOGGLE_MARK, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.MARK_SELECTION_FO, () => leoUI.command(LEOCMD.TOGGLE_MARK, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.MARK_SELECTION, () => leoUI.command(LEOCMD.TOGGLE_MARK, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
         [CMD.UNMARK, (p_node: Position) => leoUI.command(LEOCMD.TOGGLE_MARK, { node: p_node, refreshType: REFRESH_TREE, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.UNMARK_SELECTION, () => leoUI.command(LEOCMD.TOGGLE_MARK, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.UNMARK_SELECTION_FO, () => leoUI.command(LEOCMD.TOGGLE_MARK, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
-        [CMD.UNMARK_ALL, () => leoUI.command(LEOCMD.UNMARK_ALL, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.UNMARK_SELECTION, () => leoUI.command(LEOCMD.TOGGLE_MARK, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
+        [CMD.UNMARK_ALL, () => leoUI.command(LEOCMD.UNMARK_ALL, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         [CMD.EXTRACT, () => leoUI.command(LEOCMD.EXTRACT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
         [CMD.EXTRACT_NAMES, () => leoUI.command(LEOCMD.EXTRACT_NAMES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
 
         [CMD.MOVE_DOWN, (p_node: Position) => leoUI.command(LEOCMD.MOVE_PNODE_DOWN, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.MOVE_DOWN_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_DOWN, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.MOVE_DOWN_SELECTION_FO, () => leoUI.command(LEOCMD.MOVE_PNODE_DOWN, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.MOVE_DOWN_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_DOWN, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         [CMD.MOVE_LEFT, (p_node: Position) => leoUI.command(LEOCMD.MOVE_PNODE_LEFT, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.MOVE_LEFT_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_LEFT, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.MOVE_LEFT_SELECTION_FO, () => leoUI.command(LEOCMD.MOVE_PNODE_LEFT, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.MOVE_LEFT_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_LEFT, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         [CMD.MOVE_RIGHT, (p_node: Position) => leoUI.command(LEOCMD.MOVE_PNODE_RIGHT, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.MOVE_RIGHT_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_RIGHT, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.MOVE_RIGHT_SELECTION_FO, () => leoUI.command(LEOCMD.MOVE_PNODE_RIGHT, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.MOVE_RIGHT_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_RIGHT, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
         [CMD.MOVE_UP, (p_node: Position) => leoUI.command(LEOCMD.MOVE_PNODE_UP, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
-        [CMD.MOVE_UP_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_UP, { refreshType: REFRESH_TREE, finalFocus: Focus.Body })],
-        [CMD.MOVE_UP_SELECTION_FO, () => leoUI.command(LEOCMD.MOVE_PNODE_UP, { refreshType: REFRESH_TREE, finalFocus: Focus.Outline })],
+        [CMD.MOVE_UP_SELECTION, () => leoUI.command(LEOCMD.MOVE_PNODE_UP, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
 
-        [CMD.REDO, () => leoUI.command(LEOCMD.REDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.REDO_FO, () => leoUI.command(LEOCMD.REDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.UNDO, () => leoUI.command(LEOCMD.UNDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.UNDO_FO, () => leoUI.command(LEOCMD.UNDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.REDO, () => leoUI.command(LEOCMD.REDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.UNDO, () => leoUI.command(LEOCMD.UNDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         // [CMD.REVERT_TO_UNDO, (p_undo: LeoUndoNode) => p_leoUI.revertToUndo(p_undo)], // Repeat undos/redo to given undo node.
 
-        [CMD.COPY_MARKED, () => leoUI.command(LEOCMD.COPY_MARKED, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.DIFF_MARKED_NODES, () => leoUI.command(LEOCMD.DIFF_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.MARK_CHANGED_ITEMS, () => leoUI.command(LEOCMD.MARK_CHANGED_ITEMS, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.MARK_SUBHEADS, () => leoUI.command(LEOCMD.MARK_SUBHEADS, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.CLONE_MARKED_NODES, () => leoUI.command(LEOCMD.CLONE_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.DELETE_MARKED_NODES, () => leoUI.command(LEOCMD.DELETE_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
-        [CMD.MOVE_MARKED_NODES, () => leoUI.command(LEOCMD.MOVE_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.COPY_MARKED, () => leoUI.command(LEOCMD.COPY_MARKED, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.DIFF_MARKED_NODES, () => leoUI.command(LEOCMD.DIFF_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.MARK_CHANGED_ITEMS, () => leoUI.command(LEOCMD.MARK_CHANGED_ITEMS, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.MARK_SUBHEADS, () => leoUI.command(LEOCMD.MARK_SUBHEADS, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.CLONE_MARKED_NODES, () => leoUI.command(LEOCMD.CLONE_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.DELETE_MARKED_NODES, () => leoUI.command(LEOCMD.DELETE_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
+        [CMD.MOVE_MARKED_NODES, () => leoUI.command(LEOCMD.MOVE_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        [CMD.PREV_NODE, () => leoUI.command(LEOCMD.GOTO_PREV_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.PREV_NODE_FO, () => leoUI.command(LEOCMD.GOTO_PREV_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.PREV_NODE, () => leoUI.command(LEOCMD.GOTO_PREV_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        [CMD.NEXT_NODE, () => leoUI.command(LEOCMD.GOTO_NEXT_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
-        [CMD.NEXT_NODE_FO, () => leoUI.command(LEOCMD.GOTO_NEXT_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline })],
+        [CMD.NEXT_NODE, () => leoUI.command(LEOCMD.GOTO_NEXT_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         // [CMD.FIND_QUICK, () => p_leoUI.findQuick()],
         // [CMD.FIND_QUICK_SELECTED, () => p_leoUI.findQuickSelected()],
@@ -323,16 +286,12 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.REPLACE_ALL, () => leoUI.command(LEOCMD.REPLACE_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.FIND_NEXT, () => leoUI.find(false, false)],
-        [CMD.FIND_NEXT_FO, () => leoUI.find(true, false)],
         [CMD.FIND_PREVIOUS, () => leoUI.find(false, true)],
-        [CMD.FIND_PREVIOUS_FO, () => leoUI.find(true, true)],
 
         [CMD.FIND_DEF, () => leoUI.command(LEOCMD.FIND_DEF, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.REPLACE, () => leoUI.replace(false, false)],
-        [CMD.REPLACE_FO, () => leoUI.replace(true, false)],
         [CMD.REPLACE_THEN_FIND, () => leoUI.replace(false, true)],
-        [CMD.REPLACE_THEN_FIND_FO, () => leoUI.replace(true, true)],
 
         [CMD.GOTO_GLOBAL_LINE, () => leoUI.command(LEOCMD.GOTO_GLOBAL_LINE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
 

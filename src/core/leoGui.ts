@@ -532,11 +532,6 @@ export class LeoGui {
         return Promise.resolve();
     }
 
-    //@+node:felix.20251213133753.247: *4* openAside
-    public openAside(): Thenable<unknown> {
-        return Promise.resolve();
-    }
-
     //@+node:felix.20251213133753.248: *4* showSettings
     public showSettings(): Thenable<unknown> {
         return Promise.resolve();
