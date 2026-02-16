@@ -48,7 +48,7 @@ export class DialogManager {
         // Get DOM element references
         this.MODAL_DIALOG_TITLE = document.getElementById('message-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('message-dialog-description')!;
-        this.MODAL_DIALOG_BTN_CONTAINER = document.getElementById('message-dialog-buttons')!;
+        this.MODAL_DIALOG_BTN_CONTAINER = document.getElementById('modal-dialog-btn-container')!;
         this.INPUT_DIALOG_TITLE = document.getElementById('input-dialog-title')!;
         this.INPUT_DIALOG_DESCRIPTION = document.getElementById('input-dialog-description')!;
         this.INPUT_DIALOG_INPUT = document.getElementById('input-dialog-input') as HTMLInputElement;
