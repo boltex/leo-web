@@ -1,13 +1,17 @@
 # Leo Web Editor
 
-A web-based version of the Leo Editor - a structured document editor that allows you to organize your content in a hierarchical outline format.
+A browser-based version of the Leo Editor - a structured document editor that allows you to organize your content in a hierarchical outline format.
 
-## About
-
-This project is a TypeScript single-page application that brings the Leo experience to the web. Leo is known for its unique approach to organizing documents through an outline-based structure, making it perfect for complex documentation, note-taking, programming and content organization.
+Leo is a fundamentally different way of using and organizing data, programs and scripts. [📺 Introduction Video](https://www.youtube.com/watch?v=SYwlfdEukD4)
 
 > See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
 > or on [github](https://github.com/leo-editor/leo-editor).
+
+## About
+
+This project is a TypeScript implementation that brings the Leo Editor experience to the web with support for local file access.
+
+For other usage scenarios, see ([other Leo implementations](#other-leo-editor-implementations)) for versions that support online repositories, or integrated as VSCode extentions.
 
 ## Limitations
 
@@ -30,7 +34,6 @@ Absolute paths are not supported with the browser's file api. Use relative paths
 ### Not Yet Implemented
 
 - Headline editing in the outline pane
-- Body pane text editing
 - Find/replace functionality
 
 ## Contributing
@@ -79,17 +82,23 @@ The built files will be in the `dist/` directory.
 - `npm run type-check` - Run TypeScript type checking without building
 - `npm run clean` - Clean the dist directory
 
-## Technologies Used
-
-- **TypeScript** - Type-safe JavaScript
-- **Webpack** - Module bundling and development server
-- **HTML5 & CSS3** - Modern web standards
-- **idb** - A small wrapper that makes IndexedDB usable.
-
 ## Contributing
 
 This is the beginning of the Leo Web Editor project. Contributions, suggestions, and feedback are welcome!
 
-## License
+## Other Leo Editor implementations
 
-MIT License
+To instead work with _files directly inside online repositories_, such as on GitHub and Azure-Repos, use the [LeoJS VSCode extension](https://github.com/boltex/leojs?#web-based-development) within VSCode for the web. (It also can run in the desktop version of VSCode for local file editing)
+
+To work with the original Python implementation of Leo integrated into VSCode, use the [LeoInteg VSCode extension]().
+
+# Acknowledgments
+
+See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
+or on [github](https://github.com/leo-editor/leo-editor).
+
+### _Special Thanks to_
+
+All who have participated, no matter how small or big the contribution, to the creation of the original Leo Editor!
+
+## 🤍 To sponsor, donate or contribute see my [user page 🦁](https://boltex.github.io/)
