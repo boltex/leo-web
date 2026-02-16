@@ -204,7 +204,7 @@ export class LeoController {
                         e.preventDefault();
                         const currentSub = view.topLevelSubmenus.get(view.activeTopMenu);
                         if (currentSub) {
-                            const firstItem = currentSub.querySelector(".menu-item");
+                            const firstItem = currentSub.querySelector(".menu-item") as HTMLDivElement;
                             if (firstItem) view.focusMenuItem(firstItem);
                         }
                         return;
