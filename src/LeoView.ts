@@ -398,24 +398,6 @@ export class LeoView {
         return { node: this.BODY_PANE, offset: this.BODY_PANE.childNodes.length };
     }
 
-    public scrollSelectedNodeIntoView(selectedNode: Position) {
-        if (!selectedNode || !this._flatRowsLeo) return; // Not initialized yet
-        const flatRows = this._flatRowsLeo;
-
-        const selectedIndex = flatRows.findIndex(row => row.node.__eq__(selectedNode));
-        if (selectedIndex === -1) return; // Not found (shouldn't happen)
-        const nodePosition = selectedIndex * this.ROW_HEIGHT;
-
-        const scrollTop = this.OUTLINE_PANE.scrollTop;
-        const viewportHeight = this.OUTLINE_PANE.clientHeight;
-
-        if (nodePosition < scrollTop) {
-            this.OUTLINE_PANE.scrollTop = nodePosition;
-        } else if (nodePosition + this.ROW_HEIGHT > scrollTop + viewportHeight) {
-            this.OUTLINE_PANE.scrollTop = nodePosition - viewportHeight + this.ROW_HEIGHT;
-        }
-    }
-
     public setEditorTouchedCallback(callback: (change: { type: string; content: string | null }) => void) {
         this.BODY_PANE.addEventListener('input', (e) => {
             const inputEvent = e as InputEvent;
