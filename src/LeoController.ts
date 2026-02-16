@@ -34,7 +34,6 @@ export class LeoController {
     public doCommand(commandName: string, ...args: any[]): any {
         const command = this._commands[commandName];
         if (command) {
-            // console.log(`Executing command: ${commandName}`, ...args);
             return command(...args);
         } else {
             console.warn(`Command not found: ${commandName}`);
@@ -104,7 +103,6 @@ export class LeoController {
 
     private setupButtonHandlers() {
         const view = this.view;
-        console.log('Setting up button handlers');
 
         // * Outline Actions *
         view.COLLAPSE_ALL_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.CONTRACT_ALL) });
@@ -426,7 +424,6 @@ export class LeoController {
 
         // 3 Commit workspace
         workspace.setWorkspaceDirHandle(dirHandle);
-        console.log("Workspace ready:", dirHandle);
 
         // 4 Continue bootstrapping
         this.initializeInteractions();
@@ -519,8 +516,6 @@ export class LeoController {
         if (row.isSelected === false) {
             this.selectAndOrToggleAndRedraw(row.node);
         }
-
-        console.log('Context menu on node:', row.node);
 
         // Position and show the custom context menu
         view.MENU.style.top = `${e.clientY}px`;
@@ -638,8 +633,6 @@ export class LeoController {
         parts.push(key);
 
         const keyString = parts.join('+');
-
-        console.log('Body pane key pressed:', keyString);
 
         // Find matching keybinding for outline pane
         // const platform = navigator.platform.toLowerCase();

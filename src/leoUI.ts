@@ -306,7 +306,6 @@ export class LeoUI extends NullGui {
             // * Log pane instantiation
             this._leoLogPane = true;
             workspace.view.addToLogPane('', true); // Clear log pane
-            console.log("Log pane created.");
             if (g.logBuffer.length) {
                 const buffer = g.logBuffer;
                 while (buffer.length > 0) {
@@ -341,10 +340,6 @@ export class LeoUI extends NullGui {
      */
     private _onChangeEditorSelection(p_event: Selection): void {
         const c = g.app.windowList[this.frameIndex].c;
-
-        // For now, just log what we got, we'll implement it later
-        console.log('Selection change event detected:', p_event);
-
         if (p_event) {
             this._selectionDirty = true;
             this._selection = p_event;
@@ -358,10 +353,6 @@ export class LeoUI extends NullGui {
      */
     private _onChangeEditorScroll(p_event: number): void {
         const c = g.app.windowList[this.frameIndex].c;
-
-        // For now, just log what we got, we'll implement it later
-        console.log('Scroll event detected:', p_event);
-
         if (p_event != null) {
             this._scrollDirty = true;
             this._scroll = p_event;
@@ -658,7 +649,6 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
-        console.log("SETTING BODY FOCUS!");
         workspace.view.setBodySelection(w_selection); // This sets focus to the body pane as well
     }
 
@@ -896,7 +886,6 @@ export class LeoUI extends NullGui {
     }
 
     private _tryApplyNodeToBody(node: Position, showBodyNoFocus: boolean): void {
-        console.log('Trying to apply node to body: ', node.h, ' with showBodyNoFocus: ', showBodyNoFocus);
         // In LeoJS, this required a bunch of helper methods because the body pane itself was not readily available and the body text was not directly settable,
         // so it required to find the right "editor" object in the DOM, then set its value, then restore scroll and selection, etc.   
         // Here in Leo-Web, the body pane is always readily available and we can directly set its content and send it the scroll and selection info,
@@ -982,7 +971,7 @@ export class LeoUI extends NullGui {
         // TODO : implement body language setting in the web UI, 
         // which should trigger syntax coloring changes in the body pane
         // something like workspace.view.setBodyLanguage(w_language) that will be implemented later, after the base of Leo-Web works.
-        console.log('Setting body language to: ', w_language);
+        console.log('TODO: set body language to ', w_language);
     }
 
     /**
@@ -1415,8 +1404,18 @@ export class LeoUI extends NullGui {
      */
     private _doMinibufferCommand(p_picked?: QuickPickItem): Promise<unknown> {
         if (p_picked && p_picked.label) {
+
+            let finalFocus = Focus.NoChange;
+            // Get the current focus (body outline, or other will be noChange)
+            if (workspace.view.isOutlineFocused()) {
+                finalFocus = Focus.Outline;
+            } else if (workspace.view.isBodyFocused()) {
+                finalFocus = Focus.Body;
+            }
+
             // Setup refresh
-            this.setupRefresh(Focus.NoChange,
+            this.setupRefresh(
+                finalFocus,
                 {
                     tree: true,
                     body: true,
@@ -1510,7 +1509,7 @@ export class LeoUI extends NullGui {
             return Promise.resolve();
         }
 
-        let finalFocus = Focus.NoChange; // 
+        let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
         if (workspace.view.isOutlineFocused()) {
             finalFocus = Focus.Outline;
@@ -1838,7 +1837,7 @@ export class LeoUI extends NullGui {
         // this.showBodyIfClosed = true;
         // this.showOutlineIfClosed = true;
 
-        let finalFocus = Focus.NoChange; // 
+        let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
         if (workspace.view.isOutlineFocused()) {
             finalFocus = Focus.Outline;
@@ -1885,7 +1884,7 @@ export class LeoUI extends NullGui {
         }
         this.triggerBodySave(true);
 
-        let finalFocus = Focus.NoChange; // 
+        let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
         if (workspace.view.isOutlineFocused()) {
             finalFocus = Focus.Outline;
@@ -1925,7 +1924,7 @@ export class LeoUI extends NullGui {
             }
         }
 
-        let finalFocus = Focus.NoChange; // 
+        let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
         if (workspace.view.isOutlineFocused()) {
             finalFocus = Focus.Outline;
@@ -2009,7 +2008,7 @@ export class LeoUI extends NullGui {
     public async saveAsLeoFile(): Promise<unknown> {
         this.triggerBodySave(true);
 
-        let finalFocus = Focus.NoChange; // 
+        let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
         if (workspace.view.isOutlineFocused()) {
             finalFocus = Focus.Outline;
@@ -2043,7 +2042,7 @@ export class LeoUI extends NullGui {
 
         const c = g.app.windowList[this.frameIndex].c;
 
-        let finalFocus = Focus.NoChange; // 
+        let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
         if (workspace.view.isOutlineFocused()) {
             finalFocus = Focus.Outline;
