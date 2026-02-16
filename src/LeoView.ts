@@ -1927,6 +1927,9 @@ export class LeoView {
             const filterText = this.QUICKPICK_DIALOG_INPUT.value.toLowerCase().trim();
 
             if (!filterText) {
+                items.forEach(item => {
+                    (item as QuickPickInternalItem).renderedLabel = undefined;
+                });
                 filteredItems = [...items];
             } else {
                 filteredItems = items.filter(item => {
