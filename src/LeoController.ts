@@ -13,8 +13,10 @@ const defaultTitle = "Leo Editor for the web";
 
 export class LeoController {
     private view: LeoView;
-    private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
     private _commands: Record<string, (...args: any[]) => any> = {};
+
+    // Unused for now, but we can use this regex to detect URLs in the future if we want to add link-clicking functionality in the body pane or elsewhere.
+    private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
 
     constructor(view: LeoView) {
 
@@ -75,9 +77,6 @@ export class LeoController {
     private setupBodyPaneHandlers() {
         const view = this.view;
         view.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
-        // view.BODY_PANE.addEventListener("beforeinput", utils.preventDefault); // Block text changes
-        // view.BODY_PANE.addEventListener("paste", utils.preventDefault); // Block text changes
-
     }
 
     private setupLogPaneHandlers() {
@@ -125,7 +124,7 @@ export class LeoController {
         view.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
         view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
-        view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") });
+        // view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") }); // Maybe add undo tab functionality later
         view.SETTINGS_TAB.addEventListener('click', () => { view.showTab("settings") });
     }
 

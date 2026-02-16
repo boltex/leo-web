@@ -57,7 +57,7 @@ export class LeoView {
 
     public LOG_TAB: HTMLDivElement;
     public FIND_TAB: HTMLDivElement;
-    public UNDO_TAB: HTMLDivElement;
+    // public UNDO_TAB: HTMLDivElement; // Maybe add undo tab functionality later
     public SETTINGS_TAB: HTMLDivElement;
 
     public SHOW_PREV_NEXT_MARK: HTMLInputElement;
@@ -196,7 +196,7 @@ export class LeoView {
 
         this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
         this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
-        this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
+        // this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement; // Maybe add undo tab functionality later
         this.SETTINGS_TAB = document.getElementById('settings-tab')! as HTMLDivElement;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
