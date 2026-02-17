@@ -1640,7 +1640,7 @@ export class CommanderOutlineCommands {
     public asyncInsertChild(this: Commands): Thenable<Position> {
         const c: Commands = this;
         const p = c.insertHeadline('Insert Child', true);
-        return g.app.gui.editHeadline(p, true, 'Insert Child');
+        return g.app.gui.editHeadline(p, 'Insert Child');
     }
     //@+node:felix.20251214160853.204: *4* c_oc.insertHeadline (insert-*)
     @commander_command(
@@ -1738,7 +1738,7 @@ export class CommanderOutlineCommands {
         const c: Commands = this;
         // Fix #600.
         const p = this.insertHeadlineHelper(c, op_name, as_child, false, false);
-        return g.app.gui.editHeadline(p, true, op_name);
+        return g.app.gui.editHeadline(p, op_name);
     }
     @commander_command(
         'async-insert-as-first-child',
@@ -1747,7 +1747,7 @@ export class CommanderOutlineCommands {
     public asyncInsertNodeAsFirstChild(this: Commands): Thenable<Position> {
         const c: Commands = this;
         const p = this.insertHeadlineHelper(c, undefined, false, true, false);
-        return g.app.gui.editHeadline(p, true, 'Insert As First Child');
+        return g.app.gui.editHeadline(p, 'Insert As First Child');
     }
     @commander_command(
         'async-insert-as-last-child',
@@ -1756,7 +1756,7 @@ export class CommanderOutlineCommands {
     public asyncInsertNodeAsLastChild(this: Commands): Thenable<Position> {
         const c: Commands = this;
         const p = this.insertHeadlineHelper(c, undefined, false, false, true);
-        return g.app.gui.editHeadline(p, true, 'Insert As Last Child');
+        return g.app.gui.editHeadline(p, 'Insert As Last Child');
     }
     //@+node:felix.20251214160853.207: *4* c_oc.insertHeadlineBefore
     @commander_command(
@@ -1823,7 +1823,7 @@ export class CommanderOutlineCommands {
 
         // return c.redrawAndEdit(p, true);
         c.redraw(p);
-        return g.app.gui.editHeadline(p, true, op_name);
+        return g.app.gui.editHeadline(p, op_name);
     }
     //@+node:felix.20251214160853.209: *3* c_oc.Mark commands
     //@+node:felix.20251214160853.210: *4* c_oc.cloneMarked

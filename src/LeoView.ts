@@ -1,4 +1,13 @@
-import { MenuEntry, OpenDialogOptions, SaveDialogOptions, InputDialogOptions, MessageOptions, QuickPickItem, QuickPickOptions, FlatRowLeo } from './types';
+import {
+    MenuEntry,
+    OpenDialogOptions,
+    SaveDialogOptions,
+    InputDialogOptions,
+    MessageOptions,
+    QuickPickItem,
+    QuickPickOptions,
+    FlatRowLeo,
+} from './types';
 import * as utils from './utils';
 import { Uri, workspace } from './workspace';
 import { Position } from './core/leoNodes';
@@ -15,6 +24,7 @@ export class LeoView {
     public OUTLINE_PANE: HTMLElement;
     public COLLAPSE_ALL_BTN: HTMLElement;
     private SPACER: HTMLElement;
+    public HEADLINE_INPUT: HTMLInputElement;
     public BODY_PANE: HTMLElement;
     public VERTICAL_RESIZER: HTMLElement;
     public LOG_PANE: HTMLElement;
@@ -134,6 +144,8 @@ export class LeoView {
     }> = [];
     public isDialogOpen = false;
 
+    public headlineFinish: (() => void) | null = null; // Force-close any previous headline edit
+
     private __activeFocusTrap: (() => void) | null = null;
     private __preDialogFocusedElement: HTMLElement | null = null;
 
@@ -143,8 +155,6 @@ export class LeoView {
     private _changeSelectionTimer: ReturnType<typeof setTimeout> | undefined;
     private _changeScrollTimer: ReturnType<typeof setTimeout> | undefined;
 
-
-
     constructor() {
 
         this.MAIN_CONTAINER = document.getElementById("main-container")!;
@@ -152,6 +162,7 @@ export class LeoView {
         this.OUTLINE_PANE = document.getElementById("outline-pane")!;
         this.COLLAPSE_ALL_BTN = document.getElementById("collapse-all-btn")!;
         this.SPACER = document.getElementById("spacer")!;
+        this.HEADLINE_INPUT = document.getElementById("headline-input")! as HTMLInputElement;
         this.BODY_PANE = document.getElementById("body-pane")!;
         this.VERTICAL_RESIZER = document.getElementById('main-resizer')!;
         this.LOG_PANE = document.getElementById("log-pane")!;
@@ -428,6 +439,87 @@ export class LeoView {
         });
     }
 
+    public openHeadlineInputBox(node: Position): Promise<string> {
+        // Force-close any previous headline edit (resolves its pending promise)
+        if (this.headlineFinish) {
+            this.headlineFinish();
+        }
+
+        // Adds an input box element right over the position, overlapping it.
+        // (not virtual like the regular nodes) It should exist until enter or escape, or focused-out, and returns the new headline string
+
+        // the node vertical position needs to be calculated similarly to 
+        if (!this._flatRowsLeo) {
+            return Promise.resolve(node.h);  // Not initialized yet, should never happen.
+        };
+
+        const index = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
+        if (index === -1) {
+            return Promise.resolve(node.h); // Not found (shouldn't happen)
+        }
+
+        const nodeOffsetY = index * this.ROW_HEIGHT;
+        const row = this._flatRowsLeo[index]!;
+        // Attach an input box to the outline pane at the correct left and top position, pre-filled with the current headline, and focused
+        // Accept its content even if escaped or focus-out, we return its content no matter what,
+        // and the caller will decide what to do with it (update headline or not)
+
+        return new Promise<string>((resolve) => {
+            let leftOffset = this.LEFT_OFFSET;
+            if (this._flatRowsLeo!.every(r => !r.hasChildren)) {
+                leftOffset = 0;
+            }
+            const leftPosition = (row.depth * 20) + leftOffset + 16 + 20;
+            const viewportWidth = this.OUTLINE_PANE.clientWidth;
+
+            const input = this.HEADLINE_INPUT;
+            input.value = row.label;
+
+            // Dynamic positioning only
+            input.style.top = nodeOffsetY + "px";
+            input.style.left = leftPosition + "px";
+            input.style.width = (viewportWidth - leftPosition - 4) + "px";
+            input.style.height = this.ROW_HEIGHT + "px";
+            input.style.lineHeight = this.ROW_HEIGHT + "px";
+
+            this.scrollNodeIntoView(node);
+            this.HTML_ELEMENT.setAttribute('data-show-headline-edit', 'true');
+
+            setTimeout(() => {
+                input.focus();
+                input.select();
+            }, 0);
+
+            let resolved = false;
+
+            const finish = () => {
+                if (resolved) return;
+                resolved = true;
+                const newHeadline = input.value;
+                this.headlineFinish = null;
+
+                this.HTML_ELEMENT.setAttribute('data-show-headline-edit', 'false');
+
+                input.onkeydown = null;
+                input.onblur = null;
+                resolve(newHeadline);
+            };
+
+            this.headlineFinish = finish;
+
+            input.onkeydown = (e: KeyboardEvent) => {
+                if (e.key === "Enter" || e.key === "Escape") {
+                    e.preventDefault();
+                    finish();
+                }
+            };
+
+            input.onblur = () => {
+                finish();
+            };
+        });
+    }
+
     public renderTree = () => {
         if (!this._flatRowsLeo) {
             return; // Not initialized yet
@@ -507,7 +599,7 @@ export class LeoView {
         this.renderTree(); // Re-render to apply icon changes
     }
 
-    clearDocumentTabs() {
+    public clearDocumentTabs() {
         this.DOCUMENT_TABS.innerHTML = "";
     }
 
@@ -522,6 +614,7 @@ export class LeoView {
         tab.appendChild(closeBtn);
         return tab;
     }
+
     public showHtmlInNewTab(htmlContent: string, title: string) {
         const newWindow = window.open('', '_blank');
         if (newWindow) {
@@ -944,17 +1037,17 @@ export class LeoView {
     public scrollNodeIntoView(node: Position) {
         if (!this._flatRowsLeo) return; // Not initialized yet
 
-        const selectedIndex = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
-        if (selectedIndex === -1) return; // Not found (shouldn't happen)
-        const nodePosition = selectedIndex * this.ROW_HEIGHT;
+        const index = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
+        if (index === -1) return; // Not found (shouldn't happen)
+        const nodeOffsetY = index * this.ROW_HEIGHT;
 
         const scrollTop = this.OUTLINE_PANE.scrollTop;
         const viewportHeight = this.OUTLINE_PANE.clientHeight;
 
-        if (nodePosition < scrollTop) {
-            this.OUTLINE_PANE.scrollTop = nodePosition;
-        } else if (nodePosition + this.ROW_HEIGHT > scrollTop + viewportHeight) {
-            this.OUTLINE_PANE.scrollTop = nodePosition - viewportHeight + this.ROW_HEIGHT;
+        if (nodeOffsetY < scrollTop) {
+            this.OUTLINE_PANE.scrollTop = nodeOffsetY;
+        } else if (nodeOffsetY + this.ROW_HEIGHT > scrollTop + viewportHeight) {
+            this.OUTLINE_PANE.scrollTop = nodeOffsetY - viewportHeight + this.ROW_HEIGHT;
         }
     }
 

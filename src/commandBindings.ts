@@ -124,8 +124,8 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.REMOVE_SENTINELS, () => leoUI.command(LEOCMD.REMOVE_SENTINELS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.WEAVE, () => leoUI.command(LEOCMD.WEAVE, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
 
-        [CMD.HEADLINE, (p_node: Position) => leoUI.editHeadline(p_node, true)],
-        [CMD.HEADLINE_SELECTION, () => leoUI.editHeadline(U, false)],
+        [CMD.HEADLINE, (p_node: Position) => leoUI.editHeadline(p_node)],
+        [CMD.HEADLINE_SELECTION, () => leoUI.editHeadline(U)],
 
         // cut/copy/paste/delete given node.
         [CMD.COPY, (p_node: Position) => leoUI.command(LEOCMD.COPY_PNODE, { node: p_node, refreshType: NO_REFRESH, finalFocus: Focus.Outline, keepSelection: true })],
@@ -204,11 +204,11 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.CHAPTER_MAIN, () => leoUI.command(LEOCMD.CHAPTER_MAIN, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.CHAPTER_SELECT, () => leoUI.command(LEOCMD.CHAPTER_SELECT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        [CMD.INSERT, (p_node: Position) => leoUI.insertNode(p_node, true, false)],
-        [CMD.INSERT_SELECTION, () => leoUI.insertNode(U, false, false)],
+        [CMD.INSERT, (p_node: Position) => leoUI.insertNode(p_node, false)],
+        [CMD.INSERT_SELECTION, () => leoUI.insertNode(U, false)],
 
-        [CMD.INSERT_CHILD, (p_node: Position) => leoUI.insertNode(p_node, true, true)],
-        [CMD.INSERT_CHILD_SELECTION, () => leoUI.insertNode(U, false, true)],
+        [CMD.INSERT_CHILD, (p_node: Position) => leoUI.insertNode(p_node, true)],
+        [CMD.INSERT_CHILD_SELECTION, () => leoUI.insertNode(U, true)],
 
         [CMD.CLONE, (p_node: Position) => leoUI.command(LEOCMD.CLONE_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
         [CMD.CLONE_SELECTION, () => leoUI.command(LEOCMD.CLONE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],

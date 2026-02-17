@@ -161,7 +161,6 @@ export class LeoGui {
      */
     public editHeadline(
         p_node?: Position,
-        p_fromOutline?: boolean,
         p_prompt?: string
     ): any {
         this.oops();
@@ -319,6 +318,7 @@ export class LeoGui {
     //@+node:felix.20251213133753.223: *4* LeoGui.focusLogPane (Leo-Web)
     public showLogPane(p_focus?: boolean): void {
         // Shows and optionally puts focus on the log pane
+        this.oops();
     }
     //@+node:felix.20251213133753.224: *4* LeoGui.finishStartup (Leo-Web)
     public finishStartup(): void {

@@ -219,7 +219,7 @@ export class LeoUI extends NullGui {
         );
 
         workspace.view.setBodyFocusOutCallback(() => {
-            this.triggerBodySave(true, true);
+            this.triggerBodySave(true);
         });
 
         // TODO: other startup tasks...
@@ -270,7 +270,7 @@ export class LeoUI extends NullGui {
             return;
         }
         const c = g.app.windowList[this.frameIndex].c;
-        this.triggerBodySave(true);
+        this.triggerBodySave();
         try {
 
             if (p_arg.unl) {
@@ -331,6 +331,7 @@ export class LeoUI extends NullGui {
                 hasDirty = true;
             }
         }
+        console.log('TODO : SETUP BROWSER TO ASK BEFORE EXITING IF hasDirty IS TRUE, REMOVE IF FALSE');
         // TODO : SETUP BROWSER TO ASK BEFORE EXITING IF hasDirty IS TRUE, REMOVE IF FALSE
     }
 
@@ -427,23 +428,12 @@ export class LeoUI extends NullGui {
      * @param p_forcedVsCodeSave Flag to also have vscode 'save' the content of this editor through the filesystem
      * @returns a promise that resolves when the possible saving process is finished
      */
-    public triggerBodySave(p_forcedVsCodeSave?: boolean, p_fromFocusChange?: boolean): void {
+    public triggerBodySave(p_fromFocusChange?: boolean): void {
 
         // * Check if headline edit input box is active. Validate it with current value.
-        // TODO : implement headline edit box check and validation
-        // if (!p_fromFocusChange && this._hib && this._hib.enabled) {
-        //     this._hibInterrupted = true;
-        //     this._hib.enabled = false;
-        //     this._hibLastValue = this._hib.value;
-        //     this._hib.hide();
-        //     if (this._onDidHideResolve) {
-        //         console.error('IN triggerBodySave AND _onDidHideResolve PROMISE ALREADY EXISTS!');
-        //     }
-        //     const w_resolveAfterEditHeadline = new Promise<void>((p_resolve, p_reject) => {
-        //         this._onDidHideResolve = p_resolve;
-        //     });
-        //     return w_resolveAfterEditHeadline;
-        // }
+        if (!p_fromFocusChange && workspace.view.headlineFinish) {
+            workspace.view.headlineFinish();
+        }
 
         // * Save body to Leo if a change has been made to the body 'document' so far
         if (this._editorTouched) {
@@ -794,7 +784,7 @@ export class LeoUI extends NullGui {
 
         const c = node.v.context;
 
-        this.triggerBodySave(true); // Needed for self-selection to avoid 'cant save file is newer...'
+        this.triggerBodySave(); // Needed for self-selection to avoid 'cant save file is newer...'
 
         if (!isCtrlClick) {
             // Is not Ctrl-Click, so normal headline click
@@ -1132,7 +1122,7 @@ export class LeoUI extends NullGui {
             this.commandRefreshTimer = this.lastCommandTimer;
         }
 
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         if (g.app.windowList.length === 0) {
             void workspace.view.showInformationMessage("No document opened. Please open a Leo file to execute commands.");
@@ -1224,7 +1214,7 @@ export class LeoUI extends NullGui {
      */
     public async minibuffer(): Promise<unknown> {
 
-        this.triggerBodySave(true);
+        this.triggerBodySave();
         const c = g.app.windowList[this.frameIndex].c;
         const commands: QuickPickItem[] = [];
         const cDict = c.commandsDict;
@@ -1362,7 +1352,7 @@ export class LeoUI extends NullGui {
     private async _showMinibufferHistory(p_choices: QuickPickItem[]): Promise<unknown> {
 
         // Wait for _isBusyTriggerSave resolve because the full body save may change available commands
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         const c = g.app.windowList[this.frameIndex].c;
 
@@ -1477,7 +1467,7 @@ export class LeoUI extends NullGui {
      */
     public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
 
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         const c = g.app.windowList[this.frameIndex].c;
 
@@ -1517,7 +1507,7 @@ export class LeoUI extends NullGui {
             finalFocus = Focus.Body;
         }
 
-        this.triggerBodySave(true);
+        this.triggerBodySave();
         this.frameIndex = index;
         // Like we just opened or made a new file
         if (g.app.windowList.length) {
@@ -1544,36 +1534,87 @@ export class LeoUI extends NullGui {
 
     }
 
-    private _showHeadlineInputBox(p_options: any): Thenable<string> {
+    private _showHeadlineInputBox(node: Position): Thenable<string> {
+        return workspace.view.openHeadlineInputBox(node);
+    }
 
-        // TODO : implement headline input box, inserts a node, sets its label editable until enter or escape and returns the new headline string
-        console.log('TODO ! _showHeadlineInputBox called with options:', p_options);
-        return Promise.resolve('newHeadline');
+    /**
+     * * Asks for a new headline label, and replaces the current label with this new one one the specified, or currently selected node
+     * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
+     * @param p_prompt Optional prompt, to override the default 'edit headline' prompt. (for insert-* commands usage)
+     * @returns Thenable that resolves when done
+     */
+    public async editHeadline(p_node?: Position, p_prompt?: string): Promise<Position> {
+        const c = g.app.windowList[this.frameIndex].c;
+        const u = c.undoer;
+        const w_p: Position = p_node || c.p;
+
+        // if (this._hib && this._hib.enabled) {
+        //     return Promise.resolve(w_p); // DO NOT REACT IF ALREADY EDITING A HEADLINE! 
+        // }
+
+        this.triggerBodySave(true);
+
+        const w_finalFocus = Focus.Outline; // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
+
+        this.setupRefresh(
+            w_finalFocus,
+            { tree: true, states: true }
+        );
+        let p_newHeadline = await this._showHeadlineInputBox(w_p);
+
+        if ((p_newHeadline || p_newHeadline === "") && p_newHeadline !== "\n") {
+            let w_truncated = false;
+            if (p_newHeadline.indexOf("\n") >= 0) {
+                p_newHeadline = p_newHeadline.split("\n")[0];
+                w_truncated = true;
+            }
+            if (p_newHeadline.length > 1000) {
+                p_newHeadline = p_newHeadline.substring(0, 1000);
+                w_truncated = true;
+            }
+
+            if (p_newHeadline && w_p && w_p.h !== p_newHeadline) {
+                if (w_truncated) {
+                    void workspace.view.showInformationMessage("Truncating headline");
+                }
+                if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
+                    return w_p;  // The hook claims to have handled the event.
+                }
+                const undoData = u.beforeChangeHeadline(w_p);
+                c.setHeadString(w_p, p_newHeadline); // Set v.h *after* calling the undoer's before method.
+                if (!c.changed) {
+                    c.setChanged();
+                }
+                u.afterChangeHeadline(w_p, 'Edit Headline', undoData);
+                g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
+                void this.launchRefresh();
+            }
+
+        }
+        // if (this._onDidHideResolve) {
+        //     this._onDidHideResolve(undefined);
+        //     this._onDidHideResolve = undefined;
+        // }
+        return w_p;
     }
 
     /**
      * * Asks for a headline label to be entered and creates (inserts) a new node under the current, or specified, node
      * @param p_node specified under which node to insert, or leave undefined to use whichever is currently selected
-     * @param p_fromOutline Signifies that the focus was, and should be brought back to, the outline
-     * @param p_asChild Insert as child instead of as sibling
+     * @param asChild Insert as child instead of as sibling
      * @returns Thenable that resolves when done
      */
-    public async insertNode(p_node: Position | undefined, p_fromOutline: boolean, p_asChild: boolean): Promise<unknown> {
+    public async insertNode(p_node: Position | undefined, asChild: boolean): Promise<unknown> {
 
-        // let w_finalFocus: Focus = p_fromOutline ? Focus.Outline : Focus.Body; // Use w_fromOutline for where we intend to leave focus when done with the insert
         const w_finalFocus = Focus.Outline; // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
 
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
-        // * if node has child and is expanded: turn p_asChild to true!
-        const w_headlineInputOptions: any = {
-            ignoreFocusOut: false,
-            value: Constants.USER_MESSAGES.DEFAULT_HEADLINE,
-            valueSelection: undefined,
-            prompt: p_asChild ? Constants.USER_MESSAGES.PROMPT_INSERT_CHILD : Constants.USER_MESSAGES.PROMPT_INSERT_NODE
-        };
-
-        const p_newHeadline = await this._showHeadlineInputBox(w_headlineInputOptions);
+        // * if node has child and is expanded: turn asChild to true!
+        const c = g.app.windowList[this.frameIndex].c;
+        const p = p_node ? p_node : c.p;
+        const newHeadline = await this._showHeadlineInputBox(p);
 
         this.lastCommandTimer = process.hrtime();
         if (this.commandTimer === undefined) {
@@ -1584,11 +1625,7 @@ export class LeoUI extends NullGui {
             this.commandRefreshTimer = this.lastCommandTimer;
         }
 
-        const c = g.app.windowList[this.frameIndex].c;
-
         let value: any = undefined;
-        const p = p_node ? p_node : c.p;
-
         const w_refreshType: ReqRefresh = { documents: true, buttons: true, states: true };
 
         w_refreshType.tree = true;
@@ -1597,11 +1634,11 @@ export class LeoUI extends NullGui {
         if (p.__eq__(c.p)) {
             w_refreshType.body = true;
             this.setupRefresh(w_finalFocus, w_refreshType);
-            this._insertAndSetHeadline(p_newHeadline, p_asChild); // no need for re-selection
+            this._insertAndSetHeadline(newHeadline, asChild); // no need for re-selection
         } else {
             const old_p = c.p;  // c.p is old already selected
             c.selectPosition(p); // p is now the new one to be operated on
-            this._insertAndSetHeadline(p_newHeadline, p_asChild);
+            this._insertAndSetHeadline(newHeadline, asChild);
             // Only if 'keep' old position was needed (specified with a p_node parameter), and old_p still exists
             if (!!p_node && c.positionExists(old_p)) {
                 // no need to refresh body
@@ -1635,9 +1672,9 @@ export class LeoUI extends NullGui {
     /**
      * * Perform insert and rename commands
      */
-    private _insertAndSetHeadline(p_name?: string, p_asChild?: boolean): any {
+    private _insertAndSetHeadline(p_name?: string, asChild?: boolean): any {
         const LEOCMD = Constants.LEO_COMMANDS;
-        const w_command = p_asChild ? LEOCMD.INSERT_CHILD_PNODE : LEOCMD.INSERT_PNODE;
+        const w_command = asChild ? LEOCMD.INSERT_CHILD_PNODE : LEOCMD.INSERT_PNODE;
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         let value: any = c.doCommandByName(w_command);
@@ -1725,7 +1762,7 @@ export class LeoUI extends NullGui {
      * Mimic vscode's CTRL+P to find any position by it's headline
      */
     public async goAnywhere(): Promise<unknown> {
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         const allPositions: { label: string; description?: string; position?: Position; }[] = [];
         // Options for date to look like : Saturday, September 17, 2016
@@ -1787,7 +1824,7 @@ export class LeoUI extends NullGui {
      * * Cycle opened documents
      */
     public async tabCycle(): Promise<unknown> {
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         let w_chosenIndex;
         const w_files = g.app.windowList;
@@ -1832,7 +1869,7 @@ export class LeoUI extends NullGui {
     * @returns the promise started after it's done creating the frame and commander
     */
     public async newLeoFile(): Promise<unknown> {
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         // this.showBodyIfClosed = true;
         // this.showOutlineIfClosed = true;
@@ -1861,7 +1898,7 @@ export class LeoUI extends NullGui {
             }
         } else {
             await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
-            this.triggerBodySave(true);
+            this.triggerBodySave();
             const c = g.app.windowList[this.frameIndex].c;
             await c.new(this);
             setTimeout(() => {
@@ -1882,7 +1919,7 @@ export class LeoUI extends NullGui {
         if (index < 0 || index >= g.app.windowList.length) {
             return Promise.reject('closeLeoDocument: index out of range');
         }
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
@@ -1977,7 +2014,7 @@ export class LeoUI extends NullGui {
                 return Promise.resolve();
             }
         } else {
-            this.triggerBodySave(true);
+            this.triggerBodySave();
             const c = g.app.windowList[this.frameIndex].c;
             await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
             await c.open_outline(p_uri);
@@ -2006,7 +2043,7 @@ export class LeoUI extends NullGui {
      * @returns a promise from saving the file results.
      */
     public async saveAsLeoFile(): Promise<unknown> {
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
@@ -2038,7 +2075,7 @@ export class LeoUI extends NullGui {
      * @returns a promise from saving the file results.
      */
     public async saveAsLeoJsFile(): Promise<unknown> {
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         const c = g.app.windowList[this.frameIndex].c;
 
@@ -2087,7 +2124,7 @@ export class LeoUI extends NullGui {
      */
     public async switchLeoFile(): Promise<unknown> {
 
-        this.triggerBodySave(true);
+        this.triggerBodySave();
 
         const w_entries: ChooseDocumentItem[] = []; // Entries to offer as choices.
         let w_index: number = 0;
@@ -2130,6 +2167,52 @@ export class LeoUI extends NullGui {
         }
 
     }
+
+    /**
+     * Handle a successful find match.
+     */
+    public show_find_success(c: Commands, in_headline: boolean, insert: number, p: Position): void {
+        // TODO : see focus_to_body !
+        // TODO : USE ONLY 'WRAPPER' OR 'WIDGET' like in show_find_success!
+        if (in_headline) {
+            // edit_widget(p)
+            // c.frame.edit_widget(p);
+            // console.log('try to set');
+            try {
+                g.app.gui.set_focus(c, c.frame.tree.edit_widget(p));
+            }
+            catch (e) {
+                console.log('oops!', e);
+
+            }
+            // g.app.gui.set_focus(c, { _name: 'tree' });
+        } else {
+            try {
+                g.app.gui.set_focus(c, c.frame.body.widget);
+            }
+            catch (e) {
+                console.log('oops!', e);
+            }
+        }
+
+        // edit_widget
+        // ? needed ?
+
+        // trace = False and not g.unitTesting
+        // if in_headline:
+        //     if trace:
+        //         g.trace('HEADLINE', p.h)
+        //     c.frame.tree.widget.select_leo_node(p)
+        //     self.focus_to_head(c, p)  # Does not return.
+        // else:
+        //     w = c.frame.body.widget
+        //     row, col = g.convertPythonIndexToRowCol(p.b, insert)
+        //     if trace:
+        //         g.trace('BODY ROW', row, p.h)
+        //     w.cursor_line = row
+        //     self.focus_to_body(c)  # Does not return.
+    }
+
 
     /**
      * Show info window about requiring leoID to start
@@ -2241,8 +2324,19 @@ export class LeoUI extends NullGui {
     public set_focus(commander: Commands, widget: any): void {
         this.focusWidget = widget;
         const w_widgetName = this.widget_name(widget);
-        // TODO : implement focus change in web UI
-        // console.log(`Focus set to widget: ${w_widgetName}`);
+        // ! TODO: Test if this really works and if check for NoChange is needed, or if we can just always check widget name and set focus type accordingly.
+        if (widget && this.finalFocus === Focus.NoChange) {
+            // * Check which panel to focus
+            let w_target = Focus.NoChange;
+            if (w_widgetName === 'body') {
+                w_target = Focus.Body;
+            } else if (w_widgetName === 'tree') {
+                w_target = Focus.Outline;
+            }
+            this.setupRefresh(w_target);
+        } else {
+            // pass
+        }
     }
 
     public get_focus(c?: Commands): StringTextWrapper {

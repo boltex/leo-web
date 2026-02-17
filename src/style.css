@@ -64,6 +64,9 @@
   --doc-tabs-display: flex;
   --collapse-all-btn-display: inline-flex;
   --menu-toggle-line-height: 54px;
+
+  /* Headline edit */
+  --headline-input-display: none;
 }
 
 [data-active-tab="log"] {
@@ -170,6 +173,10 @@
 
 [data-body-wrap="true"] {
   --body-pane-wrap: pre-wrap;
+}
+
+[data-show-headline-edit="true"] {
+  --headline-input-display: block;
 }
 
 [data-show-message-dialog="true"] {
@@ -540,6 +547,21 @@ body.dragging-cross {
 #outline-pane:hover #collapse-all-btn {
   opacity: 1;
   pointer-events: auto;
+}
+
+#headline-input {
+  position: absolute;
+  box-sizing: border-box;
+  z-index: 10;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0 4px;
+  margin: 0;
+  border: 1px solid var(--focus-border-color, #007acc);
+  outline: none;
+  background-color: var(--input-bg, #fff);
+  color: var(--input-color, #000);
+  display: var(--headline-input-display);
 }
 
 #menu-icon {
