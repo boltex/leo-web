@@ -310,12 +310,6 @@ export class LeoGui {
         // Shows and optionally puts focus on the log pane
         this.oops();
     }
-    //@+node:felix.20251213133753.224: *4* LeoGui.finishStartup (Leo-Web)
-    public finishStartup(): void {
-        // * Leo-Web GUI needs this method to finish it's startup
-        // Set all remaining local objects, set ready flag(s) and refresh all panels
-        // pass
-    }
     //@+node:felix.20251213133753.225: *4* LeoGui.get1Arg (Leo-Web)
     public get1Arg(
         options: any,
@@ -404,6 +398,9 @@ export class LeoGui {
     }
     //@+node:felix.20251213133753.234: *5* LeoGui.Dialog utils
     public loadSearchSettings(): void {
+        this.oops();
+    }
+    public endEditHeadline(): void {
         this.oops();
     }
 
@@ -553,7 +550,6 @@ export class NullGui extends LeoGui {
     }
 
     public override makeAllBindings(): void { }
-    public override finishStartup(): void { }
 
     public launchRefresh(): void { }
     public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void { }

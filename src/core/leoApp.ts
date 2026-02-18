@@ -2736,8 +2736,6 @@ export class LoadManager {
         const ok = await lm.doPostPluginsInit(); // loads recent, or, new untitled.
         g.app.makeAllBindings();
 
-        g.app.gui.finishStartup();
-
         g.es(''); // Clears horizontal scrolling in the log pane.
 
         if (!ok) {
@@ -2762,7 +2760,7 @@ export class LoadManager {
             g.es_print(`   total:${utils.getDurationMs(t1, t5)} ms`);
             console.log('');
         }
-        g.app.gui.fullRefresh();
+        g.app.gui.runMainLoop()
         return ok;
     }
 

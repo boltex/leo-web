@@ -201,7 +201,7 @@ export class LeoUI extends NullGui {
     /**
      * * Set all remaining local objects, set ready flag(s) and refresh all panels
      */
-    public finishStartup(): void {
+    public runMainLoop(): void {
 
         if (g.app.windowList[this.frameIndex]) {
             g.app.windowList[this.frameIndex].startupWindow = true;
@@ -239,7 +239,7 @@ export class LeoUI extends NullGui {
             this.leoStates.leoIdUnset = true; // Block most UI & commands until 'setLeoIDCommand' succeeds.
         }
         this.leoStates.leojsStartupDone = true;
-
+        this.fullRefresh();
     }
 
     /**
@@ -423,6 +423,13 @@ export class LeoUI extends NullGui {
         }
     }
 
+
+    public endEditHeadline(): void {
+        if (workspace.view.headlineFinish) {
+            workspace.view.headlineFinish();
+        }
+    }
+
     /**
      * * Validate headline edit input box if active, or, Save body to the Leo app if its dirty.
      *   That is, only if a change has been made to the body 'document' so far
@@ -432,8 +439,8 @@ export class LeoUI extends NullGui {
     public triggerBodySave(p_fromFocusChange?: boolean): void {
 
         // * Check if headline edit input box is active. Validate it with current value.
-        if (!p_fromFocusChange && workspace.view.headlineFinish) {
-            workspace.view.headlineFinish();
+        if (!p_fromFocusChange) {
+            this.endEditHeadline();
         }
 
         // * Save body to Leo if a change has been made to the body 'document' so far
@@ -1604,6 +1611,7 @@ export class LeoUI extends NullGui {
         // }
         return w_p;
     }
+
 
     /**
      * Replaces the system's clipboard with the given string

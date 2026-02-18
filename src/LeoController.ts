@@ -67,7 +67,7 @@ export class LeoController {
         view.OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
         view.OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
         view.OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
-        view.OUTLINE_PANE.addEventListener("scroll", utils.throttle(view.renderTree, 33));
+        view.OUTLINE_PANE.addEventListener("scroll", utils.throttle(view.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
         view.OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
         document.addEventListener("click", (e) => {
             view.closeMenusEvent(e);
@@ -95,7 +95,7 @@ export class LeoController {
     }
 
     private setupWindowHandlers() {
-        window.addEventListener('resize', utils.throttle(() => this.view.handleWindowResize(), 33));
+        window.addEventListener('resize', utils.throttle(() => this.view.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
         window.addEventListener('beforeunload', this.saveAllPreferences);
     }
@@ -731,6 +731,7 @@ export class LeoController {
             } else {
                 view.OUTLINE_FIND_CONTAINER.style.width = (view.minWidth - 3) + 'px';
             }
+            view.renderTree();
         } else {
             let clientY = e.clientY;
             if (e.touches) {
@@ -742,11 +743,10 @@ export class LeoController {
             } else {
                 view.OUTLINE_FIND_CONTAINER.style.height = (view.minWidth - 3) + 'px';
             }
-            view.renderTree(); // Resizing vertically, so need to re-render tree
         }
         view.positionCrossDragger();
         view.updateCollapseAllPosition();
-    }, 33);
+    }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startDrag = (e: Event) => {
         this.view.isDragging = true;
@@ -786,7 +786,6 @@ export class LeoController {
                 view.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
                 view.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
-            view.renderTree(); // Resizing vertically, so need to re-render tree
         } else {
             let clientX = e.clientX;
             if (e.touches) {
@@ -799,10 +798,11 @@ export class LeoController {
                 view.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
                 view.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
+            view.renderTree();
         }
         view.positionCrossDragger();
         view.updateCollapseAllPosition();
-    }, 33);
+    }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startSecondaryDrag = (e: Event) => {
         this.view.secondaryIsDragging = true;
@@ -877,7 +877,7 @@ export class LeoController {
         view.positionCrossDragger();
         view.renderTree(); // Render afterward as it would be in each branch of the if/else
         view.updateCollapseAllPosition();
-    }, 33);
+    }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startCrossDrag = (e: Event) => {
         this.view.crossIsDragging = true;
