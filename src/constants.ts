@@ -393,8 +393,6 @@ export class Constants {
         MOVE_LEFT: Constants.NAME + ".moveOutlineLeft",
         MOVE_RIGHT: Constants.NAME + ".moveOutlineRight",
         MOVE_UP: Constants.NAME + ".moveOutlineUp",
-        INSERT: Constants.NAME + ".insertNode",
-        INSERT_CHILD: Constants.NAME + ".insertChildNode",
         CLONE: Constants.NAME + ".cloneNode",
         PROMOTE: Constants.NAME + ".promote",
         DEMOTE: Constants.NAME + ".demote",
@@ -698,11 +696,11 @@ export class Constants {
         'paste-node': 'async-paste-node',
         'paste-retaining-clones': 'async-paste-retaining-clones',
         'paste-as-template': 'async-paste-as-template',
-        'insert-child': 'async-insert-child',
-        'insert-node': 'async-insert-node',
-        'insert-as-first-child': 'async-insert-as-first-child',
-        'insert-as-last-child': 'async-insert-as-last-child',
-        'insert-node-before': 'async-insert-node-before',
+        // 'insert-child': 'async-insert-child',
+        // 'insert-node': 'async-insert-node',
+        // 'insert-as-first-child': 'async-insert-as-first-child',
+        // 'insert-as-last-child': 'async-insert-as-last-child',
+        // 'insert-node-before': 'async-insert-node-before',
     };
 
 }

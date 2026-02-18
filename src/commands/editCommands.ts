@@ -506,9 +506,11 @@ export class EditCommandsClass extends BaseEditCommandsClass {
             p.setDirty();
             u.afterChangeNodeContents(p, undoType, undoData);
         }
-
-        // return c.redrawAndEdit(p, true);
-        c.redraw(p);
+        if (g.app.inBridge) {
+            c.redraw();
+        } else {
+            return c.redrawAndEdit(p, true);
+        }
         return Promise.resolve(p);
 
     }

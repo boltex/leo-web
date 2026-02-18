@@ -1116,7 +1116,7 @@ export class CommanderEditCommands {
             p.setDirty();  // #1449.
             c.setChanged();  // #1449.
             u.afterChangeHeadline(p, command, data);
-            // c.redrawAndEdit(p, true);
+            c.redrawAndEdit(p, true);
 
         }
     }

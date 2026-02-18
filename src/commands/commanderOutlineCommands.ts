@@ -650,7 +650,6 @@ export class CommanderOutlineCommands {
             return true;
         });
     }
-
     //@+node:felix.20251214160853.152: *3* c_oc.dumpOutline
     @commander_command('dump-outline', 'Dump all nodes in the outline.')
     public dumpOutline(this: Commands): void {
@@ -1632,16 +1631,6 @@ export class CommanderOutlineCommands {
         const c: Commands = this;
         return c.insertHeadline('Insert Child', true);
     }
-    //@+node:felix.20251214160853.203: *4* c_oc.asyncInsertChild
-    @commander_command(
-        'async-insert-child',
-        'Insert a node after the presently selected node.'
-    )
-    public asyncInsertChild(this: Commands): Thenable<Position> {
-        const c: Commands = this;
-        const p = c.insertHeadline('Insert Child', true);
-        return g.app.gui.editHeadline(p, 'Insert Child');
-    }
     //@+node:felix.20251214160853.204: *4* c_oc.insertHeadline (insert-*)
     @commander_command(
         'insert-node',
@@ -1716,47 +1705,8 @@ export class CommanderOutlineCommands {
         p.setDirty();
         c.setChanged();
         u.afterInsertNode(p, op_name, undoData);
-        // c.redrawAndEdit(p, true);
-        c.redraw(p);
+        c.redrawAndEdit(p, true);
         return p;
-    }
-    //@+node:felix.20251214160853.206: *4* c_oc.asyncInsertHeadline (insert-*)
-    //
-    //
-    //
-    @commander_command(
-        'async-insert-node',
-        'If c.p is expanded, insert a new node as the first or last child of c.p,' +
-        'depending on @bool insert-new-nodes-at-end.' +
-        'If c.p is not expanded, insert a new node after c.p.'
-    )
-    public asyncInsertHeadline(
-        this: Commands,
-        op_name: string = 'Insert Node',
-        as_child: boolean = false
-    ): Thenable<Position> {
-        const c: Commands = this;
-        // Fix #600.
-        const p = this.insertHeadlineHelper(c, op_name, as_child, false, false);
-        return g.app.gui.editHeadline(p, op_name);
-    }
-    @commander_command(
-        'async-insert-as-first-child',
-        'Insert a node as the first child of the previous node.'
-    )
-    public asyncInsertNodeAsFirstChild(this: Commands): Thenable<Position> {
-        const c: Commands = this;
-        const p = this.insertHeadlineHelper(c, undefined, false, true, false);
-        return g.app.gui.editHeadline(p, 'Insert As First Child');
-    }
-    @commander_command(
-        'async-insert-as-last-child',
-        'Insert a node as the last child of the previous node.'
-    )
-    public asyncInsertNodeAsLastChild(this: Commands): Thenable<Position> {
-        const c: Commands = this;
-        const p = this.insertHeadlineHelper(c, undefined, false, false, true);
-        return g.app.gui.editHeadline(p, 'Insert As Last Child');
     }
     //@+node:felix.20251214160853.207: *4* c_oc.insertHeadlineBefore
     @commander_command(
@@ -1786,44 +1736,8 @@ export class CommanderOutlineCommands {
         p.setDirty();
         c.setChanged();
         u.afterInsertNode(p, op_name, undoData);
-        // c.redrawAndEdit(p, true);
-        c.redraw(p);
+        c.redrawAndEdit(p, true);
         return p;
-    }
-    //@+node:felix.20251214160853.208: *4* c_oc.asyncInsertHeadlineBefore
-    @commander_command(
-        'async-insert-node-before',
-        'Insert a node before the presently selected node.'
-    )
-    public asyncInsertHeadlineBefore(
-        this: Commands
-    ): Thenable<Position | undefined> {
-        const c: Commands = this;
-        const current: Position = c.p;
-        const u: Undoer = c.undoer;
-        const op_name: string = 'Insert Node Before';
-        if (!current || !current.__bool__()) {
-            return Promise.resolve(undefined);
-        }
-        // Can not insert before the base of a hoist.
-        if (
-            c.hoistStack.length &&
-            current.__eq__(c.hoistStack[c.hoistStack.length - 1]!.p)
-        ) {
-            g.warning('can not insert a node before the base of a hoist');
-            return Promise.resolve(undefined);
-        }
-        c.endEditing();
-        const undoData: Bead = u.beforeInsertNode(current);
-        const p: Position = current.insertBefore();
-        g.doHook('create-node', { c: c, p: p });
-        p.setDirty();
-        c.setChanged();
-        u.afterInsertNode(p, op_name, undoData);
-
-        // return c.redrawAndEdit(p, true);
-        c.redraw(p);
-        return g.app.gui.editHeadline(p, op_name);
     }
     //@+node:felix.20251214160853.209: *3* c_oc.Mark commands
     //@+node:felix.20251214160853.210: *4* c_oc.cloneMarked

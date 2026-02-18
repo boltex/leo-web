@@ -439,7 +439,7 @@ export class LeoView {
         });
     }
 
-    public openHeadlineInputBox(node: Position): Promise<string> {
+    public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Promise<string> {
         // Force-close any previous headline edit (resolves its pending promise)
         if (this.headlineFinish) {
             this.headlineFinish();
@@ -450,11 +450,13 @@ export class LeoView {
 
         // the node vertical position needs to be calculated similarly to 
         if (!this._flatRowsLeo) {
+            console.warn('Headline edit requested but flatRowsLeo is not initialized');
             return Promise.resolve(node.h);  // Not initialized yet, should never happen.
         };
 
         const index = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
         if (index === -1) {
+            console.warn('Headline edit requested but node not found in flatRowsLeo');
             return Promise.resolve(node.h); // Not found (shouldn't happen)
         }
 

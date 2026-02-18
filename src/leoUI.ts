@@ -44,6 +44,7 @@ export class LeoUI extends NullGui {
     protected _leoLogPane: boolean = false;
 
     // * Timers
+    public inEditHeadline: number = 0; // (incrementable in case of nested edits) Flag to indicate if we're currently editing a headline, to avoid triggering refresh.
     public refreshTimer: [number, number] | undefined; // until the selected node is found - even if already started refresh
     public lastRefreshTimer: [number, number] | undefined; // until the selected node is found - refreshed even if not found
     public commandRefreshTimer: [number, number] | undefined; // until the selected node is found -  keep if starting a new command already pending
@@ -664,6 +665,9 @@ export class LeoUI extends NullGui {
      * * Launches refresh for UI components and context states (Debounced)
      */
     public async _launchRefresh(): Promise<unknown> {
+        if (this.inEditHeadline) {
+            return; // editHeadline will end with a refresh!
+        }
 
         // Check states for having at least a document opened
         if (this.leoStates.leoReady && this.leoStates.fileOpenedReady) {
@@ -729,7 +733,7 @@ export class LeoUI extends NullGui {
      * * Refreshes all parts.
      * @returns Promise back from command's execution, if added on stack, undefined otherwise.
      */
-    public fullRefresh(p_keepFocus?: boolean): void {
+    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void {
         this.setupRefresh(
             p_keepFocus ? Focus.NoChange : this.finalFocus,
             {
@@ -741,7 +745,12 @@ export class LeoUI extends NullGui {
                 goto: true,
             }
         );
-        void this.launchRefresh();
+        if (instantRefresh) {
+            // Launch only the tree refresh immediately!
+            workspace.controller.buildRowsRenderTreeLeo();
+        } else {
+            void this.launchRefresh(); // Debounced, for better performance when multiple things need refreshing at once (ex: after a command execution)
+        }
     }
 
     /**
@@ -1534,24 +1543,19 @@ export class LeoUI extends NullGui {
 
     }
 
-    private _showHeadlineInputBox(node: Position): Thenable<string> {
-        return workspace.view.openHeadlineInputBox(node);
+    private _showHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Thenable<string> {
+        return workspace.view.openHeadlineInputBox(node, selectAll, selection);
     }
 
     /**
      * * Asks for a new headline label, and replaces the current label with this new one one the specified, or currently selected node
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
-     * @param p_prompt Optional prompt, to override the default 'edit headline' prompt. (for insert-* commands usage)
      * @returns Thenable that resolves when done
      */
-    public async editHeadline(p_node?: Position, p_prompt?: string): Promise<Position> {
+    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number]): Promise<Position> {
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         const w_p: Position = p_node || c.p;
-
-        // if (this._hib && this._hib.enabled) {
-        //     return Promise.resolve(w_p); // DO NOT REACT IF ALREADY EDITING A HEADLINE! 
-        // }
 
         this.triggerBodySave(true);
 
@@ -1561,8 +1565,10 @@ export class LeoUI extends NullGui {
             w_finalFocus,
             { tree: true, states: true }
         );
-        let p_newHeadline = await this._showHeadlineInputBox(w_p);
 
+        this.inEditHeadline++;
+        let p_newHeadline = await this._showHeadlineInputBox(w_p, selectAll, selection);
+        this.inEditHeadline--;
         if ((p_newHeadline || p_newHeadline === "") && p_newHeadline !== "\n") {
             let w_truncated = false;
             if (p_newHeadline.indexOf("\n") >= 0) {
@@ -1598,102 +1604,6 @@ export class LeoUI extends NullGui {
         // }
         return w_p;
     }
-
-    /**
-     * * Asks for a headline label to be entered and creates (inserts) a new node under the current, or specified, node
-     * @param p_node specified under which node to insert, or leave undefined to use whichever is currently selected
-     * @param asChild Insert as child instead of as sibling
-     * @returns Thenable that resolves when done
-     */
-    public async insertNode(p_node: Position | undefined, asChild: boolean): Promise<unknown> {
-
-        const w_finalFocus = Focus.Outline; // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
-
-        this.triggerBodySave();
-
-        // * if node has child and is expanded: turn asChild to true!
-        const c = g.app.windowList[this.frameIndex].c;
-        const p = p_node ? p_node : c.p;
-        const newHeadline = await this._showHeadlineInputBox(p);
-
-        this.lastCommandTimer = process.hrtime();
-        if (this.commandTimer === undefined) {
-            this.commandTimer = this.lastCommandTimer;
-        }
-        this.lastCommandRefreshTimer = this.lastCommandTimer;
-        if (this.commandRefreshTimer === undefined) {
-            this.commandRefreshTimer = this.lastCommandTimer;
-        }
-
-        let value: any = undefined;
-        const w_refreshType: ReqRefresh = { documents: true, buttons: true, states: true };
-
-        w_refreshType.tree = true;
-        w_refreshType.body = true;
-
-        if (p.__eq__(c.p)) {
-            w_refreshType.body = true;
-            this.setupRefresh(w_finalFocus, w_refreshType);
-            this._insertAndSetHeadline(newHeadline, asChild); // no need for re-selection
-        } else {
-            const old_p = c.p;  // c.p is old already selected
-            c.selectPosition(p); // p is now the new one to be operated on
-            this._insertAndSetHeadline(newHeadline, asChild);
-            // Only if 'keep' old position was needed (specified with a p_node parameter), and old_p still exists
-            if (!!p_node && c.positionExists(old_p)) {
-                // no need to refresh body
-                this.setupRefresh(w_finalFocus, w_refreshType);
-                c.selectPosition(old_p);
-            } else {
-                old_p._childIndex = old_p._childIndex + 1;
-                if (!!p_node && c.positionExists(old_p)) {
-                    // no need to refresh body
-                    this.setupRefresh(w_finalFocus, w_refreshType);
-                    c.selectPosition(old_p);
-                } else {
-                    w_refreshType.body = true;
-                    this.setupRefresh(w_finalFocus, w_refreshType);
-                }
-            }
-        }
-        if (this.trace) {
-            if (this.lastCommandTimer) {
-                console.log('lastCommandTimer', utils.getDurationMs(this.lastCommandTimer));
-            }
-        }
-        this.lastCommandTimer = undefined;
-
-        void this.launchRefresh();
-
-        return value;
-
-    }
-
-    /**
-     * * Perform insert and rename commands
-     */
-    private _insertAndSetHeadline(p_name?: string, asChild?: boolean): any {
-        const LEOCMD = Constants.LEO_COMMANDS;
-        const w_command = asChild ? LEOCMD.INSERT_CHILD_PNODE : LEOCMD.INSERT_PNODE;
-        const c = g.app.windowList[this.frameIndex].c;
-        const u = c.undoer;
-        let value: any = c.doCommandByName(w_command);
-        if (!p_name) {
-            return value;
-        }
-        if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
-            return;  // The hook claims to have handled the event.
-        }
-        const undoData = u.beforeChangeHeadline(c.p);
-        c.setHeadString(c.p, p_name);  // Set v.h *after* calling the undoer's before method.
-        if (!c.changed) {
-            c.setChanged();
-        }
-        u.afterChangeHeadline(c.p, 'Edit Headline', undoData);
-        g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
-        return value;
-    }
-
 
     /**
      * Replaces the system's clipboard with the given string

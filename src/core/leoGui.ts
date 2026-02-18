@@ -157,22 +157,12 @@ export class LeoGui {
         this.oops();
     }
     /**
-     * Asks for node headline string and inserts node.
+     * Turns the headline of p_node into an edit widget, and returns the widget.
      */
     public editHeadline(
         p_node?: Position,
-        p_prompt?: string
-    ): any {
-        this.oops();
-    }
-    /**
-     * Asks for node headline string and inserts node.
-     */
-    public insertNode(
-        p_node: Position | undefined,
-        p_fromOutline: boolean,
-        p_interrupt: boolean,
-        p_asChild: boolean
+        selectAll?: boolean,
+        selection?: [number, number],
     ): any {
         this.oops();
     }
@@ -566,7 +556,7 @@ export class NullGui extends LeoGui {
     public override finishStartup(): void { }
 
     public launchRefresh(): void { }
-    public fullRefresh(p_keepFocus?: boolean): void { }
+    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void { }
     public showNavResults(): void { }
 
     public override replaceClipboardWith(s: string): Thenable<string> {

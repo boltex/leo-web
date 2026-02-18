@@ -3581,7 +3581,7 @@ export class Commands {
     }
     //@+node:felix.20251214160339.589: *5* c.redrawing...
     //@+node:felix.20251214160339.590: *6* c.redraw
-    public redraw(p?: Position): void {
+    public redraw(p?: Position, instantRefresh?: boolean): void {
         const c: Commands = this;
 
         if (!p || !p.__bool__()) {
@@ -3605,7 +3605,7 @@ export class Commands {
         if (p && p.__bool__()) {
             c.selectPosition(p);
         }
-        // g.app.gui.fullRefresh(); // Overkill ?
+        g.app.gui.fullRefresh(instantRefresh ? true : undefined, instantRefresh); // Overkill ?
     }
     //@+node:felix.20251214160339.591: *6* c.redraw_after_icons_changed
     /**
@@ -4257,16 +4257,16 @@ export class Commands {
     public redrawAndEdit(
         p: Position,
         selectAll: boolean = false,
-        selection: any = undefined,
+        selection: [number, number] | undefined = undefined,
         keepMinibuffer: boolean = false
     ): Thenable<Position> {
         const c: Commands = this;
         const k: any = this.k;
-        c.redraw(p); // This *must* be done now.
+        c.redraw(p, true); // This *must* be done now.
         if (p && p.__bool__()) {
             // This should request focus.
             // c.frame.tree.editLabel(p, selectAll, selection);
-            return g.app.gui.editHeadline();
+            return g.app.gui.editHeadline(p, selectAll, selection);
 
             // if (k && !keepMinibuffer) {
             //     // Setting the input state has no effect on focus.

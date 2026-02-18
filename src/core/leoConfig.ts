@@ -1518,7 +1518,6 @@ export class ActiveSettingsOutline {
         c.rootPosition()!.clearDirty();
         // c.setChanged();
         c.redraw();
-        g.app.gui.fullRefresh();
     }
     //@+node:felix.20251214160339.761: *4* aso.legend
     /**

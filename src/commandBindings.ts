@@ -204,11 +204,9 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.CHAPTER_MAIN, () => leoUI.command(LEOCMD.CHAPTER_MAIN, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.CHAPTER_SELECT, () => leoUI.command(LEOCMD.CHAPTER_SELECT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        [CMD.INSERT, (p_node: Position) => leoUI.insertNode(p_node, false)],
-        [CMD.INSERT_SELECTION, () => leoUI.insertNode(U, false)],
+        [CMD.INSERT_SELECTION, () => leoUI.command(LEOCMD.INSERT_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        [CMD.INSERT_CHILD, (p_node: Position) => leoUI.insertNode(p_node, true)],
-        [CMD.INSERT_CHILD_SELECTION, () => leoUI.insertNode(U, true)],
+        [CMD.INSERT_CHILD_SELECTION, () => leoUI.command(LEOCMD.INSERT_CHILD_PNODE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
         [CMD.CLONE, (p_node: Position) => leoUI.command(LEOCMD.CLONE_PNODE, { node: p_node, refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Outline, keepSelection: true })],
         [CMD.CLONE_SELECTION, () => leoUI.command(LEOCMD.CLONE_PNODE, { refreshType: REFRESH_TREE, finalFocus: Focus.NoChange })],
