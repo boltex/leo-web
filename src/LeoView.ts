@@ -489,7 +489,11 @@ export class LeoView {
 
             setTimeout(() => {
                 input.focus();
-                input.select();
+                if (selection) {
+                    input.setSelectionRange(selection[0], selection[1]);
+                } else if (selectAll) {
+                    input.select();
+                }
             }, 0);
 
             let resolved = false;
