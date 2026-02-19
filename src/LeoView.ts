@@ -516,6 +516,8 @@ export class LeoView {
             input.onkeydown = (e: KeyboardEvent) => {
                 if (e.key === "Enter" || e.key === "Escape") {
                     e.preventDefault();
+                    // Prevent keydown from becoming a keypress and triggering keybindings in the outline pane
+                    e.stopImmediatePropagation();
                     finish();
                 }
             };

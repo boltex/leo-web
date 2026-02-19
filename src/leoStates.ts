@@ -36,6 +36,16 @@ export class LeoStates {
         utils.setContext(Constants.CONTEXT_FLAGS.LEO_READY, p_value);
     }
 
+    // inHeadlineEdit is set when headline input box is open, used to restrict some commands and interactions
+    private _inHeadlineEdit: boolean = false
+    get inHeadlineEdit(): boolean {
+        return this._inHeadlineEdit;
+    }
+    set inHeadlineEdit(p_value: boolean) {
+        this._inHeadlineEdit = p_value;
+        utils.setContext(Constants.CONTEXT_FLAGS.IN_HEADLINE_EDIT, p_value);
+    }
+
     /**
      * 'LeoID is unset' state for an empty/unset LeoID state preventing startup
      */

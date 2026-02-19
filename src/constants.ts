@@ -243,6 +243,9 @@ export class Constants {
         // Flags for focus context
         FOCUS_FIND: "leoWebFindFocus",
 
+        // Flag for Headline being edited, to prevent unwanted actions or effects.
+        IN_HEADLINE_EDIT: "leoWebInHeadlineEdit"
+
     };
 
     /**

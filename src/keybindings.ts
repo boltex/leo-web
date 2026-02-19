@@ -52,12 +52,14 @@ export const keybindings: Keybinding[] = [
         command: CMD.SHOW_BODY,
         key: "tab",
         outline: true,
-        find: true
+        find: true,
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.SHOW_BODY,
         key: "enter",
         outline: true,
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.TAB_CYCLE_NEXT,
@@ -288,7 +290,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.INSERT_SELECTION,
         key: "insert",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.INSERT_SELECTION,
@@ -358,21 +361,24 @@ export const keybindings: Keybinding[] = [
         command: CMD.DELETE_SELECTION,
         key: "delete",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.UNDO,
         key: "ctrl+z",
         mac: "cmd+z",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO]
+        enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.REDO,
         key: "ctrl+shift+z",
         mac: "cmd+shift+z",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO]
+        enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.START_SEARCH,
@@ -553,25 +559,29 @@ export const keybindings: Keybinding[] = [
         command: CMD.GOTO_FIRST_VISIBLE,
         key: "home",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.GOTO_LAST_VISIBLE,
         key: "end",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.PAGE_UP,
         key: "pageup",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.PAGE_DOWN,
         key: "pagedown",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.GOTO_NEXT_CLONE,
@@ -585,7 +595,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.GOTO_NEXT_VISIBLE,
         key: "arrowdown",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.GOTO_NEXT_VISIBLE,
@@ -599,7 +610,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.GOTO_PREV_VISIBLE,
         key: "arrowup",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.GOTO_PREV_VISIBLE,
@@ -613,7 +625,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.CONTRACT_OR_GO_LEFT,
         key: "arrowleft",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.CONTRACT_OR_GO_LEFT,
@@ -627,7 +640,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.EXPAND_AND_GO_RIGHT,
         key: "arrowright",
         outline: true,
-        enabledFlagsSet: [FLAGS.TREE_OPENED]
+        enabledFlagsSet: [FLAGS.TREE_OPENED],
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.EXPAND_AND_GO_RIGHT,

@@ -362,7 +362,6 @@ export class LeoUI extends NullGui {
         }
     }
 
-
     private _onDocumentChanged(textDocumentChange: { type: string; content: string | null }): void {
 
         const c = g.app.windowList[this.frameIndex].c;
@@ -1550,10 +1549,6 @@ export class LeoUI extends NullGui {
 
     }
 
-    private _showHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Thenable<string> {
-        return workspace.view.openHeadlineInputBox(node, selectAll, selection);
-    }
-
     /**
      * * Asks for a new headline label, and replaces the current label with this new one one the specified, or currently selected node
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
@@ -1566,16 +1561,17 @@ export class LeoUI extends NullGui {
 
         this.triggerBodySave(true);
 
-        const w_finalFocus = Focus.Outline; // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
-
-        this.setupRefresh(
-            w_finalFocus,
-            { tree: true, states: true }
-        );
+        // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
+        this.setupRefresh(Focus.Outline, { tree: true, states: true });
 
         this.inEditHeadline++;
-        let p_newHeadline = await this._showHeadlineInputBox(w_p, selectAll, selection);
+        this.leoStates.inHeadlineEdit = true;
+        let p_newHeadline = await workspace.view.openHeadlineInputBox(w_p, selectAll, selection);
         this.inEditHeadline--;
+        if (!this.inEditHeadline) {
+            this.leoStates.inHeadlineEdit = false;
+        }
+
         if ((p_newHeadline || p_newHeadline === "") && p_newHeadline !== "\n") {
             let w_truncated = false;
             if (p_newHeadline.indexOf("\n") >= 0) {
@@ -1601,14 +1597,9 @@ export class LeoUI extends NullGui {
                 }
                 u.afterChangeHeadline(w_p, 'Edit Headline', undoData);
                 g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
-                void this.launchRefresh();
             }
-
         }
-        // if (this._onDidHideResolve) {
-        //     this._onDidHideResolve(undefined);
-        //     this._onDidHideResolve = undefined;
-        // }
+        void this._launchRefresh();
         return w_p;
     }
 
