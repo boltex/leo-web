@@ -423,10 +423,12 @@ export class LeoUI extends NullGui {
     }
 
 
-    public endEditHeadline(): void {
+    public endEditHeadline(): boolean {
         if (workspace.view.headlineFinish) {
             workspace.view.headlineFinish();
+            return true;
         }
+        return false;
     }
 
     /**
@@ -435,11 +437,13 @@ export class LeoUI extends NullGui {
      * @param p_forcedVsCodeSave Flag to also have vscode 'save' the content of this editor through the filesystem
      * @returns a promise that resolves when the possible saving process is finished
      */
-    public triggerBodySave(p_fromFocusChange?: boolean): void {
+    public triggerBodySave(p_fromFocusChange?: boolean): boolean {
+
+        let hadEditHeadline = false;
 
         // * Check if headline edit input box is active. Validate it with current value.
         if (!p_fromFocusChange) {
-            this.endEditHeadline();
+            hadEditHeadline = this.endEditHeadline();
         }
 
         // * Save body to Leo if a change has been made to the body 'document' so far
@@ -448,7 +452,7 @@ export class LeoUI extends NullGui {
             this._bodySaveDocument();
         }
         this._bodySaveSelection();
-
+        return hadEditHeadline;
     }
 
     /**
@@ -1126,7 +1130,8 @@ export class LeoUI extends NullGui {
      */
     public async command(
         p_cmd: string,
-        p_options: CommandOptions
+        p_options: CommandOptions,
+        p_retried?: boolean
     ): Promise<unknown> {
         this.lastCommandTimer = process.hrtime();
         if (this.commandTimer === undefined) {
@@ -1137,7 +1142,14 @@ export class LeoUI extends NullGui {
             this.commandRefreshTimer = this.lastCommandTimer;
         }
 
-        this.triggerBodySave();
+        const hadEditHeadline = this.triggerBodySave();
+        if (hadEditHeadline && !p_retried) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(this.command(p_cmd, p_options, true));
+                }, 0);
+            });
+        }
 
         if (g.app.windowList.length === 0) {
             void workspace.view.showInformationMessage("No document opened. Please open a Leo file to execute commands.");
@@ -1554,19 +1566,26 @@ export class LeoUI extends NullGui {
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
      * @returns Thenable that resolves when done
      */
-    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number]): Promise<Position> {
+    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number], p_retried?: boolean): Promise<Position> {
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         const w_p: Position = p_node || c.p;
 
-        this.triggerBodySave(true);
+        const hadEditHeadline = this.triggerBodySave(true);
+        if (hadEditHeadline && !p_retried) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(this.editHeadline(p_node, selectAll, selection, true));
+                }, 0);
+            });
+        }
 
         // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
         this.setupRefresh(Focus.Outline, { tree: true, states: true });
 
         this.inEditHeadline++;
         this.leoStates.inHeadlineEdit = true;
-        let p_newHeadline = await workspace.view.openHeadlineInputBox(w_p, selectAll, selection);
+        let [p_newHeadline, blurred] = await workspace.view.openHeadlineInputBox(w_p, selectAll, selection);
         this.inEditHeadline--;
         if (!this.inEditHeadline) {
             this.leoStates.inHeadlineEdit = false;
@@ -1598,6 +1617,10 @@ export class LeoUI extends NullGui {
                 u.afterChangeHeadline(w_p, 'Edit Headline', undoData);
                 g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
             }
+        }
+        if (blurred) {
+            // call setupRefresh so as to not force focus on anything.
+            this.setupRefresh(Focus.NoChange, { tree: true, states: true });
         }
         void this._launchRefresh();
         return w_p;

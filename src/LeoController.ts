@@ -63,8 +63,9 @@ export class LeoController {
 
     private setupOutlinePaneHandlers() {
         const view = this.view;
+        // Use only mousedown for selection. Otherwise focus out of edit-headline messes with click events. We can still detect double-clicks by checking the event.detail property in the mousedown handler.
         view.OUTLINE_PANE.addEventListener("mousedown", this.handleOutlinePaneMouseDown);
-        view.OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
+        // view.OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
         view.OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
         view.OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
         view.OUTLINE_PANE.addEventListener("scroll", utils.throttle(view.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
@@ -433,6 +434,13 @@ export class LeoController {
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
         if (e.detail === 2) {
             e.preventDefault(); // Prevent text selection on double-click
+        }
+        // Check if left mouse button:
+        if (e.button === 0) {
+            // Handle left mouse button actions here
+            this.handleOutlinePaneClick(e);
+            // Call from mousedown to ensure it runs before click event
+            // and can call preventDefault to stop text selection on double-click
         }
     }
 

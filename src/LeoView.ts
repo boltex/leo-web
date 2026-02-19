@@ -439,7 +439,7 @@ export class LeoView {
         });
     }
 
-    public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Promise<string> {
+    public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Promise<[string, boolean]> {
         // Force-close any previous headline edit (resolves its pending promise)
         if (this.headlineFinish) {
             this.headlineFinish();
@@ -451,13 +451,13 @@ export class LeoView {
         // the node vertical position needs to be calculated similarly to 
         if (!this._flatRowsLeo) {
             console.warn('Headline edit requested but flatRowsLeo is not initialized');
-            return Promise.resolve(node.h);  // Not initialized yet, should never happen.
+            return Promise.resolve([node.h, false]);  // Not initialized yet, should never happen.
         };
 
         const index = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
         if (index === -1) {
             console.warn('Headline edit requested but node not found in flatRowsLeo');
-            return Promise.resolve(node.h); // Not found (shouldn't happen)
+            return Promise.resolve([node.h, false]); // Not found (shouldn't happen)
         }
 
         const nodeOffsetY = index * this.ROW_HEIGHT;
@@ -466,7 +466,7 @@ export class LeoView {
         // Accept its content even if escaped or focus-out, we return its content no matter what,
         // and the caller will decide what to do with it (update headline or not)
 
-        return new Promise<string>((resolve) => {
+        return new Promise<[string, boolean]>((resolve) => {
             let leftOffset = this.LEFT_OFFSET;
             if (this._flatRowsLeo!.every(r => !r.hasChildren)) {
                 leftOffset = 0;
@@ -498,7 +498,7 @@ export class LeoView {
 
             let resolved = false;
 
-            const finish = () => {
+            const finish = (blurred?: boolean) => {
                 if (resolved) return;
                 resolved = true;
                 const newHeadline = input.value;
@@ -508,7 +508,7 @@ export class LeoView {
 
                 input.onkeydown = null;
                 input.onblur = null;
-                resolve(newHeadline);
+                resolve([newHeadline, !!blurred]);
             };
 
             this.headlineFinish = finish;
@@ -523,7 +523,7 @@ export class LeoView {
             };
 
             input.onblur = () => {
-                finish();
+                finish(true);
             };
         });
     }
@@ -599,6 +599,13 @@ export class LeoView {
 
             div.appendChild(labelSpan);
             this.SPACER.appendChild(div);
+        }
+        // Update headline input width if it's currently visible
+        if (this.HTML_ELEMENT.getAttribute('data-show-headline-edit') === 'true') {
+            const inputLeft = parseFloat(this.HEADLINE_INPUT.style.left);
+            if (!isNaN(inputLeft)) {
+                this.HEADLINE_INPUT.style.width = (viewportWidth - inputLeft - 4) + "px";
+            }
         }
     }
 
