@@ -478,11 +478,9 @@ export class LeoView {
             input.value = row.label;
 
             // Dynamic positioning only
-            input.style.top = nodeOffsetY + "px";
+            input.style.top = (nodeOffsetY + 6) + "px";
             input.style.left = leftPosition + "px";
             input.style.width = (viewportWidth - leftPosition - 4) + "px";
-            input.style.height = this.ROW_HEIGHT + "px";
-            input.style.lineHeight = this.ROW_HEIGHT + "px";
 
             this.scrollNodeIntoView(node);
             this.HTML_ELEMENT.setAttribute('data-show-headline-edit', 'true');

@@ -555,11 +555,12 @@ body.dragging-cross {
   z-index: 10;
   font-size: inherit;
   font-family: inherit;
-  padding: 0 4px;
+  padding: 0;
   margin: 0;
-  border: 1px solid var(--focus-border-color, #007acc);
+  border: none;
   outline: none;
-  background-color: var(--input-bg, #fff);
+  background-color: var(--selected-bg);
+  border-radius: 4px;
   color: var(--input-color, #000);
   display: var(--headline-input-display);
 }
