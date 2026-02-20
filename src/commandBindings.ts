@@ -124,8 +124,8 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.REMOVE_SENTINELS, () => leoUI.command(LEOCMD.REMOVE_SENTINELS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.WEAVE, () => leoUI.command(LEOCMD.WEAVE, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
 
-        [CMD.HEADLINE, (p_node: Position) => leoUI.editHeadline(p_node)],
-        [CMD.HEADLINE_SELECTION, () => leoUI.editHeadline(U)],
+        [CMD.HEADLINE, (p_node: Position, p_doubleClicked?: boolean) => leoUI.editHeadline(p_node, p_doubleClicked)],
+        [CMD.HEADLINE_SELECTION, (p_doubleClicked?: boolean) => leoUI.editHeadline(U, p_doubleClicked)],
 
         // cut/copy/paste/delete given node.
         [CMD.COPY, (p_node: Position) => leoUI.command(LEOCMD.COPY_PNODE, { node: p_node, refreshType: NO_REFRESH, finalFocus: Focus.Outline, keepSelection: true })],

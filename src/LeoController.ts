@@ -497,7 +497,7 @@ export class LeoController {
             if (rowIndex >= 0 && rowIndex < view.flatRowsLeo!.length) {
                 // const row = view.flatRowsLeo![rowIndex]!;
                 // Double click should trigger 'rename/edit' headline
-                this.doCommand(Constants.COMMANDS.HEADLINE_SELECTION);
+                this.doCommand(Constants.COMMANDS.HEADLINE_SELECTION, true);
             }
         }
     }
@@ -641,7 +641,7 @@ export class LeoController {
 
         const keyString = parts.join('+');
 
-        // Find matching keybinding for outline pane
+        // Find matching keybinding for body pane
         // const platform = navigator.platform.toLowerCase();
         // const isMac = platform.includes('mac');
         // const isLinux = platform.includes('linux');
@@ -696,8 +696,13 @@ export class LeoController {
     }
 
     private handleLogPaneKeyDown = (e: KeyboardEvent) => {
-        // Similar implementation to the other keydown handlers, but for the log pane if needed.
-        // For now, we don't have specific keybindings for the log pane, but this can be implemented in the future.
+        // Build key string representation (e.g., "ctrl+shift+q", "shift+alt+left")
+        const parts: string[] = [];
+
+        if (e.ctrlKey) parts.push('ctrl');
+        if (e.altKey) parts.push('alt');
+        if (e.shiftKey) parts.push('shift');
+        if (e.metaKey) parts.push('meta');
 
         // Block if its CTRL+S even if its not enabled 
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
@@ -710,6 +715,70 @@ export class LeoController {
         }
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
             e.preventDefault();
+        }
+
+
+        // Normalize the key name to lowercase
+        let key = e.key.toLowerCase();
+
+        // Handle special cases for consistency with keybindings
+        if (key === ' ') key = 'space';
+
+        parts.push(key);
+
+        const keyString = parts.join('+');
+
+        // Find matching keybinding for find pane
+        // const platform = navigator.platform.toLowerCase();
+        // const isMac = platform.includes('mac');
+        // const isLinux = platform.includes('linux');
+
+        for (const keybind of keybindings) {
+            if (!keybind.find) continue;
+            let targetKey = keybind.key;
+
+            // // Determine which key property to check based on platform
+            // if (isMac && keybind.mac) {
+            //     targetKey = keybind.mac;
+            // } else if (isLinux && keybind.linux) {
+            //     targetKey = keybind.linux;
+            // } else if (!isMac && !isLinux && keybind.win) {
+            //     targetKey = keybind.win;
+            // }
+
+            if (targetKey.toLowerCase() === keyString) {
+
+                // First check for enabledFlagsSet and enabledFlagsClear to determine
+                // if the command should run based on the current state of the application.
+                // For example, some commands might only be active when a node is selected, 
+                // or when there are marked nodes, etc. This allows context-sensitive keybindings.
+                let enabled = true;
+                if (keybind.enabledFlagsSet) {
+                    for (const flag of keybind.enabledFlagsSet) {
+                        // just check for falsy here since some may be non-boolean (like selected node id, or undefined)
+                        if (!workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (enabled && keybind.enabledFlagsClear) {
+                    for (const flag of keybind.enabledFlagsClear) {
+                        // just check for truthy here since some may be non-boolean (like selected node id, or undefined)
+                        if (workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (!enabled) {
+                    continue;
+                }
+
+                e.preventDefault();
+                this.doCommand(keybind.command);
+                return;
+            }
         }
 
     }

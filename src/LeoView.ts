@@ -471,16 +471,17 @@ export class LeoView {
             if (this._flatRowsLeo!.every(r => !r.hasChildren)) {
                 leftOffset = 0;
             }
-            const leftPosition = (row.depth * 20) + leftOffset + 16 + 20;
+            const leftPosition = (row.depth * 20) + leftOffset + 16;
             const viewportWidth = this.OUTLINE_PANE.clientWidth;
 
             const input = this.HEADLINE_INPUT;
-            input.value = row.label;
+            input.value = node.h;
 
             // Dynamic positioning only
             input.style.top = (nodeOffsetY + 6) + "px";
-            input.style.left = leftPosition + "px";
-            input.style.width = (viewportWidth - leftPosition - 4) + "px";
+            const left = (leftPosition + 4 + (this.SHOW_NODE_ICONS.checked ? 22 : 0));
+            input.style.left = left + "px";
+            input.style.width = (viewportWidth - left - 19) + "px";
 
             this.scrollNodeIntoView(node);
             this.HTML_ELEMENT.setAttribute('data-show-headline-edit', 'true');
@@ -491,6 +492,9 @@ export class LeoView {
                     input.setSelectionRange(selection[0], selection[1]);
                 } else if (selectAll) {
                     input.select();
+                } else {
+                    // Defaults to placing the cursor at the end.
+                    input.setSelectionRange(input.value.length, input.value.length);
                 }
             }, 0);
 
@@ -602,7 +606,7 @@ export class LeoView {
         if (this.HTML_ELEMENT.getAttribute('data-show-headline-edit') === 'true') {
             const inputLeft = parseFloat(this.HEADLINE_INPUT.style.left);
             if (!isNaN(inputLeft)) {
-                this.HEADLINE_INPUT.style.width = (viewportWidth - inputLeft - 4) + "px";
+                this.HEADLINE_INPUT.style.width = (viewportWidth - inputLeft) - 19 + "px";
             }
         }
     }

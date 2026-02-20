@@ -1602,7 +1602,7 @@ export class LeoUI extends NullGui {
                 w_truncated = true;
             }
 
-            if (p_newHeadline && w_p && w_p.h !== p_newHeadline) {
+            if (w_p && w_p.h !== p_newHeadline) {
                 if (w_truncated) {
                     void workspace.view.showInformationMessage("Truncating headline");
                 }

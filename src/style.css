@@ -551,16 +551,14 @@ body.dragging-cross {
 
 #headline-input {
   position: absolute;
-  box-sizing: border-box;
   z-index: 10;
   font-size: inherit;
   font-family: inherit;
-  padding: 0;
+  padding: 2px 0 2px 0px;
   margin: 0;
   border: none;
   outline: none;
-  background-color: var(--selected-bg);
-  border-radius: 4px;
+  background-color: transparent;
   color: var(--input-color, #000);
   display: var(--headline-input-display);
 }
@@ -719,6 +717,10 @@ body.dragging-cross {
   background-color: var(--selected-bg);
 }
 
+[data-show-headline-edit="true"] .selected > .node-text {
+  font-size: 0;
+}
+
 .ancestor > .node-text::before {
   background-color: var(--ancestor-bg);
 }
@@ -770,6 +772,8 @@ body.dragging-secondary .node {
   padding: 2px 0 2px 26px;
   margin-right: 1.2rem;
   border-radius: 4px;
+  height: 18px;
+  white-space: pre;
 }
 
 /* Special handling for node icons */
