@@ -93,7 +93,6 @@ export const menuData: MenuEntry[] = [
                             { label: "Convert-All-Tabs", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CONVERT_ALL_TABS },
                             { label: "Convert-Blanks", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CONVERT_BLANKS },
                             { label: "Convert-Tabs", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CONVERT_TABS },
-                            { label: "Toggle-Invisibles", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.TOGGLE_INVISIBLES },
                         ]
                     },
                     {

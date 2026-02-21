@@ -338,7 +338,6 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.CONVERT_ALL_TABS, () => leoUI.command(LEOCMD.CONVERT_ALL_TABS, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.CONVERT_BLANKS, () => leoUI.command(LEOCMD.CONVERT_BLANKS, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.CONVERT_TABS, () => leoUI.command(LEOCMD.CONVERT_TABS, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
-        [CMD.TOGGLE_INVISIBLES, () => leoUI.command(LEOCMD.TOGGLE_INVISIBLES, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.RECTANGLE_CLEAR, () => leoUI.command(LEOCMD.RECTANGLE_CLEAR, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.RECTANGLE_CLOSE, () => leoUI.command(LEOCMD.RECTANGLE_CLOSE, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.RECTANGLE_DELETE, () => leoUI.command(LEOCMD.RECTANGLE_DELETE, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],

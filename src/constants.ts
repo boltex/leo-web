@@ -770,7 +770,6 @@ export class Constants {
         CONVERT_ALL_TABS: "convert-all-tabs",
         CONVERT_BLANKS: "convert-blanks",
         CONVERT_TABS: "convert-tabs",
-        TOGGLE_INVISIBLES: "toggle-invisibles",
         RECTANGLE_CLEAR: "rectangle-clear",
         RECTANGLE_CLOSE: "rectangle-close",
         RECTANGLE_DELETE: "rectangle-delete",
