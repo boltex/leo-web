@@ -125,10 +125,10 @@ export const menuData: MenuEntry[] = [
                         label: "Move Cursor And Make Selections", entries: [
                             {
                                 label: "Cursor Back", entries: [
-                                    { label: "Back-Char", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_CHAR, keyboardShortcut: "Left" },
-                                    { label: "Back-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_PARAGRAPH },
-                                    { label: "Back-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_SENTENCE },
-                                    { label: "Back-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_WORD, keyboardShortcut: "Ctrl+Left" },
+                                    { label: "Back-Char", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_CHAR, keyboardShortcut: "Left" },
+                                    { label: "Back-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_PARAGRAPH },
+                                    { label: "Back-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_SENTENCE },
+                                    { label: "Back-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_WORD, keyboardShortcut: "Ctrl+Left" },
                                     { label: "Beginning-Of-Buffer", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_BUFFER, keyboardShortcut: "Home" },
                                     { label: "Beginning-Of-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_LINE, keyboardShortcut: "Ctrl+Home" },
                                     { label: "Previous-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.PREVIOUS_LINE, keyboardShortcut: "Up" },
@@ -136,10 +136,10 @@ export const menuData: MenuEntry[] = [
                             },
                             {
                                 label: "Cursor Back Extend Selection", entries: [
-                                    { label: "Back-Char-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_CHAR_EXTEND_SELECTION, keyboardShortcut: "Shift+Left" },
-                                    { label: "Back-Paragraph-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_PARAGRAPH_EXTEND_SELECTION },
-                                    { label: "Back-Sentence-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_SENTENCE_EXTEND_SELECTION },
-                                    { label: "Back-Word-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_WORD_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Left" },
+                                    { label: "Back-Char-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_CHAR_EXTEND_SELECTION, keyboardShortcut: "Shift+Left" },
+                                    { label: "Back-Paragraph-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_PARAGRAPH_EXTEND_SELECTION },
+                                    { label: "Back-Sentence-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_SENTENCE_EXTEND_SELECTION },
+                                    { label: "Back-Word-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACK_WORD_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Left" },
                                     { label: "Beginning-Of-Buffer-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_BUFFER_EXTEND_SELECTION, keyboardShortcut: "Shift+Home" },
                                     { label: "Beginning-Of-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_LINE_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Home" },
                                     { label: "Previous-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.PREVIOUS_LINE_EXTEND_SELECTION, keyboardShortcut: "Shift+Up" },
