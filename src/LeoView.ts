@@ -363,18 +363,20 @@ export class LeoView {
 
     public setBodySelection(selection: body.Selection) {
         // Convert body.Selection to DOM Range and set it in the BODY_PANE
-        const range = document.createRange();
         const { anchor, active } = selection;
         const anchorInfo = this.positionToNodeOffset(anchor);
         const activeInfo = this.positionToNodeOffset(active);
 
-        range.setStart(anchorInfo.node, anchorInfo.offset);
-        range.setEnd(activeInfo.node, activeInfo.offset);
-
         const selectionObj = window.getSelection();
         if (selectionObj) {
             selectionObj.removeAllRanges();
-            selectionObj.addRange(range);
+            // Use setBaseAndExtent to support both forward and backward selections.
+            // A DOM Range always requires start <= end, which collapses backward
+            // selections. setBaseAndExtent preserves the direction.
+            selectionObj.setBaseAndExtent(
+                anchorInfo.node, anchorInfo.offset,
+                activeInfo.node, activeInfo.offset
+            );
         }
     }
 
