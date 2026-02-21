@@ -244,6 +244,109 @@ export class CommanderEditCommands {
         return true;
     }
 
+    //@+node:felix.20260221141821.1: *3* c_ec.dedentBody (unindent-region)
+    @commander_command('unindent-region', 'Remove one tab\'s worth of indentation from all presently selected lines.')
+    public dedentBody(this: Commands): void {
+
+        // * Original Python
+        /*
+        c, p, u, w = self, self.p, self.undoer, self.frame.body.wrapper
+        #
+        # Initial data.
+        sel_1, sel_2 = w.getSelectionRange()
+        tab_width = c.getTabWidth(c.p)
+        head, lines, tail, oldSel, oldYview = self.getBodyLines()
+        bunch = u.beforeChangeBody(p)
+        #
+        # Calculate the result.
+        changed, result = False, []
+        for line in lines:
+            i, width = g.skip_leading_ws_with_indent(line, 0, tab_width)
+            s = g.computeLeadingWhitespace(width - abs(tab_width), tab_width) + line[i:]
+            if s != line:
+                changed = True
+            result.append(s)
+        if not changed:
+            return
+        #
+        # Set p.b and w's text first.
+        middle = ''.join(result)
+        all = head + middle + tail
+        p.b = all  # Sets dirty and changed bits.
+        w.setAllText(all)
+        #
+        # Calculate the proper selection range (i, j, ins).
+        if sel_1 == sel_2:
+            line = result[0]
+            ins, width = g.skip_leading_ws_with_indent(line, 0, tab_width)
+            i = j = len(head) + ins
+        else:
+            i = len(head)
+            j = len(head) + len(middle)
+            if middle.endswith('\n'):  # #1742.
+                j -= 1
+        #
+        # Set the selection range and scroll position.
+        w.setSelectionRange(i, j, insert=j)
+        w.setYScrollPosition(oldYview)
+        u.afterChangeBody(p, 'Unindent Region', bunch)
+        */
+
+        const c = this;
+        const p = this.p;
+        const u = this.undoer;
+        const w = this.frame.body.wrapper;
+        //
+        // Initial data.
+        const [sel_1, sel_2] = w.getSelectionRange();
+        const tab_width = c.getTabWidth(c.p);
+        let head, lines, tail, oldSel, oldYview;
+        [head, lines, tail, oldSel, oldYview] = c.getBodyLines();
+        const bunch = u.beforeChangeBody(p);
+        //
+        // Calculate the result.
+        let changed = false;
+        const result: string[] = [];
+        for (let line of lines) {
+            const [i, w] = g.skip_leading_ws_with_indent(line, 0, tab_width);
+            const s = g.computeLeadingWhitespace(w - Math.abs(tab_width), tab_width) + line.slice(i); // use negative width.
+            if (s !== line) {
+                changed = true;
+            }
+            result.push(s);
+        }
+        if (!changed) {
+            return;
+        }
+
+        // Set p.b and w's text first.
+        const middle = result.join('');
+        const all = head + middle + tail;
+        p.b = all; // Sets dirty and changed bits.
+        w.setAllText(all);
+
+        // Calculate the proper selection range (i, j, ins).
+        let i, j;
+        if (sel_1 === sel_2) {
+            const line = result[0];
+            const [ins, width] = g.skip_leading_ws_with_indent(line, 0, tab_width);
+            i = j = head.length + ins;
+        } else {
+            i = head.length;
+            j = head.length + middle.length;
+            if (middle.endsWith('\n')) {
+                j -= 1;
+            }
+        }
+
+        // Set the selection range and scroll position.
+        w.setSelectionRange(i, j, j);
+        w.setYScrollPosition(oldYview);
+
+        // "after" snapshot.
+        u.afterChangeBody(p, 'Unindent Region', bunch);
+    }
+
     //@+node:felix.20251214160853.38: *3* c_ec.editHeadline (edit-headline)
     @commander_command(
         'edit-headline',
@@ -633,15 +736,20 @@ export class CommanderEditCommands {
         const w = this.frame.body.wrapper;
 
         // #1739. Special case for a *plain* tab bound to indent-region.
-        // const [sel_1, sel_2] = w.getSelectionRange();
-        // if (sel_1 === sel_2) {
-        //     const char = event ? event.char : null;
-        //     const stroke = event ? event.stroke : null;
-        //     if (char === '\t' && stroke && stroke.isPlainKey()) {
-        //         c.editCommands.selfInsertCommand(event);  // Handles undo.
-        //         return;
-        //     }
-        // }
+        const [sel_1, sel_2] = w.getSelectionRange();
+        if (sel_1 === sel_2) {
+            // Insert a tab at the cursor, as per the original selfInsertCommand from editCommands.py.
+            const p = this.p;
+            const u = this.undoer;
+            const bunch = u.beforeChangeBody(p);
+
+            c.editCommands.updateTab(p, w, true)
+            const spot = w.getInsertPoint();
+            c.editCommands.setMoveCol(w, spot);
+            p.v.b = w.getAllText();
+            u.afterChangeBody(p, 'Indent', bunch);
+            return;
+        }
         c.alwaysIndentBody();
     }
     //@+node:felix.20251214160853.50: *3* c_ec.insertBodyTime

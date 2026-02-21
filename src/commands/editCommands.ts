@@ -2007,10 +2007,10 @@ export class EditCommandsClass extends BaseEditCommandsClass {
     }
     //@+node:felix.20251214160853.316: *5* ec.updateTab & helper
     /**
-     * A helper for selfInsertCommand.
+     * A helper for selfInsertCommand and indentBody.
      * Add spaces equivalent to a tab.
      */
-    private updateTab(p: Position, w: StringTextWrapper, smartTab: boolean = true): void {
+    public updateTab(p: Position, w: StringTextWrapper, smartTab: boolean = true): void {
         const c = this.c;
         const [i, j] = w.getSelectionRange();  // Returns insert point if no selection, with i <= j.
         if (i !== j) {
