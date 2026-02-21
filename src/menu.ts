@@ -69,15 +69,143 @@ export const menuData: MenuEntry[] = [
                     { label: "Insert-Headline-Time", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.INSERT_HEADLINE_TIME },
                 ]
             },
-            // { label: "Edit Text", entries: [
-            // TODO : Edit menu entries when body pane is implemented
-            // ]},
+            {
+                label: "Edit Text", entries: [
+                    { label: "Backward-Delete-Char", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_DELETE_CHAR, keyboardShortcut: "Backspace" },
+                    {
+                        label: "Align Text", entries: [
+                            { label: "Center-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CENTER_LINE },
+                            { label: "Center-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CENTER_REGION },
+                        ]
+                    },
+                    {
+                        label: "Capitalize Text", entries: [
+                            { label: "Capitalize-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CAPITALIZE_WORD },
+                            { label: "Downcase-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.DOWNCASE_REGION },
+                            { label: "Downcase-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.DOWNCASE_WORD },
+                            { label: "Upcase-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.UPCASE_REGION },
+                            { label: "Upcase-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.UPCASE_WORD },
+                        ]
+                    },
+                    {
+                        label: "Convert/View Tabs Or Blanks", entries: [
+                            { label: "Convert-All-Blanks", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CONVERT_ALL_BLANKS },
+                            { label: "Convert-All-Tabs", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CONVERT_ALL_TABS },
+                            { label: "Convert-Blanks", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CONVERT_BLANKS },
+                            { label: "Convert-Tabs", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.CONVERT_TABS },
+                            { label: "Toggle-Invisibles", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.TOGGLE_INVISIBLES },
+                        ]
+                    },
+                    {
+                        label: "Create Sections", entries: [
+                            { label: "Extract-Names", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT_NAMES },
+                            { label: "Extract", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT },
+                        ]
+                    },
+                    {
+                        label: "Edit Rectangular Areas", entries: [
+                            { label: "Rectangle-Clear", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_CLEAR },
+                            { label: "Rectangle-Close", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_CLOSE },
+                            { label: "Rectangle-Delete", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_DELETE },
+                            { label: "Rectangle-Kill", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_KILL },
+                            { label: "Rectangle-Open", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_OPEN },
+                            { label: "Rectangle-String", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_STRING },
+                            { label: "Rectangle-Yank", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_YANK },
+                        ]
+                    },
+                    {
+                        label: "Indent Text", entries: [
+                            { label: "Always-Indent-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.ALWAYS_INDENT_REGION },
+                            { label: "Indent-Rigidly", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.INDENT_RIGIDLY },
+                            { label: "Indent-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.INDENT_REGION, keyboardShortcut: "Tab" },
+                            { label: "Indent-Relative", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.INDENT_RELATIVE },
+                            { label: "Unindent-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.UNINDENT_REGION, keyboardShortcut: "Shift+Tab" },
+                        ]
+                    },
+                    {
+                        label: "Move Cursor And Make Selections", entries: [
+                            {
+                                label: "Cursor Back", entries: [
+                                    { label: "Back-Char", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_CHAR, keyboardShortcut: "Left" },
+                                    { label: "Back-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_PARAGRAPH },
+                                    { label: "Back-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_SENTENCE },
+                                    { label: "Back-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_WORD, keyboardShortcut: "Ctrl+Left" },
+                                    { label: "Beginning-Of-Buffer", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_BUFFER, keyboardShortcut: "Home" },
+                                    { label: "Beginning-Of-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_LINE, keyboardShortcut: "Ctrl+Home" },
+                                    { label: "Previous-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.PREVIOUS_LINE, keyboardShortcut: "Up" },
+                                ],
+                            },
+                            {
+                                label: "Cursor Back Extend Selection", entries: [
+                                    { label: "Back-Char-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_CHAR_EXTEND_SELECTION, keyboardShortcut: "Shift+Left" },
+                                    { label: "Back-Paragraph-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_PARAGRAPH_EXTEND_SELECTION },
+                                    { label: "Back-Sentence-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_SENTENCE_EXTEND_SELECTION },
+                                    { label: "Back-Word-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BACKWARD_WORD_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Left" },
+                                    { label: "Beginning-Of-Buffer-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_BUFFER_EXTEND_SELECTION, keyboardShortcut: "Shift+Home" },
+                                    { label: "Beginning-Of-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.BEGINNING_OF_LINE_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Home" },
+                                    { label: "Previous-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.PREVIOUS_LINE_EXTEND_SELECTION, keyboardShortcut: "Shift+Up" },
+                                ],
+                            },
+                            {
+                                label: "Cursor Back Extend to", entries: [
+                                    { label: "Extend-To-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTEND_TO_LINE, keyboardShortcut: "Shift+End" },
+                                    { label: "Extend-To-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTEND_TO_PARAGRAPH },
+                                    { label: "Extend-To-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTEND_TO_SENTENCE },
+                                    { label: "Extend-To-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTEND_TO_WORD, keyboardShortcut: "Ctrl+Shift+Right" },
+                                ],
+                            },
+                            {
+                                label: "Cursor Forward", entries: [
+                                    { label: "End-Of-Buffer", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.END_OF_BUFFER, keyboardShortcut: "End" },
+                                    { label: "End-Of-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.END_OF_LINE, keyboardShortcut: "Ctrl+End" },
+                                    { label: "Forward-Char", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_CHAR, keyboardShortcut: "Right" },
+                                    { label: "Forward-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_PARAGRAPH },
+                                    { label: "Forward-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_SENTENCE },
+                                    { label: "Forward-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_WORD, keyboardShortcut: "Ctrl+Right" },
+                                    { label: "Next-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.NEXT_LINE, keyboardShortcut: "Down" },
+                                ],
+                            },
+                            {
+                                label: "Cursor Forward Extend Selection", entries: [
+                                    { label: "End-Of-Buffer-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.END_OF_BUFFER_EXTEND_SELECTION, keyboardShortcut: "Shift+End" },
+                                    { label: "End-Of-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.END_OF_LINE_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+End" },
+                                    { label: "Forward-Char-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_CHAR_EXTEND_SELECTION, keyboardShortcut: "Shift+Right" },
+                                    { label: "Forward-Paragraph-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_PARAGRAPH_EXTEND_SELECTION },
+                                    { label: "Forward-Sentence-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_SENTENCE_EXTEND_SELECTION },
+                                    { label: "Forward-Word-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.FORWARD_WORD_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Right" },
+                                    { label: "Next-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.NEXT_LINE_EXTEND_SELECTION, keyboardShortcut: "Shift+Down" },
+                                ],
+                            },
+                        ]
+                    },
+                    {
+                        label: "Sort Text", entries: [
+                            { label: "Sort-Columns", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.SORT_COLUMNS },
+                            { label: "Sort-Lines", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.SORT_LINES },
+                        ]
+                    },
+                    {
+                        label: "Yank/Kill Text", entries: [
+                            { label: "Rectangle-Kill", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_KILL },
+                            { label: "Rectangle-Yank", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RECTANGLE_YANK },
+                            { label: "Kill-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.KILL_LINE, keyboardShortcut: "Ctrl+K" },
+                            { label: "Kill-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.KILL_REGION },
+                            { label: "Kill-Region-Save", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.KILL_REGION_SAVE },
+                            { label: "Kill-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.KILL_SENTENCE },
+                            { label: "Kill-Ws", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.KILL_WS, },
+                            { label: "Kill-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.KILL_WORD, keyboardShortcut: "Ctrl+Backspace" },
+                            { label: "Yank", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.YANK, keyboardShortcut: "Ctrl+Y" },
+                            { label: "Yank-Pop", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.YANK_POP, keyboardShortcut: "Alt+Y" },
+                        ]
+                    }
+
+                ]
+            },
             {
                 label: "Format Text", entries: [
                     { label: "Insert-Body-Time", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.INSERT_BODY_TIME },
                     { label: "Reformat-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.REFORMAT_PARAGRAPH },
                     { label: "Rst3", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.RST3 },
-
                 ]
             },
             {
