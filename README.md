@@ -1,6 +1,6 @@
 # Leo Web Editor
 
-A browser-based version of the Leo Editor - a structured document editor that allows you to organize your content in a hierarchical outline format.
+A browser-based version of the Leo Editor.
 
 Leo is a fundamentally different way of using and organizing data, programs and scripts. [📺 Introduction Video](https://www.youtube.com/watch?v=SYwlfdEukD4)
 
@@ -9,15 +9,15 @@ Leo is a fundamentally different way of using and organizing data, programs and 
 
 ## About
 
-This project is a TypeScript implementation that brings the Leo Editor experience to the web with support for local file access.
+This project is a TypeScript implementation that brings the Leo Editor experience to the web. (_Scriptable in either Javascript or Typescript_)
 
-For other usage scenarios, see ([other Leo implementations](#other-leo-editor-implementations)) for versions that support online repositories, or integrated as VSCode extentions.
+It uses the browser's **File System API** for local file access. For other usage scenarios, see [other Leo implementations](#other-leo-editor-implementations) for versions that support online repositories, or integrated as VSCode extentions.
 
 ## Limitations
 
 To keep Leo-Web light and fast, it does not support .db files.
 
-Absolute paths are not supported with the browser's file api. Use relative paths exclusively for external files.
+Absolute paths are not supported with the browser's file API. Use relative paths exclusively for external files.
 
 `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
 
@@ -33,7 +33,6 @@ Absolute paths are not supported with the browser's file api. Use relative paths
 
 ### Not Yet Implemented
 
-- Headline editing in the outline pane
 - Find/replace functionality
 
 ## Contributing
@@ -81,10 +80,6 @@ The built files will be in the `dist/` directory.
 
 - `npm run type-check` - Run TypeScript type checking without building
 - `npm run clean` - Clean the dist directory
-
-## Contributing
-
-This is the beginning of the Leo Web Editor project. Contributions, suggestions, and feedback are welcome!
 
 ## Other Leo Editor implementations
 

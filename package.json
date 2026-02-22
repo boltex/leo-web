@@ -1,7 +1,7 @@
 {
   "name": "leo-web",
   "version": "1.0.0",
-  "description": "Leo Web - Web-based version of the Leo Editor",
+  "description": "Leo Web - A TypeScript implementation of the Leo Editor",
   "main": "dist/bundle.js",
   "scripts": {
     "build": "npm run clean && webpack --mode=production",

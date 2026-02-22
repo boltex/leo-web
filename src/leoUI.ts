@@ -328,17 +328,6 @@ export class LeoUI extends NullGui {
         }
     }
 
-    public checkConfirmBeforeClose(): void {
-        let hasDirty = false;
-        for (const frame of g.app.windowList) {
-            if (frame.c.changed) {
-                hasDirty = true;
-            }
-        }
-        console.log('TODO : SETUP BROWSER TO ASK BEFORE EXITING IF hasDirty IS TRUE, REMOVE IF FALSE');
-        // TODO : SETUP BROWSER TO ASK BEFORE EXITING IF hasDirty IS TRUE, REMOVE IF FALSE
-    }
-
     /**
      * * Handles detection of the active editor's selection change or cursor position
      * @param p_event a change event containing the active editor's selection, if any.
@@ -1079,7 +1068,6 @@ export class LeoUI extends NullGui {
      * * Setup UI for having no opened Leo documents
      */
     private _setupNoOpenedLeoDocument(): void {
-        void this.checkConfirmBeforeClose();
         this.leoStates.fileOpenedReady = false;
         this._refreshOutline(RevealType.NoReveal);
         const states = this.leoStates;
