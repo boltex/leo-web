@@ -3,7 +3,7 @@
 //@+<< imports >>
 //@+node:felix.20251214160339.16: ** << imports >>
 import pkg from '../../package.json'; // note the .json extension
-import { Uri, workspace } from '../workspace';
+import { workspace } from '../workspace';
 import * as Bowser from 'bowser';
 import * as os from 'os';
 import * as path from 'path';
@@ -1239,19 +1239,22 @@ export class LeoApp {
     public setIDFromConfigSetting(verbose: boolean): Promise<void> {
         let w_userName = '';
         // 1 - set leoID from configuration settings
-        // if (!this.leoID && vscode && vscode.workspace) {
-        //     w_userName = vscode.workspace
-        //         .getConfiguration(Constants.CONFIG_NAME)
-        //         .get(
-        //             Constants.CONFIG_NAMES.LEO_ID,
-        //             Constants.CONFIG_DEFAULTS.LEO_ID
-        //         );
-        //     if (w_userName) {
-        //         this.leoID = this.cleanLeoID(w_userName, 'config.leoID');
-        //     }
-        // }
-        // TODO : Temporary for leo-web
-        this.leoID = "demoId"; // Temporary for leo-web
+        if (!this.leoID && workspace) {
+            // this.gui does not exist at this point, so we cannot use it to get the config setting.
+            // Instead, we will get the config setting with localStorage, which is where the config setting is stored in leo-web.
+            // Even if this duplcates the code from config.ts, it is better than adding a dependency on the GUI before it is initialized.
+            // ! TODO : Cleanup in some way to avoid duplication and make it more robust.
+            const savedConfig = utils.safeLocalStorageGet(Constants.LOCAL_STORAGE_KEY);
+            if (savedConfig !== null) {
+                const parsedConfig = JSON.parse(savedConfig);
+                w_userName = parsedConfig.leoID || this.leoID;
+            }
+            if (w_userName && typeof w_userName === 'string') {
+                this.leoID = this.cleanLeoID(w_userName, 'config.leoID');
+            }
+        }
+
+        // this.leoID = "demoId"; // Temp for testing. Remove after testing.
         return Promise.resolve();
     }
     //@+node:felix.20251214160339.53: *5* app.setIDFromEnv
@@ -1267,7 +1270,7 @@ export class LeoApp {
         // Get the id, making sure it is at least three characters long.
         let attempt = 0;
         let id_ = "";
-        while (attempt < 2) {
+        while (!id_) {
             attempt += 1;
             const dialogVal = await g.IDDialog();
             // #1404: Make sure the id will not corrupt the .leo file.
@@ -1279,17 +1282,9 @@ export class LeoApp {
         }
 
         // Put result in g.app.leoID.
-        // Note: For unit tests, leoTest2.py: create_app sets g.app.leoID.
-        if (!id_) {
-            // g.es_print('Leo can not start without an id.');
-            // * Leo web will block all commands instead until re-set by user.
-            // print('Leo will now exit');
-            // sys.exit(1) 
-        } else {
-            this.leoID = id_;
-            if (this.leoID) {
-                g.blue('leoID=' + this.leoID);
-            }
+        this.leoID = id_;
+        if (this.leoID) {
+            g.blue('leoID=' + this.leoID);
         }
 
     }
@@ -1299,7 +1294,6 @@ export class LeoApp {
      */
     public async setIDFile(): Promise<boolean> {
 
-        // Set Leo web vscode config ONLY IF ".leoID.txt" NOT WRITTEN
         // TODO: For leo-web, use localstorage methods from the utils module.
 
         return false;

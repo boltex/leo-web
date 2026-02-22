@@ -254,8 +254,9 @@ export const menuData: MenuEntry[] = [
     {
         label: "Settings",
         entries: [
-            { label: "Open LeoSettings.leo", action: CMD.OPEN_LEO_SETTINGS },
+            { label: "Open LeoSettings", action: CMD.OPEN_LEO_SETTINGS },
             { label: "Reload Settings", action: CMD.RELOAD_SETTINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "Change LeoID", action: CMD.SET_LEO_ID },
         ],
     },
     {

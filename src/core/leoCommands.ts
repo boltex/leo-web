@@ -753,6 +753,13 @@ export class Commands {
             g.restoreStdout();
         }
     }
+    //@+node:felix.20260222124734.1: *3* @cmd setLeoID
+    @cmd('set-leoid', 'Choose a new LeoID')
+    public changeLeoID(): Thenable<unknown> {
+        const c: Commands = this;
+        return g.app.gui.setLeoIDCommand();
+    }
+
     //@+node:felix.20251214160339.451: *3* @cmd toggleUnlView
     @cmd('toggle-unl-view', 'Toggles the status-bar UNL display setting.')
     public toggleUnlView(): void {

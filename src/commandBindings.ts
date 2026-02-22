@@ -79,6 +79,9 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         // [CMD.STATUS_BAR, () => p_leoUI.statusBar()], // Not referenced in package.json
         [CMD.MINIBUFFER, () => leoUI.minibuffer()], // Is referenced in package.json
         [CMD.SET_LEO_ID, () => leoUI.setLeoIDCommand()],
+        [CMD.OPEN_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
+        [CMD.RELOAD_SETTINGS, () => leoUI.command(LEOCMD.RELOAD_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
+
         [CMD.HANDLE_UNL, (p_arg: { unl: string }) => leoUI.handleUnl(p_arg)],
 
         // [CMD.GOTO_LINE_IN_LEO_OUTLINE, (p_arg: any) => p_leoUI.gotoLineInLeoOutline(p_arg)],
@@ -320,10 +323,6 @@ export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
         [CMD.TOGGLE_FIND_WORD_OPTION, () => leoUI.command(LEOCMD.TOGGLE_FIND_WORD_OPTION, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.TOGGLE_FIND_SEARCH_BODY_OPTION, () => leoUI.command(LEOCMD.TOGGLE_FIND_SEARCH_BODY_OPTION, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.TOGGLE_FIND_SEARCH_HEADLINE_OPTION, () => leoUI.command(LEOCMD.TOGGLE_FIND_SEARCH_HEADLINE_OPTION, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
-
-        [CMD.SET_BODY_WRAP_SETTINGS, () => leoUI.config.setBodyWrap()],
-        [CMD.SET_ENABLE_PREVIEW, () => leoUI.config.setEnablePreview()],
-        [CMD.CLEAR_CLOSE_EMPTY_GROUPS, () => leoUI.config.clearCloseEmptyGroups()],
 
         // Edit Commands
         [CMD.BACKWARD_DELETE_CHAR, () => leoUI.command(LEOCMD.BACKWARD_DELETE_CHAR, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],

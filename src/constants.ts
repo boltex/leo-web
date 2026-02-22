@@ -507,9 +507,6 @@ export class Constants {
         TOGGLE_FIND_WORD_OPTION: Constants.NAME + ".toggleFindWordOption",
         TOGGLE_FIND_SEARCH_BODY_OPTION: Constants.NAME + ".toggleFindSearchBodyOption",
         TOGGLE_FIND_SEARCH_HEADLINE_OPTION: Constants.NAME + ".toggleFindSearchHeadlineOption",
-        SET_BODY_WRAP_SETTINGS: Constants.NAME + ".setBodyWrapSettings",
-        SET_ENABLE_PREVIEW: Constants.NAME + ".setEnablePreview",
-        CLEAR_CLOSE_EMPTY_GROUPS: Constants.NAME + ".clearCloseEmptyGroups",
 
         // Edit Commands
         BACKWARD_DELETE_CHAR: Constants.NAME + ".backwardDeleteChar",
@@ -594,6 +591,9 @@ export class Constants {
         WRITE_AT_FILE_NODES: 'write-at-file-nodes',
         WRITE_DIRTY_AT_FILE_NODES: 'write-dirty-at-file-nodes',
         REVERT: 'revert',
+        OPEN_LEO_SETTINGS: 'open-leo-settings',
+        RELOAD_SETTINGS: 'reload-settings',
+
         // * More Commands
         GOTO_GLOBAL_LINE: "goto-global-line",
         SET_UA: 'set-ua',

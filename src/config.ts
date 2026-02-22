@@ -49,9 +49,7 @@ export class Config {
 
     }
 
-
     public buildFromSavedSettings(): void {
-
         const savedConfig = utils.safeLocalStorageGet(Constants.LOCAL_STORAGE_KEY);
         if (savedConfig !== null) {
             const parsedConfig = JSON.parse(savedConfig);

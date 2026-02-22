@@ -421,9 +421,20 @@ export class LeoView {
         });
         this.BODY_PANE.addEventListener('paste', (e) => {
             const clipboardEvent = e as ClipboardEvent;
+            const plainText = clipboardEvent.clipboardData?.getData('text/plain') ?? null;
+
+            // When contentEditable is "true" (Firefox fallback), the browser
+            // would insert rich HTML. Prevent that and insert plain text instead.
+            if (this.BODY_PANE.contentEditable === "true") {
+                e.preventDefault();
+                if (plainText) {
+                    document.execCommand('insertText', false, plainText);
+                }
+            }
+
             callback({
                 type: 'paste',
-                content: clipboardEvent.clipboardData?.getData('text/plain') ?? null
+                content: plainText
             });
         });
         this.BODY_PANE.addEventListener('cut', (e) => {
@@ -1035,6 +1046,18 @@ export class LeoView {
         text = this._escapeBodyText(text);
 
         this.BODY_PANE.innerHTML = text;
+    }
+
+    public setBodyEditable(editable: boolean) {
+        if (editable) {
+            // Try plaintext-only first; fall back to true for Firefox
+            this.BODY_PANE.contentEditable = "plaintext-only";
+            if (this.BODY_PANE.contentEditable !== "plaintext-only") {
+                this.BODY_PANE.contentEditable = "true";
+            }
+        } else {
+            this.BODY_PANE.contentEditable = "false";
+        }
     }
 
     public setBodyWrap(wrap: boolean) {
@@ -1860,6 +1883,8 @@ export class LeoView {
         this.INPUT_DIALOG_BTN.onclick = inputCallback;
         this.INPUT_DIALOG_INPUT.onkeydown = (e) => {
             if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
                 inputCallback();
             }
         };
@@ -1892,9 +1917,9 @@ export class LeoView {
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
             this.isDialogOpen = false;
-            this._restorePreDialogFocus();
             // Remove the 'hidden-button' class from OK button for future dialogs
             this.INPUT_DIALOG_BTN.classList.remove('hidden-button');
+            this._restorePreDialogFocus();
             dialog.resolve(inputValue);
             setTimeout(() => this._processDialogQueue(), 100);
         };
@@ -2002,10 +2027,10 @@ export class LeoView {
                 li.onclick = () => {
                     this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
                     this.isDialogOpen = false;
-                    this._restorePreDialogFocus();
                     if (options?.onDidSelectItem) {
                         options.onDidSelectItem(item);
                     }
+                    this._restorePreDialogFocus();
                     dialog.resolve(item);
                     setTimeout(() => this._processDialogQueue(), 100);
                 };
@@ -2083,9 +2108,9 @@ export class LeoView {
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
             this.isDialogOpen = false;
-            this._restorePreDialogFocus();
             this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
             this.QUICKPICK_DIALOG_INPUT.oninput = null;
+            this._restorePreDialogFocus();
             dialog.resolve(returnValue);
             setTimeout(() => this._processDialogQueue(), 100);
         };
@@ -2093,9 +2118,11 @@ export class LeoView {
         this.QUICKPICK_DIALOG_INPUT.onkeydown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
+                e.stopPropagation();
                 closeDialog(null);
             } else if (e.key === 'Enter') {
                 e.preventDefault();
+                e.stopPropagation();
                 if (selectedIndex >= 0 && selectedIndex < filteredItems.length) {
                     const selectedItem = filteredItems[selectedIndex];
                     if (selectedItem && selectedItem.kind !== -1) {
@@ -2237,9 +2264,9 @@ export class LeoView {
         } catch (e) {
             console.error('Error showing native open file dialog:', e);
             this.isDialogOpen = false;
+            this._restorePreDialogFocus();
             dialog.resolve(null);
             setTimeout(() => this._processDialogQueue(), 100);
-            this._restorePreDialogFocus();
         }
     }
 
@@ -2312,9 +2339,9 @@ export class LeoView {
         } catch (e) {
             console.error('Error showing native save file dialog:', e);
             this.isDialogOpen = false;
+            this._restorePreDialogFocus();
             dialog.resolve(null);
             setTimeout(() => this._processDialogQueue(), 100);
-            this._restorePreDialogFocus();
         }
     }
 

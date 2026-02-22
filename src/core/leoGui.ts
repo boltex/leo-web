@@ -524,6 +524,11 @@ export class LeoGui {
         return Promise.resolve();
     }
 
+    //@+node:felix.20260222131953.1: *4* setLeoID
+    public setLeoIDCommand(): Thenable<unknown> {
+        return Promise.resolve();
+    }
+
     //@-others
 }
 

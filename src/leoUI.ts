@@ -28,7 +28,7 @@ import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
-import { Range, Selection } from "./body";
+import { Selection } from "./body";
 import { makeAllBindings } from "./commandBindings";
 import { menuData } from "./menu";
 
@@ -51,6 +51,9 @@ export class LeoUI extends NullGui {
     public lastCommandRefreshTimer: [number, number] | undefined; // until the selected node is found - refreshed if starting a new command
     public commandTimer: [number, number] | undefined; // until the command done - keep if starting a new one already pending
     public lastCommandTimer: [number, number] | undefined; // until the command done - refreshed if starting a new one
+
+    // * Configuration Settings Service
+    public config: Config;
 
     // * Refresh Cycle
     private _refreshType: ReqRefresh = {}; // Flags for commands to require parts of UI to refresh
@@ -341,6 +344,9 @@ export class LeoUI extends NullGui {
      * @param p_event a change event containing the active editor's selection, if any.
      */
     private _onChangeEditorSelection(p_event: Selection): void {
+        if (g.app.windowList.length === 0) {
+            return; // No file opened: exit 
+        }
         const c = g.app.windowList[this.frameIndex].c;
         if (p_event) {
             this._selectionDirty = true;
@@ -1089,6 +1095,8 @@ export class LeoUI extends NullGui {
         this.refreshUndoPane();
         // Empty body pane
         workspace.view.setBody('', false);
+        // Make body pane not editable.
+        workspace.view.setBodyEditable(false);
     }
 
     /**
@@ -1104,6 +1112,9 @@ export class LeoUI extends NullGui {
         if (!this.leoStates.leoIdUnset && g.app.leoID !== 'None') {
             this.leoStates.fileOpenedReady = true;
         }
+
+        // In case it's the first file openind, make body pane editable again.
+        workspace.view.setBodyEditable(true);
 
         this._revealType = RevealType.RevealSelect; // For initial outline 'visible' event
 
@@ -2213,7 +2224,6 @@ export class LeoUI extends NullGui {
                     this.leoStates.leoIdUnset = false;
                     this.leoStates.leoReady = true;
                     if (g.app.windowList.length) {
-
                         this.leoStates.fileOpenedReady = true;
                         this.fullRefresh();
                     }
@@ -2230,7 +2240,7 @@ export class LeoUI extends NullGui {
         }
 
         if (this.config.leoID !== p_leoID) {
-            return this.config.setLeojsSettings(w_changes);
+            return Promise.resolve(this.config.setLeoWebSettings(w_changes));
         }
         return Promise.resolve();
     }
