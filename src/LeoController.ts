@@ -654,6 +654,9 @@ export class LeoController {
         const view = this.view;
         if (view.isDialogOpen) return; // Prevent handling when a dialog is open
 
+        // Try to see if ctrl+tab is pressed:
+        console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
+
         // TODO : Remove this method if not needed when the rest of leo's core is integrated in this UI,
         // since most keybindings should be handled in the outline or body panes. 
         // For now, we can keep it for global shortcuts like opening settings, or for debugging.
@@ -993,7 +996,7 @@ export class LeoController {
             findWholeWord: view.OPT_WHOLE.checked,
             findIgnoreCase: view.OPT_IGNORECASE.checked,
             findRegexp: view.OPT_REGEXP.checked,
-            findMark: view.OPT_MARK.checked,
+            findMark: view.OPT_MARK_FINDS.checked,
             findHeadline: view.OPT_HEADLINE.checked,
             findBody: view.OPT_BODY.checked,
             findScope: selectedFindScope
@@ -1019,7 +1022,7 @@ export class LeoController {
                 view.OPT_WHOLE.checked = prefs.findWholeWord ?? view.OPT_WHOLE.checked;
                 view.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? view.OPT_IGNORECASE.checked;
                 view.OPT_REGEXP.checked = prefs.findRegexp ?? view.OPT_REGEXP.checked;
-                view.OPT_MARK.checked = prefs.findMark ?? view.OPT_MARK.checked;
+                view.OPT_MARK_FINDS.checked = prefs.findMark ?? view.OPT_MARK_FINDS.checked;
                 view.OPT_HEADLINE.checked = prefs.findHeadline ?? view.OPT_HEADLINE.checked;
                 view.OPT_BODY.checked = prefs.findBody ?? view.OPT_BODY.checked;
                 // Set the find scope radio

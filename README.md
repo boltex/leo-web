@@ -17,9 +17,11 @@ It uses the browser's **File System API** for local file access. For other usage
 
 To keep Leo-Web light and fast, it does not support .db files.
 
+Running in the browser, it cannot launch OS shell commands.
+
 Absolute paths are not supported with the browser's file API. Use relative paths exclusively for external files.
 
-`Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
+`Ctrl+TAB`, `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
 
 ## Current Features
 

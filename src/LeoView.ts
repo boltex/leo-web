@@ -61,13 +61,15 @@ export class LeoView {
     public OPT_WHOLE: HTMLInputElement;
     public OPT_IGNORECASE: HTMLInputElement;
     public OPT_REGEXP: HTMLInputElement;
-    public OPT_MARK: HTMLInputElement;
+    public OPT_MARK_FINDS: HTMLInputElement;
+    public OPT_MARK_CHANGES: HTMLInputElement;
 
     public LOG_CONTENT: HTMLElement;
 
     public LOG_TAB: HTMLDivElement;
     public FIND_TAB: HTMLDivElement;
     // public UNDO_TAB: HTMLDivElement; // Maybe add undo tab functionality later
+    // public NAV_TAB: HTMLDivElement; // Maybe add navigation tab functionality later
     public SETTINGS_TAB: HTMLDivElement;
 
     public SHOW_PREV_NEXT_MARK: HTMLInputElement;
@@ -200,14 +202,16 @@ export class LeoView {
         this.OPT_WHOLE = document.getElementById('opt-whole')! as HTMLInputElement;
         this.OPT_IGNORECASE = document.getElementById('opt-ignorecase')! as HTMLInputElement;
         this.OPT_REGEXP = document.getElementById('opt-regexp')! as HTMLInputElement;
-        this.OPT_MARK = document.getElementById('opt-mark')! as HTMLInputElement;
+        this.OPT_MARK_FINDS = document.getElementById('opt-mark-finds')! as HTMLInputElement;
+        this.OPT_MARK_CHANGES = document.getElementById('opt-mark-changes')! as HTMLInputElement;
 
         // this.LOG_CONTENT = document.getElementById('log-content')!;
         this.LOG_CONTENT = document.getElementById('log-controls')!;
 
         this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
         this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
-        // this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement; // Maybe add undo tab functionality later
+        // this.NAV_TAB = document.getElementById('nav-tab')! as HTMLDivElement;
+        // this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
         this.SETTINGS_TAB = document.getElementById('settings-tab')! as HTMLDivElement;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
@@ -2355,7 +2359,7 @@ export class LeoView {
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key !== 'Tab') return;
-
+            console.log('Focus trap keydown:', e.key, 'Shift:', e.shiftKey);
             const focusableElements = getFocusableElements();
             if (focusableElements.length === 0) return;
 

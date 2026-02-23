@@ -69,9 +69,11 @@
                     <div class="tab" id="log-tab" title="Log Pane">Log</div>
                     <div class="tab" id="find-tab" title="Find Pane">Find</div>
                     <!-- Future possible tab -->
+                    <!-- <div class="tab" id="nav-tab" title="Nav Pane">Nav</div> -->
                     <!-- <div class="tab" id="undo-tab" title="Undo Pane">Undo</div> -->
                     <div class="tab" id="settings-tab" title="Settings Pane">Settings</div>
                 </div>
+
                 <!-- Log Controls -->
                 <div id="log-controls" class="log-pane-container" role="region" aria-label="Log Pane"
                     spellcheck="false">
@@ -95,9 +97,13 @@
                             <input id="opt-regexp" type="checkbox" name="find-option" />
                             Regexp
                         </label>
-                        <label for="opt-mark">
-                            <input id="opt-mark" type="checkbox" name="find-option" />
+                        <label for="opt-mark-finds">
+                            <input id="opt-mark-finds" type="checkbox" name="find-option" />
                             Mark Finds
+                        </label>
+                        <label for="opt-mark-changes">
+                            <input id="opt-mark-changes" type="checkbox" name="find-option" />
+                            Mark Changes
                         </label>
                     </div>
                     <div class="find-col" role="radiogroup" aria-label="Search scope">
@@ -113,6 +119,10 @@
                             <input id="scope-node" type="radio" name="find-scope" value="node" />
                             Node Only
                         </label>
+                        <label for="scope-file">
+                            <input id="scope-file" type="radio" name="find-scope" value="file" />
+                            File Only
+                        </label>
                         <label for="opt-headline">
                             <input id="opt-headline" type="checkbox" name="find-target" checked />
                             Search Headline
@@ -123,10 +133,17 @@
                         </label>
                     </div>
                 </div>
-                <!-- undo Controls (future possible) -->
+
+                <!-- Nav Controls -->
+                <!-- <div id="nav-controls" class="log-pane-container" role="region" aria-label="Navigation history">
+                    <div id="nav-content" ></div>
+                </div> -->
+
+                <!-- Undo Controls -->
                 <!-- <div id="undo-controls" class="log-pane-container" role="region" aria-label="Undo history">
                     <div id="undo-content" ></div>
                 </div> -->
+
                 <!-- Configuration controls -->
                 <div id="config-controls" class="log-pane-container" role="region" aria-label="Configuration settings">
                     <span class="sub-title">Visible Controls</span>
