@@ -1430,6 +1430,11 @@ a:hover {
   background: var(--hover-bg);
 }
 
+#modal-dialog-description,
+#input-dialog-description {
+  white-space: pre;
+}
+
 /*
 #input-dialog-btn:focus {
   //
