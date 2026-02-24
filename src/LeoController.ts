@@ -125,6 +125,7 @@ export class LeoController {
         view.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
         view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
+        view.NAV_TAB.addEventListener('click', () => { view.showTab("nav") });
         // view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") }); // Maybe add undo tab functionality later
         view.SETTINGS_TAB.addEventListener('click', () => { view.showTab("settings") });
     }

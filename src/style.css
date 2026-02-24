@@ -74,6 +74,8 @@
   --log-tab-bg-color: var(--selected-bg);
   --find-display: none;
   --find-tab-bg-color: var(--menu-bg-color);
+  --nav-display: none;
+  --nav-tab-bg-color: var(--menu-bg-color);
   --undo-display: none;
   --undo-tab-bg-color: var(--menu-bg-color);
   --settings-display: none;
@@ -85,6 +87,21 @@
   --log-tab-bg-color: var(--menu-bg-color);
   --find-display: flex;
   --find-tab-bg-color: var(--selected-bg);
+  --nav-display: none;
+  --nav-tab-bg-color: var(--menu-bg-color);
+  --undo-display: none;
+  --undo-tab-bg-color: var(--menu-bg-color);
+  --settings-display: none;
+  --settings-tab-bg-color: var(--menu-bg-color);
+}
+
+[data-active-tab="nav"] {
+  --log-display: none;
+  --log-tab-bg-color: var(--menu-bg-color);
+  --find-display: none;
+  --find-tab-bg-color: var(--menu-bg-color);
+  --nav-display: flex;
+  --nav-tab-bg-color: var(--selected-bg);
   --undo-display: none;
   --undo-tab-bg-color: var(--menu-bg-color);
   --settings-display: none;
@@ -96,6 +113,8 @@
   --log-tab-bg-color: var(--menu-bg-color);
   --find-display: none;
   --find-tab-bg-color: var(--menu-bg-color);
+  --nav-display: none;
+  --nav-tab-bg-color: var(--menu-bg-color);
   --undo-display: flex;
   --undo-tab-bg-color: var(--selected-bg);
   --settings-display: none;
@@ -107,6 +126,8 @@
   --log-tab-bg-color: var(--menu-bg-color);
   --find-display: none;
   --find-tab-bg-color: var(--menu-bg-color);
+  --nav-display: none;
+  --nav-tab-bg-color: var(--menu-bg-color);
   --undo-display: none;
   --undo-tab-bg-color: var(--menu-bg-color);
   --settings-display: flex;
@@ -667,7 +688,6 @@ body.dragging-cross {
 
 #outline-pane,
 #log-pane {
-  /* overflow-y: auto; */
   flex: 1 1 0;
 }
 
@@ -1005,7 +1025,8 @@ body.dragging-secondary .node {
 }
 
 #find-controls,
-#config-controls {
+#config-controls,
+#nav-controls {
   gap: 0.5rem;
   align-items: flex-start;
   flex-wrap: wrap;
@@ -1018,8 +1039,8 @@ body.dragging-secondary .node {
 }
 
 #log-pane-tabs {
-  display: flex; /* line them up horizontally */
-  gap: 2px; /* small space between tabs */
+  display: flex;
+  gap: 2px;
   /* background: #222; */
   padding: 0 0 0 0.2rem;
   /* border-bottom: 1px solid #444; */
@@ -1044,7 +1065,6 @@ body.dragging-secondary .node {
   background: var(--log-tab-bg-color);
 }
 
-/* Log content area editable with contenteditable, no wrap */
 #log-controls {
   display: var(--log-display);
   padding: 0.25rem 0.5rem 0.5rem 0.5rem;
@@ -1062,10 +1082,23 @@ body.dragging-secondary .node {
 }
 
 #find-controls {
-  padding: 0.25rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
   display: var(--find-display);
+  flex-direction: column;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
+}
+
+#nav-tab {
+  background: var(--nav-tab-bg-color);
+}
+
+#nav-controls {
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  display: var(--nav-display);
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 #undo-tab {
@@ -1162,7 +1195,8 @@ body.dragging-secondary .node {
 }
 
 #log-pane .find-col label,
-#log-pane .config-col label {
+#log-pane .config-col label,
+#log-pane .nav-col label {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -1170,6 +1204,28 @@ body.dragging-secondary .node {
   user-select: none;
   font-size: 0.8em;
   color: var(--find-text-color);
+}
+
+#log-pane .nav-col {
+  display: flex;
+  flex-direction: row; /* TEST IF NEEDED ! horizontal layout for navigation buttons */
+  gap: 0.5rem;
+}
+
+.no-overflow {
+  text-overflow: unset !important;
+}
+
+#freeze {
+  cursor: default;
+  position: absolute;
+  right: 0.3em;
+  line-height: 1em;
+  top: 1.555em;
+  font-size: 1.8em;
+  color: #5c87ff80;
+  padding: 0;
+  margin: 0;
 }
 
 .config-col label {
@@ -1184,7 +1240,8 @@ body.dragging-secondary .node {
   margin: 0;
 }
 
-#find-input {
+#find-input,
+#replace-input {
   width: 100%;
   box-sizing: border-box;
   padding: 0.4rem 0.5rem;
@@ -1196,8 +1253,41 @@ body.dragging-secondary .node {
   font-family: sans-serif;
 }
 
-#find-input::placeholder {
+#find-input::placeholder,
+#replace-input::placeholder {
   color: var(--find-placeholder-color);
+}
+
+#navText {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem 0.5rem;
+  margin: 0;
+  border-radius: 3px;
+  border: 1px solid var(--find-border-color);
+  background: transparent;
+  color: var(--find-text-color);
+  font-family: sans-serif;
+}
+
+#navText::placeholder {
+  color: var(--find-placeholder-color);
+}
+
+.bottom-scroll {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  /* overflow-y: hidden;
+  min-height: 0;
+  flex-grow: 1;
+  padding-bottom: 4px; */
+}
+
+.bottom-scroll:hover {
+  overflow-y: auto;
 }
 
 input[type="checkbox"] {
@@ -1258,7 +1348,9 @@ input[type="checkbox"]:focus-visible:checked::after {
 #find-controls input:focus,
 #find-controls input:focus-visible,
 #config-controls input:focus,
-#config-controls input:focus-visible {
+#config-controls input:focus-visible,
+#nav-controls input:focus,
+#nav-controls input:focus-visible {
   border-color: var(--find-selection);
   outline: 2px solid var(--find-selection);
   outline-offset: -1px;
