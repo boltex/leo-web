@@ -313,6 +313,14 @@ export class LeoController {
                 this.findNext();
             }
         });
+        this.view.REPLACE_INPUT.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Same as find input. Do not 'replace' on enter.
+                // User must use the replace shortcuts (Ctrl+= or Ctrl+-) to trigger replacements.
+                this.findNext();
+            }
+        });
         this.view.OPT_BODY.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && !e.shiftKey) {
                 e.preventDefault();

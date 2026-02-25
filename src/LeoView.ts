@@ -56,6 +56,7 @@ export class LeoView {
     public ACTION_DEHOIST: HTMLElement;
 
     public FIND_INPUT: HTMLInputElement;
+    public REPLACE_INPUT: HTMLInputElement;
     public OPT_HEADLINE: HTMLInputElement;
     public OPT_BODY: HTMLInputElement;
     public OPT_WHOLE: HTMLInputElement;
@@ -197,6 +198,7 @@ export class LeoView {
         this.ACTION_DEHOIST = document.getElementById('action-dehoist')!;
 
         this.FIND_INPUT = document.getElementById('find-input')! as HTMLInputElement;
+        this.REPLACE_INPUT = document.getElementById('replace-input')! as HTMLInputElement;
         this.OPT_HEADLINE = document.getElementById('opt-headline')! as HTMLInputElement;
         this.OPT_BODY = document.getElementById('opt-body')! as HTMLInputElement;
         this.OPT_WHOLE = document.getElementById('opt-whole')! as HTMLInputElement;
