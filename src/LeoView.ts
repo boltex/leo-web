@@ -55,6 +55,7 @@ export class LeoView {
     public ACTION_HOIST: HTMLElement;
     public ACTION_DEHOIST: HTMLElement;
 
+    // Find controls
     public FIND_INPUT: HTMLInputElement;
     public REPLACE_INPUT: HTMLInputElement;
     public OPT_HEADLINE: HTMLInputElement;
@@ -64,6 +65,14 @@ export class LeoView {
     public OPT_REGEXP: HTMLInputElement;
     public OPT_MARK_FINDS: HTMLInputElement;
     public OPT_MARK_CHANGES: HTMLInputElement;
+
+    // Nav controls
+    public SEARCH_OPTIONS: HTMLSelectElement;
+    public IS_TAG: HTMLInputElement;
+    public SHOW_PARENT: HTMLInputElement;
+    public NAV_TEXT: HTMLInputElement;
+    public FREEZE: HTMLElement;
+    public GOTO_PANE: HTMLElement;
 
     public LOG_CONTENT: HTMLElement;
 
@@ -197,6 +206,7 @@ export class LeoView {
         this.ACTION_HOIST = document.getElementById('action-hoist')!;
         this.ACTION_DEHOIST = document.getElementById('action-dehoist')!;
 
+        // Find controls
         this.FIND_INPUT = document.getElementById('find-input')! as HTMLInputElement;
         this.REPLACE_INPUT = document.getElementById('replace-input')! as HTMLInputElement;
         this.OPT_HEADLINE = document.getElementById('opt-headline')! as HTMLInputElement;
@@ -206,6 +216,14 @@ export class LeoView {
         this.OPT_REGEXP = document.getElementById('opt-regexp')! as HTMLInputElement;
         this.OPT_MARK_FINDS = document.getElementById('opt-mark-finds')! as HTMLInputElement;
         this.OPT_MARK_CHANGES = document.getElementById('opt-mark-changes')! as HTMLInputElement;
+
+        // Nav controls
+        this.SEARCH_OPTIONS = document.getElementById('searchOptions') as HTMLSelectElement;
+        this.IS_TAG = document.getElementById('isTag') as HTMLInputElement;
+        this.SHOW_PARENT = document.getElementById('showParent') as HTMLInputElement;
+        this.NAV_TEXT = document.getElementById('navText') as HTMLInputElement;
+        this.FREEZE = document.getElementById('freeze') as HTMLElement; // Simple div
+        this.GOTO_PANE = document.getElementById('gotoPane') as HTMLElement; // Simple div
 
         // this.LOG_CONTENT = document.getElementById('log-content')!;
         this.LOG_CONTENT = document.getElementById('log-controls')!;
