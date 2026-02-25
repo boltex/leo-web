@@ -1081,10 +1081,30 @@ body.dragging-secondary .node {
   background: var(--find-tab-bg-color);
 }
 
+.find-input-holder {
+  gap: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 0 1 auto;
+  width: 100%;
+  padding-right: 0.5rem;
+}
+.nav-input-holder {
+  gap: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 0 1 auto;
+  width: 100%;
+  padding-right: 0.5rem;
+}
+
 #find-controls {
-  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.5rem 0 0 0.5rem;
   display: var(--find-display);
   flex-direction: column;
+  flex-wrap: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;
 }
@@ -1094,9 +1114,10 @@ body.dragging-secondary .node {
 }
 
 #nav-controls {
-  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.5rem 0 0 0.5rem;
   display: var(--nav-display);
   flex-direction: column;
+  flex-wrap: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;
 }
@@ -1221,7 +1242,7 @@ body.dragging-secondary .node {
   position: absolute;
   right: 0.3em;
   line-height: 1em;
-  top: 1.555em;
+  top: 2.36em;
   font-size: 1.8em;
   color: #5c87ff80;
   padding: 0;
@@ -1241,8 +1262,20 @@ body.dragging-secondary .node {
 }
 
 #find-input,
-#replace-input {
+#replace-input,
+#navText {
   width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem 0.5rem;
+  margin: 0;
+  border-radius: 3px;
+  border: 1px solid var(--find-border-color);
+  background: transparent;
+  color: var(--find-text-color);
+  font-family: sans-serif;
+}
+
+#searchOptions {
   box-sizing: border-box;
   padding: 0.4rem 0.5rem;
   margin: 0;
@@ -1258,18 +1291,6 @@ body.dragging-secondary .node {
   color: var(--find-placeholder-color);
 }
 
-#navText {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.4rem 0.5rem;
-  margin: 0;
-  border-radius: 3px;
-  border: 1px solid var(--find-border-color);
-  background: transparent;
-  color: var(--find-text-color);
-  font-family: sans-serif;
-}
-
 #navText::placeholder {
   color: var(--find-placeholder-color);
 }
@@ -1279,11 +1300,7 @@ body.dragging-secondary .node {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-
-  /* overflow-y: hidden;
-  min-height: 0;
-  flex-grow: 1;
-  padding-bottom: 4px; */
+  align-self: stretch;
 }
 
 .bottom-scroll:hover {

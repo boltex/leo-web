@@ -82,11 +82,14 @@
 
                 <!-- Find controls -->
                 <div id="find-controls" class="log-pane-container" role="region" aria-label="Find options">
-                    <input id="find-input" type="text" autocomplete="off" placeholder="&lt;find pattern here&gt;"
-                        title="Enter or F3 to find and goto the next match&#013;F2 for the previous match"
-                        aria-label="Find pattern">
-                    <input id="replace-input" type="text" autocomplete="off" placeholder="&lt;replace pattern here&gt;"
-                        title="Replace (Ctrl+=)&#013;Replace &amp; Find Next (Ctrl+-)" aria-label="Replace pattern">
+                    <div class="find-input-holder">
+                        <input id="find-input" type="text" autocomplete="off" placeholder="&lt;find pattern here&gt;"
+                            title="Enter or F3 to find and goto the next match&#013;F2 for the previous match"
+                            aria-label="Find pattern">
+                        <input id="replace-input" type="text" autocomplete="off"
+                            placeholder="&lt;replace pattern here&gt;"
+                            title="Replace (Ctrl+=)&#013;Replace &amp; Find Next (Ctrl+-)" aria-label="Replace pattern">
+                    </div>
                     <div class="bottom-scroll">
                         <div class="find-col" aria-label="Search options">
                             <label title="Match Whole Word (Ctrl+Alt+W)" for="opt-whole">
@@ -141,31 +144,33 @@
 
                 <!-- Nav Controls -->
                 <div id="nav-controls" class="log-pane-container" role="region" aria-label="Nav Pane">
-                    <div class="nav-col">
-                        <select class="no-overflow" name="searchOptions" id="searchOptions"
-                            title="Confine search to:&#013; - All: regular search for all nodes&#013; - Subtree: current node and it's children&#013; - File: only search under a node with an @<file> directive&#013; - Chapter: only search under a node with an @chapter directer&#013; - Node: only search currently selected node">
-                            <option value="0">All</option>
-                            <option value="1">Subtree</option>
-                            <option value="2">File</option>
-                            <option value="3">Chapter</option>
-                            <option value="4">Node</option>
-                        </select>
+                    <div class="nav-input-holder">
+                        <div class="nav-col">
+                            <select class="no-overflow" name="searchOptions" id="searchOptions"
+                                title="Confine search to:&#013; - All: regular search for all nodes&#013; - Subtree: current node and it's children&#013; - File: only search under a node with an @<file> directive&#013; - Chapter: only search under a node with an @chapter directer&#013; - Node: only search currently selected node">
+                                <option value="0">All</option>
+                                <option value="1">Subtree</option>
+                                <option value="2">File</option>
+                                <option value="3">Chapter</option>
+                                <option value="4">Node</option>
+                            </select>
 
-                        <label class="label-nav" for="isTag"
-                            title="Search Tag attributes, set algebra is supported:&#013;&amp; both the given tags&#013;&vert; either of the given tags (or both)&#013;&#45; the first tag, but not the second tag&#013;&#94; either of the given tags (but *not* both)">
-                            <input type="checkbox" id="isTag" name="isTag">
-                            <span>Tag</span>
-                        </label>
+                            <label class="label-nav" for="isTag"
+                                title="Search Tag attributes, set algebra is supported:&#013;&amp; both the given tags&#013;&vert; either of the given tags (or both)&#013;&#45; the first tag, but not the second tag&#013;&#94; either of the given tags (but *not* both)">
+                                <input type="checkbox" id="isTag" name="isTag">
+                                <span>Tag</span>
+                            </label>
 
-                        <label class="label-nav" for="showParents" title="List parents of nodes in text searches">
-                            <input type="checkbox" id="showParents" name="showParents">
-                            <span>Show parents</span>
-                        </label>
+                            <label class="label-nav" for="showParents" title="List parents of nodes in text searches">
+                                <input type="checkbox" id="showParents" name="showParents">
+                                <span>Show parents</span>
+                            </label>
+                        </div>
+                        <input
+                            title="Typing searches headlines interactively&#013;Enter freezes input and searches body text"
+                            type="text" autocomplete="off" id="navText" name="navText" placeholder="<nav pattern here>">
+                        <div id="freeze" title="Clear field to unfreeze">&#x2744;</div>
                     </div>
-                    <input
-                        title="Typing searches headlines interactively&#013;Enter freezes input and searches body text"
-                        type="text" autocomplete="off" id="navText" name="navText" placeholder="<nav pattern here>">
-                    <div id="freeze" title="Clear field to unfreeze">&#x2744;</div>
                     <div class="bottom-scroll" id="gotopane">
                         <!-- this is the goto pane -->
                     </div>
