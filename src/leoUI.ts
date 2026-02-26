@@ -1796,6 +1796,7 @@ export class LeoUI extends NullGui {
 
         // TODO : setSettings with w_settings
         console.log('TODO : setSettings with w_settings', w_settings);
+        // workspace.view.setFindNavSettings(w_settings);
 
     }
 

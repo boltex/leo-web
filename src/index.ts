@@ -5,15 +5,12 @@
 
 import './style.css';
 import * as g from './core/leoGlobals';
-import { LeoApp, LoadManager, PreviousSettings } from './core/leoApp';
+import { LeoApp, LoadManager } from './core/leoApp';
 
 import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
-import { ScriptingController } from './core/mod_scripting';
-import { Constants } from './constants';
-import { QuickPickItem, QuickPickItemKind } from './types';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
@@ -50,11 +47,6 @@ class LeoWebApp {
 
         await controller.initialize();
 
-        // Test out UI experiments (if any)
-        // await this.uiExperiments(); // * Remove when done *
-
-        console.log('Leo Web UI initialized.');
-
         // Ok, now properly start the app
         const w_start = process.hrtime(); // For calculating total startup time duration
         (g.workspaceUri as Uri) = new Uri('/');
@@ -64,227 +56,6 @@ class LeoWebApp {
         g.app.loadManager = new LoadManager();
         await g.app.loadManager.load();
         console.log(`leo-web startup launched in ${utils.getDurationMs(w_start)} ms`);
-
-        // Now test the Leo code itself by creating a new commander, inserting a node, change its headeline/body, and printing the outline to console.
-        // await this.leoCoreExperiments(); // * Remove when done *
-
-    }
-
-    private async uiExperiments(): Promise<void> {
-
-        // // 1 - TEST OPEN FILE DIALOG
-        // const chosenFile = await workspace.view.showOpenDialog();
-        // if (chosenFile) {
-        //     console.log('open file:', chosenFile);
-        // } else {
-        //     console.log('No file chosen in OPEN dialog');
-        // }
-
-        // // 2 - TEST THE SAVE DIALOG
-        // const saveFile = await workspace.view.showSaveDialog();
-        // if (saveFile) {
-        //     console.log('save to:', saveFile);
-        // } else {
-        //     console.log('No file chosen in SAVE dialog');
-        // }
-
-        // // 3 - TEST INPUT DIALOG
-        // const inputResult = await workspace.view.showInputDialog({
-        //     title: "Input Dialog Test",
-        //     prompt: "Please enter some text:",
-        //     value: "Default value",
-        //     placeholder: "Type here..."
-        // });
-        // console.log("Input dialog result:", inputResult);
-
-        // // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
-        // const items: QuickPickItem[] = [
-        //     { label: "Option 1", description: "The first option" },
-        //     { label: "Option 2", description: "The second option", detail: "Additional details about option 2" },
-        //     { label: "", kind: QuickPickItemKind.Separator },
-        //     { label: "Option 3", description: "The third option after a separator", detail: "More details here but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
-        //     { label: "Option 4", description: "some other option", detail: "Detailed description for option 4 goes here." },
-        //     { label: "Option 5", description: "some other option with a longer descriptions blablabla blabla, blablabla..." },
-        //     { label: "Option 6 with longer title", description: "some other option" },
-        //     { label: "Option 7 with extra long title to make sure it does not wrap and end with ellipsis", description: "some other option" },
-        //     { label: "Option 8", description: "some other option" },
-        //     { label: "Option 9", description: "some other option but super long to make sure it does not wrap and end with ellipsis blablabla im super long blablablabl" },
-        //     { label: "Option 10", description: "some other option" },
-        //     { label: "Option 11", description: "some other option" },
-        //     { label: "Option 12", description: "some other option" },
-        // ];
-        // workspace.view.showQuickPick(items, {
-        //     title: "Quick Pick Dialog Test",
-        //     placeHolder: "Select an option",
-        //     onDidSelectItem: (item) => {
-        //         console.log("Highlighted item:", item);
-        //     }
-        // }).then((result) => {
-        //     console.log("Quick pick result:", result);
-        // });
-
-        // // NOw test the same 4 again but using 'then' syntax instead of await.
-
-        // // 1 - TEST OPEN FILE DIALOG
-        // workspace.view.showOpenDialog().then((p_result) => {
-        //     if (p_result) {
-        //         console.log('Chosen OPEN FILE handle:', p_result);
-        //     } else {
-        //         console.log('No file chosen in OPEN dialog');
-        //     }
-        // });
-
-        // // 2 - TEST THE SAVE DIALOG
-        // workspace.view.showSaveDialog().then((p_result) => {
-        //     if (p_result) {
-        //         console.log('Chosen SAVE FILE handle:', p_result);
-        //     } else {
-        //         console.log('No file chosen in SAVE dialog');
-        //     }
-        // });
-
-        // 3 - TEST INPUT DIALOG
-        workspace.view.showInputDialog({
-            title: "Input Dialog Test",
-            prompt: "Please enter some text:",
-            value: "Preset input value",
-            placeholder: "Type here..."
-        }).then((p_result) => {
-            console.log("Input dialog result:", p_result);
-        });
-
-        // // 4 - TEST QUICK PICK DIALOG (for minibuffer, command-palette, etc.)
-        // const result = await workspace.view.showQuickPick(items, {
-        //     title: "Quick Pick Dialog Test",
-        //     placeHolder: "Select an option",
-        //     onDidSelectItem: (item) => {
-        //         console.log("Highlighted item:", item);
-        //     }
-        // });
-        // console.log("Quick pick result:", result);
-
-        const singleChar = await workspace.view.showSingleCharInputDialog({
-            title: "Input single char Test",
-            prompt: "Please enter some text, it should accept on first one:",
-            value: "",
-            placeholder: "Type here..."
-        });
-        console.log("Single char input dialog result:", singleChar);
-
-        // test showInformationMessage dialog with the modal option.
-        workspace.view.showInformationMessage("This is an information message.", { modal: true, detail: "Additional details can go here." }, "OK", "Cancel").then((selection) => {
-            console.log("Information message selection:", selection);
-        });
-        // Another modal example that should be seen after closing the first one.
-        workspace.view.showInformationMessage("Another information message.", { modal: true }, "Yes", "No", "Maybe").then((selection) => {
-            console.log("Second information message selection:", selection);
-        });
-        console.log("Displayed information messages. This hsould be seen in console before user closes the dialogs.");
-
-    }
-
-    private async leoCoreExperiments(): Promise<void> {
-
-        // For now, create a commander.
-        g.app.disable_redraw = true;
-        const lm = g.app.loadManager!;
-        let c = g.app.newCommander('', g.app.gui, new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict));
-        lm.createMenu(c);
-        lm.finishOpen(c);
-        g.doHook('new', { old_c: undefined, c: c, new_c: c });
-        c.theScriptingController = new ScriptingController(c);
-        await c.theScriptingController.createAllButtons();
-        // c.setLog();
-        c.clearChanged(); // Fix #387: Clear all dirty bits.
-        g.app.disable_redraw = false;
-        g.es('Done creating first commander.', c);
-
-        // Ok, now create a new top-level node under the default 'newHeadline' node.
-        const p = c.lastTopLevel().insertAfter();
-        p.h = 'New node with script';
-
-        // Put a script INSIDE the body of the new node.
-        // Double escape newlines in template literals for this sample script.
-        p.b = `
-        g.es("Some script running from inside a new node");
-        g.es("Another line from the script body.");
-        const parent = c.lastTopLevel().insertAfter();
-        parent.h = 'New nodes';
-        const table = [
-            ['First node', 'Body text for first node'],
-           ['Node 2', 'Body text for node 2'],
-           ['Last Node', 'Body text for last node\\nLine 2'],
-        ];
-
-        for (const [headline, body] of table) {
-            let child = parent.insertAsLastChild();
-            child.b = body.trimEnd() + '\\n'; // Ensure exactly one trailing newline.
-            child.h = headline;
-        }
-
-        g.es("a last line from the script body.");
-        `;
-        c.redraw(p); // Selects the new node.
-
-        // Now going to execute the script in the body of the new node.
-        await c.executeScript(p);
-        g.es('Done executing script in new node, outline is now:');
-
-        // Check the console or the log pane of the commander to see the output.
-        for (const p of c.all_positions()) {
-            g.es(' '.repeat(p.level()) + p.h);
-        }
-
-        // ok, now maybe offer the 'open dialog' and actually load a file?
-        const filetypes: [string, string][] = [
-            ["Leo files", "*.leojs *.leo *.db"],
-            ["Python files", "*.py"],
-            ["All files", "*"]
-        ];
-        const openResult = await workspace.view.showOpenDialog(
-            {
-                title: "Open Leo File",
-                filters: utils.convertLeoFiletypes(filetypes)
-            }
-        );
-        if (!openResult || openResult.length === 0) {
-            g.es('No file chosen, skipping file open test.');
-            return;
-        }
-        const file_URI = openResult[0];
-        if (!file_URI || file_URI.fsPath === '') {
-            g.es('No file chosen, skipping file open test.');
-            return;
-        }
-
-        console.log('   file_URI: ', file_URI);
-        // for now, try g.readFileIntoString
-        const fileString = file_URI.fsPath;
-        const result = await g.readFileIntoString(fileString); // readFileIntoString will turn it back into an Uri, etc.
-        console.log('Result of readFileIntoString: ', result);
-
-        // Show state of windowlist, frames,  etc...
-        console.log('g.app.windowList.length BEFORE: ', g.app.windowList.length);
-        console.log('g.app.gui.frameIndex BEFORE: ', g.app.gui.frameIndex);
-
-        if (!fileString.endsWith('.leo')) {
-            console.log('Not a .leo file, skipping open.');
-            return
-        }
-
-        c = g.app.windowList[g.app.gui.frameIndex].c;
-        await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
-        await c.open_outline(file_URI);
-
-        console.log('g.app.windowList.length AFTER: ', g.app.windowList.length);
-        console.log('g.app.gui.frameIndex AFTER: ', g.app.gui.frameIndex);
-        c = g.app.windowList[g.app.gui.frameIndex].c;
-
-        g.es('Have opened a file, outline is now:');
-        // Check the console or the log pane of the commander to see the output.
-        for (const p of c.all_positions()) {
-            g.es(' '.repeat(p.level()) + p.h);
-        }
 
     }
 

@@ -220,7 +220,7 @@ export class LeoView {
         // Nav controls
         this.SEARCH_OPTIONS = document.getElementById('searchOptions') as HTMLSelectElement;
         this.IS_TAG = document.getElementById('isTag') as HTMLInputElement;
-        this.SHOW_PARENT = document.getElementById('showParent') as HTMLInputElement;
+        this.SHOW_PARENT = document.getElementById('showParents') as HTMLInputElement;
         this.NAV_TEXT = document.getElementById('navText') as HTMLInputElement;
         this.FREEZE = document.getElementById('freeze') as HTMLElement; // Simple div
         this.GOTO_PANE = document.getElementById('gotoPane') as HTMLElement; // Simple div
