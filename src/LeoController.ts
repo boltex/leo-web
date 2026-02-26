@@ -12,19 +12,17 @@ import { keybindings } from "./keybindings";
 const defaultTitle = "Leo Editor for the web";
 
 export class LeoController {
-    private view: LeoView;
+
     private _commands: Record<string, (...args: any[]) => any> = {};
 
     // Unused for now, but we can use this regex to detect URLs in the future if we want to add link-clicking functionality in the body pane or elsewhere.
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
 
-    constructor(view: LeoView) {
+    constructor() {
 
-        this.view = view;
-
-        view.buildMenu(menuData);
-        view.setWindowTitle(defaultTitle)
-        view.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
+        workspace.view.buildMenu(menuData);
+        workspace.view.setWindowTitle(defaultTitle)
+        workspace.view.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
     }
 
     public setCommands(commands: [string, (...args: any[]) => any][]) {
@@ -46,7 +44,7 @@ export class LeoController {
     public initializeInteractions() {
         this.setupEventHandlers();
         this.setupButtonFocusPrevention();
-        this.view.setupLastFocusedElementTracking();
+        workspace.view.setupLastFocusedElementTracking();
     }
 
     private setupEventHandlers() {
@@ -62,7 +60,7 @@ export class LeoController {
     }
 
     private setupOutlinePaneHandlers() {
-        const view = this.view;
+        const view = workspace.view;
         // Use only mousedown for selection. Otherwise focus out of edit-headline messes with click events. We can still detect double-clicks by checking the event.detail property in the mousedown handler.
         view.OUTLINE_PANE.addEventListener("mousedown", this.handleOutlinePaneMouseDown);
         // view.OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
@@ -76,17 +74,17 @@ export class LeoController {
     }
 
     private setupBodyPaneHandlers() {
-        const view = this.view;
+        const view = workspace.view;
         view.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
     }
 
     private setupLogPaneHandlers() {
-        const view = this.view;
+        const view = workspace.view;
         view.LOG_PANE.addEventListener('keydown', this.handleLogPaneKeyDown);
     }
 
     private setupResizerHandlers() {
-        const view = this.view;
+        const view = workspace.view;
         view.VERTICAL_RESIZER.addEventListener('mousedown', this.startDrag);
         view.VERTICAL_RESIZER.addEventListener('touchstart', this.startDrag);
         view.HORIZONTAL_RESIZER.addEventListener('mousedown', this.startSecondaryDrag);
@@ -96,13 +94,13 @@ export class LeoController {
     }
 
     private setupWindowHandlers() {
-        window.addEventListener('resize', utils.throttle(() => this.view.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
+        window.addEventListener('resize', utils.throttle(() => workspace.view.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
         window.addEventListener('beforeunload', this.saveAllPreferences);
     }
 
     private setupButtonHandlers() {
-        const view = this.view;
+        const view = workspace.view;
 
         // * Outline Actions *
         view.COLLAPSE_ALL_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.CONTRACT_ALL) });
@@ -138,13 +136,13 @@ export class LeoController {
                 e.preventDefault();
             });
         });
-        this.view.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
+        workspace.view.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
             e.preventDefault();
         });
     }
 
     private setupConfigCheckboxes() {
-        const view = this.view;
+        const view = workspace.view;
         view.SHOW_PREV_NEXT_MARK.addEventListener('change', this.refreshButtonVisibility);
         view.SHOW_TOGGLE_MARK.addEventListener('change', this.refreshButtonVisibility);
         view.SHOW_PREV_NEXT_HISTORY.addEventListener('change', this.refreshButtonVisibility);
@@ -162,12 +160,12 @@ export class LeoController {
         hasMarked = workspace.getContext(Constants.CONTEXT_FLAGS.LEO_HAS_MARKED) || false;
         hasHistory = workspace.getContext(Constants.CONTEXT_FLAGS.LEO_CAN_BACK) || workspace.getContext(Constants.CONTEXT_FLAGS.LEO_CAN_NEXT) || false;
 
-        this.view.updateButtonVisibility(hasMarked, hasHistory);
+        workspace.view.updateButtonVisibility(hasMarked, hasHistory);
 
     }
 
     private setupTopMenuHandlers() {
-        const view = this.view;
+        const view = workspace.view;
         document.addEventListener("keydown", (e) => {
             if (!view.activeTopMenu) return;
 
@@ -302,18 +300,18 @@ export class LeoController {
     }
 
     private setupFindPaneHandlers() {
-        const view = this.view;
-        this.view.FIND_INPUT.addEventListener('keydown', (e) => {
+        const view = workspace.view;
+        workspace.view.FIND_INPUT.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && e.shiftKey) {
                 e.preventDefault();
-                this.view.OPT_BODY.focus();
+                workspace.view.OPT_BODY.focus();
             }
             if (e.key === 'Enter') {
                 e.preventDefault();
                 this.findNext();
             }
         });
-        this.view.REPLACE_INPUT.addEventListener('keydown', (e) => {
+        workspace.view.REPLACE_INPUT.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 // Same as find input. Do not 'replace' on enter.
@@ -321,10 +319,10 @@ export class LeoController {
                 this.findNext();
             }
         });
-        this.view.OPT_BODY.addEventListener('keydown', (e) => {
+        workspace.view.OPT_BODY.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && !e.shiftKey) {
                 e.preventDefault();
-                this.view.FIND_INPUT.focus();
+                workspace.view.FIND_INPUT.focus();
             }
         });
         const findScopeRadios = view.getFindScopeRadios();
@@ -344,16 +342,16 @@ export class LeoController {
         // a LeoFrame has a 'c' property which is the commander, and c.fileName() gives the filename.
 
         const hasOpenedDocuments = g.app.windowList.length > 0;
-        this.view.setHasOpenedDocuments(hasOpenedDocuments);
+        workspace.view.setHasOpenedDocuments(hasOpenedDocuments);
 
         // Set body pane contenteditable based on whether there are opened documents
-        this.view.BODY_PANE.contentEditable = hasOpenedDocuments ? "plaintext-only" : "false";
+        workspace.view.BODY_PANE.contentEditable = hasOpenedDocuments ? "plaintext-only" : "false";
 
         // First call the view method to clear existing tabs
-        this.view.clearDocumentTabs();
+        workspace.view.clearDocumentTabs();
 
         if (g.app.windowList.length === 0) {
-            this.view.setWindowTitle(defaultTitle);
+            workspace.view.setWindowTitle(defaultTitle);
         }
 
         // call view to create the document-tabs, and setup handlers
@@ -369,10 +367,10 @@ export class LeoController {
                 label = "* " + label;
             }
 
-            const tab = this.view.createDocumentTab(label, isActive);
+            const tab = workspace.view.createDocumentTab(label, isActive);
             // If active, also set the broswer's title
             if (isActive) {
-                this.view.setWindowTitle(label);
+                workspace.view.setWindowTitle(label);
             }
 
             // now setup handlers for the tab to call g.app.gui.selectOpenedLeoDocument(index)
@@ -398,7 +396,7 @@ export class LeoController {
 
     // * Controller Methods (Event Handlers) *
     public async initialize() {
-        const view = this.view;
+        const view = workspace.view;
 
         // outline-find-container is initially hidden to prevent FOUC
         view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
@@ -454,7 +452,7 @@ export class LeoController {
     }
 
     private handleOutlinePaneClick = (event: MouseEvent) => {
-        const view = this.view;
+        const view = workspace.view;
         const target = event.target as Element;
         const nodeEl = target.closest('.node') as HTMLElement | null;
         if (!nodeEl) {
@@ -488,7 +486,7 @@ export class LeoController {
     }
 
     private handleOutlinePaneDblClick = (event: MouseEvent) => {
-        const view = this.view;
+        const view = workspace.view;
         const target = event.target as Element;
 
         // Currently Selected Document's Commander
@@ -514,7 +512,7 @@ export class LeoController {
     private handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
         const target = e.target as Element;
-        const view = this.view;
+        const view = workspace.view;
 
         const nodeEl = target.closest('.node') as HTMLElement | null;
         if (!nodeEl) {
@@ -660,21 +658,15 @@ export class LeoController {
 
     // Global key handlers (work anywhere)
     private handleGlobalKeyDown = (e: KeyboardEvent) => {
-        const view = this.view;
-        if (view.isDialogOpen) return; // Prevent handling when a dialog is open
 
-        // Try to see if ctrl+tab is pressed:
-        console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
+        // console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
 
         // TODO : Remove this method if not needed when the rest of leo's core is integrated in this UI,
         // since most keybindings should be handled in the outline or body panes. 
-        // For now, we can keep it for global shortcuts like opening settings, or for debugging.
-        // console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
-
     }
 
     private handleDrag = utils.throttle((e) => {
-        const view = this.view;
+        const view = workspace.view;
         if (view.currentLayout === 'vertical') {
             let clientX = e.clientX;
             if (e.touches) {
@@ -704,7 +696,7 @@ export class LeoController {
     }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startDrag = (e: Event) => {
-        this.view.isDragging = true;
+        workspace.view.isDragging = true;
         document.body.classList.add('dragging-main');
         e.preventDefault();
         document.addEventListener('mousemove', this.handleDrag);
@@ -714,7 +706,7 @@ export class LeoController {
     }
 
     private stopDrag = () => {
-        const view = this.view;
+        const view = workspace.view;
         if (view.isDragging) {
             view.isDragging = false;
             document.body.classList.remove('dragging-main');
@@ -728,7 +720,7 @@ export class LeoController {
     }
 
     private handleSecondaryDrag = utils.throttle((e) => {
-        const view = this.view;
+        const view = workspace.view;
         if (view.currentLayout === 'vertical') {
             let clientY = e.clientY;
             if (e.touches) {
@@ -760,7 +752,7 @@ export class LeoController {
     }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startSecondaryDrag = (e: Event) => {
-        this.view.secondaryIsDragging = true;
+        workspace.view.secondaryIsDragging = true;
         document.body.classList.add('dragging-secondary');
         e.preventDefault();
         document.addEventListener('mousemove', this.handleSecondaryDrag);
@@ -770,7 +762,7 @@ export class LeoController {
     }
 
     private stopSecondaryDrag = () => {
-        const view = this.view;
+        const view = workspace.view;
         if (view.secondaryIsDragging) {
             view.secondaryIsDragging = false;
             document.body.classList.remove('dragging-secondary');
@@ -784,7 +776,7 @@ export class LeoController {
     }
 
     private handleCrossDrag = utils.throttle((e) => {
-        const view = this.view;
+        const view = workspace.view;
         let clientX = e.clientX;
         let clientY = e.clientY;
         if (e.touches) {
@@ -835,7 +827,7 @@ export class LeoController {
     }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startCrossDrag = (e: Event) => {
-        this.view.crossIsDragging = true;
+        workspace.view.crossIsDragging = true;
         document.body.classList.add('dragging-cross');
         e.preventDefault();
         document.addEventListener('mousemove', this.handleCrossDrag);
@@ -846,7 +838,7 @@ export class LeoController {
     }
 
     private stopCrossDrag = () => {
-        const view = this.view;
+        const view = workspace.view;
         if (view.crossIsDragging) {
             view.crossIsDragging = false;
             document.body.classList.remove('dragging-cross');
@@ -861,15 +853,15 @@ export class LeoController {
     }
 
     private handleLayoutToggleClick = () => {
-        this.view.toggleLayout();
+        workspace.view.toggleLayout();
     }
 
     private handleMenuToggleClick = () => {
-        this.view.toggleMenu();
+        workspace.view.toggleMenu();
     }
 
     private handleThemeToggleClick = () => {
-        this.view.toggleTheme();
+        workspace.view.toggleTheme();
     }
 
     private refreshHoistButtonStates(): void {
@@ -890,7 +882,7 @@ export class LeoController {
                 w_canHoist = false;
             }
         }
-        this.view.updateHoistButtonStates(
+        workspace.view.updateHoistButtonStates(
             w_canHoist,
             !!c.hoistStack.length
         );
@@ -916,7 +908,7 @@ export class LeoController {
             }
         }
 
-        this.view.updateContextMenuState(
+        workspace.view.updateContextMenuState(
             !isMarked,
             isMarked,
             w_canHoist,
@@ -977,7 +969,7 @@ export class LeoController {
     }
 
     private saveLayoutPreferences() {
-        const view = this.view;
+        const view = workspace.view;
         const layoutPreferences = {
             mainRatio: view.mainRatio,
             secondaryRatio: view.secondaryRatio,
@@ -989,7 +981,7 @@ export class LeoController {
     }
 
     private saveConfigPreferences() {
-        const view = this.view;
+        const view = workspace.view;
         const selectedFindScope = this.getFindScope();
 
         const preferences = {
@@ -1014,7 +1006,7 @@ export class LeoController {
     }
 
     private loadConfigPreferences() {
-        const view = this.view;
+        const view = workspace.view;
         const savedPrefs = utils.safeLocalStorageGet('configPreferences');
         if (savedPrefs) {
             try {
@@ -1053,7 +1045,7 @@ export class LeoController {
 
     // * Controller Methods (Finally, the actual render tree building) *
     public buildRowsRenderTreeLeo(): void {
-        const view = this.view;
+        const view = workspace.view;
         let root = null;
         if (g.app.windowList[g.app.gui.frameIndex]) {
             // Currently Selected Document's Commander

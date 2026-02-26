@@ -11,6 +11,12 @@ import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
+import { DialogManager } from './dialog-manager';
+import { MenuManager } from './menu-manager';
+import { LayoutManager } from './layout-manager';
+import { OutlineView } from './outline-view';
+import { BodyView } from './body-view';
+import { LogPaneView } from './log-pane-view';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
@@ -38,11 +44,29 @@ class LeoWebApp {
 
     private async setupApp(): Promise<void> {
 
-        // Initialize the MVC components
+        // Initialize the components
         const view = new LeoView();
+        workspace.setView(view); // This class is too big and general. (its parts should be moved into classes below)
 
-        const controller = new LeoController(view);
-        workspace.setView(view);
+        const dialog = new DialogManager();
+        workspace.setDialogManager(dialog);
+
+        const menu = new MenuManager();
+        workspace.setMenuManager(menu);
+
+        const layout = new LayoutManager();
+        workspace.setLayoutManager(layout);
+
+        const outline = new OutlineView();
+        workspace.setOutlineView(outline);
+
+        const body = new BodyView();
+        workspace.setBodyView(body);
+
+        const logPane = new LogPaneView();
+        workspace.setLogPaneView(logPane);
+
+        const controller = new LeoController();
         workspace.setController(controller);
 
         await controller.initialize();
