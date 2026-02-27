@@ -64,7 +64,7 @@ export class LeoController {
         // OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
         OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
         OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
-        OUTLINE_PANE.addEventListener("scroll", utils.throttle(workspace.view.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
+        OUTLINE_PANE.addEventListener("scroll", utils.throttle(workspace.outline.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
         OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
         document.addEventListener("click", (e) => {
             workspace.menu.closeMenusEvent(e);
@@ -96,7 +96,7 @@ export class LeoController {
     }
 
     private setupButtonHandlers() {
-        const view = workspace.view;
+        const logPane = workspace.logPane;
         const menu = workspace.menu;
 
         // * Outline Actions *
@@ -118,11 +118,11 @@ export class LeoController {
         menu.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
         menu.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         menu.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
-        view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
-        view.NAV_TAB.addEventListener('click', () => { view.showTab("nav") });
-        // view.UNDO_TAB.addEventListener('click', () => { view.showTab("undo") }); // Maybe add undo tab functionality later
-        view.SETTINGS_TAB.addEventListener('click', () => { view.showTab("settings") });
+        logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab("log") });
+        logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab("find") });
+        logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab("nav") });
+        // logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab("undo") }); // Maybe add undo tab functionality later
+        logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab("settings") });
     }
 
 
@@ -146,7 +146,7 @@ export class LeoController {
         menu.SHOW_HOIST_DEHOIST.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_THEME_TOGGLE.addEventListener('change', this.refreshButtonVisibility);
-        menu.SHOW_NODE_ICONS.addEventListener('change', workspace.view.updateNodeIcons);
+        menu.SHOW_NODE_ICONS.addEventListener('change', workspace.outline.updateNodeIcons);
         menu.SHOW_COLLAPSE_ALL.addEventListener('change', this.refreshButtonVisibility);
     }
 
@@ -162,7 +162,6 @@ export class LeoController {
     }
 
     private setupTopMenuHandlers() {
-        const view = workspace.view;
         const menu = workspace.menu;
         const layout = workspace.layout;
         document.addEventListener("keydown", (e) => {
@@ -299,18 +298,18 @@ export class LeoController {
     }
 
     private setupFindPaneHandlers() {
-        const view = workspace.view;
-        workspace.view.FIND_INPUT.addEventListener('keydown', (e) => {
+        const logPane = workspace.logPane;
+        logPane.FIND_INPUT.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && e.shiftKey) {
                 e.preventDefault();
-                workspace.view.OPT_BODY.focus();
+                logPane.OPT_BODY.focus();
             }
             if (e.key === 'Enter') {
                 e.preventDefault();
                 this.findNext();
             }
         });
-        workspace.view.REPLACE_INPUT.addEventListener('keydown', (e) => {
+        logPane.REPLACE_INPUT.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 // Same as find input. Do not 'replace' on enter.
@@ -318,13 +317,13 @@ export class LeoController {
                 this.findNext();
             }
         });
-        workspace.view.OPT_BODY.addEventListener('keydown', (e) => {
+        logPane.OPT_BODY.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && !e.shiftKey) {
                 e.preventDefault();
-                workspace.view.FIND_INPUT.focus();
+                logPane.FIND_INPUT.focus();
             }
         });
-        const findScopeRadios = view.getFindScopeRadios();
+        const findScopeRadios = logPane.getFindScopeRadios();
         findScopeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
                 // TODO : Implement or remove when the rest of leo's core is integrated in this UI.
@@ -400,7 +399,7 @@ export class LeoController {
         this.loadConfigPreferences();
 
         workspace.menu.setupButtonContainerAutoHide();
-        workspace.view.showTab("log");
+        workspace.logPane.showTab("log");
 
         let dirHandle: FileSystemDirectoryHandle | null = null;
 
@@ -449,17 +448,17 @@ export class LeoController {
     }
 
     private handleOutlinePaneClick = (event: MouseEvent) => {
-        const view = workspace.view;
+        const outline = workspace.outline;
         const target = event.target as Element;
         const nodeEl = target.closest('.node') as HTMLElement | null;
         if (!nodeEl) {
             return;
         }
 
-        const rowIndex = Math.floor(parseInt(nodeEl.style.top) / view.ROW_HEIGHT);
-        if (rowIndex < 0 || rowIndex >= view.flatRowsLeo!.length) return;
+        const rowIndex = Math.floor(parseInt(nodeEl.style.top) / outline.ROW_HEIGHT);
+        if (rowIndex < 0 || rowIndex >= outline.flatRowsLeo!.length) return;
 
-        const row = view.flatRowsLeo![rowIndex]!;
+        const row = outline.flatRowsLeo![rowIndex]!;
 
         // Currently Selected Document's Commander
         const c = g.app.windowList[g.app.gui.frameIndex].c;
@@ -483,7 +482,7 @@ export class LeoController {
     }
 
     private handleOutlinePaneDblClick = (event: MouseEvent) => {
-        const view = workspace.view;
+        const outline = workspace.outline;
         const target = event.target as Element;
 
         // Currently Selected Document's Commander
@@ -496,8 +495,8 @@ export class LeoController {
             const nodeEl = target.closest('.node') as HTMLElement | null;
             if (!nodeEl) return;
 
-            const rowIndex = Math.floor(parseInt(nodeEl.style.top) / view.ROW_HEIGHT);
-            if (rowIndex >= 0 && rowIndex < view.flatRowsLeo!.length) {
+            const rowIndex = Math.floor(parseInt(nodeEl.style.top) / outline.ROW_HEIGHT);
+            if (rowIndex >= 0 && rowIndex < outline.flatRowsLeo!.length) {
                 // const row = view.flatRowsLeo![rowIndex]!;
                 // Double click should trigger 'rename/edit' headline
                 this.doCommand(Constants.COMMANDS.HEADLINE_SELECTION, true);
@@ -508,7 +507,7 @@ export class LeoController {
     private handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
         const target = e.target as Element;
-        const view = workspace.view;
+        const outline = workspace.outline;
         const MENU = workspace.menu.MENU;
 
         const nodeEl = target.closest('.node') as HTMLElement | null;
@@ -518,9 +517,9 @@ export class LeoController {
             return;
         }
 
-        const rowIndex = Math.floor(parseInt(nodeEl.style.top) / view.ROW_HEIGHT);
-        if (rowIndex < 0 || rowIndex >= view.flatRowsLeo!.length) return;
-        const row = view.flatRowsLeo![rowIndex]!;
+        const rowIndex = Math.floor(parseInt(nodeEl.style.top) / outline.ROW_HEIGHT);
+        if (rowIndex < 0 || rowIndex >= outline.flatRowsLeo!.length) return;
+        const row = outline.flatRowsLeo![rowIndex]!;
 
         // Select the node if not already selected
         if (row.isSelected === false) {
@@ -675,7 +674,7 @@ export class LeoController {
             } else {
                 layout.OUTLINE_FIND_CONTAINER.style.width = (layout.minWidth - 3) + 'px';
             }
-            workspace.view.renderTree();
+            workspace.outline.renderTree();
         } else {
             let clientY = e.clientY;
             if (e.touches) {
@@ -704,7 +703,6 @@ export class LeoController {
 
     private stopDrag = () => {
         const layout = workspace.layout;
-        const view = workspace.view;
         if (layout.isDragging) {
             layout.isDragging = false;
             document.body.classList.remove('dragging-main');
@@ -713,7 +711,7 @@ export class LeoController {
             document.removeEventListener('touchmove', this.handleDrag);
             document.removeEventListener('touchend', this.stopDrag);
             layout.updateProportion();
-            view.renderTree();
+            workspace.outline.renderTree();
         }
     }
 
@@ -744,7 +742,7 @@ export class LeoController {
                 layout.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
                 layout.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
-            workspace.view.renderTree();
+            workspace.outline.renderTree();
         }
         layout.positionCrossDragger();
         layout.updateCollapseAllPosition();
@@ -770,7 +768,7 @@ export class LeoController {
             document.removeEventListener('touchmove', this.handleSecondaryDrag);
             document.removeEventListener('touchend', this.stopSecondaryDrag);
             layout.updateSecondaryProportion();
-            workspace.view.renderTree();
+            workspace.outline.renderTree();
         }
     }
 
@@ -822,7 +820,7 @@ export class LeoController {
             }
         }
         layout.positionCrossDragger();
-        workspace.view.renderTree(); // Render afterward as it would be in each branch of the if/else
+        workspace.outline.renderTree(); // Render afterward as it would be in each branch of the if/else
         layout.updateCollapseAllPosition();
     }, Constants.DRAG_DEBOUNCE_DELAY);
 
@@ -848,7 +846,7 @@ export class LeoController {
             document.removeEventListener('touchend', this.stopCrossDrag);
             layout.updateProportion();
             layout.updateSecondaryProportion();
-            workspace.view.renderTree();
+            workspace.outline.renderTree();
         }
     }
 
@@ -981,7 +979,7 @@ export class LeoController {
     }
 
     private saveConfigPreferences() {
-        const view = workspace.view;
+        const logPane = workspace.logPane;
         const menu = workspace.menu;
         const selectedFindScope = this.getFindScope();
 
@@ -995,24 +993,24 @@ export class LeoController {
             showNodeIcons: menu.SHOW_NODE_ICONS.checked,
             showCollapseAll: menu.SHOW_COLLAPSE_ALL.checked,
             // Find-pane options
-            findWholeWord: view.OPT_WHOLE.checked,
-            findIgnoreCase: view.OPT_IGNORECASE.checked,
-            findRegexp: view.OPT_REGEXP.checked,
-            findMark: view.OPT_MARK_FINDS.checked,
-            findHeadline: view.OPT_HEADLINE.checked,
-            findBody: view.OPT_BODY.checked,
+            findWholeWord: logPane.OPT_WHOLE.checked,
+            findIgnoreCase: logPane.OPT_IGNORECASE.checked,
+            findRegexp: logPane.OPT_REGEXP.checked,
+            findMark: logPane.OPT_MARK_FINDS.checked,
+            findHeadline: logPane.OPT_HEADLINE.checked,
+            findBody: logPane.OPT_BODY.checked,
             findScope: selectedFindScope
         };
         utils.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
     }
 
     private loadConfigPreferences() {
-        const view = workspace.view;
-        const menu = workspace.menu;
 
         const savedPrefs = utils.safeLocalStorageGet('configPreferences');
         if (savedPrefs) {
             try {
+                const logPane = workspace.logPane;
+                const menu = workspace.menu;
                 const prefs = JSON.parse(savedPrefs);
                 menu.SHOW_PREV_NEXT_MARK.checked = prefs.showPrevNextMark ?? false;
                 menu.SHOW_TOGGLE_MARK.checked = prefs.showToggleMark ?? false;
@@ -1023,12 +1021,12 @@ export class LeoController {
                 menu.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
                 menu.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
                 // Find-pane options
-                view.OPT_WHOLE.checked = prefs.findWholeWord ?? view.OPT_WHOLE.checked;
-                view.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? view.OPT_IGNORECASE.checked;
-                view.OPT_REGEXP.checked = prefs.findRegexp ?? view.OPT_REGEXP.checked;
-                view.OPT_MARK_FINDS.checked = prefs.findMark ?? view.OPT_MARK_FINDS.checked;
-                view.OPT_HEADLINE.checked = prefs.findHeadline ?? view.OPT_HEADLINE.checked;
-                view.OPT_BODY.checked = prefs.findBody ?? view.OPT_BODY.checked;
+                logPane.OPT_WHOLE.checked = prefs.findWholeWord ?? logPane.OPT_WHOLE.checked;
+                logPane.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? logPane.OPT_IGNORECASE.checked;
+                logPane.OPT_REGEXP.checked = prefs.findRegexp ?? logPane.OPT_REGEXP.checked;
+                logPane.OPT_MARK_FINDS.checked = prefs.findMark ?? logPane.OPT_MARK_FINDS.checked;
+                logPane.OPT_HEADLINE.checked = prefs.findHeadline ?? logPane.OPT_HEADLINE.checked;
+                logPane.OPT_BODY.checked = prefs.findBody ?? logPane.OPT_BODY.checked;
                 // Set the find scope radio
                 if (prefs.findScope) {
                     const scopeRadio = document.getElementById('scope-' + prefs.findScope) as HTMLInputElement | null;
@@ -1036,19 +1034,19 @@ export class LeoController {
                 }
 
                 this.refreshButtonVisibility();
-                view.updateNodeIcons();
+                workspace.outline.updateNodeIcons();
             } catch (e) {
                 console.error('Error loading config preferences:', e);
             }
         } else {
             this.refreshButtonVisibility();
-            view.updateNodeIcons();
+            workspace.outline.updateNodeIcons();
         }
     }
 
     // * Controller Methods (Finally, the actual render tree building) *
     public buildRowsRenderTreeLeo(): void {
-        const view = workspace.view;
+        const outline = workspace.outline;
         let root = null;
         if (g.app.windowList[g.app.gui.frameIndex]) {
             // Currently Selected Document's Commander
@@ -1058,10 +1056,7 @@ export class LeoController {
                 const w_rootPosition = c.hoistStack[c.hoistStack.length - 1].p;
                 w_rootPosition._isRoot = true;
                 root = w_rootPosition;
-            } else {
-                // NOT HOISTED
             }
-            // Calculate data, then pass to View. View handles the rendering.
             const rows = this.flattenTreeLeo(
                 root,
                 0,
@@ -1071,9 +1066,9 @@ export class LeoController {
             );
             // Clear list of positions to animate at the end of the render, since they have now been rendered
             g.app.gui.positionsToAnimate = [];
-            view.setTreeDataLeo(rows);
+            outline.setTreeDataLeo(rows);
         } else {
-            view.setTreeDataLeo([]);
+            outline.setTreeDataLeo([]);
             console.warn("No active Leo document found for building render tree.");
         }
     }

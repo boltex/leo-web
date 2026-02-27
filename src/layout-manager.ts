@@ -234,19 +234,19 @@ export class LayoutManager {
         this.HTML_ELEMENT.setAttribute('data-transition', 'true');
         const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
         this.applyTheme(newTheme);
-        workspace.view.renderTree(); // Re-render to update inverted icon colors
+        workspace.outline.renderTree(); // Re-render to update inverted icon colors
     }
 
     public toggleLayout() {
         this.HTML_ELEMENT.setAttribute('data-transition', 'true');
         const newLayout = this.currentLayout === 'vertical' ? 'horizontal' : 'vertical';
         this.applyLayout(newLayout);
-        workspace.view.renderTree();
+        workspace.outline.renderTree();
     }
 
     public handleWindowResize() {
         this.updatePanelSizes();
-        workspace.view.renderTree();
+        workspace.outline.renderTree();
     }
 
 

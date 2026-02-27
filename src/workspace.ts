@@ -1,6 +1,5 @@
 import { openDB } from "idb";
 import { LeoController } from "./LeoController";
-import { LeoView } from "./LeoView";
 import { FileStat } from "./types";
 import { BodyView } from "./body-view";
 import { DialogManager } from "./dialog-manager";
@@ -161,8 +160,7 @@ class Workspace {
     // Window's workspace in use
     public workspaceDirHandle: FileSystemDirectoryHandle | null = null; // The FileSystemDirectoryHandle for the workspace
 
-    public fs!: Fs; // TODO eventually: (see setWorkspaceDirHandle method below) initialize properly with a fake class that mimics Fs methods but throws errors or forces setting workspace first. (Or something else?)
-    public view!: LeoView;  // This class is too big and general. (its parts should be moved into classes below)
+    public fs!: Fs; // TODO eventually: (see setWorkspaceDirHandle method below) initialize properly with a fake class that mimics Fs methods but throws errors or forces setting workspace first. (Or something else?)  
     public dialog!: DialogManager;
     public menu!: MenuManager;
     public layout!: LayoutManager;
@@ -182,10 +180,6 @@ class Workspace {
 
     public getContext(key: string): any {
         return this._context[key];
-    }
-
-    public setView(view: LeoView) {
-        this.view = view;
     }
 
     public setDialogManager(dialog: DialogManager) {

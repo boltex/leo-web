@@ -7,7 +7,6 @@ import './style.css';
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager } from './core/leoApp';
 
-import { LeoView } from './LeoView';
 import { LeoController } from './LeoController';
 import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
@@ -45,9 +44,6 @@ class LeoWebApp {
     private async setupApp(): Promise<void> {
 
         // Initialize the components
-        const view = new LeoView();
-        workspace.setView(view); // This class is too big and general. (its parts should be moved into classes below)
-
         const dialog = new DialogManager();
         workspace.setDialogManager(dialog);
 

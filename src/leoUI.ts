@@ -214,18 +214,18 @@ export class LeoUI extends NullGui {
         }
 
         // * React to change in selection, cursor position and scroll position
-        workspace.view.setChangeTextEditorSelectionCallback((event) =>
+        workspace.body.setChangeTextEditorSelectionCallback((event) =>
             this._onChangeEditorSelection(event)
         );
-        workspace.view.setChangeTextEditorScrollCallback((event) =>
+        workspace.body.setChangeTextEditorScrollCallback((event) =>
             this._onChangeEditorScroll(event)
         );
 
-        workspace.view.setEditorTouchedCallback((textDocumentChange) =>
+        workspace.body.setEditorTouchedCallback((textDocumentChange) =>
             this._onDocumentChanged(textDocumentChange)
         );
 
-        workspace.view.setBodyFocusOutCallback(() => {
+        workspace.body.setBodyFocusOutCallback(() => {
             this.triggerBodySave(true);
         });
 
@@ -312,7 +312,7 @@ export class LeoUI extends NullGui {
         if (!this._leoLogPane) {
             // * Log pane instantiation
             this._leoLogPane = true;
-            workspace.view.addToLogPane('', true); // Clear log pane
+            workspace.logPane.addToLogPane('', true); // Clear log pane
             if (g.logBuffer.length) {
                 const buffer = g.logBuffer;
                 while (buffer.length > 0) {
@@ -325,7 +325,7 @@ export class LeoUI extends NullGui {
 
     public override addLogPaneEntry(p_message: string): void {
         if (this._leoLogPane) {
-            workspace.view.addToLogPane(p_message);
+            workspace.logPane.addToLogPane(p_message);
         } else {
             g.logBuffer.push(p_message);
         }
@@ -365,7 +365,7 @@ export class LeoUI extends NullGui {
         const c = g.app.windowList[this.frameIndex].c;
         this._editorTouched = true; // To make sure to transfer content to Leo even if all undone
 
-        const w_bodyText = workspace.view.getBody();
+        const w_bodyText = workspace.body.getBody();
         const w_hasBody = !!w_bodyText.length;
         const w_iconChanged = (!c.p.isDirty() || (!!c.p.bodyString().length === !w_hasBody))
         if (!this.leoStates.leoChanged || w_iconChanged) {
@@ -422,8 +422,8 @@ export class LeoUI extends NullGui {
 
 
     public endEditHeadline(): boolean {
-        if (workspace.view.headlineFinish) {
-            workspace.view.headlineFinish();
+        if (workspace.outline.headlineFinish) {
+            workspace.outline.headlineFinish();
             return true;
         }
         return false;
@@ -540,7 +540,7 @@ export class LeoUI extends NullGui {
      */
     private _bodySaveDocument(): void {
 
-        const body = workspace.view.getBody();
+        const body = workspace.body.getBody();
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         const wrapper = c.frame.body.wrapper;
@@ -584,7 +584,7 @@ export class LeoUI extends NullGui {
         // this._setBodyLanguage(w_language);
 
         // Set document wrap
-        workspace.view.setBodyWrap(w_language[1]);
+        workspace.body.setBodyWrap(w_language[1]);
     }
 
     public refreshGotoPane(): void {
@@ -648,7 +648,7 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
-        workspace.view.setBodySelection(w_selection); // This sets focus to the body pane as well
+        workspace.body.setBodySelection(w_selection); // This sets focus to the body pane as well
     }
 
     /**
@@ -781,7 +781,7 @@ export class LeoUI extends NullGui {
                 // should reveal selected node in the tree, so scroll to it if needed
                 if (g.app.windowList.length) {
                     const c = g.app.windowList[this.frameIndex].c;
-                    workspace.view.scrollNodeIntoView(c.p);
+                    workspace.outline.scrollNodeIntoView(c.p);
                 }
             }
             this._revealType = RevealType.NoReveal; // Clear after use
@@ -908,10 +908,10 @@ export class LeoUI extends NullGui {
 
         const [w_language, w_wrap] = this._getBodyLanguage(node);
         // 1- set body text and wrap
-        workspace.view.setBody(p.b, w_wrap);
+        workspace.body.setBody(p.b, w_wrap);
         this._setBodyLanguage(w_language);
         const scroll = p.v.scrollBarSpot;
-        workspace.view.setBodyScroll(scroll);
+        workspace.body.setBodyScroll(scroll);
 
         if (!showBodyNoFocus) {
             // Set focus to body pane
@@ -1085,9 +1085,9 @@ export class LeoUI extends NullGui {
         this.refreshButtonsPane();
         this.refreshUndoPane();
         // Empty body pane
-        workspace.view.setBody('', false);
+        workspace.body.setBody('', false);
         // Make body pane not editable.
-        workspace.view.setBodyEditable(false);
+        workspace.body.setBodyEditable(false);
     }
 
     /**
@@ -1105,7 +1105,7 @@ export class LeoUI extends NullGui {
         }
 
         // In case it's the first file openind, make body pane editable again.
-        workspace.view.setBodyEditable(true);
+        workspace.body.setBodyEditable(true);
 
         this._revealType = RevealType.RevealSelect; // For initial outline 'visible' event
 
@@ -1587,7 +1587,7 @@ export class LeoUI extends NullGui {
 
         this.inEditHeadline++;
         this.leoStates.inHeadlineEdit = true;
-        let [p_newHeadline, blurred] = await workspace.view.openHeadlineInputBox(w_p, selectAll, selection);
+        let [p_newHeadline, blurred] = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);
         this.inEditHeadline--;
         if (!this.inEditHeadline) {
             this.leoStates.inHeadlineEdit = false;
