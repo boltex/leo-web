@@ -3,7 +3,6 @@ import { LeoUI } from "./leoUI";
 import { Constants } from "./constants";
 import { LeoPackageStates } from "./types";
 import { Position } from "./core/leoNodes";
-import { has } from "lodash";
 
 /**
  * * Global states service

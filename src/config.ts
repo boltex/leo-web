@@ -2,7 +2,6 @@ import { Constants } from "./constants";
 import { ConfigMembers, ConfigSetting } from "./types";
 import * as utils from './utils';
 
-
 /**
  * * Configuration Settings Service
  */
