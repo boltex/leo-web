@@ -272,7 +272,6 @@ class Workspace {
         return false;
     }
 
-
 }
 
 export let workspace = new Workspace();

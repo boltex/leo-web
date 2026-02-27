@@ -1,5 +1,5 @@
-import { Constants } from "./constants";
-import { workspace } from "./workspace";
+
+import { Uri, workspace } from "./workspace";
 // import { Position } from "./core/leoNodes";
 type Position = any;
 
@@ -51,6 +51,87 @@ export function safeLocalStorageSet(key: string, value: string): void {
         // ignore
     }
 }
+export function showHtmlInNewTab(htmlContent: string, title: string) {
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+
+        // Check current theme and set colors accordingly
+        const isDark = workspace.layout.currentTheme === 'dark';
+        const bodyBg = isDark ? '#1e1e2e' : '#fff';
+        const bodyColor = isDark ? '#cdd6f4' : '#222';
+        const preBg = isDark ? '#2a2536' : '#f5f5f5';
+        const linkColor = isDark ? '#929bda' : '#0b5ed7';
+
+        newWindow.document.open();
+        newWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="utf-8">
+            <title>${title}</title>
+            <style>
+                body {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                            "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                font-size: 16px;
+                line-height: 1.55;
+                padding: 1.25rem;
+                color: ${bodyColor};
+                background: ${bodyBg};
+                }
+
+                h1, h2, h3, h4 {
+                margin-top: 1.4em;
+                }
+
+                pre, code {
+                font-family: ui-monospace, SFMono-Regular, Consolas,
+                            "Liberation Mono", Menlo, monospace;
+                }
+
+                pre {
+                background: ${preBg};
+                padding: 0.75rem;
+                border-radius: 4px;
+                overflow-x: auto;
+                }
+
+                a {
+                color: ${linkColor};
+                text-decoration: none;
+                }
+
+                a:hover {
+                text-decoration: underline;
+                }
+            </style>
+            </head>
+            <body>
+            ${htmlContent}
+            </body>
+            </html>
+            `);
+        newWindow.document.close();
+        newWindow.focus();
+    }
+}
+
+export function showTextDocument(uri: Uri): void {
+    // Read the file, and open in a new tab or window
+    workspace.fs.readFile(uri).then(data => {
+        const text = new TextDecoder().decode(data);
+        const newWindow = window.open();
+        if (newWindow) {
+            newWindow.document.title = uri.fsPath.split('/').pop() || 'Document';
+            const pre = newWindow.document.createElement('pre');
+            pre.textContent = text;
+            newWindow.document.body.appendChild(pre);
+        }
+    }).catch(err => {
+        console.error('Error reading file for showTextDocument:', err);
+    });
+}
+
 /**
  * Prevent default event behavior - useful as event handler
  */

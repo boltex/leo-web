@@ -534,7 +534,7 @@ export class RstCommands {
         } else {
             // TODO : FIX THIS !
             g.es("Leo-Web : docutils not available, only the intermediate file was written.");
-            void workspace.view.showInformationMessage("Leo-Web: docutils not available, only the intermediate file was written.");
+            void workspace.dialog.showInformationMessage("Leo-Web: docutils not available, only the intermediate file was written.");
             return;
         }
 

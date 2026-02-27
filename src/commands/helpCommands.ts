@@ -127,7 +127,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
         w_choices.push(...w_withDetails);
 
-        const w_picked = await workspace.view.showQuickPick(w_choices, {
+        const w_picked = await workspace.dialog.showQuickPick(w_choices, {
             placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
         });
 

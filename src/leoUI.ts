@@ -157,17 +157,17 @@ export class LeoUI extends NullGui {
     };
 
     public lightTheme(): void {
-        workspace.view.applyTheme('light');
+        workspace.layout.applyTheme('light');
     }
     public darkTheme(): void {
-        workspace.view.applyTheme('dark');
+        workspace.layout.applyTheme('dark');
     }
 
     public applyLayout(orientation: string): void {
-        workspace.view.applyLayout(orientation);
+        workspace.layout.applyLayout(orientation);
     }
     public equalSizedPanes(): void {
-        workspace.view.equalSizedPanes();
+        workspace.layout.equalSizedPanes();
     }
 
     public showDocumentation(): void {
@@ -177,7 +177,7 @@ export class LeoUI extends NullGui {
     }
 
     public todo(): void {
-        workspace.view.showInformationMessage("TODO: Not yet implemented.");
+        workspace.dialog.showInformationMessage("TODO: Not yet implemented.");
     }
 
     public async chooseNewWorkspace(): Promise<boolean> {
@@ -264,7 +264,7 @@ export class LeoUI extends NullGui {
     public put_help(c: Commands, s: string, short_title: string): void {
         s = g.dedent(s.trimEnd());
         s = this.showdownConverter.makeHtml(s);
-        workspace.view.showHtmlInNewTab(s, short_title);
+        utils.showHtmlInNewTab(s, short_title);
     }
 
     /**
@@ -596,7 +596,7 @@ export class LeoUI extends NullGui {
     }
 
     public showOutline(): void {
-        workspace.view.OUTLINE_PANE.focus();
+        workspace.layout.OUTLINE_PANE.focus();
     }
 
     public showBody(): void {
@@ -989,7 +989,7 @@ export class LeoUI extends NullGui {
         const frame = g.app.windowList[this.frameIndex];
         const c = frame.c;
         const states = this.leoStates;
-        const view = workspace.view;
+        const menu = workspace.menu;
 
         if (this._refreshType.states) {
             this._refreshType.states = false;
@@ -1045,12 +1045,12 @@ export class LeoUI extends NullGui {
 
         this.refreshBodyStates(); // Set language and wrap states, if different.
 
-        view.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
-        view.updateMarkedButtonStates(states.leoHasMarked);
-        view.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
-        view.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        view.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
-        view.refreshMenu(menuData);
+        menu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
+        menu.updateMarkedButtonStates(states.leoHasMarked);
+        menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
+        menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        menu.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
+        menu.refreshMenu(menuData);
 
         // Refresh other panes if needed
         if (this._refreshType.documents) {
@@ -1074,13 +1074,13 @@ export class LeoUI extends NullGui {
         this.leoStates.fileOpenedReady = false;
         this._refreshOutline(RevealType.NoReveal);
         const states = this.leoStates;
-        const view = workspace.view;
-        view.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
-        view.updateMarkedButtonStates(states.leoHasMarked);
-        view.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
-        view.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        view.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
-        view.refreshMenu(menuData);
+        const mwnu = workspace.menu;
+        mwnu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
+        mwnu.updateMarkedButtonStates(states.leoHasMarked);
+        mwnu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
+        mwnu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        mwnu.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
+        mwnu.refreshMenu(menuData);
         this.refreshDocumentsPane();
         this.refreshButtonsPane();
         this.refreshUndoPane();
@@ -1154,15 +1154,15 @@ export class LeoUI extends NullGui {
         }
 
         if (g.app.windowList.length === 0) {
-            void workspace.view.showInformationMessage("No document opened. Please open a Leo file to execute commands.");
+            void workspace.dialog.showInformationMessage("No document opened. Please open a Leo file to execute commands.");
             return Promise.resolve();
         }
 
         if (p_options.finalFocus === Focus.NoChange) {
             // Get the current focus (body outline, or other will be noChange)
-            if (workspace.view.isOutlineFocused()) {
+            if (workspace.layout.isOutlineFocused()) {
                 p_options.finalFocus = Focus.Outline;
-            } else if (workspace.view.isBodyFocused()) {
+            } else if (workspace.layout.isBodyFocused()) {
                 p_options.finalFocus = Focus.Body;
             }
         }
@@ -1214,7 +1214,7 @@ export class LeoUI extends NullGui {
                 }
             }
         } catch (e) {
-            void workspace.view.showInformationMessage("LeoUI Error: " + e);
+            void workspace.dialog.showInformationMessage("LeoUI Error: " + e);
         }
 
         if (this.trace) {
@@ -1333,12 +1333,12 @@ export class LeoUI extends NullGui {
 
         w_choices.push(...w_withDetails);
 
-        const w_picked = await workspace.view.showQuickPick(w_choices, {
+        const w_picked = await workspace.dialog.showQuickPick(w_choices, {
             placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
         });
 
         // To check for numeric line goto 'easter egg'
-        const lastInput = workspace.view.getLastQuickPickInput();
+        const lastInput = workspace.dialog.getLastQuickPickInput();
         if (lastInput && /^\d+$/.test(lastInput)) {
             // * Was an integer EASTER EGG
             this.setupRefresh(
@@ -1414,7 +1414,7 @@ export class LeoUI extends NullGui {
         const w_options: QuickPickOptions = {
             placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
         };
-        const w_picked = await workspace.view.showQuickPick(w_commandList, w_options);
+        const w_picked = await workspace.dialog.showQuickPick(w_commandList, w_options);
         return this._doMinibufferCommand(w_picked);
     }
 
@@ -1426,9 +1426,9 @@ export class LeoUI extends NullGui {
 
             let finalFocus = Focus.NoChange;
             // Get the current focus (body outline, or other will be noChange)
-            if (workspace.view.isOutlineFocused()) {
+            if (workspace.layout.isOutlineFocused()) {
                 finalFocus = Focus.Outline;
-            } else if (workspace.view.isBodyFocused()) {
+            } else if (workspace.layout.isBodyFocused()) {
                 finalFocus = Focus.Body;
             }
 
@@ -1530,9 +1530,9 @@ export class LeoUI extends NullGui {
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
-        if (workspace.view.isOutlineFocused()) {
+        if (workspace.layout.isOutlineFocused()) {
             finalFocus = Focus.Outline;
-        } else if (workspace.view.isBodyFocused()) {
+        } else if (workspace.layout.isBodyFocused()) {
             finalFocus = Focus.Body;
         }
 
@@ -1606,7 +1606,7 @@ export class LeoUI extends NullGui {
 
             if (w_p && w_p.h !== p_newHeadline) {
                 if (w_truncated) {
-                    void workspace.view.showInformationMessage("Truncating headline");
+                    void workspace.dialog.showInformationMessage("Truncating headline");
                 }
                 if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
                     return w_p;  // The hook claims to have handled the event.
@@ -1730,7 +1730,7 @@ export class LeoUI extends NullGui {
             placeHolder: Constants.USER_MESSAGES.SEARCH_POSITION_BY_HEADLINE
         };
 
-        const picked = (await workspace.view.showQuickPick(allPositions, w_options)) as QuickPickItem & { position: Position };;
+        const picked = (await workspace.dialog.showQuickPick(allPositions, w_options)) as QuickPickItem & { position: Position };;
 
         if (picked && picked.label && picked.position) {
             if (c.positionExists(picked.position)) {
@@ -1949,22 +1949,22 @@ export class LeoUI extends NullGui {
 
     public async cutText(): Promise<unknown> {
         // TODO : This is for body pane text only!
-        workspace.view.showToast('Cut Text: TODO Implement');
+        workspace.dialog.showToast('Cut Text: TODO Implement');
         return Promise.resolve();
     }
     public async copyText(): Promise<unknown> {
         // TODO : This is for body pane text only!
-        workspace.view.showToast('Copy Text: TODO Implement');
+        workspace.dialog.showToast('Copy Text: TODO Implement');
         return Promise.resolve();
     }
     public async pasteText(): Promise<unknown> {
         // TODO : This is for body pane text only!
-        workspace.view.showToast('Paste Text: TODO Implement');
+        workspace.dialog.showToast('Paste Text: TODO Implement');
         return Promise.resolve();
     }
     public async selectAllText(): Promise<unknown> {
         // TODO : This is for body pane text only!
-        workspace.view.showToast('Select All Text: TODO Implement');
+        workspace.dialog.showToast('Select All Text: TODO Implement');
         return Promise.resolve();
     }
 
@@ -1980,9 +1980,9 @@ export class LeoUI extends NullGui {
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
-        if (workspace.view.isOutlineFocused()) {
+        if (workspace.layout.isOutlineFocused()) {
             finalFocus = Focus.Outline;
-        } else if (workspace.view.isBodyFocused()) {
+        } else if (workspace.layout.isBodyFocused()) {
             finalFocus = Focus.Body;
         }
 
@@ -2027,9 +2027,9 @@ export class LeoUI extends NullGui {
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
-        if (workspace.view.isOutlineFocused()) {
+        if (workspace.layout.isOutlineFocused()) {
             finalFocus = Focus.Outline;
-        } else if (workspace.view.isBodyFocused()) {
+        } else if (workspace.layout.isBodyFocused()) {
             finalFocus = Focus.Body;
         }
 
@@ -2067,9 +2067,9 @@ export class LeoUI extends NullGui {
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
-        if (workspace.view.isOutlineFocused()) {
+        if (workspace.layout.isOutlineFocused()) {
             finalFocus = Focus.Outline;
-        } else if (workspace.view.isBodyFocused()) {
+        } else if (workspace.layout.isBodyFocused()) {
             finalFocus = Focus.Body;
         }
 
@@ -2096,7 +2096,7 @@ export class LeoUI extends NullGui {
                 await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
                 const commander = await g.app.loadManager.loadLocalFile(fileName, this);
                 if (!commander) {
-                    void workspace.view.showInformationMessage('can not open:' + '"' + fileName + '"');
+                    void workspace.dialog.showInformationMessage('can not open:' + '"' + fileName + '"');
                     return Promise.resolve();
                 }
                 // this.showBodyIfClosed = true;
@@ -2139,7 +2139,6 @@ export class LeoUI extends NullGui {
         return this.loadSearchSettings();
     }
 
-
     /**
      * * Asks for file name and path, then saves the Leo file
      * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
@@ -2150,9 +2149,9 @@ export class LeoUI extends NullGui {
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
-        if (workspace.view.isOutlineFocused()) {
+        if (workspace.layout.isOutlineFocused()) {
             finalFocus = Focus.Outline;
-        } else if (workspace.view.isBodyFocused()) {
+        } else if (workspace.layout.isBodyFocused()) {
             finalFocus = Focus.Body;
         }
 
@@ -2184,9 +2183,9 @@ export class LeoUI extends NullGui {
 
         let finalFocus = Focus.NoChange;
         // Get the current focus (body outline, or other will be noChange)
-        if (workspace.view.isOutlineFocused()) {
+        if (workspace.layout.isOutlineFocused()) {
             finalFocus = Focus.Outline;
-        } else if (workspace.view.isBodyFocused()) {
+        } else if (workspace.layout.isBodyFocused()) {
             finalFocus = Focus.Body;
         }
 
@@ -2257,7 +2256,7 @@ export class LeoUI extends NullGui {
             const w_pickOptions: QuickPickOptions = {
                 placeHolder: Constants.USER_MESSAGES.CHOOSE_OPENED_FILE,
             };
-            w_chosenDocument = await workspace.view.showQuickPick(w_entries, w_pickOptions) as ChooseDocumentItem | undefined;
+            w_chosenDocument = await workspace.dialog.showQuickPick(w_entries, w_pickOptions) as ChooseDocumentItem | undefined;
         } else {
             // "No opened documents"
             return Promise.resolve(undefined);
@@ -2268,7 +2267,6 @@ export class LeoUI extends NullGui {
             // Canceled
             return Promise.resolve(undefined);
         }
-
     }
 
     /**
@@ -2322,7 +2320,7 @@ export class LeoUI extends NullGui {
      * and a button to perform the 'set leoID' command.
      */
     public showLeoIDMessage(): void {
-        void workspace.view.showInformationMessage(
+        void workspace.dialog.showInformationMessage(
             Constants.USER_MESSAGES.SET_LEO_ID_MESSAGE,
             { modal: true, detail: Constants.USER_MESSAGES.GET_LEO_ID_PROMPT },
             Constants.USER_MESSAGES.ENTER_LEO_ID
@@ -2388,7 +2386,7 @@ export class LeoUI extends NullGui {
                         this.fullRefresh();
                     }
                 } else {
-                    void workspace.view.showInformationMessage("'None' is a reserved LeoID, please choose another one.");
+                    void workspace.dialog.showInformationMessage("'None' is a reserved LeoID, please choose another one.");
                 }
             }
         } else if (!p_leoID.trim()) {
@@ -2458,7 +2456,7 @@ export class LeoUI extends NullGui {
             const itemList: QuickPickItem[] = tabList.map(
                 (entry) => { return { label: entry }; }
             );
-            return workspace.view.showQuickPick(itemList, options).then(
+            return workspace.dialog.showQuickPick(itemList, options).then(
                 (p_picked) => {
                     if (p_picked && typeof p_picked !== 'string' && p_picked.label) {
                         return p_picked.label;
@@ -2469,7 +2467,7 @@ export class LeoUI extends NullGui {
                 }
             );
         } else {
-            return workspace.view.showInputDialog(options);
+            return workspace.dialog.showInputDialog(options);
         }
     }
 
@@ -2492,7 +2490,7 @@ export class LeoUI extends NullGui {
                 placeHolder: ''
             };
         }
-        return workspace.view.showSingleCharInputDialog(options);
+        return workspace.dialog.showSingleCharInputDialog(options);
     }
 
     public runAboutLeoDialog(
@@ -2502,7 +2500,7 @@ export class LeoUI extends NullGui {
         url: string,
         email: string
     ): Thenable<unknown> {
-        return workspace.view.showInformationMessage(
+        return workspace.dialog.showInformationMessage(
             version,
             {
                 modal: true,
@@ -2516,7 +2514,7 @@ export class LeoUI extends NullGui {
         message: string,
         text = "Ok"
     ): Thenable<unknown> {
-        return workspace.view.showInformationMessage(
+        return workspace.dialog.showInformationMessage(
             title,
             {
                 modal: true,
@@ -2543,7 +2541,7 @@ export class LeoUI extends NullGui {
             w_choices.push(Constants.USER_MESSAGES.NO_ALL,);
         }
 
-        return workspace.view
+        return workspace.dialog
             .showInformationMessage(
                 title,
                 {
@@ -2587,7 +2585,7 @@ export class LeoUI extends NullGui {
             w_choices.push(cancelMessage);
         }
 
-        return workspace.view
+        return workspace.dialog
             .showInformationMessage(
                 title,
                 {
@@ -2624,7 +2622,7 @@ export class LeoUI extends NullGui {
         }
         // convert to { [name: string]: string[] } typing
         const types: { [name: string]: string[] } = utils.convertLeoFiletypes(filetypes);
-        return workspace.view.showOpenDialog(
+        return workspace.dialog.showOpenDialog(
             {
                 title: title,
                 canSelectMany: false,
@@ -2652,7 +2650,7 @@ export class LeoUI extends NullGui {
     ): Thenable<string[]> {
         // convert to { [name: string]: string[] } typing
         const types: { [name: string]: string[] } = utils.convertLeoFiletypes(filetypes);
-        return workspace.view.showOpenDialog(
+        return workspace.dialog.showOpenDialog(
             {
                 title: title,
                 canSelectMany: true,
@@ -2680,7 +2678,7 @@ export class LeoUI extends NullGui {
     ): Thenable<string> {
         // convert to { [name: string]: string[] } typing
         const types: { [name: string]: string[] } = utils.convertLeoFiletypes(filetypes);
-        return workspace.view.showSaveDialog(
+        return workspace.dialog.showSaveDialog(
             {
                 title: title,
                 filters: types

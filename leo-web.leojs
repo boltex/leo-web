@@ -92,6 +92,14 @@
           "vh": "safeLocalStorageSet"
         },
         {
+          "gnx": "felix.20260226215039.1",
+          "vh": "showHtmlInNewTab"
+        },
+        {
+          "gnx": "felix.20260226215651.1",
+          "vh": "showTextDocument"
+        },
+        {
           "gnx": "felix.20251211212732.1",
           "vh": "preventDefault"
         },
@@ -702,10 +710,12 @@
     "felix.20251210234420.18": "/**\n * List of command names for both categories of possible offsets when keeping selection.\n */\npublic static OLD_POS_OFFSETS = {\n    DELETE: [\"cut-node\", \"delete-node\"],\n    ADD: [\"clone-node\", \"async-paste-node\", \"async-paste-retaining-clones\"]\n};\n\n",
     "felix.20251210234420.19": "/**\n * * Overridden 'good' minibuffer command name strings\n */\npublic static MINIBUFFER_OVERRIDDEN_NAMES: { [key: string]: string } = {\n    'paste-node': 'async-paste-node',\n    'paste-retaining-clones': 'async-paste-retaining-clones',\n    'paste-as-template': 'async-paste-as-template',\n    // 'insert-child': 'async-insert-child',\n    // 'insert-node': 'async-insert-node',\n    // 'insert-as-first-child': 'async-insert-as-first-child',\n    // 'insert-as-last-child': 'async-insert-as-last-child',\n    // 'insert-node-before': 'async-insert-node-before',\n};\n\n",
     "felix.20251210234451.1": "@language typescript\n@tabwidth -4\n\n// ambient module declaration for https://www.npmjs.com/package/date-format-lite\ndeclare module \"date-format-lite\" { }\n\n// date-format-lite augments built-in Date\ninterface Date {\n    format: (format?: string) => string;\n    masks: { default: string };\n}\n",
-    "felix.20251211000427.1": "import { Constants } from \"./constants\";\nimport { workspace } from \"./workspace\";\n// import { Position } from \"./core/leoNodes\";\ntype Position = any;\n\n// String and other types/structures helper functions, along with common vscode API calls\n\n@language typescript\n@tabwidth -4\n@others\n",
+    "felix.20251211000427.1": "\nimport { Uri, workspace } from \"./workspace\";\n// import { Position } from \"./core/leoNodes\";\ntype Position = any;\n\n// String and other types/structures helper functions, along with common vscode API calls\n\n@language typescript\n@tabwidth -4\n@others\n",
     "felix.20251211212644.1": "/**\n * Throttle function execution to limit how often it can be called\n * @param func Function to throttle\n * @param limit Minimum time between calls in milliseconds\n * @returns Throttled version of the function\n */\nexport function throttle<T extends any[]>(func: (...args: T) => void, limit: number) {\n    let lastCall = 0;\n    let timeout: ReturnType<typeof setTimeout>;\n\n    return (...args: T): void => {\n        const now = Date.now();\n        if (timeout) {\n            clearTimeout(timeout);\n        }\n        if (now - lastCall >= limit) {\n            lastCall = now;\n            func(...args);\n        } else {\n            timeout = setTimeout(() => {\n                lastCall = Date.now();\n                func(...args);\n            }, limit - (now - lastCall));\n        }\n    };\n}\n",
     "felix.20251211212701.1": "/**\n * Safely access localStorage.getItem with error handling\n */\nexport function safeLocalStorageGet(key: string): string | null {\n    try {\n        return localStorage.getItem(key);\n    } catch (e) {\n        return null;\n    }\n}\n",
     "felix.20251211212717.1": "/**\n * Safely access localStorage.setItem with error handling\n */\nexport function safeLocalStorageSet(key: string, value: string): void {\n    try {\n        localStorage.setItem(key, value);\n    } catch (e) {\n        // ignore\n    }\n}\n",
+    "felix.20260226215039.1": "export function showHtmlInNewTab(htmlContent: string, title: string) {\n    const newWindow = window.open('', '_blank');\n    if (newWindow) {\n\n        // Check current theme and set colors accordingly\n        const isDark = workspace.layout.currentTheme === 'dark';\n        const bodyBg = isDark ? '#1e1e2e' : '#fff';\n        const bodyColor = isDark ? '#cdd6f4' : '#222';\n        const preBg = isDark ? '#2a2536' : '#f5f5f5';\n        const linkColor = isDark ? '#929bda' : '#0b5ed7';\n\n        newWindow.document.open();\n        newWindow.document.write(`\n            <!DOCTYPE html>\n            <html>\n            <head>\n            <meta charset=\"utf-8\">\n            <title>${title}</title>\n            <style>\n                body {\n                font-family: system-ui, -apple-system, BlinkMacSystemFont,\n                            \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n                font-size: 16px;\n                line-height: 1.55;\n                padding: 1.25rem;\n                color: ${bodyColor};\n                background: ${bodyBg};\n                }\n\n                h1, h2, h3, h4 {\n                margin-top: 1.4em;\n                }\n\n                pre, code {\n                font-family: ui-monospace, SFMono-Regular, Consolas,\n                            \"Liberation Mono\", Menlo, monospace;\n                }\n\n                pre {\n                background: ${preBg};\n                padding: 0.75rem;\n                border-radius: 4px;\n                overflow-x: auto;\n                }\n\n                a {\n                color: ${linkColor};\n                text-decoration: none;\n                }\n\n                a:hover {\n                text-decoration: underline;\n                }\n            </style>\n            </head>\n            <body>\n            ${htmlContent}\n            </body>\n            </html>\n            `);\n        newWindow.document.close();\n        newWindow.focus();\n    }\n}\n\n",
+    "felix.20260226215651.1": "export function showTextDocument(uri: Uri): void {\n    // Read the file, and open in a new tab or window\n    workspace.fs.readFile(uri).then(data => {\n        const text = new TextDecoder().decode(data);\n        const newWindow = window.open();\n        if (newWindow) {\n            newWindow.document.title = uri.fsPath.split('/').pop() || 'Document';\n            const pre = newWindow.document.createElement('pre');\n            pre.textContent = text;\n            newWindow.document.body.appendChild(pre);\n        }\n    }).catch(err => {\n        console.error('Error reading file for showTextDocument:', err);\n    });\n}\n\n",
     "felix.20251211212732.1": "/**\n * Prevent default event behavior - useful as event handler\n */\nexport function preventDefault(e: Event): void {\n    e.preventDefault();\n}\n",
     "felix.20251211212753.1": "/**\n * Get the text node and offset at a given global character index within a root node\n */\nexport function getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);\n    let currentNode = walker.nextNode();\n    let remaining = index;\n\n    while (currentNode) {\n        const len = currentNode!.nodeValue!.length;\n        if (remaining <= len) {\n            return { node: currentNode, offset: remaining };\n        }\n        remaining -= len;\n        currentNode = walker.nextNode();\n    }\n    return null;\n}\n",
     "felix.20251211212824.1": "/**\n * Get the global character offset within a root node for a given text node and offset\n */\nexport function getGlobalOffset(root: Node, container: Node, offset: number): number {\n    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);\n    let total = 0;\n    let current: Node | null = walker.nextNode();\n\n    while (current) {\n        if (current === container) {\n            return total + offset;\n        }\n        total += current.nodeValue!.length;\n        current = walker.nextNode();\n    }\n    return total;\n}\n",
@@ -780,7 +790,7 @@
       "_mod_time": 1771805597.47
     },
     "felix.20251103000914.1": {
-      "_mod_time": 1772082711.219
+      "_mod_time": 1772164295.989
     },
     "felix.20251103000934.1": {
       "_mod_time": 1772079757.929
@@ -795,7 +805,7 @@
       "_mod_time": 1765428602.58
     },
     "felix.20251211000427.1": {
-      "_mod_time": 1770353563.827
+      "_mod_time": 1772161117.643
     },
     "felix.20251211000618.1": {
       "_mod_time": 1771303175.282

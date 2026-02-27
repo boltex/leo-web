@@ -1220,7 +1220,7 @@ export class LeoApp {
             id_ = '';
             if (!this.LeoIDWarningShown) {
                 this.LeoIDWarningShown = true;
-                void workspace.view.showInformationMessage(
+                void workspace.dialog.showInformationMessage(
                     `Invalid Leo ID: ${tag}`,
                     {
                         detail:

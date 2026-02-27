@@ -747,12 +747,12 @@ export class ExternalFilesController {
                 if (!checkConfig.includes('none')) {
                     let w_message = 'Changes to external files were detected.';
                     if (checkConfig.includes('yes')) {
-                        void workspace.view.showInformationMessage(
+                        void workspace.dialog.showInformationMessage(
                             w_message + ' Nodes refreshed.'
                         );
                         return 'yes-all';
                     } else {
-                        void workspace.view.showInformationMessage(
+                        void workspace.dialog.showInformationMessage(
                             w_message + ' They were ignored.'
                         );
                         return 'no-all';
@@ -970,7 +970,7 @@ export class ExternalFilesController {
                 'Proceed with refresh-from-disk only if this is intended.\n';
         }
 
-        void workspace.view.showInformationMessage(message);
+        void workspace.dialog.showInformationMessage(message);
     }
 
     //@-others

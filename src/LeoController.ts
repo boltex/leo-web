@@ -1,5 +1,4 @@
 import { Position } from "./core/leoNodes";
-import { LeoView } from "./LeoView";
 import * as g from './core/leoGlobals';
 import { FlatRowLeo } from "./types";
 import * as utils from './utils';
@@ -19,10 +18,9 @@ export class LeoController {
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
 
     constructor() {
-
-        workspace.view.buildMenu(menuData);
-        workspace.view.setWindowTitle(defaultTitle)
-        workspace.view.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
+        workspace.menu.buildMenu(menuData);
+        workspace.layout.setWindowTitle(defaultTitle)
+        workspace.layout.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
     }
 
     public setCommands(commands: [string, (...args: any[]) => any][]) {
@@ -44,7 +42,7 @@ export class LeoController {
     public initializeInteractions() {
         this.setupEventHandlers();
         this.setupButtonFocusPrevention();
-        workspace.view.setupLastFocusedElementTracking();
+        workspace.layout.setupLastFocusedElementTracking();
     }
 
     private setupEventHandlers() {
@@ -60,67 +58,66 @@ export class LeoController {
     }
 
     private setupOutlinePaneHandlers() {
-        const view = workspace.view;
+        const OUTLINE_PANE = workspace.layout.OUTLINE_PANE;
         // Use only mousedown for selection. Otherwise focus out of edit-headline messes with click events. We can still detect double-clicks by checking the event.detail property in the mousedown handler.
-        view.OUTLINE_PANE.addEventListener("mousedown", this.handleOutlinePaneMouseDown);
-        // view.OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
-        view.OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
-        view.OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
-        view.OUTLINE_PANE.addEventListener("scroll", utils.throttle(view.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
-        view.OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
+        OUTLINE_PANE.addEventListener("mousedown", this.handleOutlinePaneMouseDown);
+        // OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
+        OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
+        OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
+        OUTLINE_PANE.addEventListener("scroll", utils.throttle(workspace.view.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
+        OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
         document.addEventListener("click", (e) => {
-            view.closeMenusEvent(e);
+            workspace.menu.closeMenusEvent(e);
         });
     }
 
     private setupBodyPaneHandlers() {
-        const view = workspace.view;
-        view.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
+        workspace.layout.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
     }
 
     private setupLogPaneHandlers() {
-        const view = workspace.view;
-        view.LOG_PANE.addEventListener('keydown', this.handleLogPaneKeyDown);
+        workspace.layout.LOG_PANE.addEventListener('keydown', this.handleLogPaneKeyDown);
     }
 
     private setupResizerHandlers() {
-        const view = workspace.view;
-        view.VERTICAL_RESIZER.addEventListener('mousedown', this.startDrag);
-        view.VERTICAL_RESIZER.addEventListener('touchstart', this.startDrag);
-        view.HORIZONTAL_RESIZER.addEventListener('mousedown', this.startSecondaryDrag);
-        view.HORIZONTAL_RESIZER.addEventListener('touchstart', this.startSecondaryDrag);
-        view.CROSS_RESIZER.addEventListener('mousedown', this.startCrossDrag);
-        view.CROSS_RESIZER.addEventListener('touchstart', this.startCrossDrag);
+        const layout = workspace.layout;
+        layout.VERTICAL_RESIZER.addEventListener('mousedown', this.startDrag);
+        layout.VERTICAL_RESIZER.addEventListener('touchstart', this.startDrag);
+        layout.HORIZONTAL_RESIZER.addEventListener('mousedown', this.startSecondaryDrag);
+        layout.HORIZONTAL_RESIZER.addEventListener('touchstart', this.startSecondaryDrag);
+        layout.CROSS_RESIZER.addEventListener('mousedown', this.startCrossDrag);
+        layout.CROSS_RESIZER.addEventListener('touchstart', this.startCrossDrag);
     }
 
     private setupWindowHandlers() {
-        window.addEventListener('resize', utils.throttle(() => workspace.view.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
+        window.addEventListener('resize', utils.throttle(() => workspace.layout.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
         window.addEventListener('beforeunload', this.saveAllPreferences);
     }
 
     private setupButtonHandlers() {
         const view = workspace.view;
+        const menu = workspace.menu;
 
         // * Outline Actions *
-        view.COLLAPSE_ALL_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.CONTRACT_ALL) });
-        view.HOIST_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.HOIST) });
-        view.DEHOIST_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DEHOIST) });
-        view.PREV_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GO_BACK) });
-        view.NEXT_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GO_FORWARD) });
-        view.TOGGLE_MARK_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
-        view.NEXT_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_NEXT_MARKED) });
-        view.PREV_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_PREV_MARKED) });
-        view.ACTION_MARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
-        view.ACTION_UNMARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
-        view.ACTION_HOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.HOIST) });
-        view.ACTION_DEHOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DEHOIST) });
+        menu.COLLAPSE_ALL_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.CONTRACT_ALL) });
+        menu.HOIST_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.HOIST) });
+        menu.DEHOIST_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DEHOIST) });
+        menu.PREV_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GO_BACK) });
+        menu.NEXT_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GO_FORWARD) });
+        menu.TOGGLE_MARK_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
+        menu.NEXT_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_NEXT_MARKED) });
+        menu.PREV_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_PREV_MARKED) });
+        menu.ACTION_MARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
+        menu.ACTION_UNMARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
+        menu.ACTION_HOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.HOIST) });
+        menu.ACTION_DEHOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DEHOIST) });
 
         // * Interface Only Actions *
-        view.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
-        view.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
-        view.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        view.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        menu.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
+        menu.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
+        menu.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        menu.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         view.LOG_TAB.addEventListener('click', () => { view.showTab("log") });
         view.FIND_TAB.addEventListener('click', () => { view.showTab("find") });
         view.NAV_TAB.addEventListener('click', () => { view.showTab("nav") });
@@ -136,21 +133,21 @@ export class LeoController {
                 e.preventDefault();
             });
         });
-        workspace.view.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
+        workspace.menu.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
             e.preventDefault();
         });
     }
 
     private setupConfigCheckboxes() {
-        const view = workspace.view;
-        view.SHOW_PREV_NEXT_MARK.addEventListener('change', this.refreshButtonVisibility);
-        view.SHOW_TOGGLE_MARK.addEventListener('change', this.refreshButtonVisibility);
-        view.SHOW_PREV_NEXT_HISTORY.addEventListener('change', this.refreshButtonVisibility);
-        view.SHOW_HOIST_DEHOIST.addEventListener('change', this.refreshButtonVisibility);
-        view.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.refreshButtonVisibility);
-        view.SHOW_THEME_TOGGLE.addEventListener('change', this.refreshButtonVisibility);
-        view.SHOW_NODE_ICONS.addEventListener('change', view.updateNodeIcons);
-        view.SHOW_COLLAPSE_ALL.addEventListener('change', this.refreshButtonVisibility);
+        const menu = workspace.menu;
+        menu.SHOW_PREV_NEXT_MARK.addEventListener('change', this.refreshButtonVisibility);
+        menu.SHOW_TOGGLE_MARK.addEventListener('change', this.refreshButtonVisibility);
+        menu.SHOW_PREV_NEXT_HISTORY.addEventListener('change', this.refreshButtonVisibility);
+        menu.SHOW_HOIST_DEHOIST.addEventListener('change', this.refreshButtonVisibility);
+        menu.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.refreshButtonVisibility);
+        menu.SHOW_THEME_TOGGLE.addEventListener('change', this.refreshButtonVisibility);
+        menu.SHOW_NODE_ICONS.addEventListener('change', workspace.view.updateNodeIcons);
+        menu.SHOW_COLLAPSE_ALL.addEventListener('change', this.refreshButtonVisibility);
     }
 
     private refreshButtonVisibility = () => {
@@ -160,59 +157,61 @@ export class LeoController {
         hasMarked = workspace.getContext(Constants.CONTEXT_FLAGS.LEO_HAS_MARKED) || false;
         hasHistory = workspace.getContext(Constants.CONTEXT_FLAGS.LEO_CAN_BACK) || workspace.getContext(Constants.CONTEXT_FLAGS.LEO_CAN_NEXT) || false;
 
-        workspace.view.updateButtonVisibility(hasMarked, hasHistory);
+        workspace.menu.updateButtonVisibility(hasMarked, hasHistory);
 
     }
 
     private setupTopMenuHandlers() {
         const view = workspace.view;
+        const menu = workspace.menu;
+        const layout = workspace.layout;
         document.addEventListener("keydown", (e) => {
-            if (!view.activeTopMenu) return;
+            if (!menu.activeTopMenu) return;
 
-            const topItems = view.topLevelItems;
-            const topIndex = topItems.indexOf(view.activeTopMenu);
+            const topItems = menu.topLevelItems;
+            const topIndex = topItems.indexOf(menu.activeTopMenu);
             if (topIndex === -1) return;
 
-            let openSubmenu = view.focusedMenuItem
-                ? view.focusedMenuItem.closest(".submenu")
-                : view.topLevelSubmenus.get(view.activeTopMenu);
+            let openSubmenu = menu.focusedMenuItem
+                ? menu.focusedMenuItem.closest(".submenu")
+                : menu.topLevelSubmenus.get(menu.activeTopMenu);
 
             if (!openSubmenu) return;
 
             // Handle top-level navigation
-            if (!view.focusedMenuItem || !openSubmenu.contains(view.focusedMenuItem)) {
+            if (!menu.focusedMenuItem || !openSubmenu.contains(menu.focusedMenuItem)) {
                 switch (e.key) {
                     case "ArrowRight":
                         e.preventDefault();
                         const nextTop = topItems[(topIndex + 1) % topItems.length];
-                        const nextSub = view.topLevelSubmenus.get(nextTop);
+                        const nextSub = menu.topLevelSubmenus.get(nextTop);
                         if (nextTop && nextSub) {
-                            view.openTopMenu(nextTop, nextSub, 0);
-                            view.focusMenuItem(nextSub.querySelector(".menu-item"));
+                            menu.openTopMenu(nextTop, nextSub, 0);
+                            menu.focusMenuItem(nextSub.querySelector(".menu-item"));
                         }
                         return;
                     case "ArrowLeft":
                         e.preventDefault();
                         const prevTop = topItems[(topIndex - 1 + topItems.length) % topItems.length];
-                        const prevSub = view.topLevelSubmenus.get(prevTop);
+                        const prevSub = menu.topLevelSubmenus.get(prevTop);
                         if (prevTop && prevSub) {
-                            view.openTopMenu(prevTop, prevSub, 0);
-                            view.focusMenuItem(prevSub.querySelector(".menu-item"));
+                            menu.openTopMenu(prevTop, prevSub, 0);
+                            menu.focusMenuItem(prevSub.querySelector(".menu-item"));
                         }
                         return;
                     case "ArrowDown":
                         e.preventDefault();
-                        const currentSub = view.topLevelSubmenus.get(view.activeTopMenu);
+                        const currentSub = menu.topLevelSubmenus.get(menu.activeTopMenu);
                         if (currentSub) {
                             const firstItem = currentSub.querySelector(".menu-item");
-                            if (firstItem) view.focusMenuItem(firstItem);
+                            if (firstItem) menu.focusMenuItem(firstItem);
                         }
                         return;
                     case "Escape":
                         e.preventDefault();
-                        view.closeAllSubmenus();
-                        view.activeTopMenu = null;
-                        view.restoreLastFocusedElement();
+                        menu.closeAllSubmenus();
+                        menu.activeTopMenu = null;
+                        layout.restoreLastFocusedElement();
                         return;
                 }
                 return; // stop here if we just handled top-level
@@ -220,79 +219,79 @@ export class LeoController {
 
             // Handle submenu navigation
             const items: HTMLDivElement[] = Array.from(openSubmenu.querySelectorAll(":scope > .menu-item"));
-            const index = view.focusedMenuItem ? items.indexOf(view.focusedMenuItem) : -1;
+            const index = menu.focusedMenuItem ? items.indexOf(menu.focusedMenuItem) : -1;
 
             switch (e.key) {
                 case "ArrowDown":
                     e.preventDefault();
                     if (index < items.length - 1) {
-                        view.focusMenuItem(items[index + 1]!);
+                        menu.focusMenuItem(items[index + 1]!);
                     } else {
-                        view.focusMenuItem(items[0]!); // Wrap to first item
+                        menu.focusMenuItem(items[0]!); // Wrap to first item
                     }
                     break;
                 case "ArrowUp":
                     e.preventDefault();
                     if (index > 0) {
-                        view.focusMenuItem(items[index - 1]!);
+                        menu.focusMenuItem(items[index - 1]!);
                     } else {
-                        view.focusMenuItem(items[items.length - 1]!); // Wrap to last item
+                        menu.focusMenuItem(items[items.length - 1]!); // Wrap to last item
                     }
                     break;
                 case "ArrowRight":
                     e.preventDefault();
-                    if (view.focusedMenuItem?.classList.contains("has-sub")) {
-                        const sub: HTMLElement | null = view.focusedMenuItem.querySelector(":scope > .submenu");
+                    if (menu.focusedMenuItem?.classList.contains("has-sub")) {
+                        const sub: HTMLElement | null = menu.focusedMenuItem.querySelector(":scope > .submenu");
                         if (sub) {
-                            view.positionSubmenu(view.focusedMenuItem, sub, 1);
+                            menu.positionSubmenu(menu.focusedMenuItem, sub, 1);
                             sub.classList.add("visible");
-                            view.focusMenuItem(sub.querySelector(".menu-item"));
+                            menu.focusMenuItem(sub.querySelector(".menu-item"));
                         }
                     } else {
                         const nextTop = topItems[(topIndex + 1) % topItems.length];
-                        const nextSub = view.topLevelSubmenus.get(nextTop);
+                        const nextSub = menu.topLevelSubmenus.get(nextTop);
                         if (nextTop && nextSub) {
-                            view.openTopMenu(nextTop, nextSub, 0);
-                            view.focusMenuItem(nextSub.querySelector(".menu-item"));
+                            menu.openTopMenu(nextTop, nextSub, 0);
+                            menu.focusMenuItem(nextSub.querySelector(".menu-item"));
                         }
                     }
                     break;
                 case "ArrowLeft":
                     e.preventDefault();
-                    const parentMenu: HTMLElement | null = view.focusedMenuItem.closest(".submenu")!;
+                    const parentMenu: HTMLElement | null = menu.focusedMenuItem.closest(".submenu")!;
                     const parentItem: HTMLDivElement | null = parentMenu?.parentElement?.closest(".menu-item")!;
 
                     if (parentItem) {
                         parentMenu.classList.remove("visible");
-                        view.focusMenuItem(parentItem);
+                        menu.focusMenuItem(parentItem);
                     } else {
                         const prevTop = topItems[(topIndex - 1 + topItems.length) % topItems.length];
-                        const prevSub = view.topLevelSubmenus.get(prevTop);
+                        const prevSub = menu.topLevelSubmenus.get(prevTop);
                         if (prevTop && prevSub) {
-                            view.openTopMenu(prevTop, prevSub, 0);
-                            view.focusMenuItem(prevSub.querySelector(".menu-item"));
+                            menu.openTopMenu(prevTop, prevSub, 0);
+                            menu.focusMenuItem(prevSub.querySelector(".menu-item"));
                         }
                     }
                     break;
                 case "Enter":
                 case " ":
                     e.preventDefault();
-                    if (view.focusedMenuItem?.classList.contains("has-sub")) {
-                        const sub: HTMLElement | null = view.focusedMenuItem.querySelector(":scope > .submenu");
+                    if (menu.focusedMenuItem?.classList.contains("has-sub")) {
+                        const sub: HTMLElement | null = menu.focusedMenuItem.querySelector(":scope > .submenu");
                         if (sub) {
-                            view.positionSubmenu(view.focusedMenuItem, sub, 1);
+                            menu.positionSubmenu(menu.focusedMenuItem, sub, 1);
                             sub.classList.add("visible");
-                            view.focusMenuItem(sub.querySelector(".menu-item"));
+                            menu.focusMenuItem(sub.querySelector(".menu-item"));
                             return;
                         }
                     }
-                    view.focusedMenuItem?.click();
+                    menu.focusedMenuItem?.click();
                     break;
                 case "Escape":
                     e.preventDefault();
-                    view.closeAllSubmenus();
-                    view.activeTopMenu = null;
-                    view.restoreLastFocusedElement();
+                    menu.closeAllSubmenus();
+                    menu.activeTopMenu = null;
+                    layout.restoreLastFocusedElement();
                     break;
             }
         });
@@ -340,18 +339,18 @@ export class LeoController {
         // The selected document index is this.frameIndex,
         // so the active document (LeoFrame) is g.app.windowList[this.frameIndex]
         // a LeoFrame has a 'c' property which is the commander, and c.fileName() gives the filename.
-
+        const layout = workspace.layout
         const hasOpenedDocuments = g.app.windowList.length > 0;
-        workspace.view.setHasOpenedDocuments(hasOpenedDocuments);
+        layout.setHasOpenedDocuments(hasOpenedDocuments);
 
         // Set body pane contenteditable based on whether there are opened documents
-        workspace.view.BODY_PANE.contentEditable = hasOpenedDocuments ? "plaintext-only" : "false";
+        workspace.layout.BODY_PANE.contentEditable = hasOpenedDocuments ? "plaintext-only" : "false";
 
         // First call the view method to clear existing tabs
-        workspace.view.clearDocumentTabs();
+        workspace.menu.clearDocumentTabs();
 
         if (g.app.windowList.length === 0) {
-            workspace.view.setWindowTitle(defaultTitle);
+            layout.setWindowTitle(defaultTitle);
         }
 
         // call view to create the document-tabs, and setup handlers
@@ -367,10 +366,10 @@ export class LeoController {
                 label = "* " + label;
             }
 
-            const tab = workspace.view.createDocumentTab(label, isActive);
+            const tab = workspace.menu.createDocumentTab(label, isActive);
             // If active, also set the broswer's title
             if (isActive) {
-                workspace.view.setWindowTitle(label);
+                layout.setWindowTitle(label);
             }
 
             // now setup handlers for the tab to call g.app.gui.selectOpenedLeoDocument(index)
@@ -396,14 +395,12 @@ export class LeoController {
 
     // * Controller Methods (Event Handlers) *
     public async initialize() {
-        const view = workspace.view;
-
         // outline-find-container is initially hidden to prevent FOUC
-        view.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
+        workspace.layout.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
 
-        view.setupButtonContainerAutoHide();
-        view.showTab("log");
+        workspace.menu.setupButtonContainerAutoHide();
+        workspace.view.showTab("log");
 
         let dirHandle: FileSystemDirectoryHandle | null = null;
 
@@ -419,7 +416,7 @@ export class LeoController {
 
         // 2 Fallback: prompt user
         while (!dirHandle) {
-            dirHandle = await view.requestWorkspaceDirectory().catch(e => {
+            dirHandle = await workspace.dialog.requestWorkspaceDirectory().catch(e => {
                 console.warn("Error selecting workspace directory:", e);
                 return null;
             });
@@ -434,7 +431,7 @@ export class LeoController {
 
         // 4 Continue bootstrapping
         this.initializeInteractions();
-        view.OUTLINE_PANE.focus();
+        workspace.layout.OUTLINE_PANE.focus();
     }
 
 
@@ -468,7 +465,7 @@ export class LeoController {
         const c = g.app.windowList[g.app.gui.frameIndex].c;
 
         event.stopPropagation();
-        view.closeMenusEvent(event);
+        workspace.menu.closeMenusEvent(event);
         // Handle different click targets
         if (target.classList.contains('caret') && row.hasChildren) {
             // Both toggle and select in one operation
@@ -508,16 +505,16 @@ export class LeoController {
         }
     }
 
-
     private handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
         const target = e.target as Element;
         const view = workspace.view;
+        const MENU = workspace.menu.MENU;
 
         const nodeEl = target.closest('.node') as HTMLElement | null;
         if (!nodeEl) {
             // close possible existing right-click menu
-            view.MENU.style.display = 'none';
+            MENU.style.display = 'none';
             return;
         }
 
@@ -531,9 +528,9 @@ export class LeoController {
         }
 
         // Position and show the custom context menu
-        view.MENU.style.top = `${e.clientY}px`;
-        view.MENU.style.left = `${e.clientX}px`;
-        view.MENU.style.display = 'block';
+        MENU.style.top = `${e.clientY}px`;
+        MENU.style.left = `${e.clientX}px`;
+        MENU.style.display = 'block';
     }
 
     private handleOutlinePaneKeyDown = (e: KeyboardEvent) => {
@@ -666,37 +663,37 @@ export class LeoController {
     }
 
     private handleDrag = utils.throttle((e) => {
-        const view = workspace.view;
-        if (view.currentLayout === 'vertical') {
+        const layout = workspace.layout;
+        if (layout.currentLayout === 'vertical') {
             let clientX = e.clientX;
             if (e.touches) {
                 clientX = e.touches[0].clientX;
             }
             const newWidth = clientX;
-            if (newWidth >= view.minWidth) {
-                view.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
+            if (newWidth >= layout.minWidth) {
+                layout.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
             } else {
-                view.OUTLINE_FIND_CONTAINER.style.width = (view.minWidth - 3) + 'px';
+                layout.OUTLINE_FIND_CONTAINER.style.width = (layout.minWidth - 3) + 'px';
             }
-            view.renderTree();
+            workspace.view.renderTree();
         } else {
             let clientY = e.clientY;
             if (e.touches) {
                 clientY = e.touches[0].clientY;
             }
-            const newHeight = clientY - view.TOP_MENU_TOGGLE.offsetHeight;
-            if (newHeight >= view.minWidth) {
-                view.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
+            const newHeight = clientY - workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            if (newHeight >= layout.minWidth) {
+                layout.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
             } else {
-                view.OUTLINE_FIND_CONTAINER.style.height = (view.minWidth - 3) + 'px';
+                layout.OUTLINE_FIND_CONTAINER.style.height = (layout.minWidth - 3) + 'px';
             }
         }
-        view.positionCrossDragger();
-        view.updateCollapseAllPosition();
+        layout.positionCrossDragger();
+        layout.updateCollapseAllPosition();
     }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startDrag = (e: Event) => {
-        workspace.view.isDragging = true;
+        workspace.layout.isDragging = true;
         document.body.classList.add('dragging-main');
         e.preventDefault();
         document.addEventListener('mousemove', this.handleDrag);
@@ -706,53 +703,55 @@ export class LeoController {
     }
 
     private stopDrag = () => {
+        const layout = workspace.layout;
         const view = workspace.view;
-        if (view.isDragging) {
-            view.isDragging = false;
+        if (layout.isDragging) {
+            layout.isDragging = false;
             document.body.classList.remove('dragging-main');
             document.removeEventListener('mousemove', this.handleDrag);
             document.removeEventListener('mouseup', this.stopDrag);
             document.removeEventListener('touchmove', this.handleDrag);
             document.removeEventListener('touchend', this.stopDrag);
-            view.updateProportion();
+            layout.updateProportion();
             view.renderTree();
         }
     }
 
     private handleSecondaryDrag = utils.throttle((e) => {
-        const view = workspace.view;
-        if (view.currentLayout === 'vertical') {
+        const layout = workspace.layout;
+
+        if (layout.currentLayout === 'vertical') {
             let clientY = e.clientY;
             if (e.touches) {
                 clientY = e.touches[0].clientY;
             }
-            const containerRect = view.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const containerRect = layout.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
             const relativeY = clientY - containerRect.top;
-            const containerHeight = view.OUTLINE_FIND_CONTAINER.offsetHeight;
-            if (relativeY >= view.minHeight && relativeY <= containerHeight - view.minHeight) {
-                view.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
-                view.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            const containerHeight = layout.OUTLINE_FIND_CONTAINER.offsetHeight;
+            if (relativeY >= layout.minHeight && relativeY <= containerHeight - layout.minHeight) {
+                layout.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
+                layout.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
         } else {
             let clientX = e.clientX;
             if (e.touches) {
                 clientX = e.touches[0].clientX;
             }
-            const containerRect = view.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const containerRect = layout.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
             const relativeX = clientX - containerRect.left;
-            const containerWidth = view.OUTLINE_FIND_CONTAINER.offsetWidth;
-            if (relativeX >= view.minHeight && relativeX <= containerWidth - view.minHeight) {
-                view.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
-                view.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            const containerWidth = layout.OUTLINE_FIND_CONTAINER.offsetWidth;
+            if (relativeX >= layout.minHeight && relativeX <= containerWidth - layout.minHeight) {
+                layout.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
+                layout.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
-            view.renderTree();
+            workspace.view.renderTree();
         }
-        view.positionCrossDragger();
-        view.updateCollapseAllPosition();
+        layout.positionCrossDragger();
+        layout.updateCollapseAllPosition();
     }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startSecondaryDrag = (e: Event) => {
-        workspace.view.secondaryIsDragging = true;
+        workspace.layout.secondaryIsDragging = true;
         document.body.classList.add('dragging-secondary');
         e.preventDefault();
         document.addEventListener('mousemove', this.handleSecondaryDrag);
@@ -762,21 +761,22 @@ export class LeoController {
     }
 
     private stopSecondaryDrag = () => {
-        const view = workspace.view;
-        if (view.secondaryIsDragging) {
-            view.secondaryIsDragging = false;
+        const layout = workspace.layout;
+        if (layout.secondaryIsDragging) {
+            layout.secondaryIsDragging = false;
             document.body.classList.remove('dragging-secondary');
             document.removeEventListener('mousemove', this.handleSecondaryDrag);
             document.removeEventListener('mouseup', this.stopSecondaryDrag);
             document.removeEventListener('touchmove', this.handleSecondaryDrag);
             document.removeEventListener('touchend', this.stopSecondaryDrag);
-            view.updateSecondaryProportion();
-            view.renderTree();
+            layout.updateSecondaryProportion();
+            workspace.view.renderTree();
         }
     }
 
     private handleCrossDrag = utils.throttle((e) => {
-        const view = workspace.view;
+        const layout = workspace.layout;
+
         let clientX = e.clientX;
         let clientY = e.clientY;
         if (e.touches) {
@@ -784,50 +784,50 @@ export class LeoController {
             clientY = e.touches[0].clientY;
         }
 
-        if (view.currentLayout === 'vertical') {
+        if (layout.currentLayout === 'vertical') {
             // Handle cross drag when in vertical layout
 
             // do main first as per handleDrag
             const newWidth = clientX;
-            if (newWidth >= view.minWidth) {
-                view.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
+            if (newWidth >= layout.minWidth) {
+                layout.OUTLINE_FIND_CONTAINER.style.width = (newWidth - 3) + 'px';
             } else {
-                view.OUTLINE_FIND_CONTAINER.style.width = (view.minWidth - 3) + 'px';
+                layout.OUTLINE_FIND_CONTAINER.style.width = (layout.minWidth - 3) + 'px';
             }
             // then secondary as per handleSecondaryDrag
-            const containerRect = view.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const containerRect = layout.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
             const relativeY = clientY - containerRect.top;
-            const containerHeight = view.OUTLINE_FIND_CONTAINER.offsetHeight;
-            if (relativeY >= view.minHeight && relativeY <= containerHeight - view.minHeight) {
-                view.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
-                view.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            const containerHeight = layout.OUTLINE_FIND_CONTAINER.offsetHeight;
+            if (relativeY >= layout.minHeight && relativeY <= containerHeight - layout.minHeight) {
+                layout.OUTLINE_PANE.style.flex = `0 0 ${relativeY - 8}px`;
+                layout.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
         } else {
             // Handle cross drag when in horizontal layout
 
             // do main first as per handleDrag
-            const newHeight = clientY - view.TOP_MENU_TOGGLE.offsetHeight;
-            if (newHeight >= view.minWidth) {
-                view.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
+            const newHeight = clientY - workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            if (newHeight >= layout.minWidth) {
+                layout.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
             } else {
-                view.OUTLINE_FIND_CONTAINER.style.height = (view.minWidth - 3) + 'px';
+                layout.OUTLINE_FIND_CONTAINER.style.height = (layout.minWidth - 3) + 'px';
             }
             // then secondary as per handleSecondaryDrag
-            const containerRect = view.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
+            const containerRect = layout.OUTLINE_FIND_CONTAINER.getBoundingClientRect();
             const relativeX = clientX - containerRect.left;
-            const containerWidth = view.OUTLINE_FIND_CONTAINER.offsetWidth;
-            if (relativeX >= view.minHeight && relativeX <= containerWidth - view.minHeight) {
-                view.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
-                view.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
+            const containerWidth = layout.OUTLINE_FIND_CONTAINER.offsetWidth;
+            if (relativeX >= layout.minHeight && relativeX <= containerWidth - layout.minHeight) {
+                layout.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
+                layout.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
         }
-        view.positionCrossDragger();
-        view.renderTree(); // Render afterward as it would be in each branch of the if/else
-        view.updateCollapseAllPosition();
+        layout.positionCrossDragger();
+        workspace.view.renderTree(); // Render afterward as it would be in each branch of the if/else
+        layout.updateCollapseAllPosition();
     }, Constants.DRAG_DEBOUNCE_DELAY);
 
     private startCrossDrag = (e: Event) => {
-        workspace.view.crossIsDragging = true;
+        workspace.layout.crossIsDragging = true;
         document.body.classList.add('dragging-cross');
         e.preventDefault();
         document.addEventListener('mousemove', this.handleCrossDrag);
@@ -838,30 +838,30 @@ export class LeoController {
     }
 
     private stopCrossDrag = () => {
-        const view = workspace.view;
-        if (view.crossIsDragging) {
-            view.crossIsDragging = false;
+        const layout = workspace.layout;
+        if (layout.crossIsDragging) {
+            layout.crossIsDragging = false;
             document.body.classList.remove('dragging-cross');
             document.removeEventListener('mousemove', this.handleCrossDrag);
             document.removeEventListener('mouseup', this.stopCrossDrag);
             document.removeEventListener('touchmove', this.handleCrossDrag);
             document.removeEventListener('touchend', this.stopCrossDrag);
-            view.updateProportion();
-            view.updateSecondaryProportion();
-            view.renderTree();
+            layout.updateProportion();
+            layout.updateSecondaryProportion();
+            workspace.view.renderTree();
         }
     }
 
     private handleLayoutToggleClick = () => {
-        workspace.view.toggleLayout();
+        workspace.layout.toggleLayout();
     }
 
     private handleMenuToggleClick = () => {
-        workspace.view.toggleMenu();
+        workspace.menu.toggleMenu();
     }
 
     private handleThemeToggleClick = () => {
-        workspace.view.toggleTheme();
+        workspace.layout.toggleTheme();
     }
 
     private refreshHoistButtonStates(): void {
@@ -882,7 +882,7 @@ export class LeoController {
                 w_canHoist = false;
             }
         }
-        workspace.view.updateHoistButtonStates(
+        workspace.menu.updateHoistButtonStates(
             w_canHoist,
             !!c.hoistStack.length
         );
@@ -908,7 +908,7 @@ export class LeoController {
             }
         }
 
-        workspace.view.updateContextMenuState(
+        workspace.menu.updateContextMenuState(
             !isMarked,
             isMarked,
             w_canHoist,
@@ -969,30 +969,31 @@ export class LeoController {
     }
 
     private saveLayoutPreferences() {
-        const view = workspace.view;
+        const layout = workspace.layout;
         const layoutPreferences = {
-            mainRatio: view.mainRatio,
-            secondaryRatio: view.secondaryRatio,
-            theme: view.currentTheme,
-            layout: view.currentLayout,
-            menuVisible: view.isMenuShown
+            mainRatio: layout.mainRatio,
+            secondaryRatio: layout.secondaryRatio,
+            theme: layout.currentTheme,
+            layout: layout.currentLayout,
+            menuVisible: workspace.menu.isMenuShown
         };
         utils.safeLocalStorageSet('layoutPreferences', JSON.stringify(layoutPreferences));
     }
 
     private saveConfigPreferences() {
         const view = workspace.view;
+        const menu = workspace.menu;
         const selectedFindScope = this.getFindScope();
 
         const preferences = {
-            showPrevNextMark: view.SHOW_PREV_NEXT_MARK.checked,
-            showToggleMark: view.SHOW_TOGGLE_MARK.checked,
-            showPrevNextHistory: view.SHOW_PREV_NEXT_HISTORY.checked,
-            showHoistDehoist: view.SHOW_HOIST_DEHOIST.checked,
-            showLayoutOrientation: view.SHOW_LAYOUT_ORIENTATION.checked,
-            showThemeToggle: view.SHOW_THEME_TOGGLE.checked,
-            showNodeIcons: view.SHOW_NODE_ICONS.checked,
-            showCollapseAll: view.SHOW_COLLAPSE_ALL.checked,
+            showPrevNextMark: menu.SHOW_PREV_NEXT_MARK.checked,
+            showToggleMark: menu.SHOW_TOGGLE_MARK.checked,
+            showPrevNextHistory: menu.SHOW_PREV_NEXT_HISTORY.checked,
+            showHoistDehoist: menu.SHOW_HOIST_DEHOIST.checked,
+            showLayoutOrientation: menu.SHOW_LAYOUT_ORIENTATION.checked,
+            showThemeToggle: menu.SHOW_THEME_TOGGLE.checked,
+            showNodeIcons: menu.SHOW_NODE_ICONS.checked,
+            showCollapseAll: menu.SHOW_COLLAPSE_ALL.checked,
             // Find-pane options
             findWholeWord: view.OPT_WHOLE.checked,
             findIgnoreCase: view.OPT_IGNORECASE.checked,
@@ -1007,18 +1008,20 @@ export class LeoController {
 
     private loadConfigPreferences() {
         const view = workspace.view;
+        const menu = workspace.menu;
+
         const savedPrefs = utils.safeLocalStorageGet('configPreferences');
         if (savedPrefs) {
             try {
                 const prefs = JSON.parse(savedPrefs);
-                view.SHOW_PREV_NEXT_MARK.checked = prefs.showPrevNextMark ?? false;
-                view.SHOW_TOGGLE_MARK.checked = prefs.showToggleMark ?? false;
-                view.SHOW_PREV_NEXT_HISTORY.checked = prefs.showPrevNextHistory ?? true;
-                view.SHOW_HOIST_DEHOIST.checked = prefs.showHoistDehoist ?? false;
-                view.SHOW_LAYOUT_ORIENTATION.checked = prefs.showLayoutOrientation ?? true;
-                view.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
-                view.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
-                view.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
+                menu.SHOW_PREV_NEXT_MARK.checked = prefs.showPrevNextMark ?? false;
+                menu.SHOW_TOGGLE_MARK.checked = prefs.showToggleMark ?? false;
+                menu.SHOW_PREV_NEXT_HISTORY.checked = prefs.showPrevNextHistory ?? true;
+                menu.SHOW_HOIST_DEHOIST.checked = prefs.showHoistDehoist ?? false;
+                menu.SHOW_LAYOUT_ORIENTATION.checked = prefs.showLayoutOrientation ?? true;
+                menu.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
+                menu.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
+                menu.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
                 // Find-pane options
                 view.OPT_WHOLE.checked = prefs.findWholeWord ?? view.OPT_WHOLE.checked;
                 view.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? view.OPT_IGNORECASE.checked;

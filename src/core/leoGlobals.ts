@@ -7,6 +7,7 @@
 //@+<< imports >>
 //@+node:felix.20251207215313.2: ** << imports >>
 import { workspace } from '../workspace';
+import * as utils from '../utils';
 import * as os from 'os';
 import * as path from 'path';
 import * as showdownObj from "showdown";
@@ -3933,7 +3934,7 @@ export function es_print_unique_message(message: string, color?: string): boolea
 //@+node:felix.20251207215313.202: ** g.Miscellaneous
 //@+node:felix.20251207215313.203: *3* g.IDDialog
 export function IDDialog(): Thenable<string> {
-    return workspace.view.showInputDialog({
+    return workspace.dialog.showInputDialog({
         title: "Enter Leo id",
         prompt: "Please enter an id that identifies you uniquely.\n(Letters and numbers only, and at least 3 characters in length)",
     }).then((id) => {
@@ -4263,7 +4264,7 @@ export async function os_listdir(p_path: string): Promise<string[]> {
 }
 //@+node:felix.20251207215313.223: *3* g.setStatusLabel
 export function setStatusLabel(s: string): void {
-    workspace.view.showToast(s);
+    workspace.dialog.showToast(s);
 }
 //@+node:felix.20251207215313.224: *3* g.truncate
 export function truncate(s: string, n: number): string {
@@ -6097,7 +6098,7 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
 
             // It'S a file in the workspace
             const fileUri = makeUri(leo_path);
-            await workspace.view.showTextDocument(fileUri);
+            await utils.showTextDocument(fileUri);
 
 
         } else {
