@@ -6,7 +6,7 @@ import { Focus, ReqRefresh } from "./types";
 import { Uri } from "./workspace";
 
 /**
- * * Make all command/key bindings 
+ * Make all command/key bindings for the application.
  */
 export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
     // Shortcut pointers for readability

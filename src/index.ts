@@ -15,7 +15,7 @@ import { MenuManager } from './menu-manager';
 import { LayoutManager } from './layout-manager';
 import { OutlineManager } from './outline-manager';
 import { BodyManager } from './body-manager';
-import { LogPaneView } from './log-pane-view';
+import { LogPaneManager } from './log-pane-manager';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
@@ -59,7 +59,7 @@ class LeoWebApp {
         const body = new BodyManager();
         workspace.setBodyView(body);
 
-        const logPane = new LogPaneView();
+        const logPane = new LogPaneManager();
         workspace.setLogPaneView(logPane);
 
         const controller = new LeoController();

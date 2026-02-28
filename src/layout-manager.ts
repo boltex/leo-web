@@ -1,6 +1,10 @@
 import * as utils from './utils';
 import { workspace } from './workspace';
 
+/**
+ * Layout Manager is responsible for managing the overall layout of the application, including the outline pane, body pane, and log pane.
+ * It handles drag-handles, resizing, theme and layout toggling, and tracking the last focused element used when opening/closing menus.
+ */
 export class LayoutManager {
 
     public HTML_ELEMENT: HTMLElement;

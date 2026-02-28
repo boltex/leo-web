@@ -1,4 +1,18 @@
-export class LogPaneView {
+/**
+ * Log Pane contains Log, Find, Nav, and Settings controls. Each with its respctive tab at the top. 
+ * This class manages the UI controls within this pane, but not the layout of the pane itself (see LayoutManager).
+ */
+export class LogPaneManager {
+
+    // Tabs
+    public LOG_TAB: HTMLDivElement;
+    public FIND_TAB: HTMLDivElement;
+    public NAV_TAB: HTMLDivElement;
+    // public UNDO_TAB: HTMLDivElement; // Maybe add undo tab functionality later
+    public SETTINGS_TAB: HTMLDivElement;
+
+    // Log text content
+    public LOG_CONTENT: HTMLElement;
 
     // Find controls
     public FIND_INPUT: HTMLInputElement;
@@ -19,17 +33,19 @@ export class LogPaneView {
     public FREEZE: HTMLElement;
     public GOTO_PANE: HTMLElement;
 
-    public LOG_CONTENT: HTMLElement;
-
-    public LOG_TAB: HTMLDivElement;
-    public FIND_TAB: HTMLDivElement;
-    public NAV_TAB: HTMLDivElement;
-    // public UNDO_TAB: HTMLDivElement; // Maybe add undo tab functionality later
-    public SETTINGS_TAB: HTMLDivElement;
-
     public HTML_ELEMENT: HTMLElement;
 
     constructor() {
+
+        // Tabs
+        this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
+        this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
+        this.NAV_TAB = document.getElementById('nav-tab')! as HTMLDivElement;
+        // this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
+        this.SETTINGS_TAB = document.getElementById('settings-tab')! as HTMLDivElement;
+
+        // Log text content
+        this.LOG_CONTENT = document.getElementById('log-controls')!;
 
         // Find controls
         this.FIND_INPUT = document.getElementById('find-input')! as HTMLInputElement;
@@ -49,16 +65,6 @@ export class LogPaneView {
         this.NAV_TEXT = document.getElementById('navText') as HTMLInputElement;
         this.FREEZE = document.getElementById('freeze') as HTMLElement; // Simple div
         this.GOTO_PANE = document.getElementById('gotoPane') as HTMLElement; // Simple div
-
-        // Log text content
-        this.LOG_CONTENT = document.getElementById('log-controls')!;
-
-        // Tabs
-        this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
-        this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
-        this.NAV_TAB = document.getElementById('nav-tab')! as HTMLDivElement;
-        // this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
-        this.SETTINGS_TAB = document.getElementById('settings-tab')! as HTMLDivElement;
 
         this.HTML_ELEMENT = document.documentElement;
 

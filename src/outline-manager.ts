@@ -2,6 +2,10 @@ import { Position } from './core/leoNodes';
 import { FlatRowLeo } from './types';
 import { workspace } from './workspace';
 
+/**
+ * Outline Manager renders only the visible portion of the tree and provides a responsive UI for headline editing.
+ * It receives the flat list of visible nodes (flatRowsLeo) from the controller, which computes it based on the current tree state and user interactions.
+ */
 export class OutlineManager {
 
     public selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane

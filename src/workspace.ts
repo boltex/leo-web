@@ -4,7 +4,7 @@ import { FileStat } from "./types";
 import { BodyManager } from "./body-manager";
 import { DialogManager } from "./dialog-manager";
 import { LayoutManager } from "./layout-manager";
-import { LogPaneView } from "./log-pane-view";
+import { LogPaneManager } from "./log-pane-manager";
 import { MenuManager } from "./menu-manager";
 import { OutlineManager } from "./outline-manager";
 
@@ -166,7 +166,7 @@ class Workspace {
     public layout!: LayoutManager;
     public outline!: OutlineManager;
     public body!: BodyManager;
-    public logPane!: LogPaneView;
+    public logPane!: LogPaneManager;
 
 
     public controller!: LeoController;
@@ -197,7 +197,7 @@ class Workspace {
     public setBodyView(body: BodyManager) {
         this.body = body;
     }
-    public setLogPaneView(logPane: LogPaneView) {
+    public setLogPaneView(logPane: LogPaneManager) {
         this.logPane = logPane;
     }
 

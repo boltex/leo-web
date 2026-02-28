@@ -2,6 +2,10 @@ import * as utils from './utils';
 import { workspace } from './workspace';
 import * as body from './body'
 
+/**
+ * Body Manager is responsible for managing the body pane, which includes rendering the body text, handling user interactions
+ * (selection, scroll, input), and providing an API for the controller to manipulate the body content and state.
+ */
 export class BodyManager {
 
     private _changeSelectionTimer: ReturnType<typeof setTimeout> | undefined;

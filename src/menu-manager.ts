@@ -2,6 +2,10 @@ import { workspace } from './workspace';
 
 import { MenuEntry } from "./types";
 
+/**
+ * Manages the UI controls that launch commands or change settings. 
+ * (see LayoutManager for layout related controls and LogPaneManager for log, find, nav, and settings tabs.)
+ */
 export class MenuManager {
 
     public HTML_ELEMENT: HTMLElement;

@@ -10,6 +10,10 @@ import { Uri, workspace } from './workspace';
 
 type QuickPickInternalItem = QuickPickItem & { renderedLabel?: string };
 
+/**
+ * Dialog Manager is responsible for managing all modal and non-modal dialogs in the application.
+ * It maintains a queue of dialog requests to ensure that only one dialog is open at a time and handles focus management.
+ */
 export class DialogManager {
 
     public HTML_ELEMENT: HTMLElement;
