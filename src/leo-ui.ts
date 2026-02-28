@@ -36,7 +36,8 @@ import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
 
 /**
- * Creates and manages instances of the UI elements along with their events
+ * Implements LeoGUI instanced as g.app.gui at startup.
+ * Uses workspace members such as workspace.controller, workspace.body, workspace.outline, etc. to manipulate the UI and react to user interactions. 
  */
 export class LeoUI extends NullGui {
 

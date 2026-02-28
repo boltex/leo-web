@@ -7,7 +7,7 @@ import './style.css';
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager } from './core/leoApp';
 
-import { LeoController } from './controller';
+import { Controller } from './controller';
 import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
 import { DialogManager } from './dialog-manager';
@@ -62,7 +62,7 @@ class LeoWebApp {
         const logPane = new LogPaneManager();
         workspace.setLogPaneView(logPane);
 
-        const controller = new LeoController();
+        const controller = new Controller();
         workspace.setController(controller);
 
         await controller.initialize();

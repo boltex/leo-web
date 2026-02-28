@@ -1,6 +1,6 @@
 import { Constants } from "./constants";
 import { Position } from "./core/leoNodes";
-import { LeoController } from "./controller";
+import { Controller } from "./controller";
 import { LeoUI } from "./leo-ui";
 import { Focus, ReqRefresh } from "./types";
 import { Uri } from "./workspace";
@@ -8,7 +8,7 @@ import { Uri } from "./workspace";
 /**
  * Make all command/key bindings for the application.
  */
-export function makeAllBindings(leoUI: LeoUI, controller: LeoController): void {
+export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
     // Shortcut pointers for readability
     const U = undefined;
     const CMD = Constants.COMMANDS;

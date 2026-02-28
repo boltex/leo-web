@@ -1,5 +1,5 @@
 import { openDB } from "idb";
-import { LeoController } from "./controller";
+import { Controller } from "./controller";
 import { FileStat } from "./types";
 import { BodyManager } from "./body-manager";
 import { DialogManager } from "./dialog-manager";
@@ -169,7 +169,7 @@ class Workspace {
     public logPane!: LogPaneManager;
 
 
-    public controller!: LeoController;
+    public controller!: Controller;
     private _context: any = {}; // Arbitrary context data
 
     constructor() { }
@@ -201,7 +201,7 @@ class Workspace {
         this.logPane = logPane;
     }
 
-    public setController(controller: LeoController) {
+    public setController(controller: Controller) {
         this.controller = controller;
     }
 

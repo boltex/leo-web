@@ -10,7 +10,7 @@ import { keybindings } from "./keybindings";
 
 const defaultTitle = "Leo Editor for the web";
 
-export class LeoController {
+export class Controller {
 
     private _commands: Record<string, (...args: any[]) => any> = {};
 
