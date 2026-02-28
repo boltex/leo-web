@@ -1,12 +1,12 @@
 import { openDB } from "idb";
-import { LeoController } from "./LeoController";
+import { LeoController } from "./controller";
 import { FileStat } from "./types";
-import { BodyView } from "./body-view";
+import { BodyManager } from "./body-manager";
 import { DialogManager } from "./dialog-manager";
 import { LayoutManager } from "./layout-manager";
 import { LogPaneView } from "./log-pane-view";
 import { MenuManager } from "./menu-manager";
-import { OutlineView } from "./outline-view";
+import { OutlineManager } from "./outline-manager";
 
 const DB_NAME = "leo-workspace";
 const DB_VERSION = 1;
@@ -164,8 +164,8 @@ class Workspace {
     public dialog!: DialogManager;
     public menu!: MenuManager;
     public layout!: LayoutManager;
-    public outline!: OutlineView;
-    public body!: BodyView;
+    public outline!: OutlineManager;
+    public body!: BodyManager;
     public logPane!: LogPaneView;
 
 
@@ -191,10 +191,10 @@ class Workspace {
     public setLayoutManager(layout: LayoutManager) {
         this.layout = layout;
     }
-    public setOutlineView(outline: OutlineView) {
+    public setOutlineView(outline: OutlineManager) {
         this.outline = outline;
     }
-    public setBodyView(body: BodyView) {
+    public setBodyView(body: BodyManager) {
         this.body = body;
     }
     public setLogPaneView(logPane: LogPaneView) {

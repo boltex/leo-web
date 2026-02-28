@@ -53,7 +53,7 @@ import * as csv from 'csvtojson';
 import KSUID from 'ksuid';
 // import KSUID = require('ksuid');
 import { Uri, workspace } from '../workspace';
-import { OutlineViewerHtml } from '../OutlineViewerHtml';
+import { OutlineViewerHtml } from '../outline-viewer-html';
 
 // Make sure crypto functions are available.
 // crypto.randomUUID = globalThis.crypto.randomUUID;

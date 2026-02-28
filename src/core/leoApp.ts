@@ -28,7 +28,7 @@ import { Constants } from '../constants';
 import { ExternalFilesController } from './leoExternalFiles';
 import { LeoFrame } from './leoFrame';
 import { SettingsDict } from './leoGlobals';
-import { LeoUI } from '../leoUI';
+import { LeoUI } from '../leo-ui';
 import { GlobalCacher, SqlitePickleShare } from './leoCache';
 // importers
 import * as importer_c from '../importers/c';

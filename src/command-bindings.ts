@@ -1,7 +1,7 @@
 import { Constants } from "./constants";
 import { Position } from "./core/leoNodes";
-import { LeoController } from "./LeoController";
-import { LeoUI } from "./leoUI";
+import { LeoController } from "./controller";
+import { LeoUI } from "./leo-ui";
 import { Focus, ReqRefresh } from "./types";
 import { Uri } from "./workspace";
 

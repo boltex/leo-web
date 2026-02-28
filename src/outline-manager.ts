@@ -2,7 +2,7 @@ import { Position } from './core/leoNodes';
 import { FlatRowLeo } from './types';
 import { workspace } from './workspace';
 
-export class OutlineView {
+export class OutlineManager {
 
     public selectedLabelElement: HTMLSpanElement | null = null; // Track the currently selected label element in the outline pane
 

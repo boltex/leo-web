@@ -2,7 +2,7 @@ import * as utils from './utils';
 import { workspace } from './workspace';
 import * as body from './body'
 
-export class BodyView {
+export class BodyManager {
 
     private _changeSelectionTimer: ReturnType<typeof setTimeout> | undefined;
     private _changeScrollTimer: ReturnType<typeof setTimeout> | undefined;

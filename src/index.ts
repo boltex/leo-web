@@ -7,14 +7,14 @@ import './style.css';
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager } from './core/leoApp';
 
-import { LeoController } from './LeoController';
+import { LeoController } from './controller';
 import { Uri, workspace } from "./workspace";
 import * as utils from "./utils";
 import { DialogManager } from './dialog-manager';
 import { MenuManager } from './menu-manager';
 import { LayoutManager } from './layout-manager';
-import { OutlineView } from './outline-view';
-import { BodyView } from './body-view';
+import { OutlineManager } from './outline-manager';
+import { BodyManager } from './body-manager';
 import { LogPaneView } from './log-pane-view';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
@@ -53,10 +53,10 @@ class LeoWebApp {
         const layout = new LayoutManager();
         workspace.setLayoutManager(layout);
 
-        const outline = new OutlineView();
+        const outline = new OutlineManager();
         workspace.setOutlineView(outline);
 
-        const body = new BodyView();
+        const body = new BodyManager();
         workspace.setBodyView(body);
 
         const logPane = new LogPaneView();

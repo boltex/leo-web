@@ -1,5 +1,5 @@
 import * as utils from "./utils";
-import { LeoUI } from "./leoUI";
+import { LeoUI } from "./leo-ui";
 import { Constants } from "./constants";
 import { LeoPackageStates } from "./types";
 import { Position } from "./core/leoNodes";
