@@ -12,14 +12,14 @@ import { Position } from "./core/leoNodes";
 export class LeoStates {
 
     /**
-     * Used mostly for leojsOutline ViewsWelcome content
+     * Used mostly for leoWebOutline ViewsWelcome content
      */
-    private _leojsStartupDone: boolean = false;
-    get leojsStartupDone(): boolean {
-        return this._leojsStartupDone;
+    private _leoWebStartupDone: boolean = false;
+    get leoWebStartupDone(): boolean {
+        return this._leoWebStartupDone;
     }
-    set leojsStartupDone(p_value: boolean) {
-        this._leojsStartupDone = p_value;
+    set leoWebStartupDone(p_value: boolean) {
+        this._leoWebStartupDone = p_value;
         utils.setContext(Constants.CONTEXT_FLAGS.LEO_STARTUP_DONE, p_value);
     }
 

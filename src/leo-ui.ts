@@ -182,8 +182,8 @@ export class LeoUI extends NullGui {
     }
 
     public async chooseNewWorkspace(): Promise<boolean> {
-        // Perform the 'quit' command to force asking to save unsaved changeswwwwwwwwwwww
-        // Then clear the workspace from db and force-refresh the page to restart leojs
+        // Perform the 'quit' command to force asking to save unsaved changes
+        // Then clear the workspace from db and force-refresh the page to restart leoWeb
         // This will have the effect of closing all opened documents and then asking for a new workspace
         for (const c of g.app.commanders()) {
             const closed = await g.app.closeLeoWindow(c.frame)
@@ -197,7 +197,7 @@ export class LeoUI extends NullGui {
             console.error('Error clearing workspace:', e);
         });
 
-        // Reload the page to restart leojs
+        // Reload the page to restart leoWeb
         window.location.reload();
 
 
@@ -245,7 +245,7 @@ export class LeoUI extends NullGui {
         } else {
             this.leoStates.leoIdUnset = true; // Block most UI & commands until 'setLeoIDCommand' succeeds.
         }
-        this.leoStates.leojsStartupDone = true;
+        this.leoStates.leoWebStartupDone = true;
         this.fullRefresh();
     }
 
@@ -1795,9 +1795,7 @@ export class LeoUI extends NullGui {
         }
         this._lastSettingsUsed = w_settings;
 
-        // TODO : setSettings with w_settings
-        console.log('TODO : setSettings with w_settings', w_settings);
-        // workspace.view.setFindNavSettings(w_settings);
+        workspace.logPane.setSettings(w_settings);
 
     }
 
@@ -2334,7 +2332,7 @@ export class LeoUI extends NullGui {
 
     /**
      * * Command to get the LeoID from dialog, save it to user settings.
-     * Start leojs if the ID is valid, and not already started.
+     * Start Leo-Web if the ID is valid, and not already started.
      */
     public setLeoIDCommand(): Thenable<unknown> {
         return g.IDDialog().then((p_id) => {
@@ -2351,7 +2349,7 @@ export class LeoUI extends NullGui {
     }
 
     /**
-     * * Returns the leoID from the leojs settings
+     * * Returns the leoID from the Leo-Web settings
      */
     public getIdFromSetting(): string {
         return this.config.leoID;
@@ -2376,8 +2374,8 @@ export class LeoUI extends NullGui {
             if (g.app.nodeIndices) {
                 g.app.nodeIndices.userId = p_leoID;
             }
-            // If LeoJS had finish its startup without valid LeoID, set ready flags!
-            if (!this.leoStates.leoReady && this.leoStates.leojsStartupDone && this.leoStates.leoIdUnset) {
+            // If Leo-Web had finish its startup without valid LeoID, set ready flags!
+            if (!this.leoStates.leoReady && this.leoStates.leoWebStartupDone && this.leoStates.leoIdUnset) {
                 if (g.app.leoID && g.app.leoID !== 'None') {
                     this.createLogPane();
                     this.leoStates.leoIdUnset = false;
