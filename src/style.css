@@ -1101,12 +1101,20 @@ body.dragging-secondary .node {
 }
 
 #find-controls {
-  padding: 0.5rem 0 0 0.5rem;
+  padding: 0.5rem 0.5rem 0 0.5rem;
   display: var(--find-display);
   flex-direction: column;
   flex-wrap: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;
+  min-height: 0;
+  flex-grow: 1;
+}
+
+#nav-controls label,
+#find-controls label,
+#config-controls label {
+  white-space: nowrap;
 }
 
 #nav-tab {
@@ -1141,6 +1149,9 @@ body.dragging-secondary .node {
   padding-top: 0.5rem;
   display: var(--settings-display);
   overflow-x: hidden;
+  overflow-y: hidden;
+}
+#config-controls:hover {
   overflow-y: auto;
 }
 
@@ -1296,11 +1307,14 @@ body.dragging-secondary .node {
 }
 
 .bottom-scroll {
+  gap: 0.35rem;
   display: flex;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: hidden;
+  overflow-x: hidden;
   align-self: stretch;
+  margin-right: -0.5rem; /* compensate for padding */
 }
 
 .bottom-scroll:hover {

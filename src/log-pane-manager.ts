@@ -319,6 +319,10 @@ export class LogPaneManager {
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
     }
 
+    public focusFindInput() {
+        this.FIND_INPUT.select();
+    }
+
     public addToLogPane(message: string, replace = false) {
         if (replace) {
             this.LOG_CONTENT.textContent = message + (message ? '\n' : '');

@@ -1754,6 +1754,23 @@ export class LeoUI extends NullGui {
 
     }
 
+    /**
+     * * Opens the find panel and selects all & focuses on the find field.
+     */
+    public startSearch(): void {
+
+        this.triggerBodySave(true);
+
+        // Use workspace.logPane to set the selected tab to 'find' and focus the find input field.
+        workspace.logPane.showTab('find');
+        setTimeout(() => {
+            workspace.logPane.focusFindInput();
+        }, 0);
+
+        // workspace.logPane.
+        // { type: 'selectFind' }
+    }
+
 
     /**
      * * Gets the search settings from Leo, and applies them to the find panel webviews
