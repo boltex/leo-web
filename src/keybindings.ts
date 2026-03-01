@@ -393,6 +393,15 @@ export const keybindings: Keybinding[] = [
         enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
+        command: CMD.FIND_QUICK_GO_ANYWHERE,
+        key: "ctrl+p",
+        mac: "cmd+p",
+        outline: true,
+        body: true,
+        find: true,
+        enabledFlagsSet: [FLAGS.TREE_OPENED]
+    },
+    {
         command: CMD.START_SEARCH,
         key: "ctrl+f",
         mac: "cmd+f",

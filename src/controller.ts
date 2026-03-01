@@ -375,12 +375,16 @@ export class Controller {
             const index = g.app.windowList.indexOf(frame);
             tab.addEventListener("click", () => {
                 g.app.gui.selectOpenedLeoDocument(index);
+                // Set focus back as per same way the menu items clicked bring back focus.
+                workspace.layout.restoreLastFocusedElement();
+
             });
             // Also setup handler for middle-click to close the document
             tab.addEventListener("auxclick", (e) => {
                 if (e.button === 1) { // Middle click
                     e.preventDefault();
                     g.app.gui.closeLeoFile(index);
+                    workspace.layout.restoreLastFocusedElement();
                 }
             });
             // Add handler to the close button inside the tab
@@ -388,6 +392,7 @@ export class Controller {
             closeBtn?.addEventListener("click", (e) => {
                 e.stopPropagation(); // prevent triggering the tab click event
                 g.app.gui.closeLeoFile(index);
+                workspace.layout.restoreLastFocusedElement();
             });
         }
     }
