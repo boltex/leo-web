@@ -15,6 +15,7 @@ import {
     ConfigSetting,
     Focus,
     LeoDocument,
+    LeoGotoNavKey,
     LeoGuiFindTabManagerSettings,
     LeoPackageStates,
     LeoSearchSettings,
@@ -34,6 +35,7 @@ import { makeAllBindings } from "./command-bindings";
 import { menuData } from "./menu";
 import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
+import { QuickSearchController } from "./core/quicksearch";
 
 /**
  * Implements LeoGUI instanced as g.app.gui at startup.
@@ -136,6 +138,78 @@ export class LeoUI extends NullGui {
         this.showdownConverter = new showdown.Converter();
 
         window.addEventListener('beforeunload', this.onBeforeUnload);
+
+        // * Leo Find Panel
+        workspace.logPane.setPostMessageCallback(this._resolveFindPaneMessage.bind(this));
+
+
+    }
+
+    private _resolveFindPaneMessage = (message: any): void => {
+        switch (message.type) {
+            case 'leoNavEnter': {
+                void this.navEnter();
+                break;
+            }
+            case 'leoNavTextChange': {
+                void this.navTextChange();
+                break;
+            }
+            case 'leoNavClear': {
+                void this.navTextClear();
+                break;
+            }
+            // TODO.
+            // case 'leoNavMarkedList': {
+            //     void this.findQuickMarked(true);
+            //     break;
+            // }
+            case 'leoFindNext': {
+                this.find(true, false);
+                break;
+            }
+            case 'leoFindPrevious': {
+                this.find(true, true);
+                break;
+            }
+            case 'searchConfig': {
+                void this.saveSearchSettings(message.value);
+                break;
+            }
+            case 'replace': {
+                void this.replace(true, false);
+                break;
+            }
+            case 'replaceThenFind': {
+                void this.replace(true, true);
+                break;
+            }
+            // TODO.
+            // case 'navigateNavEntry': {
+            //     void this.navigateNavEntry(message.value);
+            //     break;
+            // }
+            case 'refreshSearchConfig': {
+                void this.triggerBodySave(true);
+                // Leave a cycle before getting settings
+                setTimeout(() => {
+                    this.loadSearchSettings();
+                }, 0);
+                break;
+            }
+            // TODO.
+            // case 'gotoCommand': {
+            //     try {
+            //         const w_index = Number(message.value);
+            //         if (!isNaN(w_index) && this.leoGotoProvider.nodeList[w_index]) {
+            //         }
+            //         void this.gotoNavEntry(this.leoGotoProvider.nodeList[w_index]);
+            //     } catch (e) {
+            //         console.log('goto nav entry failed for index: ', message.value);
+            //     }
+            //     break;
+            // }
+        }
     }
 
     private onBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -865,23 +939,25 @@ export class LeoUI extends NullGui {
 
         c.selectPosition(node);
 
-        if (this.findFocusTree) {
-            // had a range but now refresh from other than find/replace
-            // So make sure tree is also refreshed.
-            this.findFocusTree = false;
-            this.setupRefresh(
-                Focus.Outline,
-                {
-                    tree: true,
-                    body: true,
-                    // documents: false,
-                    // buttons: false,
-                    // states: false,
-                }
-            );
-            g.doHook("headclick2", { c: c, p: node, v: node });
-            return this._launchRefresh();
-        }
+        // * Unused in Leo-Web
+        // if (this.findFocusTree) {
+        //     // had a range but now refresh from other than find/replace
+        //     // So make sure tree is also refreshed.
+        //     this.findFocusTree = false;
+        //     this.setupRefresh(
+        //         Focus.Outline,
+        //         {
+        //             tree: true,
+        //             body: true,
+        //             // documents: false,
+        //             // buttons: false,
+        //             // states: false,
+        //         }
+        //     );
+        //     g.doHook("headclick2", { c: c, p: node, v: node });
+        //     return this._launchRefresh();
+        // }
+
         this._refreshType.states = true;
         this.getStates();
 
@@ -1754,23 +1830,259 @@ export class LeoUI extends NullGui {
 
     }
 
+
+    /**
+     * * Goto the next, previous, first or last nav entry via arrow keys in
+     */
+    public navigateNavEntry(p_nav: LeoGotoNavKey): void {
+        // TODO : Finish nav entry navigation implementation!
+        // void this.leoGotoProvider.navigateNavEntry(p_nav);
+    }
+
+    private _get_focus(): string {
+        const c = g.app.windowList[this.frameIndex].c;
+        const w = g.app.gui.get_focus(c);
+        const focus = g.app.gui.widget_name(w);
+        return focus;
+    }
+
+    /**
+     * * Handles an enter press in the 'nav pattern' input
+     */
+    public async navEnter(): Promise<unknown> {
+        await this.triggerBodySave(true);
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+
+        const inp = scon.navText;
+        if (scon.isTag) {
+            scon.qsc_find_tags(inp);
+        } else {
+            scon.qsc_search(inp);
+        }
+
+        return this.showNavResults();
+
+    }
+
+    /**
+     * * Handles a debounced text change in the nav pattern input box
+     */
+    public async navTextChange(): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+
+        const inp = scon.navText;
+        if (scon.isTag) {
+            scon.qsc_find_tags(inp);
+        } else {
+            const exp = inp.replace(/ /g, '*');
+            scon.qsc_background_search(exp);
+        }
+        return this.showNavResults();
+    }
+
+    /**
+     * * Clears the nav search results of the goto pane
+     */
+    public navTextClear(): void {
+
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+
+        scon.clear();
+
+        // TODO: Implement proper goto provider refresh!
+        // this.leoGotoProvider.refreshTreeRoot();
+    }
+
     /**
      * * Opens the find panel and selects all & focuses on the find field.
      */
     public startSearch(): void {
-
         this.triggerBodySave(true);
-
-        // Use workspace.logPane to set the selected tab to 'find' and focus the find input field.
         workspace.logPane.showTab('find');
         setTimeout(() => {
             workspace.logPane.focusFindInput();
         }, 0);
-
-        // workspace.logPane.
-        // { type: 'selectFind' }
     }
 
+    /**
+     * * Find next / previous commands
+     * @param p_fromOutline
+     * @param p_reverse
+     * @returns Promise that resolves when the "launch refresh" is started
+     */
+    public async find(p_fromOutline: boolean, p_reverse: boolean): Promise<unknown> {
+
+        this.triggerBodySave(true);
+        let found;
+        let focus;
+
+        const c = g.app.windowList[this.frameIndex].c;
+        const fc = c.findCommands;
+        let p: Position | undefined = c.p;
+
+        const fromOutline = p_fromOutline;
+        const fromBody = !fromOutline;
+
+        let w = this.get_focus(c);
+        focus = this.widget_name(w);
+
+        const inOutline = (focus.includes("tree")) || (focus.includes("head"));
+        const inBody = !inOutline;
+
+        if (fromOutline && inBody) {
+            fc.in_headline = true;
+        } else if (fromBody && inOutline) {
+            fc.in_headline = false;
+            c.bodyWantsFocus();
+            c.bodyWantsFocusNow();
+        }
+
+        let pos, newpos, settings;
+        settings = fc.ftm.get_settings();
+        if (p_reverse) {
+            [p, pos, newpos] = fc.do_find_prev(settings);
+        } else {
+            [p, pos, newpos] = fc.do_find_next(settings);
+        }
+
+        w = this.get_focus(c); // get focus again after the operation
+        focus = this.widget_name(w);
+        found = p && p.__bool__();
+
+        this.findFocusTree = false; // Reset flag for headline range
+
+        if (!found || !focus) {
+            return workspace.dialog.showInformationMessage('Not found');
+        } else {
+            let w_finalFocus = Focus.Body;
+            const w_focus = focus.toLowerCase();
+            if (w_focus.includes('tree') || w_focus.includes('head')) {
+                // tree
+                w_finalFocus = Focus.Outline;
+                // this.showOutlineIfClosed = true;
+                // * SETUP HEADLINE RANGE -> NOT NEEDED IN LEO-WEB ? 
+                this.findFocusTree = true;
+                // this.findHeadlineRange = [w.sel[0], w.sel[1]];
+                // this.findHeadlinePosition = c.p;
+            } else {
+                // this.showBodyIfClosed = true;
+            }
+            const w_scroll = (found && w_finalFocus === Focus.Body) || undefined;
+
+            this.setupRefresh(
+                w_finalFocus, // ! Unlike gotoNavEntry, this sets focus in outline -or- body.
+                {
+                    tree: true, // HAVE to refresh tree because find folds/unfolds only result outline paths
+                    body: true,
+                    scroll: w_scroll,
+                    // documents: false,
+                    // buttons: false,
+                    states: true,
+                },
+                this.findFocusTree
+            );
+
+            this._launchRefresh();
+
+            if (this.findFocusTree) {
+                setTimeout(() => {
+                    // Select headline if needed after refresh.
+                    this.editHeadline(undefined, false, [w.sel[0], w.sel[1]]);
+                }, 0);
+            }
+        }
+    }
+
+    /**
+     * * Replace / Replace-Then-Find commands
+     * @param p_fromOutline
+     * @param p_thenFind
+     * @returns Promise that resolves when the "launch refresh" is started
+     */
+    public async replace(p_fromOutline?: boolean, p_thenFind?: boolean): Promise<unknown> {
+
+        this.triggerBodySave(true);
+        let found;
+        let focus;
+
+        const c = g.app.windowList[this.frameIndex].c;
+        const fc = c.findCommands;
+
+        const fromOutline = p_fromOutline;
+        const fromBody = !fromOutline;
+
+        let w = this.get_focus(c);
+        focus = this.widget_name(w);
+
+        const inOutline = (focus.includes("tree")) || (focus.includes("head"));
+        const inBody = !inOutline;
+
+        if (fromOutline && inBody) {
+            fc.in_headline = true;
+        } else if (fromBody && inOutline) {
+            fc.in_headline = false;
+            c.bodyWantsFocus();
+            c.bodyWantsFocusNow();
+        }
+
+        found = false;
+
+        const settings = fc.ftm.get_settings();
+        fc.init_ivars_from_settings(settings); // ? Needed for fc.change_selection
+
+        fc.check_args('replace');
+        if (p_thenFind) {
+            found = fc.do_change_then_find(settings);
+        } else {
+            fc.change_selection(c.p);
+            found = true;
+        }
+
+        w = this.get_focus(c); // get focus again after the operation
+        focus = this.widget_name(w);
+
+        this.findFocusTree = false; // Reset flag for headline range
+
+        if (!found || !focus) {
+            void workspace.dialog.showInformationMessage('Not found'); // Flag not found/replaced!
+        }
+        if (focus) {
+            let w_finalFocus = Focus.Body;
+            const w_focus = focus.toLowerCase();
+            if (w_focus.includes('tree') || w_focus.includes('head')) {
+                // tree
+                w_finalFocus = Focus.Outline;
+                // this.showOutlineIfClosed = true;
+                // * SETUP HEADLINE RANGE
+                this.findFocusTree = true;
+                this.findHeadlineRange = [w.sel[0], w.sel[1]];
+                this.findHeadlinePosition = c.p;
+            } else {
+                // this.showBodyIfClosed = true;
+            }
+            const w_scroll = (found && w_finalFocus === Focus.Body) || undefined;
+
+            this.setupRefresh(
+                w_finalFocus, // ! Unlike gotoNavEntry, this sets focus in outline -or- body.
+                {
+                    tree: true, // HAVE to refresh tree because find folds/unfolds only result outline paths
+                    body: true,
+                    scroll: w_scroll,
+                    // documents: false,
+                    // buttons: false,
+                    states: true,
+                },
+                this.findFocusTree
+            );
+            return this.launchRefresh();
+        }
+
+    }
 
     /**
      * * Gets the search settings from Leo, and applies them to the find panel webviews

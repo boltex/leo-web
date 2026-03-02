@@ -75,7 +75,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.TAB_CYCLE_NEXT,
-        key: "ctrl+tab",
+        key: "ctrl+tab", // Maybe browser will intercept?
         mac: "cmd+tab",
         outline: true,
         body: true,

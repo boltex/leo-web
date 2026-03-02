@@ -88,7 +88,7 @@ export class LogPaneManager {
         searchScope: 0, // 0 is entire outline (1: sub-outline, 2: node only)
     };
 
-    public postMessageCallback: ((message: any) => void) | undefined; // Set by controller, used to send messages to LeoWeb when settings change or when user interacts with the controls.
+    private _postMessageCallback: ((message: any) => void) | undefined; // Set by controller, used to send messages to LeoWeb when settings change or when user interacts with the controls.
 
     constructor() {
 
@@ -130,6 +130,81 @@ export class LogPaneManager {
 
         this.HTML_ELEMENT = document.documentElement;
 
+
+        // * Find & Replace controls change detection
+        this.SEARCH_OPTIONS.addEventListener('change', () => {
+            this.searchSettings.searchOptions = Number(this.SEARCH_OPTIONS.value);
+            this.processChange();
+        });
+
+        const findReplaceInputs = [this.FIND_INPUT, this.REPLACE_INPUT];
+        const checkboxes = [this.OPT_HEADLINE, this.OPT_BODY, this.OPT_WHOLE, this.OPT_IGNORECASE, this.OPT_REGEXP, this.OPT_MARK_FINDS, this.OPT_MARK_CHANGES];
+        const radios = [this.SCOPE_ENTIRE, this.SCOPE_SUBOUTLINE, this.SCOPE_NODE, this.SCOPE_FILE];
+
+        for (const input of findReplaceInputs) {
+            // first, check for 'enter' press:
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    if (this.timer) {
+                        clearTimeout(this.timer);
+                        this.sendSearchConfig();
+                    }
+                    this._postMessageCallback?.({ type: 'leoFindNext' });
+                }
+            });
+            // Next, listen for 'input' events:
+            input.addEventListener('input', () => {
+                const inputId = input.id === 'find-input' ? 'findText' : 'replaceText';
+                this.searchSettings[inputId] = input.value;
+                this.processChange();
+            });
+        }
+
+        for (const checkbox of checkboxes) {
+            checkbox.addEventListener('change', () => {
+                const settingKey = checkbox.id.replace('opt-', '') as keyof LeoSearchSettings;
+                // @ts-ignore - We know this is safe because the checkbox IDs are designed to match the keys in LeoSearchSettings.
+                this.searchSettings[settingKey] = checkbox.checked;
+                this.processChange();
+            });
+        }
+
+        for (const radio of radios) {
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    const scopeValue = radio.id.replace('scope-', '');
+                    switch (scopeValue) {
+                        case 'entire':
+                            this.searchSettings.searchScope = 0;
+                            break;
+                        case 'suboutline':
+                            this.searchSettings.searchScope = 1;
+                            break;
+                        case 'node':
+                            this.searchSettings.searchScope = 2;
+                            break;
+                        case 'file':
+                            this.searchSettings.searchScope = 3;
+                            break;
+                    }
+                    this.processChange();
+                }
+            });
+        }
+
+    }
+
+    private processChange() {
+        clearTimeout(this.timer);
+        this.dirty = true;
+        this.timer = setTimeout(() => {
+            this.sendSearchConfig();
+        }, 300);
+    }
+
+
+    public setPostMessageCallback(callback: (message: any) => void) {
+        this._postMessageCallback = callback;
     }
 
     public setSearchSetting(name: searchSettingNames) {
@@ -237,7 +312,7 @@ export class LogPaneManager {
 
     public sendSearchConfig() {
         this.dirty = false;
-        this.postMessageCallback?.({ type: 'searchConfig', value: this.searchSettings });
+        this._postMessageCallback?.({ type: 'searchConfig', value: this.searchSettings });
     }
 
     public navTextChange() {
@@ -265,7 +340,7 @@ export class LogPaneManager {
                     }
                     this.sendSearchConfig();
                 }
-                this.postMessageCallback?.({ type: 'leoNavMarkedList' });
+                this._postMessageCallback?.({ type: 'leoNavMarkedList' });
 
             }, 40); // Shorter delay for this command
             return false;
@@ -285,7 +360,7 @@ export class LogPaneManager {
                 }
                 this.sendSearchConfig();
             }
-            this.postMessageCallback?.({ type: 'leoNavTextChange' });
+            this._postMessageCallback?.({ type: 'leoNavTextChange' });
         }, 400); // almost half second
 
     }
@@ -311,7 +386,7 @@ export class LogPaneManager {
                 }
                 this.sendSearchConfig();
             }
-            this.postMessageCallback?.({ type: 'leoNavTextChange' });
+            this._postMessageCallback?.({ type: 'leoNavTextChange' });
         }, 250); // quarter second
     }
 

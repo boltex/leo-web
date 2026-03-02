@@ -2464,7 +2464,7 @@ export class Position {
         //@+<< validate x ivar >>
         //@+node:felix.20251214160339.1587: *5* << validate x ivar >>
         if (!p.v && pv && pv.__bool__()) {
-            this.invalidOutline('Empty t');
+            this.invalidOutline('Empty p.v');
         }
         //@-<< validate x ivar >>
         // Recursively validate all the children.
@@ -2600,15 +2600,17 @@ export class Position {
      */
     public contract(): void {
         const p: Position = this;
-        g.app.gui.positionsToAnimate.push(p);
         const v: VNode = this.v;
         v.expandedPositions = v.expandedPositions.filter((z) => !z.__eq__(p));
+        // Only push p in g.app.gui.positionsToAnimate if not already contracted
+        if (v.isExpanded()) {
+            g.app.gui.positionsToAnimate.push(p);
+        }
         v.contract();
     }
 
     public expand(): void {
         const p: Position = this;
-        g.app.gui.positionsToAnimate.push(p);
         const v: VNode = this.v;
         v.expandedPositions = v.expandedPositions.filter((z) => !z.__eq__(p));
         let isBreak: boolean = false;
@@ -2620,6 +2622,10 @@ export class Position {
         }
         if (!isBreak) {
             v.expandedPositions.push(p.copy());
+        }
+        // Only push p in g.app.gui.positionsToAnimate if not already expanded
+        if (!v.isExpanded()) {
+            g.app.gui.positionsToAnimate.push(p);
         }
         v.expand();
     }

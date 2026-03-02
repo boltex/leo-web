@@ -41,6 +41,13 @@ export class OutlineManager {
         this.renderTree(); // Re-render to apply icon changes
     }
 
+    /**
+     * Open an input box for editing the headline of a node.
+     * @param node The Position for which to find corresponding outlive view node.
+     * @param selectAll select whole (or falsy)
+     * @param selection specific selection range (overrides selectAll if provided)
+     * @returns A promise that resolves to a tuple containing the new headline string and a boolean indicating whether the headline was changed.
+     */
     public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Promise<[string, boolean]> {
         // Force-close any previous headline edit (resolves its pending promise)
         if (this.headlineFinish) {
