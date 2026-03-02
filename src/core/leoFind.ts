@@ -1071,6 +1071,8 @@ export class LeoFind {
         // Init the work widget, so we don't get stuck.
         const s = this.in_headline ? p.h : p.b;
         const ins = gui_w ? gui_w.getInsertPoint() : 0;
+        console.log('insert Point:', ins, 'in headline: ', this.in_headline);
+        console.log(this.request_reverse, this.reverse)
         this.work_s = s;
         this.work_sel = [ins, ins, ins];
         //
@@ -3316,7 +3318,7 @@ export class LeoFind {
     //@+node:felix.20251213133753.105: *5* find._fnm_search
     /**
      * Search this.work_s for this.find_text with present options.
-     * Returns (pos, newpos) or (undefined, dundefined).
+     * Returns (pos, newpos) or (undefined, undefined).
      */
     private _fnm_search(
         p: Position
@@ -3849,6 +3851,7 @@ export class LeoFind {
             w = c.edit_widget(p) as StringTextWrapper; // #2220
             if (w) {
                 w.setSelectionRange(pos, newpos, insert); // #2220
+                console.log('Set headline selection to', pos, newpos, insert);
             }
         } else {
             // Tricky code.  Do not change without careful thought.

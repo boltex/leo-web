@@ -103,7 +103,7 @@ export class BodyManager {
         workspace.layout.BODY_PANE.scrollTop = scroll;
     }
 
-    public setBodySelection(selection: body.Selection) {
+    public setBodySelection(selection: body.Selection, scrollSelectionIntoView: boolean = false) {
         // Convert body.Selection to DOM Range and set it in the BODY_PANE
         const { anchor, active } = selection;
         const anchorInfo = this.positionToNodeOffset(anchor);
@@ -119,6 +119,12 @@ export class BodyManager {
                 anchorInfo.node, anchorInfo.offset,
                 activeInfo.node, activeInfo.offset
             );
+            if (scrollSelectionIntoView) {
+                const range = selectionObj.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                const BODY_PANE = workspace.layout.BODY_PANE;
+                BODY_PANE.scrollTop = rect.top + BODY_PANE.scrollTop - BODY_PANE.clientHeight / 2;
+            }
         }
     }
 

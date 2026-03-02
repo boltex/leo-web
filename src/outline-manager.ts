@@ -47,6 +47,7 @@ export class OutlineManager {
      * @param selectAll select whole (or falsy)
      * @param selection specific selection range (overrides selectAll if provided)
      * @returns A promise that resolves to a tuple containing the new headline string and a boolean indicating whether the headline was changed.
+     * TODO : should also return the cursor position : use selectionStart, selectionEnd and selectionDirection to determine a proper cursor position.
      */
     public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Promise<[string, boolean]> {
         // Force-close any previous headline edit (resolves its pending promise)
@@ -76,6 +77,7 @@ export class OutlineManager {
         // and the caller will decide what to do with it (update headline or not)
 
         return new Promise<[string, boolean]>((resolve) => {
+
             let leftOffset = this.LEFT_OFFSET;
             if (this._flatRowsLeo!.every(r => !r.hasChildren)) {
                 leftOffset = 0;

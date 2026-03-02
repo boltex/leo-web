@@ -723,7 +723,9 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
-        workspace.body.setBodySelection(w_selection); // This sets focus to the body pane as well
+        workspace.body.setBodySelection(w_selection, this._refreshType.scroll); // This sets focus to the body pane as well
+        this._refreshType.scroll = false;
+
     }
 
     /**
@@ -1992,7 +1994,8 @@ export class LeoUI extends NullGui {
             if (this.findFocusTree) {
                 setTimeout(() => {
                     // Select headline if needed after refresh.
-                    this.editHeadline(undefined, false, [w.sel[0], w.sel[1]]);
+                    // this.editHeadline(undefined, false, [w.sel[0], w.sel[1]]);
+                    console.log('TODO : select headline from / to  selection: ', [w.sel[0], w.sel[1]]);
                 }, 0);
             }
         }
