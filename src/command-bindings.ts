@@ -287,13 +287,13 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.FIND_ALL, () => leoUI.command(LEOCMD.FIND_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.REPLACE_ALL, () => leoUI.command(LEOCMD.REPLACE_ALL, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        [CMD.FIND_NEXT, () => leoUI.find(false, false)],
-        [CMD.FIND_PREVIOUS, () => leoUI.find(false, true)],
+        [CMD.FIND_NEXT, () => leoUI.find(false)],
+        [CMD.FIND_PREVIOUS, () => leoUI.find(true)],
 
         [CMD.FIND_DEF, () => leoUI.command(LEOCMD.FIND_DEF, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        [CMD.REPLACE, () => leoUI.replace(false, false)],
-        [CMD.REPLACE_THEN_FIND, () => leoUI.replace(false, true)],
+        [CMD.REPLACE, () => leoUI.replace(false)],
+        [CMD.REPLACE_THEN_FIND, () => leoUI.replace(true)],
 
         [CMD.GOTO_GLOBAL_LINE, () => leoUI.command(LEOCMD.GOTO_GLOBAL_LINE, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
 

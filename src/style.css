@@ -1119,6 +1119,8 @@ body.dragging-secondary .node {
 
 #nav-tab {
   background: var(--nav-tab-bg-color);
+  /* Hidden while being developped */
+  display: none; /* TEMPORARY */
 }
 
 #nav-controls {

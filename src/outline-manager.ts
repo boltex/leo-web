@@ -27,7 +27,7 @@ export class OutlineManager {
     public ROW_HEIGHT = 26;
     private LEFT_OFFSET = 16; // Padding from left edge
 
-    public headlineFinish: (() => void) | null = null; // Force-close any previous headline edit
+    public headlineFinish: (() => [string, boolean, [number, number, number]] | undefined) | null = null; // Force-close any previous headline edit
 
     constructor() {
         this.SPACER = document.getElementById("spacer")!;
@@ -45,11 +45,11 @@ export class OutlineManager {
      * Open an input box for editing the headline of a node.
      * @param node The Position for which to find corresponding outlive view node.
      * @param selectAll select whole (or falsy)
-     * @param selection specific selection range (overrides selectAll if provided)
-     * @returns A promise that resolves to a tuple containing the new headline string and a boolean indicating whether the headline was changed.
+     * @param selection specific selection range (overrides selectAll if provided) its start,end and insertionn point which needs to be compared to to start and end to set direction
+     * @returns A promise that resolves to a tuple containing the new headline string and a boolean indicating whether the headline was changed along with last selection state info.
      * TODO : should also return the cursor position : use selectionStart, selectionEnd and selectionDirection to determine a proper cursor position.
      */
-    public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number]): Promise<[string, boolean]> {
+    public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number, number]): Promise<[string, boolean, [number, number, number]]> {
         // Force-close any previous headline edit (resolves its pending promise)
         if (this.headlineFinish) {
             this.headlineFinish();
@@ -61,13 +61,13 @@ export class OutlineManager {
         // the node vertical position needs to be calculated similarly to 
         if (!this._flatRowsLeo) {
             console.warn('Headline edit requested but flatRowsLeo is not initialized');
-            return Promise.resolve([node.h, false]);  // Not initialized yet, should never happen.
+            return Promise.resolve([node.h, false, [0, 0, 0]]);  // Not initialized yet, should never happen.
         };
 
         const index = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
         if (index === -1) {
             console.warn('Headline edit requested but node not found in flatRowsLeo');
-            return Promise.resolve([node.h, false]); // Not found (shouldn't happen)
+            return Promise.resolve([node.h, false, [0, 0, 0]]); // Not found (shouldn't happen)
         }
 
         const nodeOffsetY = index * this.ROW_HEIGHT;
@@ -76,7 +76,7 @@ export class OutlineManager {
         // Accept its content even if escaped or focus-out, we return its content no matter what,
         // and the caller will decide what to do with it (update headline or not)
 
-        return new Promise<[string, boolean]>((resolve) => {
+        return new Promise<[string, boolean, [number, number, number]]>((resolve) => {
 
             let leftOffset = this.LEFT_OFFSET;
             if (this._flatRowsLeo!.every(r => !r.hasChildren)) {
@@ -101,6 +101,11 @@ export class OutlineManager {
                 input.focus();
                 if (selection) {
                     input.setSelectionRange(selection[0], selection[1]);
+                    if (selection[2] === selection[0]) {
+                        input.selectionDirection = "backward";
+                    } else if (selection[2] === selection[1]) {
+                        input.selectionDirection = "forward";
+                    }
                 } else if (selectAll) {
                     input.select();
                 } else {
@@ -111,7 +116,7 @@ export class OutlineManager {
 
             let resolved = false;
 
-            const finish = (blurred?: boolean) => {
+            const finish = (blurred?: boolean): [string, boolean, [number, number, number]] | undefined => {
                 if (resolved) return;
                 resolved = true;
                 const newHeadline = input.value;
@@ -121,7 +126,10 @@ export class OutlineManager {
 
                 input.onkeydown = null;
                 input.onblur = null;
-                resolve([newHeadline, !!blurred]);
+                resolve([newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]]);
+                // Also return the last selection state so the caller can decide to restore it if needed 
+                // (for example, if headline was not changed and they want to keep the same selection in the headline) or use it for other purposes like determining cursor position in the new headline.
+                return [newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]];
             };
 
             this.headlineFinish = finish;

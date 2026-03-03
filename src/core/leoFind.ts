@@ -526,7 +526,7 @@ export class LeoFind {
     @cmd('replace-then-find', 'Handle the replace-then-find command.')
     @cmd('change-then-find', 'Handle the replace-then-find command.')
     public change_then_find(): void {
-        g.app.gui.replace(false, true);
+        g.app.gui.replace(true);
         // // Settings...
         // this.init_in_headline();
         // const settings = this.ftm.get_settings();
@@ -1025,7 +1025,7 @@ export class LeoFind {
     //@+node:felix.20251213133753.47: *4* find.find-next, find-prev & do_find_*
     @cmd('find-next', 'The find-next command.')
     public find_next(): void {
-        g.app.gui.find(false, false);
+        g.app.gui.find(false);
         // // Settings...
         // this.reverse = false;
         // this.init_in_headline();  // Do this *before* creating the settings.
@@ -1035,7 +1035,7 @@ export class LeoFind {
     }
     @cmd('find-prev', 'Handle F2 (find-previous)')
     public find_prev(): void {
-        g.app.gui.find(false, true);
+        g.app.gui.find(true);
         // // Settings...
         // this.init_in_headline();  // Do this *before* creating the settings.
         // const settings = this.ftm.get_settings();
@@ -1071,7 +1071,7 @@ export class LeoFind {
         // Init the work widget, so we don't get stuck.
         const s = this.in_headline ? p.h : p.b;
         const ins = gui_w ? gui_w.getInsertPoint() : 0;
-        console.log('insert Point:', ins, 'in headline: ', this.in_headline);
+        console.log('START FIND --------------> insert Point:', ins, 'in headline: ', this.in_headline);
         console.log(this.request_reverse, this.reverse)
         this.work_s = s;
         this.work_sel = [ins, ins, ins];
@@ -1171,7 +1171,7 @@ export class LeoFind {
     @cmd('replace', 'Replace the selected text with the replacement text.')
     @cmd('change', 'Replace the selected text with the replacement text.')
     public change(): void {
-        g.app.gui.replace(false, false);
+        g.app.gui.replace(false);
         // const p = this.c.p;
         // if (this.check_args('replace')) {
         //     this.init_in_headline();

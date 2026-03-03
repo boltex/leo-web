@@ -4264,7 +4264,7 @@ export class Commands {
     public redrawAndEdit(
         p: Position,
         selectAll: boolean = false,
-        selection: [number, number] | undefined = undefined,
+        selection: [number, number, number] | undefined = undefined,
         keepMinibuffer: boolean = false
     ): Thenable<Position> {
         const c: Commands = this;

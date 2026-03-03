@@ -165,11 +165,11 @@ export class LeoUI extends NullGui {
             //     break;
             // }
             case 'leoFindNext': {
-                this.find(true, false);
+                this.find(false);
                 break;
             }
             case 'leoFindPrevious': {
-                this.find(true, true);
+                this.find(true);
                 break;
             }
             case 'searchConfig': {
@@ -177,11 +177,11 @@ export class LeoUI extends NullGui {
                 break;
             }
             case 'replace': {
-                void this.replace(true, false);
+                void this.replace(false);
                 break;
             }
             case 'replaceThenFind': {
-                void this.replace(true, true);
+                void this.replace(true);
                 break;
             }
             // TODO.
@@ -190,7 +190,7 @@ export class LeoUI extends NullGui {
             //     break;
             // }
             case 'refreshSearchConfig': {
-                void this.triggerBodySave(true);
+                void this.triggerBodySave();
                 // Leave a cycle before getting settings
                 setTimeout(() => {
                     this.loadSearchSettings();
@@ -496,23 +496,22 @@ export class LeoUI extends NullGui {
     }
 
 
-    public endEditHeadline(): boolean {
+    public endEditHeadline(): [string, boolean, [number, number, number]] | undefined {
         if (workspace.outline.headlineFinish) {
-            workspace.outline.headlineFinish();
-            return true;
+            const result = workspace.outline.headlineFinish();
+            return result;
         }
-        return false;
+        return undefined;
     }
 
     /**
      * * Validate headline edit input box if active, or, Save body to the Leo app if its dirty.
      *   That is, only if a change has been made to the body 'document' so far
-     * @param p_forcedVsCodeSave Flag to also have vscode 'save' the content of this editor through the filesystem
      * @returns a promise that resolves when the possible saving process is finished
      */
-    public triggerBodySave(p_fromFocusChange?: boolean): boolean {
+    public triggerBodySave(p_fromFocusChange?: boolean): [string, boolean, [number, number, number]] | undefined {
 
-        let hadEditHeadline = false;
+        let hadEditHeadline: [string, boolean, [number, number, number]] | undefined = undefined;
 
         // * Check if headline edit input box is active. Validate it with current value.
         if (!p_fromFocusChange) {
@@ -1647,32 +1646,44 @@ export class LeoUI extends NullGui {
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
      * @returns Thenable that resolves when done
      */
-    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number], p_retried?: boolean): Promise<Position> {
+    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number, number], p_retried?: boolean): Promise<Position> {
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         const w_p: Position = p_node || c.p;
 
-        const hadEditHeadline = this.triggerBodySave(true);
-        if (hadEditHeadline && !p_retried) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve(this.editHeadline(p_node, selectAll, selection, true));
-                }, 0);
-            });
-        }
+        const hadEditHeadline = this.triggerBodySave();
+        // if (hadEditHeadline && !p_retried) {
+        //     return new Promise((resolve) => {
+        //         setTimeout(() => {
+        //             resolve(this.editHeadline(p_node, selectAll, selection, true));
+        //         }, 0);
+        //     });
+        // }
 
         // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
         this.setupRefresh(Focus.Outline, { tree: true, states: true });
 
         this.inEditHeadline++;
         this.leoStates.inHeadlineEdit = true;
-        let [p_newHeadline, blurred] = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);
+        let [p_newHeadline, blurred, newSelection] = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);
         this.inEditHeadline--;
         if (!this.inEditHeadline) {
             this.leoStates.inHeadlineEdit = false;
         }
 
         if ((p_newHeadline || p_newHeadline === "") && p_newHeadline !== "\n") {
+
+            let w = this.get_focus(c);
+            const focus = this.widget_name(w);
+            const inOutline = (focus.includes("tree")) || (focus.includes("head"));
+            if (inOutline && newSelection) {
+                // w.sel[0] = newSelection ? newSelection[0] : 0;
+                // w.sel[1] = newSelection ? newSelection[1] : 0;
+                // w.ins = newSelection ? newSelection[2] : 0;
+                console.log(`The Old StringTextWrapper selection was ${w.sel[0]}, ${w.sel[1]}, ${w.ins}`);
+                console.log(`Should we set new selection from headline edit to this? -> ${newSelection[0]}, ${newSelection[1]}, ${newSelection[2]}`);
+            }
+
             let w_truncated = false;
             if (p_newHeadline.indexOf("\n") >= 0) {
                 p_newHeadline = p_newHeadline.split("\n")[0];
@@ -1852,7 +1863,7 @@ export class LeoUI extends NullGui {
      * * Handles an enter press in the 'nav pattern' input
      */
     public async navEnter(): Promise<unknown> {
-        await this.triggerBodySave(true);
+        this.triggerBodySave();
         const c = g.app.windowList[this.frameIndex].c;
         const scon: QuickSearchController = c.quicksearchController;
 
@@ -1871,8 +1882,7 @@ export class LeoUI extends NullGui {
      * * Handles a debounced text change in the nav pattern input box
      */
     public async navTextChange(): Promise<unknown> {
-
-        await this.triggerBodySave(true);
+        this.triggerBodySave();
         const c = g.app.windowList[this.frameIndex].c;
         const scon: QuickSearchController = c.quicksearchController;
 
@@ -1904,7 +1914,7 @@ export class LeoUI extends NullGui {
      * * Opens the find panel and selects all & focuses on the find field.
      */
     public startSearch(): void {
-        this.triggerBodySave(true);
+        this.triggerBodySave();
         workspace.logPane.showTab('find');
         setTimeout(() => {
             workspace.logPane.focusFindInput();
@@ -1913,13 +1923,17 @@ export class LeoUI extends NullGui {
 
     /**
      * * Find next / previous commands
-     * @param p_fromOutline
      * @param p_reverse
      * @returns Promise that resolves when the "launch refresh" is started
      */
-    public async find(p_fromOutline: boolean, p_reverse: boolean): Promise<unknown> {
+    public async find(p_reverse: boolean): Promise<unknown> {
 
-        this.triggerBodySave(true);
+        const headlineResult = this.triggerBodySave();
+        if (headlineResult) {
+
+            console.log('find headlineResult', headlineResult[0], headlineResult[1]);
+            console.log('position cursor: ', headlineResult[2][0], headlineResult[2][1], headlineResult[2][2])
+        }
         let found;
         let focus;
 
@@ -1927,8 +1941,9 @@ export class LeoUI extends NullGui {
         const fc = c.findCommands;
         let p: Position | undefined = c.p;
 
-        const fromOutline = p_fromOutline;
-        const fromBody = !fromOutline;
+        // Detect focus instead of using parameter!
+        const fromBody = workspace.layout.isBodyFocused();
+        const fromOutline = !fromBody;
 
         let w = this.get_focus(c);
         focus = this.widget_name(w);
@@ -1994,8 +2009,7 @@ export class LeoUI extends NullGui {
             if (this.findFocusTree) {
                 setTimeout(() => {
                     // Select headline if needed after refresh.
-                    // this.editHeadline(undefined, false, [w.sel[0], w.sel[1]]);
-                    console.log('TODO : select headline from / to  selection: ', [w.sel[0], w.sel[1]]);
+                    this.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);
                 }, 0);
             }
         }
@@ -2007,17 +2021,18 @@ export class LeoUI extends NullGui {
      * @param p_thenFind
      * @returns Promise that resolves when the "launch refresh" is started
      */
-    public async replace(p_fromOutline?: boolean, p_thenFind?: boolean): Promise<unknown> {
+    public async replace(p_thenFind?: boolean): Promise<unknown> {
 
-        this.triggerBodySave(true);
+        this.triggerBodySave();
         let found;
         let focus;
 
         const c = g.app.windowList[this.frameIndex].c;
         const fc = c.findCommands;
 
-        const fromOutline = p_fromOutline;
-        const fromBody = !fromOutline;
+        // Detect focus instead of using parameter!
+        const fromBody = workspace.layout.isBodyFocused();
+        const fromOutline = !fromBody;
 
         let w = this.get_focus(c);
         focus = this.widget_name(w);

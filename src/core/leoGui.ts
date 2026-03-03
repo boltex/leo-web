@@ -141,13 +141,13 @@ export class LeoGui {
     /**
      * Run Leo's find method.
      */
-    public find(p_fromOutline: boolean, p_reverse: boolean): any {
+    public find(p_reverse: boolean): any {
         this.oops();
     }
     /**
      * Run Leo's replace method.
      */
-    public replace(p_fromOutline?: boolean, p_thenFind?: boolean): any {
+    public replace(p_thenFind?: boolean): any {
         this.oops();
     }
     /**
@@ -162,7 +162,7 @@ export class LeoGui {
     public editHeadline(
         p_node?: Position,
         selectAll?: boolean,
-        selection?: [number, number],
+        selection?: [number, number, number],
     ): any {
         this.oops();
     }
