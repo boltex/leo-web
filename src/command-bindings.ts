@@ -60,7 +60,8 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.CHOOSE_NEW_WORKSPACE, () => leoUI.chooseNewWorkspace()],
 
         [CMD.CUT_TEXT, () => leoUI.cutText()],
-        [CMD.COPY_TEXT, () => leoUI.copyText()],
+        // [CMD.COPY_TEXT, () => leoUI.copyText()],
+        [CMD.COPY_TEXT, () => leoUI.command('copy-text', { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.PASTE_TEXT, () => leoUI.pasteText()],
         [CMD.SELECT_ALL_TEXT, () => leoUI.selectAllText()],
 

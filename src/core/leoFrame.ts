@@ -8,6 +8,7 @@
 import * as g from './leoGlobals';
 import { LeoGui } from './leoGui';
 
+import { new_cmd_decorator } from '../core/decorators';
 import { Commands } from './leoCommands';
 import { Position, VNode } from './leoNodes';
 import { Chapter } from './leoChapters';
@@ -15,6 +16,26 @@ import { StringFindTabManager } from './findTabManager';
 import { RClick, ScriptingController, build_rclick_tree } from './mod_scripting';
 
 //@-<< imports >>
+//@+<< leoFrame command decorators >>
+//@+node:felix.20260304000944.1: ** << leoFrame command decorators >>
+// def log_cmd(name: str) -> Callable:  # Not used.
+//     """Command decorator for the LeoLog class."""
+//     return g.new_cmd_decorator(name, ['c', 'frame', 'log'])
+
+
+// def body_cmd(name: str) -> Callable:
+//     """Command decorator for the c.frame.body class."""
+//     return g.new_cmd_decorator(name, ['c', 'frame', 'body'])
+
+
+// def frame_cmd(name: str) -> Callable:
+//     """Command decorator for the LeoFrame class."""
+//     return g.new_cmd_decorator(name, ['c', 'frame'])
+function frame_cmd(p_name: string, p_doc: string) {
+    return new_cmd_decorator(p_name, p_doc, ['c', 'frame']);
+}
+
+//@-<< leoFrame command decorators >>
 //@+others
 //@+node:felix.20251213133753.135: ** class LeoFrame
 export class LeoFrame {
@@ -250,6 +271,154 @@ export class LeoFrame {
         // this.update();
 
     }
+    //@+node:felix.20260304001929.1: *3* LeoFrame.Cut/Copy/Paste
+    //@+node:felix.20260304001929.2: *4* LeoFrame.copyText
+    // @frame_cmd('copy-text')
+    // def copyText(self, event: LeoKeyEvent = None) -> None:
+    //     """Copy the selected text from the widget to the clipboard."""
+    //     # f = self
+    //     w = event and event.widget
+    //     # wname = c.widget_name(w)
+    //     if not w or not g.isTextWrapper(w):
+    //         return
+    //     # Set the clipboard text.
+    //     i, j = w.getSelectionRange()
+    //     if i == j:
+    //         ins = w.getInsertPoint()
+    //         i, j = g.getLine(w.getAllText(), ins)
+    //     # 2016/03/27: Fix a recent buglet.
+    //     # Don't clear the clipboard if we hit ctrl-c by mistake.
+    //     s = w.get(i, j)
+    //     s = s.replace('\r\n', '\n').replace('\r', '\n')  # 3759.
+    //     if s:
+    //         g.app.gui.replaceClipboardWith(s)
+
+    @frame_cmd('copy-text', 'Copy the selected text from the widget to the clipboard.')
+    public copyText(): void {
+
+        const body = this.body;
+        const w = body.wrapper;
+        if (!g.isTextWrapper(w)) {
+            return;
+        }
+        // Set the clipboard text.
+        let [i, j] = w.getSelectionRange();
+        if (i === j) {
+            const ins = w.getInsertPoint();
+            [i, j] = g.getLine(w.getAllText(), ins);
+        }
+        // 2016/03/27: Fix a recent buglet.
+        // Don't clear the clipboard if we hit ctrl-c by mistake.
+        let s = w.get(i, j);
+        s = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        if (s) {
+            g.app.gui.replaceClipboardWith(s);
+        }
+    }
+
+    // OnCopyFromMenu = copyText
+
+    //@+node:felix.20260304001929.3: *4* LeoFrame.cutText
+    // @frame_cmd('cut-text')
+    // def cutText(self, event: LeoKeyEvent = None) -> None:
+    //     """Invoked from the mini-buffer and from shortcuts."""
+    //     c, p, u = self.c, self.c.p, self.c.undoer
+    //     w = event and event.widget
+    //     if not w or not g.isTextWrapper(w):
+    //         return
+    //     bunch = u.beforeChangeBody(p)
+    //     name = c.widget_name(w)
+    //     oldText = w.getAllText()
+    //     i, j = w.getSelectionRange()
+    //     # Update the widget and set the clipboard text.
+    //     if i == j:
+    //         ins = w.getInsertPoint()
+    //         i, j = g.getLine(oldText, ins)
+    //     s = w.get(i, j)
+    //     w.delete(i, j)
+    //     w.see(i)  # Required.
+    //     s = s.replace('\r\n', '\n').replace('\r', '\n')  # 3759.
+    //     g.app.gui.replaceClipboardWith(s)
+    //     if name.startswith('body'):
+    //         p.v.b = w.getAllText()
+    //         u.afterChangeBody(p, 'Cut', bunch)
+    //     # If it's the headline, the headline has not officially changed yet.
+    //     c.recolor()  # 4398.
+
+    // OnCutFromMenu = cutText
+
+    //@+node:felix.20260304001929.4: *4* LeoFrame.pasteText
+    // @frame_cmd('paste-text')
+    // def pasteText(self, event: LeoKeyEvent = None, middleButton: bool = False) -> None:
+    //     """
+    //     Paste the clipboard into a widget.
+    //     If middleButton is True, support x-windows middle-mouse-button easter-egg.
+    //     """
+    //     c, p, u = self.c, self.c.p, self.c.undoer
+    //     w = event and event.widget
+    //     wname = c.widget_name(w)
+    //     if not w or not g.isTextWrapper(w):
+    //         return
+    //     bunch = u.beforeChangeBody(p)
+    //     if self.cursorStay and wname.startswith('body'):
+    //         tCurPosition = w.getInsertPoint()
+    //     i, j = w.getSelectionRange()  # Returns insert point if no selection.
+
+    //     # 2025/12/01: c.k.previousSelection no longer exists.
+    //     # if middleButton and c.k.previousSelection is not None:
+    //     # start, end = c.k.previousSelection
+    //     # s = w.getAllText()
+    //     # s = s[start:end]
+    //     # c.k.previousSelection = None
+    //     # else:
+    //     # s = g.app.gui.getTextFromClipboard()
+    //     s = g.app.gui.getTextFromClipboard()
+    //     s = g.checkUnicode(s)
+    //     s = s.replace('\r\n', '\n').replace('\r', '\n')  # 3759.
+    //     singleLine = wname.startswith('head') or wname.startswith('minibuffer')
+    //     if singleLine:
+    //         # Strip trailing newlines so the truncation doesn't cause confusion.
+    //         while s and s[-1] in ('\n', '\r'):
+    //             s = s[:-1]
+    //     # Save the horizontal scroll position.
+    //     if hasattr(w, 'getXScrollPosition'):
+    //         x_pos = w.getXScrollPosition()
+    //     # Update the widget.
+    //     if i != j:
+    //         w.delete(i, j)
+    //     # #2593: Replace link patterns with html links.
+    //     if wname.startswith('log'):
+    //         if c.frame.log.put_html_links(s):
+    //             return  # create_html_links has done all the work.
+    //     w.insert(i, s)
+    //     w.see(i + len(s) + 2)
+    //     if wname.startswith('body'):
+    //         if self.cursorStay:
+    //             if tCurPosition == j:
+    //                 offset = len(s) - (j - i)
+    //             else:
+    //                 offset = 0
+    //             newCurPosition = tCurPosition + offset
+    //             w.setSelectionRange(i=newCurPosition, j=newCurPosition)
+    //         p.v.b = w.getAllText()
+    //         u.afterChangeBody(p, 'Paste', bunch)
+    //     elif singleLine:
+    //         s = w.getAllText()
+    //         while s and s[-1] in ('\n', '\r'):
+    //             s = s[:-1]
+    //     else:
+    //         pass
+    //     # Never scroll horizontally.
+    //     if hasattr(w, 'getXScrollPosition'):
+    //         w.setXScrollPosition(x_pos)
+    //     c.recolor()  # 4398.
+
+    // OnPasteFromMenu = pasteText
+
+    //@+node:felix.20260304001929.5: *4* LeoFrame.OnPaste (support middle-button paste)
+    // def OnPaste(self, event: LeoKeyEvent = None) -> None:
+    //     return self.pasteText(event=event, middleButton=True)
+
     //@-others
 }
 //@+node:felix.20251213133753.150: ** class NullBody (LeoBody)

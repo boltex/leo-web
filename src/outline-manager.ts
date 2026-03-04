@@ -130,16 +130,23 @@ export class OutlineManager {
 
                 this.HTML_ELEMENT.setAttribute('data-show-headline-edit', 'false');
 
+                // Clean up event handlers to prevent memory leaks and unintended behavior in future edits.
                 input.onkeydown = null;
                 input.onblur = null;
+
+                // * Do a 3 step process to notify both the headline edit initiator and any other interested parties:
+
+                // 1- Call the callback to notify that headline editing is finished, passing the new headline and whether it was blurred.
                 if (this._headlineFinishedCallback) {
-                    // Just call back sending the same data.
                     this._headlineFinishedCallback(node, newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]);
                 }
+
+                // 2- Resolve the promise to notify the original edit-headline initiator with the new headline, whether it was blurred, and the last selection state.
                 resolve([newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]]);
-                // Also return the last selection state so the caller can decide to restore it if needed 
-                // (for example, if headline was not changed and they want to keep the same selection in the headline) or use it for other purposes like determining cursor position in the new headline.
+
+                // 3- Also return the last selection state so the 'finish' caller have access to it and can decide to use it or not 
                 return [newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]];
+
             };
 
             this.headlineFinish = finish;
