@@ -27,13 +27,19 @@ export class OutlineManager {
     public ROW_HEIGHT = 26;
     private LEFT_OFFSET = 16; // Padding from left edge
 
-    public headlineFinish: (() => [string, boolean, [number, number, number]] | undefined) | null = null; // Force-close any previous headline edit
+    public headlineFinish: (() => [string, boolean, [number, number, number]] | undefined) | null = null; // Force-close any previous headline edit.
+
+    private _headlineFinishedCallback: ((node: Position, newHeadline: string, blurred: boolean, selection: [number, number, number]) => void) | null = null; // Other technique.
 
     constructor() {
         this.SPACER = document.getElementById("spacer")!;
         this.HEADLINE_INPUT = document.getElementById("headline-input")! as HTMLInputElement;
         this.HTML_ELEMENT = document.documentElement;
 
+    }
+
+    public setEditFinishedCallback(callback: (node: Position, newHeadline: string, blurred: boolean, selection: [number, number, number]) => void) {
+        this._headlineFinishedCallback = callback;
     }
 
     public updateNodeIcons = () => {
@@ -126,6 +132,10 @@ export class OutlineManager {
 
                 input.onkeydown = null;
                 input.onblur = null;
+                if (this._headlineFinishedCallback) {
+                    // Just call back sending the same data.
+                    this._headlineFinishedCallback(node, newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]);
+                }
                 resolve([newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]]);
                 // Also return the last selection state so the caller can decide to restore it if needed 
                 // (for example, if headline was not changed and they want to keep the same selection in the headline) or use it for other purposes like determining cursor position in the new headline.

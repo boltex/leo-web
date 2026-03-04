@@ -87,7 +87,7 @@ export class LeoUI extends NullGui {
     public findHeadlinePosition: Position | undefined;
 
     // * Help Panel
-    public showdownConverter: showdown.Converter;
+    public showdownConverter = new showdown.Converter();
 
     // * Selection & scroll
     private _selectionDirty: boolean = false; // Flag set when cursor selection is changed
@@ -100,7 +100,6 @@ export class LeoUI extends NullGui {
     // * Body pane
     private _editorTouched: boolean = false; // Signifies that the body editor DOM element has been modified by the user since last save
     private _bodyStatesTimer: ReturnType<typeof setTimeout> | undefined;
-
 
     // * Debounced method used to get states for UI display flags (commands such as undo, redo, save, ...)
     public getStates: (() => void);
@@ -133,15 +132,6 @@ export class LeoUI extends NullGui {
             this._launchRefresh,
             Constants.REFRESH_DEBOUNCE_DELAY
         );
-
-        // * Help panel helper
-        this.showdownConverter = new showdown.Converter();
-
-        window.addEventListener('beforeunload', this.onBeforeUnload);
-
-        // * Leo Find Panel
-        workspace.logPane.setPostMessageCallback(this._resolveFindPaneMessage.bind(this));
-
 
     }
 
@@ -303,6 +293,13 @@ export class LeoUI extends NullGui {
         workspace.body.setBodyFocusOutCallback(() => {
             this.triggerBodySave(true);
         });
+
+        workspace.outline.setEditFinishedCallback(this._finishEditHeadline.bind(this));
+
+        window.addEventListener('beforeunload', this.onBeforeUnload);
+
+        // * Leo Find Panel
+        workspace.logPane.setPostMessageCallback(this._resolveFindPaneMessage.bind(this));
 
         // TODO: other startup tasks...
 
@@ -1671,45 +1668,54 @@ export class LeoUI extends NullGui {
             this.leoStates.inHeadlineEdit = false;
         }
 
-        if ((p_newHeadline || p_newHeadline === "") && p_newHeadline !== "\n") {
+        // if ((p_newHeadline || p_newHeadline === "") && p_newHeadline !== "\n") {
 
-            let w = this.get_focus(c);
-            const focus = this.widget_name(w);
-            const inOutline = (focus.includes("tree")) || (focus.includes("head"));
-            if (inOutline && newSelection) {
-                // w.sel[0] = newSelection ? newSelection[0] : 0;
-                // w.sel[1] = newSelection ? newSelection[1] : 0;
-                // w.ins = newSelection ? newSelection[2] : 0;
-                console.log(`The Old StringTextWrapper selection was ${w.sel[0]}, ${w.sel[1]}, ${w.ins}`);
-                console.log(`Should we set new selection from headline edit to this? -> ${newSelection[0]}, ${newSelection[1]}, ${newSelection[2]}`);
-            }
+        //     // let w = this.get_focus(c);
+        //     // const focus = this.widget_name(w);
+        //     // const inOutline = (focus.includes("tree")) || (focus.includes("head"));
+        //     // if (inOutline && newSelection) {
+        //     //     // w.sel[0] = newSelection ? newSelection[0] : 0;
+        //     //     // w.sel[1] = newSelection ? newSelection[1] : 0;
+        //     //     // w.ins = newSelection ? newSelection[2] : 0;
+        //     //     console.log(`The Old StringTextWrapper selection was ${w.sel[0]}, ${w.sel[1]}, ${w.ins}`);
+        //     //     console.log(`Should we set new selection from headline edit to this? -> ${newSelection[0]}, ${newSelection[1]}, ${newSelection[2]}`);
+        //     // }
 
-            let w_truncated = false;
-            if (p_newHeadline.indexOf("\n") >= 0) {
-                p_newHeadline = p_newHeadline.split("\n")[0];
-                w_truncated = true;
-            }
-            if (p_newHeadline.length > 1000) {
-                p_newHeadline = p_newHeadline.substring(0, 1000);
-                w_truncated = true;
-            }
+        //     let w_truncated = false;
+        //     if (p_newHeadline.indexOf("\n") >= 0) {
+        //         p_newHeadline = p_newHeadline.split("\n")[0];
+        //         w_truncated = true;
+        //     }
+        //     if (p_newHeadline.length > 1000) {
+        //         p_newHeadline = p_newHeadline.substring(0, 1000);
+        //         w_truncated = true;
+        //     }
 
-            if (w_p && w_p.h !== p_newHeadline) {
-                if (w_truncated) {
-                    void workspace.dialog.showInformationMessage("Truncating headline");
-                }
-                if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
-                    return w_p;  // The hook claims to have handled the event.
-                }
-                const undoData = u.beforeChangeHeadline(w_p);
-                c.setHeadString(w_p, p_newHeadline); // Set v.h *after* calling the undoer's before method.
-                if (!c.changed) {
-                    c.setChanged();
-                }
-                u.afterChangeHeadline(w_p, 'Edit Headline', undoData);
-                g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
-            }
-        }
+        //     if (w_p && w_p.h !== p_newHeadline) {
+        //         if (w_truncated) {
+        //             void workspace.dialog.showInformationMessage("Truncating headline");
+        //         }
+        //         if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
+        //             return w_p;  // The hook claims to have handled the event.
+        //         }
+        //         const undoData = u.beforeChangeHeadline(w_p);
+        //         c.setHeadString(w_p, p_newHeadline); // Set v.h *after* calling the undoer's before method.
+        //         if (!c.changed) {
+        //             c.setChanged();
+        //         }
+        //         u.afterChangeHeadline(w_p, 'Edit Headline', undoData);
+        //         g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
+        //     }
+        // }
+        // if (blurred) {
+        //     // call setupRefresh so as to not force focus on anything.
+        //     this.setupRefresh(Focus.NoChange, { tree: true, states: true });
+        // }
+        // void this._launchRefresh();
+        console.log("Ok edit headline is done, refreshing");
+
+        this.setupRefresh(Focus.Outline, { tree: true, states: true });
+
         if (blurred) {
             // call setupRefresh so as to not force focus on anything.
             this.setupRefresh(Focus.NoChange, { tree: true, states: true });
@@ -1718,6 +1724,59 @@ export class LeoUI extends NullGui {
         return w_p;
     }
 
+    private _finishEditHeadline(node: Position, p_newHeadline: string, blurred: boolean, newSelection: [number, number, number]): void {
+        console.log('Finishing headline edit with new headline:', p_newHeadline, ' blurred:', blurred, ' newSelection:', newSelection);
+        const c = g.app.windowList[this.frameIndex].c;
+        const u = c.undoer;
+        let w = this.get_focus(c);
+        const focus = this.widget_name(w);
+        const inOutline = (focus.includes("tree")) || (focus.includes("head"));
+        console.log('Current focus is:', focus);
+        if (inOutline && newSelection) {
+            // w.sel[0] = newSelection ? newSelection[0] : 0;
+            // w.sel[1] = newSelection ? newSelection[1] : 0;
+            // w.ins = newSelection ? newSelection[2] : 0;
+            if (w && w.sel) {
+                console.log(`The Old StringTextWrapper selection was ${w.sel[0]}, ${w.sel[1]}, ${w.ins}`);
+                console.log(`Should we set new selection from headline edit to this? -> ${newSelection[0]}, ${newSelection[1]}, ${newSelection[2]}`);
+            } else {
+                console.log('Could not find the StringTextWrapper to set selection on after headline edit', w);
+            }
+        }
+
+        let w_truncated = false;
+        if (p_newHeadline.indexOf("\n") >= 0) {
+            p_newHeadline = p_newHeadline.split("\n")[0];
+            w_truncated = true;
+        }
+        if (p_newHeadline.length > 1000) {
+            p_newHeadline = p_newHeadline.substring(0, 1000);
+            w_truncated = true;
+        }
+
+        if (node && node.h !== p_newHeadline) {
+            if (w_truncated) {
+                void workspace.dialog.showInformationMessage("Truncating headline");
+            }
+            if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
+                // return node;  // The hook claims to have handled the event.
+            }
+            const undoData = u.beforeChangeHeadline(node);
+            c.setHeadString(node, p_newHeadline); // Set v.h *after* calling the undoer's before method.
+            if (!c.changed) {
+                c.setChanged();
+            }
+            u.afterChangeHeadline(node, 'Edit Headline', undoData);
+            g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
+        }
+        // this.setupRefresh(Focus.Outline, { tree: true, states: true });
+
+        // if (blurred) {
+        //     // call setupRefresh so as to not force focus on anything.
+        //     this.setupRefresh(Focus.NoChange, { tree: true, states: true });
+        // }
+        // void this._launchRefresh();
+    }
 
     /**
      * Replaces the system's clipboard with the given string
