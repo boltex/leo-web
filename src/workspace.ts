@@ -1,4 +1,5 @@
 import { openDB } from "idb";
+import * as showdown from "showdown";
 import { Controller } from "./controller";
 import { FileStat } from "./types";
 import { BodyManager } from "./body-manager";
@@ -157,6 +158,9 @@ class Fs {
 }
 
 class Workspace {
+
+    public showdownConverter = new showdown.Converter();
+
     // Window's workspace in use
     public workspaceDirHandle: FileSystemDirectoryHandle | null = null; // The FileSystemDirectoryHandle for the workspace
 

@@ -1,4 +1,3 @@
-import * as showdown from "showdown";
 
 import { NullGui } from "./core/leoGui";
 import * as g from './core/leoGlobals';
@@ -85,9 +84,6 @@ export class LeoUI extends NullGui {
     public findFocusTree = false;
     public findHeadlineRange: [number, number] = [0, 0];
     public findHeadlinePosition: Position | undefined;
-
-    // * Help Panel
-    public showdownConverter = new showdown.Converter();
 
     // * Selection & scroll
     private _selectionDirty: boolean = false; // Flag set when cursor selection is changed
@@ -335,7 +331,7 @@ export class LeoUI extends NullGui {
 
     public put_help(c: Commands, s: string, short_title: string): void {
         s = g.dedent(s.trimEnd());
-        s = this.showdownConverter.makeHtml(s);
+        s = workspace.showdownConverter.makeHtml(s);
         utils.showHtmlInNewTab(s, short_title);
     }
 
