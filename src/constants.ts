@@ -758,6 +758,11 @@ export class Constants {
         CLONE_FIND_PARENTS: "clone-find-parents",
 
         // * Edit Commands
+        CUT_TEXT: "cut-text",
+        COPY_TEXT: "copy-text",
+        PASTE_TEXT: "paste-text",
+        SELECT_ALL_TEXT: "select-all",
+
         BACKWARD_DELETE_CHAR: "backward-delete-char",
         CENTER_LINE: "center-line",
         CENTER_REGION: "center-region",

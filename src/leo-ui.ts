@@ -294,10 +294,24 @@ export class LeoUI extends NullGui {
 
         window.addEventListener('beforeunload', this.onBeforeUnload);
 
+        // Firefox or other may not support that.
+        try {
+            navigator.clipboard.addEventListener("clipboardchange", (event) => {
+                navigator.clipboard.readText().then((s) => {
+                    this.clipboardContents = s;
+                    console.log('Clipboard contents updated: ', s);
+                }).catch((e) => {
+                    console.error('Error reading clipboard contents: ', e);
+                });
+            });
+        } catch (e) {
+            console.warn('Clipboard API not available, clipboard change events will not be detected.', e);
+        }
+
         // * Leo Find Panel
         workspace.logPane.setPostMessageCallback(this._resolveFindPaneMessage.bind(this));
 
-        // TODO: other startup tasks...
+        // TODO: other startup tasks... (if any)
 
         if (g.app.windowList.length) {
             this._setupOpenedLeoDocument();// this sets this.leoStates.fileOpenedReady

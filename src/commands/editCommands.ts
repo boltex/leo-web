@@ -3012,6 +3012,10 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         if (!w) {
             return;
         }
+        if (g.isTextWrapper(w)) {
+            console.log('selectAllText: not implemented for text wrappers');
+            w.selectAllText();
+        }
     }
     //@+node:felix.20251214160853.356: *4* ec.sentences & helpers
     @cmd('back-sentence', 'Move the cursor to the previous sentence.')

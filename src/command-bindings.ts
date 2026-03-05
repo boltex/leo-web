@@ -59,11 +59,10 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.EQUAL_SIZED_PANES, () => leoUI.equalSizedPanes()],
         [CMD.CHOOSE_NEW_WORKSPACE, () => leoUI.chooseNewWorkspace()],
 
-        [CMD.CUT_TEXT, () => leoUI.cutText()],
-        // [CMD.COPY_TEXT, () => leoUI.copyText()],
-        [CMD.COPY_TEXT, () => leoUI.command('copy-text', { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
-        [CMD.PASTE_TEXT, () => leoUI.pasteText()],
-        [CMD.SELECT_ALL_TEXT, () => leoUI.selectAllText()],
+        [CMD.CUT_TEXT, () => leoUI.command(LEOCMD.CUT_TEXT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
+        [CMD.COPY_TEXT, () => leoUI.command(LEOCMD.COPY_TEXT, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.PASTE_TEXT, () => leoUI.command(LEOCMD.PASTE_TEXT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
+        [CMD.SELECT_ALL_TEXT, () => leoUI.command(LEOCMD.SELECT_ALL_TEXT, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
 
         [CMD.SHOW_WELCOME, () => leoUI.showSettings()],
         [CMD.SHOW_SETTINGS, () => leoUI.showSettings()],

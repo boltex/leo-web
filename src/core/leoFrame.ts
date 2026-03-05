@@ -56,6 +56,8 @@ export class LeoFrame {
     public body: NullBody;
     public tab_width: number = 0;
 
+    public cursorStay = true  // May be overridden in subclass.reloadSettings.
+
     public w: number = 800;
     public h: number = 500;
     public x: number = 50;
@@ -77,6 +79,15 @@ export class LeoFrame {
 
         this.tree = new NullTree(this);
         this.body = new NullBody(this);
+
+        this.reloadSettings();
+    }
+    //@+node:felix.20260304201424.1: *3* reloadSettings
+    public reloadSettings(): void {
+        const c = this.c;
+        this.cursorStay = c.config.getBool("cursor-stay-on-paste", true);
+        // this.use_chapters = c.config.getBool('use-chapters');
+        // this.use_chapter_tabs = c.config.getBool('use-chapter-tabs');
     }
     //@+node:felix.20251213133753.137: *3* createFirstTreeNode
     public createFirstTreeNode(): void {
@@ -286,14 +297,12 @@ export class LeoFrame {
     //     if i == j:
     //         ins = w.getInsertPoint()
     //         i, j = g.getLine(w.getAllText(), ins)
-    //     # 2016/03/27: Fix a recent buglet.
-    //     # Don't clear the clipboard if we hit ctrl-c by mistake.
     //     s = w.get(i, j)
     //     s = s.replace('\r\n', '\n').replace('\r', '\n')  # 3759.
     //     if s:
     //         g.app.gui.replaceClipboardWith(s)
 
-    @frame_cmd('copy-text', 'Copy the selected text from the widget to the clipboard.')
+    @frame_cmd('copy-text', 'Copy the selected text from the body to the clipboard.')
     public copyText(): void {
 
         const body = this.body;
@@ -345,6 +354,40 @@ export class LeoFrame {
     //     # If it's the headline, the headline has not officially changed yet.
     //     c.recolor()  # 4398.
 
+    @frame_cmd('cut-text', 'Cut the selected text from the body to the clipboard.')
+    public cutText(): void {
+        const c = this.c;
+        const p = c.p;
+        const u = c.undoer;
+
+        const body = this.body;
+        const w = body.wrapper;
+        if (!g.isTextWrapper(w)) {
+            return;
+        }
+
+        const bunch = u.beforeChangeBody(p)
+        const oldText = w.getAllText();
+
+        // Set the clipboard text.
+        let [i, j] = w.getSelectionRange();
+        if (i === j) {
+            const ins = w.getInsertPoint();
+            [i, j] = g.getLine(oldText, ins);
+        }
+
+        let s = w.get(i, j);
+        w.delete(i, j)
+        s = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        if (s) {
+            g.app.gui.replaceClipboardWith(s);
+        }
+
+        p.v.b = w.getAllText()
+        u.afterChangeBody(p, 'Cut', bunch)
+        c.recolor();  // 4398.
+    }
+
     // OnCutFromMenu = cutText
 
     //@+node:felix.20260304001929.4: *4* LeoFrame.pasteText
@@ -364,14 +407,6 @@ export class LeoFrame {
     //         tCurPosition = w.getInsertPoint()
     //     i, j = w.getSelectionRange()  # Returns insert point if no selection.
 
-    //     # 2025/12/01: c.k.previousSelection no longer exists.
-    //     # if middleButton and c.k.previousSelection is not None:
-    //     # start, end = c.k.previousSelection
-    //     # s = w.getAllText()
-    //     # s = s[start:end]
-    //     # c.k.previousSelection = None
-    //     # else:
-    //     # s = g.app.gui.getTextFromClipboard()
     //     s = g.app.gui.getTextFromClipboard()
     //     s = g.checkUnicode(s)
     //     s = s.replace('\r\n', '\n').replace('\r', '\n')  # 3759.
@@ -412,6 +447,49 @@ export class LeoFrame {
     //     if hasattr(w, 'getXScrollPosition'):
     //         w.setXScrollPosition(x_pos)
     //     c.recolor()  # 4398.
+
+    @frame_cmd('paste-text', 'Paste the clipboard into the body.')
+    public pasteText(): void {
+        const c = this.c;
+        const p = c.p;
+        const u = c.undoer;
+
+        const body = this.body;
+        const w = body.wrapper;
+        if (!g.isTextWrapper(w)) {
+            return;
+        }
+
+        const bunch = u.beforeChangeBody(p)
+
+        let tCurPosition = 0;
+        if (this.cursorStay) {
+            tCurPosition = w.getInsertPoint()
+        }
+        let [i, j] = w.getSelectionRange();
+        let s = g.app.gui.getTextFromClipboard();
+        s = g.checkUnicode(s);
+        s = s.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        if (i != j) {
+            w.delete(i, j);
+        }
+        w.insert(i, s);
+
+        if (this.cursorStay) {
+            let offset: number;
+            if (tCurPosition == j) {
+                offset = s.length - (j - i);
+            } else {
+                offset = 0;
+            }
+            const newCurPosition = tCurPosition + offset;
+            w.setSelectionRange(newCurPosition, newCurPosition)
+        }
+        p.v.b = w.getAllText();
+        u.afterChangeBody(p, 'Paste', bunch)
+        c.recolor();  // 4398.
+    }
 
     // OnPasteFromMenu = pasteText
 
