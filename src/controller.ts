@@ -660,10 +660,21 @@ export class Controller {
     // Global key handlers (work anywhere)
     private handleGlobalKeyDown = (e: KeyboardEvent) => {
 
+        // Uncomment to see key details for debugging keybinding issues. Will log every keydown, so can be noisy!
         // console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
 
-        // TODO : Remove this method if not needed when the rest of leo's core is integrated in this UI,
-        // since most keybindings should be handled in the outline or body panes. 
+        // Block if its CTRL+A if it's not in the body pane nor in an input/textarea, 
+        // to prevent selecting all sorts of unintended things on the page. We want to allow Ctrl+A in the body pane for text selection,
+        // and in any input or textarea for the same reason, but outside of those we should block it to prevent weird interactions with the rest of the UI.
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+            const activeElement = document.activeElement;
+            const isInBodyPane = workspace.layout.BODY_PANE.contains(activeElement);
+            const isInInput = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.getAttribute('contenteditable') === 'true');
+            if (!isInBodyPane && !isInInput) {
+                e.preventDefault();
+            }
+        }
+
     }
 
     private handleDrag = utils.throttle((e) => {
