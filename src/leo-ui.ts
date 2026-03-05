@@ -822,7 +822,6 @@ export class LeoUI extends NullGui {
 
     /**
      * * Refreshes all parts.
-     * @returns Promise back from command's execution, if added on stack, undefined otherwise.
      */
     public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void {
         this.setupRefresh(
@@ -837,7 +836,7 @@ export class LeoUI extends NullGui {
             }
         );
         if (instantRefresh) {
-            // Launch only the tree refresh immediately!
+            // Launch the tree and body refresh immediately!
             workspace.controller.buildRowsRenderTreeLeo();
             if (g.app.windowList[this.frameIndex]) {
                 const c = g.app.windowList[this.frameIndex].c;
