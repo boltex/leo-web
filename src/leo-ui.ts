@@ -839,6 +839,10 @@ export class LeoUI extends NullGui {
         if (instantRefresh) {
             // Launch only the tree refresh immediately!
             workspace.controller.buildRowsRenderTreeLeo();
+            if (g.app.windowList[this.frameIndex]) {
+                const c = g.app.windowList[this.frameIndex].c;
+                this._tryApplyNodeToBody(c.p, true);
+            }
         } else {
             void this.launchRefresh(); // Debounced, for better performance when multiple things need refreshing at once (ex: after a command execution)
         }
