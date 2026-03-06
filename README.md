@@ -35,7 +35,9 @@ Absolute paths are not supported with the browser's file API. Use relative paths
 
 ### Not Yet Implemented
 
-- Find/replace functionality
+- Body pane syntax coloring
+- Nav pane
+- Undo pane
 
 ## Contributing
 
