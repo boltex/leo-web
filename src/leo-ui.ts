@@ -2018,13 +2018,25 @@ export class LeoUI extends NullGui {
 
         w = this.get_focus(c); // get focus again after the operation
         focus = this.widget_name(w);
+
         found = p && p.__bool__();
 
         this.findFocusTree = false; // Reset flag for headline range
         let w_finalFocus = Focus.Body;
-        const w_focus = focus.toLowerCase();
+        let w_focus = focus.toLowerCase();
+
+        console.log(' BEFORE found check , get_focus is:', focus);
+
 
         if (!found) {
+            w = c.get_requested_focus(); // get the focus that the commander requested to be focused after the find operation, which is more accurate for cases where the find operation itself changes the focus (e.g. find in body focusing headline if found there)
+            focus = this.widget_name(w);
+            w_focus = focus.toLowerCase();
+            console.log(' NOT FOUND , get_requested_focus is:', focus);
+
+            if (w_focus.includes('tree') || w_focus.includes('head')) {
+                w_finalFocus = Focus.Outline
+            }
             this.setupRefresh(
                 w_finalFocus, // ! Unlike gotoNavEntry, this sets focus in outline -or- body.
                 {
@@ -2043,6 +2055,7 @@ export class LeoUI extends NullGui {
         } else {
 
             if (w_focus.includes('tree') || w_focus.includes('head')) {
+                console.log(' FOUND , focus is in headline/tree, setting final focus to outline - headline:', p?.h);
                 // tree
                 w_finalFocus = Focus.NoChange; // NoChange because its going to be headline selected, so it will be headline edit mode, which already focuses the headline. 
                 // If we set it to Outline, it will try to focus the tree and mess up the headline edit focus!
@@ -2053,6 +2066,7 @@ export class LeoUI extends NullGui {
                 // this.findHeadlineRange = [w.sel[0], w.sel[1]];
                 // this.findHeadlinePosition = c.p;
             } else {
+                console.log(' FOUND , focus is in body, setting final focus to body - headline:', p?.h);
                 // this.showBodyIfClosed = true;
             }
             const w_scroll = (found && w_finalFocus === Focus.Body) || undefined;
@@ -2070,9 +2084,9 @@ export class LeoUI extends NullGui {
                 this.findFocusTree
             );
 
-            this._launchRefresh();
+            this.launchRefresh();
 
-            if (this.findFocusTree) {
+            if (this.findFocusTree && w.sel) {
                 setTimeout(() => {
                     // Select headline if needed after refresh.
                     this.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);

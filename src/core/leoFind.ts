@@ -1067,6 +1067,7 @@ export class LeoFind {
         const gui_w = this.in_headline
             ? c.edit_widget(p)
             : c.frame.body.wrapper;
+        console.log(`Starting do_find_next: in_headline: ${this.in_headline} p: ${p?.h}`);
         //
         // Init the work widget, so we don't get stuck.
         const s = this.in_headline ? p.h : p.b;
@@ -1154,6 +1155,8 @@ export class LeoFind {
             return [undefined, undefined, undefined];
         }
         const data = this.save();
+        console.log(`before find_next_match self.in_headline is ${this.in_headline}`)
+
         let pos;
         let newpos;
         [p, pos, newpos] = this.find_next_match(p);
@@ -1162,6 +1165,8 @@ export class LeoFind {
             this.show_success(p!, pos!, newpos!);
         } else {
             // Restore previous position.
+            console.log(`do_find_next, not found! self.in_headline is ${this.in_headline}`)
+
             this.restore(data);
         }
         this.show_status(found);
@@ -3783,6 +3788,8 @@ export class LeoFind {
         }
         c.selectPosition(p);
         // Fix bug 1258373: https://bugs.launchpad.net/leo-editor/+bug/1258373
+        console.log('In restore: self.in_headline is', this.in_headline, 'but p is', p.h)
+
         if (this.in_headline) {
             c.treeWantsFocus();
         } else {
