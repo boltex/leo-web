@@ -35,6 +35,7 @@ import { menuData } from "./menu";
 import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
 import { QuickSearchController } from "./core/quicksearch";
+import { HeadlineFinishedResult } from "./outline-manager";
 
 /**
  * Implements LeoGUI instanced as g.app.gui at startup.
@@ -502,12 +503,13 @@ export class LeoUI extends NullGui {
         }
     }
 
-
-    public endEditHeadline(): [string, boolean, [number, number, number]] | undefined {
+    public endEditHeadline(p_saveSelectionOnly?: boolean): HeadlineFinishedResult | undefined {
         if (workspace.outline.headlineFinish) {
-            const result = workspace.outline.headlineFinish();
+            console.log('Ending headline edit HAD A HEADLINEFINISH TO CALL! ');
+            const result = workspace.outline.headlineFinish(false, p_saveSelectionOnly);
             return result;
         }
+        console.log('Ending headline edit had NO headlineFinish to call! ');
         return undefined;
     }
 
@@ -516,13 +518,18 @@ export class LeoUI extends NullGui {
      *   That is, only if a change has been made to the body 'document' so far
      * @returns a promise that resolves when the possible saving process is finished
      */
-    public triggerBodySave(p_fromFocusChange?: boolean): [string, boolean, [number, number, number]] | undefined {
+    public triggerBodySave(p_fromFocusChange?: boolean, p_saveSelectionOnly?: boolean): HeadlineFinishedResult | undefined {
 
-        let hadEditHeadline: [string, boolean, [number, number, number]] | undefined = undefined;
+        let hadEditHeadline: HeadlineFinishedResult | undefined = undefined;
 
-        // * Check if headline edit input box is active. Validate it with current value.
-        if (!p_fromFocusChange) {
-            hadEditHeadline = this.endEditHeadline();
+        if (p_fromFocusChange) {
+            console.log('Reset selection and insertion!');
+            // const c = g.app.windowList[this.frameIndex].c;
+            // c.endEditing();  // Reset selection and insertion
+
+        } else {
+            hadEditHeadline = this.endEditHeadline(p_saveSelectionOnly);
+
         }
 
         // * Save body to Leo if a change has been made to the body 'document' so far
@@ -1675,61 +1682,23 @@ export class LeoUI extends NullGui {
 
         this.inEditHeadline++;
         this.leoStates.inHeadlineEdit = true;
-        let [p_newHeadline, blurred, newSelection] = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);
+        let headlineResult = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);
         this.inEditHeadline--;
         if (!this.inEditHeadline) {
             this.leoStates.inHeadlineEdit = false;
         }
 
-        // if ((p_newHeadline || p_newHeadline === "") && p_newHeadline !== "\n") {
+        if (headlineResult.saveSelectionOnly) {
+            console.log("Ok edit headline is done, no refresh needed, returning");
+            return w_p;
 
-        //     // let w = this.get_focus(c);
-        //     // const focus = this.widget_name(w);
-        //     // const inOutline = (focus.includes("tree")) || (focus.includes("head"));
-        //     // if (inOutline && newSelection) {
-        //     //     // w.sel[0] = newSelection ? newSelection[0] : 0;
-        //     //     // w.sel[1] = newSelection ? newSelection[1] : 0;
-        //     //     // w.ins = newSelection ? newSelection[2] : 0;
-        //     //     console.log(`The Old StringTextWrapper selection was ${w.sel[0]}, ${w.sel[1]}, ${w.ins}`);
-        //     //     console.log(`Should we set new selection from headline edit to this? -> ${newSelection[0]}, ${newSelection[1]}, ${newSelection[2]}`);
-        //     // }
+        }
 
-        //     let w_truncated = false;
-        //     if (p_newHeadline.indexOf("\n") >= 0) {
-        //         p_newHeadline = p_newHeadline.split("\n")[0];
-        //         w_truncated = true;
-        //     }
-        //     if (p_newHeadline.length > 1000) {
-        //         p_newHeadline = p_newHeadline.substring(0, 1000);
-        //         w_truncated = true;
-        //     }
-
-        //     if (w_p && w_p.h !== p_newHeadline) {
-        //         if (w_truncated) {
-        //             void workspace.dialog.showInformationMessage("Truncating headline");
-        //         }
-        //         if (g.doHook("headkey1", { c: c, p: c.p, ch: '\n', changed: true })) {
-        //             return w_p;  // The hook claims to have handled the event.
-        //         }
-        //         const undoData = u.beforeChangeHeadline(w_p);
-        //         c.setHeadString(w_p, p_newHeadline); // Set v.h *after* calling the undoer's before method.
-        //         if (!c.changed) {
-        //             c.setChanged();
-        //         }
-        //         u.afterChangeHeadline(w_p, 'Edit Headline', undoData);
-        //         g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
-        //     }
-        // }
-        // if (blurred) {
-        //     // call setupRefresh so as to not force focus on anything.
-        //     this.setupRefresh(Focus.NoChange, { tree: true, states: true });
-        // }
-        // void this._launchRefresh();
         console.log("Ok edit headline is done, refreshing");
 
         this.setupRefresh(Focus.Outline, { tree: true, states: true });
 
-        if (blurred) {
+        if (headlineResult.blurred) {
             // call setupRefresh so as to not force focus on anything.
             this.setupRefresh(Focus.NoChange, { tree: true, states: true });
         }
@@ -1737,37 +1706,45 @@ export class LeoUI extends NullGui {
         return w_p;
     }
 
-    private _finishEditHeadline(node: Position, p_newHeadline: string, blurred: boolean, newSelection: [number, number, number]): void {
-        console.log('Finishing headline edit with new headline:', p_newHeadline, ' blurred:', blurred, ' newSelection:', newSelection);
+    private _finishEditHeadline(result: HeadlineFinishedResult): void {
+        console.log('Finishing headline edit with new headline:', result.newHeadline, ' blurred:', result.blurred, ' newSelection:', result.selection);
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         let w = this.get_focus(c);
+        const node = result.node;
+        let newHeadline = result.newHeadline;
+        const newSelection = result.selection;
+        const saveSelectionOnly = result.saveSelectionOnly;
+
         const focus = this.widget_name(w);
-        const inOutline = (focus.includes("tree")) || (focus.includes("head"));
         console.log('Current focus is:', focus);
-        if (inOutline && newSelection) {
-            // w.sel[0] = newSelection ? newSelection[0] : 0;
-            // w.sel[1] = newSelection ? newSelection[1] : 0;
-            // w.ins = newSelection ? newSelection[2] : 0;
-            if (w && w.sel) {
-                console.log(`The Old StringTextWrapper selection was ${w.sel[0]}, ${w.sel[1]}, ${w.ins}`);
-                console.log(`Should we set new selection from headline edit to this? -> ${newSelection[0]}, ${newSelection[1]}, ${newSelection[2]}`);
+
+        if (saveSelectionOnly) {
+            c.frame.tree.editLabel(node); // <-- THIS SHOULD CREATE IT !
+            const headlineWidget = c.edit_widget(node) as StringTextWrapper;
+            if (headlineWidget && headlineWidget.sel) {
+                headlineWidget.setSelectionRange(newSelection[0], newSelection[1], newSelection[2]);
             } else {
-                console.log('Could not find the StringTextWrapper to set selection on after headline edit', w);
+                console.error('Could not find the StringTextWrapper to set selection on after headline edit', w);
+            }
+        } else {
+            const d = c.frame.tree.editWidgetsDict;
+            if (d[c.p.v.gnx]) {
+                delete d[c.p.v.gnx];
             }
         }
 
         let w_truncated = false;
-        if (p_newHeadline.indexOf("\n") >= 0) {
-            p_newHeadline = p_newHeadline.split("\n")[0];
+        if (newHeadline.indexOf("\n") >= 0) {
+            newHeadline = newHeadline.split("\n")[0];
             w_truncated = true;
         }
-        if (p_newHeadline.length > 1000) {
-            p_newHeadline = p_newHeadline.substring(0, 1000);
+        if (newHeadline.length > 1000) {
+            newHeadline = newHeadline.substring(0, 1000);
             w_truncated = true;
         }
 
-        if (node && node.h !== p_newHeadline) {
+        if (node && node.h !== newHeadline) {
             if (w_truncated) {
                 void workspace.dialog.showInformationMessage("Truncating headline");
             }
@@ -1775,7 +1752,7 @@ export class LeoUI extends NullGui {
                 // return node;  // The hook claims to have handled the event.
             }
             const undoData = u.beforeChangeHeadline(node);
-            c.setHeadString(node, p_newHeadline); // Set v.h *after* calling the undoer's before method.
+            c.setHeadString(node, newHeadline); // Set v.h *after* calling the undoer's before method.
             if (!c.changed) {
                 c.setChanged();
             }
@@ -2000,11 +1977,11 @@ export class LeoUI extends NullGui {
      */
     public async find(p_reverse: boolean): Promise<unknown> {
 
-        const headlineResult = this.triggerBodySave();
+        const headlineResult = this.triggerBodySave(false, true); // From Find: save selection and insert pos only
         if (headlineResult) {
-
-            console.log('find headlineResult', headlineResult[0], headlineResult[1]);
-            console.log('position cursor: ', headlineResult[2][0], headlineResult[2][1], headlineResult[2][2])
+            const selection = headlineResult.selection
+            console.log('find headlineResul blurred:', headlineResult.blurred, 'new headline', headlineResult.newHeadline);
+            console.log('position cursor: ', selection[0], selection[1], selection[2])
         }
         let found;
         let focus;
@@ -2044,15 +2021,32 @@ export class LeoUI extends NullGui {
         found = p && p.__bool__();
 
         this.findFocusTree = false; // Reset flag for headline range
+        let w_finalFocus = Focus.Body;
+        const w_focus = focus.toLowerCase();
 
-        if (!found || !focus) {
+        if (!found) {
+            this.setupRefresh(
+                w_finalFocus, // ! Unlike gotoNavEntry, this sets focus in outline -or- body.
+                {
+                    tree: true, // HAVE to refresh tree because find folds/unfolds only result outline paths
+                    body: true,
+                    scroll: false,
+                    // documents: false,
+                    // buttons: false,
+                    states: true,
+                },
+                this.findFocusTree
+            );
+            this.launchRefresh();
+
             return workspace.dialog.showInformationMessage('Not found');
         } else {
-            let w_finalFocus = Focus.Body;
-            const w_focus = focus.toLowerCase();
+
             if (w_focus.includes('tree') || w_focus.includes('head')) {
                 // tree
-                w_finalFocus = Focus.Outline;
+                w_finalFocus = Focus.NoChange; // NoChange because its going to be headline selected, so it will be headline edit mode, which already focuses the headline. 
+                // If we set it to Outline, it will try to focus the tree and mess up the headline edit focus!
+
                 // this.showOutlineIfClosed = true;
                 // * SETUP HEADLINE RANGE -> NOT NEEDED IN LEO-WEB ? 
                 this.findFocusTree = true;

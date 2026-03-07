@@ -2,6 +2,14 @@ import { Position } from './core/leoNodes';
 import { FlatRowLeo } from './types';
 import { workspace } from './workspace';
 
+export type HeadlineFinishedResult = {
+    node: Position;
+    blurred: boolean;
+    saveSelectionOnly: boolean;
+    newHeadline: string;
+    selection: [number, number, number];
+};
+
 /**
  * Outline Manager renders only the visible portion of the tree and provides a responsive UI for headline editing.
  * It receives the flat list of visible nodes (flatRowsLeo) from the controller, which computes it based on the current tree state and user interactions.
@@ -27,9 +35,9 @@ export class OutlineManager {
     public ROW_HEIGHT = 26;
     private LEFT_OFFSET = 16; // Padding from left edge
 
-    public headlineFinish: (() => [string, boolean, [number, number, number]] | undefined) | null = null; // Force-close any previous headline edit.
+    public headlineFinish: ((blurred?: boolean, p_saveSelectionOnly?: boolean) => HeadlineFinishedResult | undefined) | null = null; // Force-close any previous headline edit.
 
-    private _headlineFinishedCallback: ((node: Position, newHeadline: string, blurred: boolean, selection: [number, number, number]) => void) | null = null; // Other technique.
+    private _headlineFinishedCallback: ((result: HeadlineFinishedResult) => void) | null = null; // Other technique.
 
     constructor() {
         this.SPACER = document.getElementById("spacer")!;
@@ -38,7 +46,7 @@ export class OutlineManager {
 
     }
 
-    public setEditFinishedCallback(callback: (node: Position, newHeadline: string, blurred: boolean, selection: [number, number, number]) => void) {
+    public setEditFinishedCallback(callback: (result: HeadlineFinishedResult) => void) {
         this._headlineFinishedCallback = callback;
     }
 
@@ -52,10 +60,10 @@ export class OutlineManager {
      * @param node The Position for which to find corresponding outlive view node.
      * @param selectAll select whole (or falsy)
      * @param selection specific selection range (overrides selectAll if provided) its start,end and insertionn point which needs to be compared to to start and end to set direction
-     * @returns A promise that resolves to a tuple containing the new headline string and a boolean indicating whether the headline was changed along with last selection state info.
+     * @returns A promise that resolves to a HeadlineFinishedResult containing the new headline string, a boolean indicating whether the headline was changed, and the last selection state info.
      * TODO : should also return the cursor position : use selectionStart, selectionEnd and selectionDirection to determine a proper cursor position.
      */
-    public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number, number]): Promise<[string, boolean, [number, number, number]]> {
+    public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number, number]): Promise<HeadlineFinishedResult> {
         // Force-close any previous headline edit (resolves its pending promise)
         if (this.headlineFinish) {
             this.headlineFinish();
@@ -67,13 +75,13 @@ export class OutlineManager {
         // the node vertical position needs to be calculated similarly to 
         if (!this._flatRowsLeo) {
             console.warn('Headline edit requested but flatRowsLeo is not initialized');
-            return Promise.resolve([node.h, false, [0, 0, 0]]);  // Not initialized yet, should never happen.
+            return Promise.resolve({ node, newHeadline: node.h, blurred: false, saveSelectionOnly: false, selection: [0, 0, 0] });  // Not initialized yet, should never happen.
         };
 
         const index = this._flatRowsLeo.findIndex(row => row.node.__eq__(node));
         if (index === -1) {
             console.warn('Headline edit requested but node not found in flatRowsLeo');
-            return Promise.resolve([node.h, false, [0, 0, 0]]); // Not found (shouldn't happen)
+            return Promise.resolve({ node, newHeadline: node.h, blurred: false, saveSelectionOnly: false, selection: [0, 0, 0] }); // Not found (shouldn't happen)
         }
 
         const nodeOffsetY = index * this.ROW_HEIGHT;
@@ -82,7 +90,7 @@ export class OutlineManager {
         // Accept its content even if escaped or focus-out, we return its content no matter what,
         // and the caller will decide what to do with it (update headline or not)
 
-        return new Promise<[string, boolean, [number, number, number]]>((resolve) => {
+        return new Promise<HeadlineFinishedResult>((resolve) => {
 
             let leftOffset = this.LEFT_OFFSET;
             if (this._flatRowsLeo!.every(r => !r.hasChildren)) {
@@ -122,7 +130,7 @@ export class OutlineManager {
 
             let resolved = false;
 
-            const finish = (blurred?: boolean): [string, boolean, [number, number, number]] | undefined => {
+            const finish = (blurred?: boolean, p_saveSelectionOnly?: boolean): HeadlineFinishedResult | undefined => {
                 if (resolved) return;
                 resolved = true;
                 const newHeadline = input.value;
@@ -138,14 +146,32 @@ export class OutlineManager {
 
                 // 1- Call the callback to notify that headline editing is finished, passing the new headline and whether it was blurred.
                 if (this._headlineFinishedCallback) {
-                    this._headlineFinishedCallback(node, newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]);
+                    this._headlineFinishedCallback({
+                        node: node,
+                        newHeadline,
+                        blurred: !!blurred,
+                        saveSelectionOnly: !!p_saveSelectionOnly,
+                        selection: [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]
+                    });
                 }
 
                 // 2- Resolve the promise to notify the original edit-headline initiator with the new headline, whether it was blurred, and the last selection state.
-                resolve([newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]]);
+                resolve({
+                    node: node,
+                    newHeadline,
+                    blurred: !!blurred,
+                    saveSelectionOnly: !!p_saveSelectionOnly,
+                    selection: [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]
+                });
 
                 // 3- Also return the last selection state so the 'finish' caller have access to it and can decide to use it or not 
-                return [newHeadline, !!blurred, [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]];
+                return {
+                    node: node,
+                    newHeadline,
+                    blurred: !!blurred,
+                    saveSelectionOnly: !!p_saveSelectionOnly,
+                    selection: [input.selectionStart || 0, input.selectionEnd || 0, input.selectionDirection === "backward" ? input.selectionStart || 0 : input.selectionEnd || 0]
+                };
 
             };
 
