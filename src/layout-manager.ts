@@ -32,6 +32,7 @@ export class LayoutManager {
     public minHeight = 20;
 
     private lastFocusedElement: HTMLElement | null = null; // Used when opening/closing the menu to restore focus
+    private lastFocusedBodyOrOutline: 'body' | 'outline' | null = null; // Used to track the last focused element between body and outline. Should never really be null.
 
     constructor() {
         this.HTML_ELEMENT = document.documentElement;
@@ -45,10 +46,27 @@ export class LayoutManager {
         this.VERTICAL_RESIZER = document.getElementById('main-resizer')!;
         this.HORIZONTAL_RESIZER = document.getElementById('secondary-resizer')!;
         this.CROSS_RESIZER = document.getElementById('cross-resizer')!;
+
+        // Setup 'focusin' listeners for both outline and body panes to track the last focused element between them
+        this.OUTLINE_PANE.addEventListener('focusin', () => {
+            this.lastFocusedBodyOrOutline = 'outline';
+        });
+        this.BODY_PANE.addEventListener('focusin', () => {
+            this.lastFocusedBodyOrOutline = 'body';
+        });
+
     }
 
     public setHasOpenedDocuments(hasOpened: boolean) {
         this.HTML_ELEMENT.setAttribute('data-no-opened-documents', hasOpened ? 'false' : 'true');
+    }
+
+    public getLastFocusedBodyOrOutline(): 'body' | 'outline' {
+        // Error out if null 
+        if (!this.lastFocusedBodyOrOutline) {
+            throw new Error('Last focused body or outline is null, this should never happen');
+        }
+        return this.lastFocusedBodyOrOutline;
     }
 
     public isOutlineFocused(): boolean {
@@ -76,7 +94,6 @@ export class LayoutManager {
             this.CROSS_RESIZER.style.top = (outlineHeight) + 'px';
         }
     }
-
 
     public setupLastFocusedElementTracking() {
         const focusableElements = [this.OUTLINE_PANE, this.BODY_PANE];
