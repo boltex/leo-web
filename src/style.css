@@ -20,6 +20,13 @@
   --menu-caret-color: #666;
   --menu-border-color: #ccc;
   --menu-box-shadow-color: rgba(0, 0, 0, 0.2);
+  /* Syntax Highlighting - Light Mode */
+  --syn-keyword: #af00db; /* Purple */
+  --syn-string: #a31515; /* Deep Red */
+  --syn-comment: #008000; /* Green */
+  --syn-section: #007acc; /* Blue */
+  --syn-function: #795e26; /* Brown/Gold */
+
   /* vertical layout (default) */
   --main-direction: row;
   --main-resizer-width: 5px;
@@ -166,6 +173,13 @@
   --menu-caret-color: #999;
   --menu-border-color: #5c5485;
   --menu-box-shadow-color: rgba(246, 150, 255, 0.247);
+
+  /* Syntax Highlighting - Dark Mode */
+  --syn-keyword: #c586c0; /* Light Purple */
+  --syn-string: #ce9178; /* Salmon/Orange */
+  --syn-comment: #6a9955; /* Sage Green */
+  --syn-section: #4ec9b0; /* Teal */
+  --syn-function: #dcdcaa; /* Soft Yellow */
 }
 
 [data-layout="horizontal"] {
@@ -689,6 +703,29 @@ body.dragging-cross {
 #outline-pane,
 #log-pane {
   flex: 1 1 0;
+}
+
+/* Mapping Prism tokens to Leo-web variables */
+#body-pane .token.keyword {
+  color: var(--syn-keyword);
+  /* font-weight: bold; */
+}
+#body-pane .token.string {
+  color: var(--syn-string);
+}
+#body-pane .token.comment {
+  color: var(--syn-comment);
+  /* font-style: italic; */
+}
+#body-pane .token.function {
+  color: var(--syn-function);
+}
+
+/* Custom Leo Tokens */
+#body-pane .token.leo-sectionref {
+  color: var(--syn-section);
+  text-decoration: underline;
+  /* font-weight: bold; */
 }
 
 #body-pane {

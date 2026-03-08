@@ -1,6 +1,10 @@
 import * as utils from './utils';
 import { workspace } from './workspace';
 import * as body from './body'
+import * as Prism from 'prismjs';
+// Import languages you need
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-python';
 
 /**
  * Body Manager is responsible for managing the body pane, which includes rendering the body text, handling user interactions
@@ -208,6 +212,39 @@ export class BodyManager {
      */
     public setBodyLanguage(language: string): void {
         console.log('(setBodyLanguage) Setting body language to', language);
+        // First gather selection and insertion point in order to restore them after re-rendering
+        const domSelection = document.getSelection();
+        if (!domSelection || domSelection.rangeCount === 0) return;
+
+        // Check if the selection is within the BODY_PANE
+        const range = domSelection.getRangeAt(0);
+        if (!workspace.layout.BODY_PANE.contains(range.commonAncestorContainer)) {
+            return; // Selection is not in the body pane
+        }
+
+        // Convert DOM selection to Position/Selection objects
+        const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
+        const activePos = this.offsetToPosition(domSelection.focusOffset, domSelection.focusNode);
+
+        const selection = new body.Selection(anchorPos, activePos);
+        // Get current body text
+        const currentText = this.getBody();
+        // Re-set the body with the same text but new language for syntax highlighting
+        // 1. Get the grammar for the language
+        const grammar = Prism.languages[language] || Prism.languages.plaintext;
+
+        console.log(grammar); // Debug: log the grammar to ensure it's loaded correctly
+
+        // 2. Prism.highlight returns a string with <span class="token"> tags
+        // It also handles escaping for you!
+        const highlightedHtml = Prism.highlight(currentText, grammar, language);
+
+        // 3. Inject into the pane
+        workspace.layout.BODY_PANE.innerHTML = highlightedHtml;
+
+        // Restore selection
+        this.setBodySelection(selection, true);
+
     }
 
     /**
@@ -216,12 +253,22 @@ export class BodyManager {
     public setBody(text: string, wrap: boolean, language = "plain") {
         this.setBodyWrap(wrap);
 
-        console.log('(setBody) Setting body language to', language);
+        // 1. Get the grammar for the language
+        const grammar = Prism.languages[language] || Prism.languages.plaintext;
 
-        // Escape the text to prevent HTML injection, <, >, &, etc. but preserve newlines and spaces
-        text = this._escapeBodyText(text);
+        console.log(grammar); // Debug: log the grammar to ensure it's loaded correctly
 
-        workspace.layout.BODY_PANE.innerHTML = text;
+        // 2. Prism.highlight returns a string with <span class="token"> tags
+        // It also handles escaping for you!
+        const highlightedHtml = Prism.highlight(text, grammar, language);
+
+        // 3. Inject into the pane
+        workspace.layout.BODY_PANE.innerHTML = highlightedHtml;
+
+        // // Escape the text to prevent HTML injection, <, >, &, etc. but preserve newlines and spaces
+        // text = this._escapeBodyText(text);
+
+        // workspace.layout.BODY_PANE.innerHTML = text;
     }
 
     public setBodyEditable(editable: boolean) {
