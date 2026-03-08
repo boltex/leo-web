@@ -19,10 +19,6 @@ export class BodyManager {
 
     }
 
-    public setBodyLanguage(language: string): void {
-        console.log('Setting body language to', language);
-    }
-
     public setChangeTextEditorSelectionCallback(callback: (selection: body.Selection) => void) {
         const handleSelectionChange = () => {
 
@@ -207,8 +203,20 @@ export class BodyManager {
         });
     }
 
-    public setBody(text: string, wrap: boolean) {
+    /**
+     * Used when we only change the language syntax coloring in the body pane, without changing the body text or wrap state.
+     */
+    public setBodyLanguage(language: string): void {
+        console.log('(setBodyLanguage) Setting body language to', language);
+    }
+
+    /**
+     * Sets the body text, wrap state, and optionally the language for syntax coloring. The text is escaped to prevent HTML injection, and newlines/spaces are preserved.
+     */
+    public setBody(text: string, wrap: boolean, language = "plain") {
         this.setBodyWrap(wrap);
+
+        console.log('(setBody) Setting body language to', language);
 
         // Escape the text to prevent HTML injection, <, >, &, etc. but preserve newlines and spaces
         text = this._escapeBodyText(text);

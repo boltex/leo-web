@@ -660,13 +660,13 @@ export class LeoUI extends NullGui {
 
     public refreshBodyStates(): void {
         const c = g.app.windowList[this.frameIndex].c;
-        let w_language = this._getBodyLanguage(c.p);
+        const [w_language, w_wrap] = this._getBodyLanguage(c.p);
 
-        // Set document language (TODO after the base of Leo-Web works)
-        // this._setBodyLanguage(w_language);
+        // Set document language
+        this._setBodyLanguage(w_language);
 
         // Set document wrap
-        workspace.body.setBodyWrap(w_language[1]);
+        workspace.body.setBodyWrap(w_wrap);
     }
 
     public refreshGotoPane(): void {
@@ -996,9 +996,10 @@ export class LeoUI extends NullGui {
         }
 
         const [w_language, w_wrap] = this._getBodyLanguage(node);
-        // 1- set body text and wrap
-        workspace.body.setBody(p.b, w_wrap);
-        this._setBodyLanguage(w_language);
+
+        workspace.body.setBody(p.b, w_wrap, w_language);
+        // this._setBodyLanguage(w_language); // Unused?
+
         const scroll = p.v.scrollBarSpot;
         workspace.body.setBodyScroll(scroll);
 
