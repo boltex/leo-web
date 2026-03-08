@@ -3752,7 +3752,6 @@ export function es(...args: any[]): void {
         app.gui.addLogPaneEntry(s);
     } else {
         logBuffer.push(s);
-        console.log("Log Pane Not Ready: ", s);
     }
 }
 

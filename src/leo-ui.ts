@@ -106,7 +106,6 @@ export class LeoUI extends NullGui {
 
     constructor(guiName = 'browserGui') {
         super(guiName);
-        console.log('LeoUI initialized with gui:', guiName);
         this.isNullGui = false;
 
         this.idleTimeClass = IdleTime;
@@ -300,7 +299,6 @@ export class LeoUI extends NullGui {
             navigator.clipboard.addEventListener("clipboardchange", (event) => {
                 navigator.clipboard.readText().then((s) => {
                     this.clipboardContents = s;
-                    console.log('Clipboard contents updated: ', s);
                 }).catch((e) => {
                     console.error('Error reading clipboard contents: ', e);
                 });
@@ -400,7 +398,7 @@ export class LeoUI extends NullGui {
                 const buffer = g.logBuffer;
                 while (buffer.length > 0) {
                     // Pop the bottom one and append it
-                    g.es_print(buffer.shift()!);
+                    g.es(buffer.shift()!);
                 }
             }
         }
@@ -412,6 +410,10 @@ export class LeoUI extends NullGui {
         } else {
             g.logBuffer.push(p_message);
         }
+    }
+
+    public showLogPane(p_focus?: boolean): void {
+        workspace.logPane.showTab('log');
     }
 
     /**
@@ -505,11 +507,9 @@ export class LeoUI extends NullGui {
 
     public endEditHeadline(p_saveSelectionOnly?: boolean): HeadlineFinishedResult | undefined {
         if (workspace.outline.headlineFinish) {
-            console.log('Ending headline edit HAD A HEADLINEFINISH TO CALL! ');
             const result = workspace.outline.headlineFinish(false, p_saveSelectionOnly);
             return result;
         }
-        console.log('Ending headline edit had NO headlineFinish to call! ');
         return undefined;
     }
 
@@ -522,14 +522,8 @@ export class LeoUI extends NullGui {
 
         let hadEditHeadline: HeadlineFinishedResult | undefined = undefined;
 
-        if (p_fromFocusChange) {
-            console.log('Reset selection and insertion!');
-            // const c = g.app.windowList[this.frameIndex].c;
-            // c.endEditing();  // Reset selection and insertion
-
-        } else {
+        if (!p_fromFocusChange) {
             hadEditHeadline = this.endEditHeadline(p_saveSelectionOnly);
-
         }
 
         // * Save body to Leo if a change has been made to the body 'document' so far
@@ -1668,14 +1662,7 @@ export class LeoUI extends NullGui {
         const u = c.undoer;
         const w_p: Position = p_node || c.p;
 
-        const hadEditHeadline = this.triggerBodySave();
-        // if (hadEditHeadline && !p_retried) {
-        //     return new Promise((resolve) => {
-        //         setTimeout(() => {
-        //             resolve(this.editHeadline(p_node, selectAll, selection, true));
-        //         }, 0);
-        //     });
-        // }
+        this.triggerBodySave();
 
         // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
         this.setupRefresh(Focus.Outline, { tree: true, states: true });
@@ -1689,13 +1676,9 @@ export class LeoUI extends NullGui {
         }
 
         if (headlineResult.saveSelectionOnly) {
-            console.log("Ok edit headline is done, no refresh needed, returning");
             return w_p;
 
         }
-
-        console.log("Ok edit headline is done, refreshing");
-
         this.setupRefresh(Focus.Outline, { tree: true, states: true });
 
         if (headlineResult.blurred) {
@@ -1707,7 +1690,6 @@ export class LeoUI extends NullGui {
     }
 
     private _finishEditHeadline(result: HeadlineFinishedResult): void {
-        console.log('Finishing headline edit with new headline:', result.newHeadline, ' blurred:', result.blurred, ' newSelection:', result.selection);
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         let w = this.get_focus(c);
@@ -1717,7 +1699,6 @@ export class LeoUI extends NullGui {
         const saveSelectionOnly = result.saveSelectionOnly;
 
         const focus = this.widget_name(w);
-        console.log('Current focus is:', focus);
 
         if (saveSelectionOnly) {
             c.frame.tree.editLabel(node); // <-- THIS SHOULD CREATE IT !
@@ -1759,13 +1740,6 @@ export class LeoUI extends NullGui {
             u.afterChangeHeadline(node, 'Edit Headline', undoData);
             g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
         }
-        // this.setupRefresh(Focus.Outline, { tree: true, states: true });
-
-        // if (blurred) {
-        //     // call setupRefresh so as to not force focus on anything.
-        //     this.setupRefresh(Focus.NoChange, { tree: true, states: true });
-        // }
-        // void this._launchRefresh();
     }
 
     /**
@@ -1977,14 +1951,7 @@ export class LeoUI extends NullGui {
      */
     public async find(p_reverse: boolean): Promise<unknown> {
 
-        const headlineResult = this.triggerBodySave(false, true); // From Find: save selection and insert pos only
-        if (headlineResult) {
-            const selection = headlineResult.selection
-            console.log('find headlineResult blurred:', headlineResult.blurred, 'new headline', headlineResult.newHeadline);
-            console.log('position cursor: ', selection[0], selection[1], selection[2])
-        }
-        let found;
-        let focus;
+        this.triggerBodySave(false, true); // From Find: save selection and insert pos only
 
         const c = g.app.windowList[this.frameIndex].c;
         const fc = c.findCommands;
@@ -1995,7 +1962,7 @@ export class LeoUI extends NullGui {
         const fromOutline = !fromBody;
 
         let w = this.get_focus(c);
-        focus = this.widget_name(w);
+        let focus = this.widget_name(w);
 
         const inOutline = (focus.includes("tree")) || (focus.includes("head"));
         const inBody = !inOutline;
@@ -2019,20 +1986,16 @@ export class LeoUI extends NullGui {
         w = this.get_focus(c); // get focus again after the operation
         focus = this.widget_name(w);
 
-        found = p && p.__bool__();
+        let found = p && p.__bool__();
 
         this.findFocusTree = false; // Reset flag for headline range
         let w_finalFocus = Focus.Body;
         let w_focus = focus.toLowerCase();
 
-        console.log(' BEFORE found check , get_focus is:', focus);
-
-
         if (!found) {
             w = c.get_requested_focus(); // get the focus that the commander requested to be focused after the find operation, which is more accurate for cases where the find operation itself changes the focus (e.g. find in body focusing headline if found there)
             focus = this.widget_name(w);
             w_focus = focus.toLowerCase();
-            console.log(' NOT FOUND , get_requested_focus is:', focus);
 
             if (w_focus.includes('tree') || w_focus.includes('head')) {
                 w_finalFocus = Focus.Outline
@@ -2042,7 +2005,7 @@ export class LeoUI extends NullGui {
                 {
                     tree: true, // HAVE to refresh tree because find folds/unfolds only result outline paths
                     body: true,
-                    scroll: false,
+                    scroll: false, // not found: dont scroll.
                     // documents: false,
                     // buttons: false,
                     states: true,
@@ -2055,19 +2018,9 @@ export class LeoUI extends NullGui {
         } else {
 
             if (w_focus.includes('tree') || w_focus.includes('head')) {
-                console.log(' FOUND , focus is in headline/tree, setting final focus to outline - headline:', p?.h);
-                // tree
                 w_finalFocus = Focus.NoChange; // NoChange because its going to be headline selected, so it will be headline edit mode, which already focuses the headline. 
                 // If we set it to Outline, it will try to focus the tree and mess up the headline edit focus!
-
-                // this.showOutlineIfClosed = true;
-                // * SETUP HEADLINE RANGE -> NOT NEEDED IN LEO-WEB ? 
                 this.findFocusTree = true;
-                // this.findHeadlineRange = [w.sel[0], w.sel[1]];
-                // this.findHeadlinePosition = c.p;
-            } else {
-                console.log(' FOUND , focus is in body, setting final focus to body - headline:', p?.h);
-                // this.showBodyIfClosed = true;
             }
             const w_scroll = (found && w_finalFocus === Focus.Body) || undefined;
 
@@ -2103,14 +2056,7 @@ export class LeoUI extends NullGui {
      */
     public async replace(p_thenFind?: boolean): Promise<unknown> {
 
-        const headlineResult = this.triggerBodySave(false, true); // From Find: save selection and insert pos only
-        if (headlineResult) {
-            const selection = headlineResult.selection
-            console.log('Replace headlineResult blurred:', headlineResult.blurred, 'new headline', headlineResult.newHeadline);
-            console.log('position cursor: ', selection[0], selection[1], selection[2])
-        }
-        let found;
-        let focus;
+        this.triggerBodySave(false, true); // From Find: save selection and insert pos only
 
         const c = g.app.windowList[this.frameIndex].c;
         const fc = c.findCommands;
@@ -2120,7 +2066,7 @@ export class LeoUI extends NullGui {
         const fromOutline = !fromBody;
 
         let w = this.get_focus(c);
-        focus = this.widget_name(w);
+        let focus = this.widget_name(w);
 
         const inOutline = (focus.includes("tree")) || (focus.includes("head"));
         const inBody = !inOutline;
@@ -2133,7 +2079,7 @@ export class LeoUI extends NullGui {
             c.bodyWantsFocusNow();
         }
 
-        found = false;
+        let found = false;
 
         const settings = fc.ftm.get_settings();
         fc.init_ivars_from_settings(settings); // ? Needed for fc.change_selection
@@ -2153,13 +2099,10 @@ export class LeoUI extends NullGui {
         let w_finalFocus = Focus.Body;
         let w_focus = focus.toLowerCase();
 
-        console.log(' (REPLACE) BEFORE Found check , get_focus is:', focus);
-
         if (!found) {
             w = c.get_requested_focus(); // get the focus that the commander requested to be focused after the find operation, which is more accurate for cases where the find operation itself changes the focus (e.g. find in body focusing headline if found there)
             focus = this.widget_name(w);
             w_focus = focus.toLowerCase();
-            console.log(' NOT FOUND after replace , get_requested_focus is:', focus);
 
             if (w_focus.includes('tree') || w_focus.includes('head')) {
                 w_finalFocus = Focus.Outline
@@ -2169,7 +2112,7 @@ export class LeoUI extends NullGui {
                 {
                     tree: true, // HAVE to refresh tree because find folds/unfolds only result outline paths
                     body: true,
-                    scroll: false,
+                    scroll: false, // not found: dont scroll.
                     // documents: false,
                     // buttons: false,
                     states: true,
@@ -2181,19 +2124,9 @@ export class LeoUI extends NullGui {
             return workspace.dialog.showInformationMessage('Not found');
         } else {
             if (w_focus.includes('tree') || w_focus.includes('head')) {
-                console.log(' FOUND after replace, focus is in headline/tree, setting final focus to outline');
-                // tree
                 w_finalFocus = Focus.NoChange; // NoChange because its going to be headline selected, so it will be headline edit mode, which already focuses the headline. 
                 // If we set it to Outline, it will try to focus the tree and mess up the headline edit focus!
-
-                // this.showOutlineIfClosed = true;
-                // * SETUP HEADLINE RANGE -> NOT NEEDED IN LEO-WEB ? 
                 this.findFocusTree = true;
-                // this.findHeadlineRange = [w.sel[0], w.sel[1]];
-                // this.findHeadlinePosition = c.p;
-            } else {
-                console.log(' FOUND after replace, focus is in body, setting final focus to body');
-                // this.showBodyIfClosed = true;
             }
             const w_scroll = (found && w_finalFocus === Focus.Body) || undefined;
 
@@ -2219,37 +2152,6 @@ export class LeoUI extends NullGui {
                 }, 0);
             }
         }
-        // if (focus) {
-        //     let w_finalFocus = Focus.Body;
-        //     const w_focus = focus.toLowerCase();
-        //     if (w_focus.includes('tree') || w_focus.includes('head')) {
-        //         // tree
-        //         w_finalFocus = Focus.Outline;
-        //         // this.showOutlineIfClosed = true;
-        //         // * SETUP HEADLINE RANGE
-        //         this.findFocusTree = true;
-        //         this.findHeadlineRange = [w.sel[0], w.sel[1]];
-        //         this.findHeadlinePosition = c.p;
-        //     } else {
-        //         // this.showBodyIfClosed = true;
-        //     }
-        //     const w_scroll = (found && w_finalFocus === Focus.Body) || undefined;
-
-        //     this.setupRefresh(
-        //         w_finalFocus, // ! Unlike gotoNavEntry, this sets focus in outline -or- body.
-        //         {
-        //             tree: true, // HAVE to refresh tree because find folds/unfolds only result outline paths
-        //             body: true,
-        //             scroll: w_scroll,
-        //             // documents: false,
-        //             // buttons: false,
-        //             states: true,
-        //         },
-        //         this.findFocusTree
-        //     );
-        //     return this.launchRefresh();
-        // }
-
     }
 
     /**

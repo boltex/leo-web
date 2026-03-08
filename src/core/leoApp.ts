@@ -1120,31 +1120,16 @@ export class LeoApp {
         if (app.silentMode) {
             return;
         }
-        /*         
-        if (sys.stdout.encoding && sys.stdout.encoding.lower() !== 'utf-8'){
-            console.log('Note: sys.stdout.encoding is not UTF-8');
-            console.log(`Encoding is: ${sys.stdout.encoding}`);
-            console.log('See: https://stackoverflow.com/questions/14109024');
-            console.log('');
-        }
-        */
-        // * Modified for leo-web SINGLE log pane
-        // g.es_print(app.signon);
-        // g.es_print(app.signon1);
 
-        // Is this the first possible valid output to log pane?
-        // If so empty the log Buffer first.
+        // Add to logBuffer for when createLogPane is called.
         const buffer = g.logBuffer;
         buffer.unshift(app.signon1);
         buffer.unshift(app.signon);
-        if (buffer.length) {
-            let len = buffer.length; // Only do loop once if log pane not visible
-            while (len > 0) {
-                // Pop the bottom one and append it
-                g.es_print(buffer.shift()!);
-                len = len - 1;
-            }
-        }
+
+        // Console.log to simulate python's print to console.
+        console.log(app.signon);
+        console.log(app.signon1);
+
     }
     //@+node:felix.20251214160339.48: *4* app.setGlobalDb
     /**
