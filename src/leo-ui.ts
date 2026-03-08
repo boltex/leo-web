@@ -471,10 +471,9 @@ export class LeoUI extends NullGui {
             }
         }
 
-        // * If body changed a line with and '@' directive refresh body states
-        if (textDocumentChange.content?.includes('@')) {
-            this.debouncedRefreshBodyStates(100);
-        }
+        // Maybe color syntaxing, wrap or some other body state needs refresh after a change...
+        // do it with a small debounce to avoid doing it on every keystroke while editing.
+        this.debouncedRefreshBodyStates(250);
 
     }
 
