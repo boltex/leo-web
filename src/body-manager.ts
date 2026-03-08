@@ -19,6 +19,10 @@ export class BodyManager {
 
     }
 
+    public setBodyLanguage(language: string): void {
+        console.log('Setting body language to', language);
+    }
+
     public setChangeTextEditorSelectionCallback(callback: (selection: body.Selection) => void) {
         const handleSelectionChange = () => {
 
@@ -54,7 +58,7 @@ export class BodyManager {
     private offsetToPosition(offset: number, node: Node | null): body.Position {
         if (!node) return new body.Position(0, 0);
 
-        const bodyText = workspace.layout.BODY_PANE.innerText;
+        const bodyText = workspace.layout.BODY_PANE.innerText; // TODO: Maybe use textContent and handle newlines manually for better performance?
         const beforeNode = this.getTextBeforeNode(node);
         const totalOffset = beforeNode.length + offset;
 
@@ -131,7 +135,7 @@ export class BodyManager {
     private positionToNodeOffset(position: body.Position): { node: Node; offset: number } {
         const BODY_PANE = workspace.layout.BODY_PANE;
         // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
-        const bodyText = BODY_PANE.innerText;
+        const bodyText = BODY_PANE.innerText; // TODO: Maybe use textContent and handle newlines manually for better performance?
         const lines = bodyText.split('\n');
         let charCount = 0;
         for (let i = 0; i < position.line; i++) {

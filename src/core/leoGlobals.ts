@@ -1464,7 +1464,7 @@ export async function chdir(p_path: string): Promise<void> {
 
     if (w_isDir && w_exist) {
         // process.chdir?.(p_path);
-        console.warn('Browser environment: chdir not implemented.');
+        // console.warn('Browser environment: chdir not implemented.');
     }
 }
 //@+node:felix.20251207215313.73: *3* g.mkdir

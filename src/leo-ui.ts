@@ -1064,10 +1064,8 @@ export class LeoUI extends NullGui {
     }
 
     private _setBodyLanguage(w_language: string): void {
-        // TODO : implement body language setting in the web UI, 
-        // which should trigger syntax coloring changes in the body pane
-        // something like workspace.view.setBodyLanguage(w_language) that will be implemented later, after the base of Leo-Web works.
-        console.log('TODO: set body language to ', w_language);
+
+        workspace.body.setBodyLanguage(w_language);
     }
 
     /**
