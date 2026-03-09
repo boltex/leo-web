@@ -83,10 +83,13 @@ export class BodyManager {
     }
 
     // Helper method to convert DOM offset to Position
-    private offsetToPosition(offset: number, node: Node | null): body.Position {
+    private offsetToPosition(offset: number, node: Node | null, bodyText?: string): body.Position {
         if (!node) return new body.Position(0, 0);
 
-        const bodyText = this.getBody();
+        if (bodyText == null) {
+            bodyText = this.getBody();
+        }
+
         const beforeNode = this.getTextBeforeNode(node);
         const totalOffset = beforeNode.length + offset;
 
@@ -269,8 +272,9 @@ export class BodyManager {
             return undefined;
         }
 
-        const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
-        const activePos = this.offsetToPosition(domSelection.focusOffset, domSelection.focusNode);
+        const bodyText = this.getBody();
+        const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode, bodyText);
+        const activePos = this.offsetToPosition(domSelection.focusOffset, domSelection.focusNode, bodyText);
 
         return new body.Selection(anchorPos, activePos);
     }
