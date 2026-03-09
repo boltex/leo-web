@@ -1672,6 +1672,24 @@ mark {
   text-overflow: ellipsis;
 }
 
+.leo-sentinel {
+  /* Use 'inline' NOT 'inline-block' to stay in the same text flow */
+  display: inline;
+
+  /* Inherit everything to keep the caret thickness consistent */
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+
+  /* Standard protection */
+  pointer-events: none;
+  user-select: none;
+
+  /* Hide the actual character visually */
+  color: transparent;
+  width: 0;
+}
+
 /* Themes */
 [data-theme="dark"] {
   .token.comment,

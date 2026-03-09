@@ -27,6 +27,9 @@ const LANGUAGE_ALIASES: Record<string, string> = {
     xml: "markup"
 };
 
+const SENTINEL_CLASS = "leo-sentinel";
+const SENTINEL_CHAR = "\u200B";
+
 /**
  * Body Manager is responsible for managing the body pane, which includes rendering the body text, handling user interactions
  * (selection, scroll, input), and providing an API for the controller to manipulate the body content and state.
@@ -42,6 +45,21 @@ export class BodyManager {
 
         this.HTML_ELEMENT = document.documentElement;
 
+    }
+
+    private _ensureSentinel(): void {
+        const BODY_PANE = workspace.layout.BODY_PANE;
+
+        let sentinel = BODY_PANE.querySelector("." + SENTINEL_CLASS) as HTMLElement | null;
+
+        if (!sentinel) {
+            sentinel = document.createElement("span");
+            sentinel.className = SENTINEL_CLASS;
+            sentinel.contentEditable = "false";
+            sentinel.textContent = SENTINEL_CHAR;
+        }
+        // Always force it to remain the last node
+        BODY_PANE.appendChild(sentinel);
     }
 
     public setChangeTextEditorSelectionCallback(callback: (selection: body.Selection) => void) {
@@ -68,7 +86,7 @@ export class BodyManager {
     private offsetToPosition(offset: number, node: Node | null): body.Position {
         if (!node) return new body.Position(0, 0);
 
-        const bodyText = workspace.layout.BODY_PANE.innerText; // TODO: Maybe use textContent and handle newlines manually for better performance?
+        const bodyText = this.getBody();
         const beforeNode = this.getTextBeforeNode(node);
         const totalOffset = beforeNode.length + offset;
 
@@ -87,7 +105,13 @@ export class BodyManager {
         const walker = document.createTreeWalker(
             workspace.layout.BODY_PANE,
             NodeFilter.SHOW_TEXT,
-            null
+            {
+                acceptNode: (node) => {
+                    // Check if this text node is inside our sentinel
+                    const isSentinel = node.parentElement?.classList.contains(SENTINEL_CLASS);
+                    return isSentinel ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+                }
+            }
         );
 
         let currentNode;
@@ -145,7 +169,8 @@ export class BodyManager {
     private positionToNodeOffset(position: body.Position): { node: Node; offset: number } {
         const BODY_PANE = workspace.layout.BODY_PANE;
         // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
-        const bodyText = BODY_PANE.innerText; // TODO: Maybe use textContent and handle newlines manually for better performance?
+        const bodyText = this.getBody();
+
         const lines = bodyText.split('\n');
         let charCount = 0;
         for (let i = 0; i < position.line; i++) {
@@ -157,7 +182,13 @@ export class BodyManager {
         const walker = document.createTreeWalker(
             BODY_PANE,
             NodeFilter.SHOW_TEXT,
-            null
+            {
+                acceptNode: (node) => {
+                    // Check if this text node is inside our sentinel
+                    const isSentinel = node.parentElement?.classList.contains(SENTINEL_CLASS);
+                    return isSentinel ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+                }
+            }
         );
 
         let currentNode;
@@ -170,6 +201,13 @@ export class BodyManager {
             accumulatedLength += nodeLength;
         }
 
+        // Fallback: If we reach the end, find the sentinel and return the position right before it.
+        const sentinel = BODY_PANE.querySelector("." + SENTINEL_CLASS);
+        if (sentinel) {
+            const index = Array.from(BODY_PANE.childNodes).indexOf(sentinel);
+            return { node: BODY_PANE, offset: index };
+        }
+
         // Fallback to the end of BODY_PANE
         return { node: BODY_PANE, offset: BODY_PANE.childNodes.length };
     }
@@ -179,11 +217,13 @@ export class BodyManager {
 
         BODY_PANE.addEventListener('input', (e) => {
             const inputEvent = e as InputEvent;
+            this._ensureSentinel();
             callback({
                 type: inputEvent.inputType,
                 content: inputEvent.data
             });
         });
+
         BODY_PANE.addEventListener('paste', (e) => {
             const clipboardEvent = e as ClipboardEvent;
             const plainText = clipboardEvent.clipboardData?.getData('text/plain') ?? null;
@@ -196,7 +236,7 @@ export class BodyManager {
                     document.execCommand('insertText', false, plainText);
                 }
             }
-
+            this._ensureSentinel();
             callback({
                 type: 'paste',
                 content: plainText
@@ -204,6 +244,7 @@ export class BodyManager {
         });
         BODY_PANE.addEventListener('cut', (e) => {
             const clipboardEvent = e as ClipboardEvent;
+            this._ensureSentinel();
             callback({
                 type: 'cut',
                 content: clipboardEvent.clipboardData?.getData('text/plain') ?? null
@@ -254,10 +295,18 @@ export class BodyManager {
         // * non-highlighted version, for experiments.
         // text = this._escapeBodyText(text);
         // workspace.layout.BODY_PANE.innerHTML = text;
+
+        this._ensureSentinel();
     }
 
     public setBodyLanguage(language: string): void {
-        const selection = this.getCurrentBodyPaneSelection();
+        let selection;
+
+        // Only grab selection if the body pane is focused, otherwise it might be stale and cause issues after re-rendering.
+        if (document.activeElement === workspace.layout.BODY_PANE) {
+            selection = this.getCurrentBodyPaneSelection();
+        }
+
         this.renderHighlightedBody(this.getBody(), language);
 
         if (selection) {
@@ -296,7 +345,10 @@ export class BodyManager {
     }
 
     public getBody(): string {
-        return workspace.layout.BODY_PANE.textContent || "";
+        const text = workspace.layout.BODY_PANE.textContent || "";
+        // If the sentinel character is at the end, just slice it off.
+        // This is significantly faster than cloning the DOM.
+        return text.endsWith(SENTINEL_CHAR) ? text.slice(0, -1) : text;
     }
 
     public highlightMatchInBody(startIndex: number, endIndex: number) {

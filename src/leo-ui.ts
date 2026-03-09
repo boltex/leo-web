@@ -627,6 +627,11 @@ export class LeoUI extends NullGui {
         const wrapper = c.frame.body.wrapper;
         const w_v = c.p.v;
 
+        // If already exactly the same, return without doing anything
+        if (body === c.p.bodyString()) {
+            return;
+        }
+
         // ok we got a valid p.
         const bunch = u.beforeChangeNodeContents(c.p);
         c.p.v.setBodyString(body);
@@ -639,8 +644,6 @@ export class LeoUI extends NullGui {
         if (!c.p.v.isDirty()) {
             c.p.setDirty();
         }
-        // this.clearHeadlineSelection();
-
         g.doHook("bodykey2", { c: c, v: w_v });
 
         this._bodySaveSelection();
@@ -2323,7 +2326,6 @@ export class LeoUI extends NullGui {
      * * Cycle opened documents
      */
     public async tabCycle(): Promise<unknown> {
-        console.log("TAB CYCLE");
         this.triggerBodySave();
 
         let w_chosenIndex;

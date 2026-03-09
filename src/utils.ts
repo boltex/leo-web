@@ -31,6 +31,7 @@ export function throttle<T extends any[]>(func: (...args: T) => void, limit: num
         }
     };
 }
+
 /**
  * Safely access localStorage.getItem with error handling
  */
@@ -41,6 +42,7 @@ export function safeLocalStorageGet(key: string): string | null {
         return null;
     }
 }
+
 /**
  * Safely access localStorage.setItem with error handling
  */
@@ -51,6 +53,7 @@ export function safeLocalStorageSet(key: string, value: string): void {
         // ignore
     }
 }
+
 export function showHtmlInNewTab(htmlContent: string, title: string) {
     const newWindow = window.open('', '_blank');
     if (newWindow) {
@@ -138,16 +141,33 @@ export function showTextDocument(uri: Uri): void {
 export function preventDefault(e: Event): void {
     e.preventDefault();
 }
+
 /**
- * Get the text node and offset at a given global character index within a root node
+ * Get the text node and offset at a given global character index within a root node,
+ * strictly ignoring any sentinel nodes.
  */
 export function getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    const SENTINEL_CLASS = "leo-sentinel";
+
+    const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        {
+            acceptNode: (node) => {
+                // Ignore text nodes that live inside the sentinel span
+                const isSentinel = node.parentElement?.classList.contains(SENTINEL_CLASS);
+                return isSentinel ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+            }
+        }
+    );
+
     let currentNode = walker.nextNode();
     let remaining = index;
 
     while (currentNode) {
-        const len = currentNode!.nodeValue!.length;
+        const nodeValue = currentNode.nodeValue || "";
+        const len = nodeValue.length;
+        // If 'remaining' is less than or equal to length, we've found our node.
         if (remaining <= len) {
             return { node: currentNode, offset: remaining };
         }
@@ -156,23 +176,7 @@ export function getTextNodeAtIndex(root: Node, index: number): { node: Node; off
     }
     return null;
 }
-/**
- * Get the global character offset within a root node for a given text node and offset
- */
-export function getGlobalOffset(root: Node, container: Node, offset: number): number {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    let total = 0;
-    let current: Node | null = walker.nextNode();
 
-    while (current) {
-        if (current === container) {
-            return total + offset;
-        }
-        total += current.nodeValue!.length;
-        current = walker.nextNode();
-    }
-    return total;
-}
 /**
  * Read all entries from a directory handle, returning an array of name/kind/handle objects
  */
@@ -187,6 +191,7 @@ export async function readDirectory(dirHandle: FileSystemDirectoryHandle): Promi
     }
     return entries;
 }
+
 /**
  * * window.performace.now browser/node crossover utility
  */
@@ -280,6 +285,7 @@ export function convertLeoFiletypes(p_filetypes: [string, string][]): { [name: s
     });
     return w_types;
 }
+
 /**
  * * Returns milliseconds between the p_start process.hrtime tuple and p_end (or current call to process.hrtime)
  * @param p_start starting process.hrtime to subtract from p_end or current immediate time
@@ -302,6 +308,7 @@ export function getDurationMs(p_start: [number, number], p_end?: [number, number
 export function getDurationSeconds(p_start: [number, number], p_end?: [number, number]): number {
     return parseFloat((getDurationMs(p_start, p_end) / 1000).toFixed(2));
 }
+
 /**
  * * Extracts the file name from a full path, such as "foo.bar" from "/abc/def/foo.bar"
  * @param p_path Full path such as "/var/drop/foo/boo/moo.js" or "C:\Documents and Settings\img\recycled log.jpg"
@@ -326,6 +333,7 @@ export function isAlphaNumeric(str: string): boolean {
     }
     return true;
 };
+
 /**
  * * Checks if a node would become dirty if it were to now have body content at all
  * @param p_node LeoNode from vscode's outline
