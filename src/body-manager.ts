@@ -2,17 +2,36 @@ import * as utils from './utils';
 import { workspace } from './workspace';
 import * as body from './body'
 import * as Prism from 'prismjs';
-// Import languages you need
-import 'prismjs/components/prism-typescript';
+// Css, Html and XML are supported by default, so we don't need to import them explicitly.
+// See https://prismjs.com/#supported-languages
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-batch';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-php';
+import 'prismjs/components/prism-markup-templating'; // Needed for php and other templating languages
 import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-rest';
+import 'prismjs/components/prism-rust';
+import 'prismjs/components/prism-typescript';
+
+const LANGUAGE_ALIASES: Record<string, string> = {
+    shell: "bash",
+    sh: "bash",
+    restructuredtext: "rest",
+    rst: "rest",
+    html: "markup",
+    xml: "markup"
+};
 
 /**
  * Body Manager is responsible for managing the body pane, which includes rendering the body text, handling user interactions
  * (selection, scroll, input), and providing an API for the controller to manipulate the body content and state.
  */
 export class BodyManager {
-
-    private _lastLanguage: string = "plain";
 
     private _changeSelectionTimer: ReturnType<typeof setTimeout> | undefined;
     private _changeScrollTimer: ReturnType<typeof setTimeout> | undefined;
@@ -216,9 +235,25 @@ export class BodyManager {
     }
 
     private renderHighlightedBody(text: string, language: string): void {
-        const grammar = Prism.languages[language] ?? Prism.languages.plaintext;
-        workspace.layout.BODY_PANE.innerHTML = Prism.highlight(text, grammar, language);
-        this._lastLanguage = language;
+
+        const normalized =
+            LANGUAGE_ALIASES[language.toLowerCase()] ??
+            language.toLowerCase() ??
+            ""; // Default to empty string if language is undefined or doesn't have toLowerCase method
+
+        const grammar = Prism.languages[normalized] ?? Prism.languages.plaintext;
+
+        if (!Prism.languages[normalized]) {
+            workspace.dialog.showToast(
+                `Unsupported language "${language}", falling back to plain text.`
+            );
+        }
+
+        workspace.layout.BODY_PANE.innerHTML = Prism.highlight(text, grammar, normalized);
+
+        // * non-highlighted version, for experiments.
+        // text = this._escapeBodyText(text);
+        // workspace.layout.BODY_PANE.innerHTML = text;
     }
 
     public setBodyLanguage(language: string): void {

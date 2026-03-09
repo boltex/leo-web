@@ -20,12 +20,6 @@
   --menu-caret-color: #666;
   --menu-border-color: #ccc;
   --menu-box-shadow-color: rgba(0, 0, 0, 0.2);
-  /* Syntax Highlighting - Light Mode */
-  --syn-keyword: #af00db; /* Purple */
-  --syn-string: #a31515; /* Deep Red */
-  --syn-comment: #008000; /* Green */
-  --syn-section: #007acc; /* Blue */
-  --syn-function: #795e26; /* Brown/Gold */
 
   /* vertical layout (default) */
   --main-direction: row;
@@ -168,18 +162,11 @@
   --find-placeholder-color: #5a699e;
   --find-border-color: #81889e;
   --find-selection: #3c54ce;
-  --menu-bg-color: #2d2934;
+  --menu-bg-color: #706a7a;
   --menu-color: #cdd6f4;
   --menu-caret-color: #999;
   --menu-border-color: #5c5485;
   --menu-box-shadow-color: rgba(246, 150, 255, 0.247);
-
-  /* Syntax Highlighting - Dark Mode */
-  --syn-keyword: #c586c0; /* Light Purple */
-  --syn-string: #ce9178; /* Salmon/Orange */
-  --syn-comment: #6a9955; /* Sage Green */
-  --syn-section: #4ec9b0; /* Teal */
-  --syn-function: #dcdcaa; /* Soft Yellow */
 }
 
 [data-layout="horizontal"] {
@@ -703,29 +690,6 @@ body.dragging-cross {
 #outline-pane,
 #log-pane {
   flex: 1 1 0;
-}
-
-/* Mapping Prism tokens to Leo-web variables */
-#body-pane .token.keyword {
-  color: var(--syn-keyword);
-  /* font-weight: bold; */
-}
-#body-pane .token.string {
-  color: var(--syn-string);
-}
-#body-pane .token.comment {
-  color: var(--syn-comment);
-  /* font-style: italic; */
-}
-#body-pane .token.function {
-  color: var(--syn-function);
-}
-
-/* Custom Leo Tokens */
-#body-pane .token.leo-sectionref {
-  color: var(--syn-section);
-  text-decoration: underline;
-  /* font-weight: bold; */
 }
 
 #body-pane {
@@ -1706,4 +1670,156 @@ mark {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Themes */
+[data-theme="dark"] {
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: #8292a2;
+  }
+
+  .token.punctuation {
+    color: #f8f8f2;
+  }
+
+  .token.namespace {
+    opacity: 0.7;
+  }
+
+  .token.property,
+  .token.tag,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    color: #f92672;
+  }
+
+  .token.boolean,
+  .token.number {
+    color: #ae81ff;
+  }
+
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin,
+  .token.inserted {
+    color: #a6e22e;
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string,
+  .token.variable {
+    color: #f8f8f2;
+  }
+
+  .token.atrule,
+  .token.attr-value,
+  .token.function,
+  .token.class-name {
+    color: #e6db74;
+  }
+
+  .token.keyword {
+    color: #66d9ef;
+  }
+
+  .token.regex,
+  .token.important {
+    color: #fd971f;
+  }
+
+  .token.important,
+  .token.bold {
+    font-weight: bold;
+  }
+  .token.italic {
+    font-style: italic;
+  }
+
+  .token.entity {
+    cursor: help;
+  }
+}
+
+[data-theme="light"] {
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: slategray;
+  }
+
+  .token.punctuation {
+    color: #999;
+  }
+
+  .token.namespace {
+    opacity: 0.7;
+  }
+
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol,
+  .token.deleted {
+    color: #905;
+  }
+
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin,
+  .token.inserted {
+    color: #690;
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    color: #9a6e3a;
+    /* This background color was intended by the author of this theme. */
+    background: hsla(0, 0%, 100%, 0.5);
+  }
+
+  .token.atrule,
+  .token.attr-value,
+  .token.keyword {
+    color: #07a;
+  }
+
+  .token.function,
+  .token.class-name {
+    color: #dd4a68;
+  }
+
+  .token.regex,
+  .token.important,
+  .token.variable {
+    color: #e90;
+  }
+
+  .token.important,
+  .token.bold {
+    font-weight: bold;
+  }
+  .token.italic {
+    font-style: italic;
+  }
+
+  .token.entity {
+    cursor: help;
+  }
 }
