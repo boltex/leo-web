@@ -473,7 +473,7 @@ export class LeoUI extends NullGui {
 
         // Maybe color syntaxing, wrap or some other body state needs refresh after a change...
         // do it with a small debounce to avoid doing it on every keystroke while editing.
-        this.debouncedRefreshBodyStates(250);
+        this.debouncedRefreshBodyStates(750);
 
     }
 
@@ -732,7 +732,7 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
-        workspace.body.setBodySelection(w_selection, this._refreshType.scroll); // This sets focus to the body pane as well
+        workspace.body.setBodySelection(w_selection, this._refreshType.scroll); // Note, in some browser, this has a side-effect of setting focus in body.
         this._refreshType.scroll = false;
 
     }

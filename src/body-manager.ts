@@ -39,27 +39,91 @@ export class BodyManager {
     private _changeSelectionTimer: ReturnType<typeof setTimeout> | undefined;
     private _changeScrollTimer: ReturnType<typeof setTimeout> | undefined;
 
+    private _bodyPane!: HTMLElement;
+
+    private _lineStarts: number[] = [0];
+    private _lineStartsDirty = true;
+
+    private _sentinel: HTMLElement | null = null;
+
     public HTML_ELEMENT: HTMLElement;
 
     constructor() {
 
         this.HTML_ELEMENT = document.documentElement;
+        this._bodyPane = workspace.layout.BODY_PANE;
+
+        if (!this._bodyPane) {
+            throw new Error("Body pane not found");
+        }
+
+    }
+
+    private _getLineStarts(): number[] {
+        if (this._lineStartsDirty) {
+            const text = this.getBody();
+            const starts = [0];
+            for (let i = 0; i < text.length; i++) {
+                if (text[i] === '\n') starts.push(i + 1);
+            }
+            this._lineStarts = starts;
+            this._lineStartsDirty = false;
+        }
+        return this._lineStarts;
+    }
+
+    private _rebuildLineIndex(text: string): void {
+        this._lineStarts = [0];
+        for (let i = 0; i < text.length; i++) {
+            if (text[i] === '\n') {
+                this._lineStarts.push(i + 1);
+            }
+        }
+        this._lineStartsDirty = false;
+    }
+
+    private _offsetToPositionFast(offset: number): body.Position {
+
+        let low = 0;
+        let high = this._lineStarts.length - 1;
+
+        while (low <= high) {
+            const mid = (low + high) >> 1;
+
+            if (this._lineStarts[mid] <= offset) {
+                if (mid === this._lineStarts.length - 1 || this._lineStarts[mid + 1] > offset) {
+                    const line = mid;
+                    const character = offset - this._lineStarts[mid];
+                    return new body.Position(line, character);
+                }
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+
+        return new body.Position(0, offset);
+    }
+
+    // Helper method to convert DOM offset to Position
+    private offsetToPosition(offset: number, node: Node | null): body.Position {
+        if (!node) return new body.Position(0, 0);
+
+        const beforeNode = this._getOffsetToNode(node);
+        const totalOffset = beforeNode + offset;
+
+        return this._offsetToPositionFast(totalOffset);
 
     }
 
     private _ensureSentinel(): void {
-        const BODY_PANE = workspace.layout.BODY_PANE;
-
-        let sentinel = BODY_PANE.querySelector("." + SENTINEL_CLASS) as HTMLElement | null;
-
-        if (!sentinel) {
-            sentinel = document.createElement("span");
-            sentinel.className = SENTINEL_CLASS;
-            sentinel.contentEditable = "false";
-            sentinel.textContent = SENTINEL_CHAR;
+        if (!this._sentinel) {
+            this._sentinel = document.createElement("span");
+            this._sentinel.className = SENTINEL_CLASS;
+            this._sentinel.contentEditable = "false";
+            this._sentinel.textContent = SENTINEL_CHAR;
         }
-        // Always force it to remain the last node
-        BODY_PANE.appendChild(sentinel);
+        this._bodyPane.appendChild(this._sentinel);
     }
 
     public setChangeTextEditorSelectionCallback(callback: (selection: body.Selection) => void) {
@@ -82,70 +146,43 @@ export class BodyManager {
         document.addEventListener('selectionchange', handleSelectionChange);
     }
 
-    // Helper method to convert DOM offset to Position
-    private offsetToPosition(offset: number, node: Node | null, bodyText?: string): body.Position {
-        if (!node) return new body.Position(0, 0);
 
-        if (bodyText == null) {
-            bodyText = this.getBody();
-        }
 
-        const beforeNode = this.getTextBeforeNode(node);
-        const totalOffset = beforeNode.length + offset;
-
-        // Convert absolute offset to line/character
-        const lines = bodyText.substring(0, totalOffset).split('\n');
-        const line = lines.length - 1;
-        const character = lines[lines.length - 1].length;
-
-        return new body.Position(line, character);
-    }
-
-    private getTextBeforeNode(node: Node): string {
-        // Implementation to get all text before the given node within BODY_PANE
-        // This is a simplified version - you may need to refine based on your DOM structure
-        let text = '';
+    private _getOffsetToNode(node: Node): number {
         const walker = document.createTreeWalker(
-            workspace.layout.BODY_PANE,
+            this._bodyPane,
             NodeFilter.SHOW_TEXT,
-            {
-                acceptNode: (node) => {
-                    // Check if this text node is inside our sentinel
-                    const isSentinel = node.parentElement?.classList.contains(SENTINEL_CLASS);
-                    return isSentinel ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
-                }
-            }
+            { acceptNode: (n) => n.parentElement?.classList.contains(SENTINEL_CLASS) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT }
         );
-
-        let currentNode;
-        while (currentNode = walker.nextNode()) {
-            if (currentNode === node) break;
-            text += currentNode.textContent || '';
+        let count = 0;
+        let current;
+        while (current = walker.nextNode()) {
+            if (current === node) break;
+            count += current.textContent?.length ?? 0;
         }
-
-        return text;
+        return count;
     }
 
     public setChangeTextEditorScrollCallback(callback: (event: number) => void) {
-        const BODY_PANE = workspace.layout.BODY_PANE;
-        BODY_PANE.addEventListener('scroll', (e) => {
+        this._bodyPane.addEventListener('scroll', (e) => {
             if (this._changeScrollTimer) {
                 clearTimeout(this._changeScrollTimer);
             }
             this._changeScrollTimer = setTimeout(() => {
 
-                callback(BODY_PANE.scrollTop);
+                callback(this._bodyPane.scrollTop);
 
             }, 100); // debounce delay in ms
         });
     }
 
     public setBodyScroll(scroll: number) {
-        workspace.layout.BODY_PANE.scrollTop = scroll;
+        this._bodyPane.scrollTop = scroll;
     }
 
     public setBodySelection(selection: body.Selection, scrollSelectionIntoView: boolean = false) {
         // Convert body.Selection to DOM Range and set it in the BODY_PANE
+        const BODY_PANE = this._bodyPane;
         const { anchor, active } = selection;
         const anchorInfo = this.positionToNodeOffset(anchor);
         const activeInfo = this.positionToNodeOffset(active);
@@ -163,23 +200,17 @@ export class BodyManager {
             if (scrollSelectionIntoView) {
                 const range = selectionObj.getRangeAt(0);
                 const rect = range.getBoundingClientRect();
-                const BODY_PANE = workspace.layout.BODY_PANE;
                 BODY_PANE.scrollTop = rect.top + BODY_PANE.scrollTop - BODY_PANE.clientHeight / 2;
             }
         }
     }
 
     private positionToNodeOffset(position: body.Position): { node: Node; offset: number } {
-        const BODY_PANE = workspace.layout.BODY_PANE;
         // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
-        const bodyText = this.getBody();
-
-        const lines = bodyText.split('\n');
-        let charCount = 0;
-        for (let i = 0; i < position.line; i++) {
-            charCount += lines[i].length + 1; // +1 for the newline character
-        }
-        charCount += position.character;
+        const BODY_PANE = this._bodyPane;
+        const lineStarts = this._getLineStarts();
+        const line = Math.min(position.line, lineStarts.length - 1);
+        const charCount = lineStarts[line] + position.character;
 
         // Find the corresponding DOM node and offset
         const walker = document.createTreeWalker(
@@ -216,10 +247,11 @@ export class BodyManager {
     }
 
     public setEditorTouchedCallback(callback: (change: { type: string; content: string | null }) => void) {
-        const BODY_PANE = workspace.layout.BODY_PANE;
+        const BODY_PANE = this._bodyPane;
 
         BODY_PANE.addEventListener('input', (e) => {
             const inputEvent = e as InputEvent;
+            this._lineStartsDirty = true;
             this._ensureSentinel();
             callback({
                 type: inputEvent.inputType,
@@ -239,6 +271,7 @@ export class BodyManager {
                     document.execCommand('insertText', false, plainText);
                 }
             }
+            this._lineStartsDirty = true;
             this._ensureSentinel();
             callback({
                 type: 'paste',
@@ -247,6 +280,7 @@ export class BodyManager {
         });
         BODY_PANE.addEventListener('cut', (e) => {
             const clipboardEvent = e as ClipboardEvent;
+            this._lineStartsDirty = true;
             this._ensureSentinel();
             callback({
                 type: 'cut',
@@ -256,7 +290,7 @@ export class BodyManager {
     }
 
     public setBodyFocusOutCallback(callback: () => void) {
-        workspace.layout.BODY_PANE.addEventListener('blur', () => {
+        this._bodyPane.addEventListener('blur', () => {
             callback();
         });
     }
@@ -268,13 +302,12 @@ export class BodyManager {
         }
 
         const range = domSelection.getRangeAt(0);
-        if (!workspace.layout.BODY_PANE.contains(range.commonAncestorContainer)) {
+        if (!this._bodyPane.contains(range.commonAncestorContainer)) {
             return undefined;
         }
 
-        const bodyText = this.getBody();
-        const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode, bodyText);
-        const activePos = this.offsetToPosition(domSelection.focusOffset, domSelection.focusNode, bodyText);
+        const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
+        const activePos = this.offsetToPosition(domSelection.focusOffset, domSelection.focusNode);
 
         return new body.Selection(anchorPos, activePos);
     }
@@ -293,12 +326,12 @@ export class BodyManager {
                 `Unsupported language "${language}", falling back to plain text.`
             );
         }
-
-        workspace.layout.BODY_PANE.innerHTML = Prism.highlight(text, grammar, normalized);
+        this._sentinel = null;  // innerHTML destroyed the old element.
+        this._bodyPane.innerHTML = Prism.highlight(text, grammar, normalized);
 
         // * non-highlighted version, for experiments.
         // text = this._escapeBodyText(text);
-        // workspace.layout.BODY_PANE.innerHTML = text;
+        // this._bodyPane.innerHTML = text;
 
         this._ensureSentinel();
     }
@@ -307,7 +340,7 @@ export class BodyManager {
         let selection;
 
         // Only grab selection if the body pane is focused, otherwise it might be stale and cause issues after re-rendering.
-        if (document.activeElement === workspace.layout.BODY_PANE) {
+        if (document.activeElement === this._bodyPane) {
             selection = this.getCurrentBodyPaneSelection();
         }
 
@@ -320,11 +353,12 @@ export class BodyManager {
 
     public setBody(text: string, wrap: boolean, language = "plain"): void {
         this.setBodyWrap(wrap);
+        this._rebuildLineIndex(text);
         this.renderHighlightedBody(text, language);
     }
 
     public setBodyEditable(editable: boolean) {
-        const BODY_PANE = workspace.layout.BODY_PANE;
+        const BODY_PANE = this._bodyPane;
         if (editable) {
             // Try plaintext-only first; fall back to true for Firefox
             BODY_PANE.contentEditable = "plaintext-only";
@@ -349,20 +383,49 @@ export class BodyManager {
     }
 
     public getBody(): string {
-        const text = workspace.layout.BODY_PANE.textContent || "";
-        // If the sentinel character is at the end, just slice it off.
-        // This is significantly faster than cloning the DOM.
+        const text = this._bodyPane.textContent ?? "";
         return text.endsWith(SENTINEL_CHAR) ? text.slice(0, -1) : text;
     }
 
+    private getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
+        const SENTINEL_CLASS = "leo-sentinel";
+
+        const walker = document.createTreeWalker(
+            root,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode: (node) => {
+                    // Ignore text nodes that live inside the sentinel span
+                    const isSentinel = node.parentElement?.classList.contains(SENTINEL_CLASS);
+                    return isSentinel ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+                }
+            }
+        );
+
+        let currentNode = walker.nextNode();
+        let remaining = index;
+
+        while (currentNode) {
+            const nodeValue = currentNode.nodeValue || "";
+            const len = nodeValue.length;
+            // If 'remaining' is less than or equal to length, we've found our node.
+            if (remaining <= len) {
+                return { node: currentNode, offset: remaining };
+            }
+            remaining -= len;
+            currentNode = walker.nextNode();
+        }
+        return null;
+    }
+
     public highlightMatchInBody(startIndex: number, endIndex: number) {
-        const BODY_PANE = workspace.layout.BODY_PANE
+        const BODY_PANE = this._bodyPane;
         // The body pane content is set directly as textContent, so it's a single text node
         if (!BODY_PANE.firstChild) return;
         try {
             const range = document.createRange();
-            const start = utils.getTextNodeAtIndex(BODY_PANE, startIndex);
-            const end = utils.getTextNodeAtIndex(BODY_PANE, endIndex);
+            const start = this.getTextNodeAtIndex(BODY_PANE, startIndex);
+            const end = this.getTextNodeAtIndex(BODY_PANE, endIndex);
 
             if (!start || !end) {
                 console.warn("Invalid range: could not resolve text nodes");

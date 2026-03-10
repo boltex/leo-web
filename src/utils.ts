@@ -143,41 +143,6 @@ export function preventDefault(e: Event): void {
 }
 
 /**
- * Get the text node and offset at a given global character index within a root node,
- * strictly ignoring any sentinel nodes.
- */
-export function getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
-    const SENTINEL_CLASS = "leo-sentinel";
-
-    const walker = document.createTreeWalker(
-        root,
-        NodeFilter.SHOW_TEXT,
-        {
-            acceptNode: (node) => {
-                // Ignore text nodes that live inside the sentinel span
-                const isSentinel = node.parentElement?.classList.contains(SENTINEL_CLASS);
-                return isSentinel ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
-            }
-        }
-    );
-
-    let currentNode = walker.nextNode();
-    let remaining = index;
-
-    while (currentNode) {
-        const nodeValue = currentNode.nodeValue || "";
-        const len = nodeValue.length;
-        // If 'remaining' is less than or equal to length, we've found our node.
-        if (remaining <= len) {
-            return { node: currentNode, offset: remaining };
-        }
-        remaining -= len;
-        currentNode = walker.nextNode();
-    }
-    return null;
-}
-
-/**
  * Read all entries from a directory handle, returning an array of name/kind/handle objects
  */
 export async function readDirectory(dirHandle: FileSystemDirectoryHandle): Promise<Array<{ name: string; kind: 'file' | 'directory'; handle: FileSystemHandle }>> {
