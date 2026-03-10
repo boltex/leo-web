@@ -282,8 +282,8 @@ export class LeoUI extends NullGui {
             this._onChangeEditorScroll(event)
         );
 
-        workspace.body.setEditorTouchedCallback((textDocumentChange) =>
-            this._onDocumentChanged(textDocumentChange)
+        workspace.body.setEditorTouchedCallback(() =>
+            this._onDocumentChanged()
         );
 
         workspace.body.setBodyFocusOutCallback(() => {
@@ -445,7 +445,7 @@ export class LeoUI extends NullGui {
         }
     }
 
-    private _onDocumentChanged(textDocumentChange: { type: string; content: string | null }): void {
+    private _onDocumentChanged(): void {
 
         const c = g.app.windowList[this.frameIndex].c;
         this._editorTouched = true; // To make sure to transfer content to Leo even if all undone

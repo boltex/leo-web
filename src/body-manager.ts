@@ -1,4 +1,3 @@
-import * as utils from './utils';
 import { workspace } from './workspace';
 import * as body from './body'
 import * as Prism from 'prismjs';
@@ -41,6 +40,7 @@ export class BodyManager {
 
     private _bodyPane!: HTMLElement;
 
+    private _textLength = 0;
     private _lineStarts: number[] = [0];
     private _lineStartsDirty = true;
 
@@ -62,6 +62,7 @@ export class BodyManager {
     private _getLineStarts(): number[] {
         if (this._lineStartsDirty) {
             const text = this.getBody();
+            this._textLength = text.length;
             const starts = [0];
             for (let i = 0; i < text.length; i++) {
                 if (text[i] === '\n') starts.push(i + 1);
@@ -74,6 +75,7 @@ export class BodyManager {
 
     private _rebuildLineIndex(text: string): void {
         this._lineStarts = [0];
+        this._textLength = text.length;
         for (let i = 0; i < text.length; i++) {
             if (text[i] === '\n') {
                 this._lineStarts.push(i + 1);
@@ -83,18 +85,18 @@ export class BodyManager {
     }
 
     private _offsetToPositionFast(offset: number): body.Position {
+        const lineStarts = this._getLineStarts();
+        const safeOffset = Math.max(0, Math.min(offset, this._textLength));
 
         let low = 0;
-        let high = this._lineStarts.length - 1;
+        let high = lineStarts.length - 1;
 
         while (low <= high) {
             const mid = (low + high) >> 1;
 
-            if (this._lineStarts[mid] <= offset) {
-                if (mid === this._lineStarts.length - 1 || this._lineStarts[mid + 1] > offset) {
-                    const line = mid;
-                    const character = offset - this._lineStarts[mid];
-                    return new body.Position(line, character);
+            if (lineStarts[mid] <= safeOffset) {
+                if (mid === lineStarts.length - 1 || lineStarts[mid + 1] > safeOffset) {
+                    return new body.Position(mid, safeOffset - lineStarts[mid]);
                 }
                 low = mid + 1;
             } else {
@@ -102,19 +104,25 @@ export class BodyManager {
             }
         }
 
-        return new body.Position(0, offset);
+        return new body.Position(0, safeOffset);
     }
 
     // Helper method to convert DOM offset to Position
     private offsetToPosition(offset: number, node: Node | null): body.Position {
         if (!node) return new body.Position(0, 0);
 
-        const beforeNode = this._getOffsetToNode(node);
-        const totalOffset = beforeNode + offset;
-
+        const totalOffset = this._domPointToTextOffset(node, offset);
         return this._offsetToPositionFast(totalOffset);
 
     }
+
+    private _domPointToTextOffset(node: Node, offset: number): number {
+        const range = document.createRange();
+        range.setStart(this._bodyPane, 0);
+        range.setEnd(node, offset);
+        return range.toString().length;
+    }
+
 
     private _ensureSentinel(): void {
         if (!this._sentinel) {
@@ -144,23 +152,6 @@ export class BodyManager {
 
         // Listen on document, not on BODY_PANE
         document.addEventListener('selectionchange', handleSelectionChange);
-    }
-
-
-
-    private _getOffsetToNode(node: Node): number {
-        const walker = document.createTreeWalker(
-            this._bodyPane,
-            NodeFilter.SHOW_TEXT,
-            { acceptNode: (n) => n.parentElement?.classList.contains(SENTINEL_CLASS) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT }
-        );
-        let count = 0;
-        let current;
-        while (current = walker.nextNode()) {
-            if (current === node) break;
-            count += current.textContent?.length ?? 0;
-        }
-        return count;
     }
 
     public setChangeTextEditorScrollCallback(callback: (event: number) => void) {
@@ -199,8 +190,12 @@ export class BodyManager {
             );
             if (scrollSelectionIntoView) {
                 const range = selectionObj.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
-                BODY_PANE.scrollTop = rect.top + BODY_PANE.scrollTop - BODY_PANE.clientHeight / 2;
+                const rect = range.getClientRects()[0] ?? range.getBoundingClientRect();
+                const paneRect = BODY_PANE.getBoundingClientRect();
+                const targetMid =
+                    rect.top - paneRect.top + BODY_PANE.scrollTop + rect.height / 2;
+
+                BODY_PANE.scrollTop = Math.max(0, targetMid - BODY_PANE.clientHeight / 2);
             }
         }
     }
@@ -210,7 +205,10 @@ export class BodyManager {
         const BODY_PANE = this._bodyPane;
         const lineStarts = this._getLineStarts();
         const line = Math.min(position.line, lineStarts.length - 1);
-        const charCount = lineStarts[line] + position.character;
+        const charCount = Math.max(
+            0,
+            Math.min(lineStarts[line] + position.character, this._textLength)
+        );
 
         // Find the corresponding DOM node and offset
         const walker = document.createTreeWalker(
@@ -246,47 +244,30 @@ export class BodyManager {
         return { node: BODY_PANE, offset: BODY_PANE.childNodes.length };
     }
 
-    public setEditorTouchedCallback(callback: (change: { type: string; content: string | null }) => void) {
+    public setEditorTouchedCallback(callback: () => void) {
         const BODY_PANE = this._bodyPane;
 
         BODY_PANE.addEventListener('input', (e) => {
-            const inputEvent = e as InputEvent;
             this._lineStartsDirty = true;
             this._ensureSentinel();
-            callback({
-                type: inputEvent.inputType,
-                content: inputEvent.data
-            });
+
+            callback();
         });
 
         BODY_PANE.addEventListener('paste', (e) => {
-            const clipboardEvent = e as ClipboardEvent;
-            const plainText = clipboardEvent.clipboardData?.getData('text/plain') ?? null;
-
-            // When contentEditable is "true" (Firefox fallback), the browser
-            // would insert rich HTML. Prevent that and insert plain text instead.
-            if (BODY_PANE.contentEditable === "true") {
-                e.preventDefault();
-                if (plainText) {
-                    document.execCommand('insertText', false, plainText);
-                }
+            if (BODY_PANE.contentEditable !== "true") {
+                return;
             }
-            this._lineStartsDirty = true;
-            this._ensureSentinel();
-            callback({
-                type: 'paste',
-                content: plainText
-            });
-        });
-        BODY_PANE.addEventListener('cut', (e) => {
+
             const clipboardEvent = e as ClipboardEvent;
-            this._lineStartsDirty = true;
-            this._ensureSentinel();
-            callback({
-                type: 'cut',
-                content: clipboardEvent.clipboardData?.getData('text/plain') ?? null
-            });
+            const plainText = clipboardEvent.clipboardData?.getData('text/plain') ?? "";
+
+            e.preventDefault();
+            if (plainText) {
+                document.execCommand('insertText', false, plainText);
+            }
         });
+
     }
 
     public setBodyFocusOutCallback(callback: () => void) {
