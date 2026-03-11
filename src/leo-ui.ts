@@ -119,6 +119,15 @@ export class LeoUI extends NullGui {
         // * also check workbench.editor.enablePreview
         this.config.buildFromSavedSettings();
 
+        // If app.leoId is set, then save it in the config.
+        if (!this.config.leoID && g.app.leoID && g.app.leoID !== 'None') {
+            const w_changes: ConfigSetting[] = [{
+                code: "leoID",
+                value: g.app.leoID
+            }];
+            this.config.setLeoWebSettings(w_changes);
+        }
+
         this.getStates = debounce(
             this._triggerGetStates,
             Constants.STATES_DEBOUNCE_DELAY

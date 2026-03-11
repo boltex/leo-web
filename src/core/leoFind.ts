@@ -3837,6 +3837,8 @@ export class LeoFind {
             : Math.max(pos, newpos);
         if (c.sparse_find) {
             c.expandOnlyAncestorsOfNode(p);
+            // Clear g.app.gui.positionsToAnimate to prevent animating the same position repeatedly.
+            g.app.gui.positionsToAnimate = [];
         }
         let w: StringTextWrapper;
 
