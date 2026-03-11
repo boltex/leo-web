@@ -39,6 +39,8 @@ export class BodyManager {
     private _changeSelectionTimer: ReturnType<typeof setTimeout> | undefined;
     private _changeScrollTimer: ReturnType<typeof setTimeout> | undefined;
 
+    private _correctScrollRAF: number | undefined;
+
     private _bodyPane!: HTMLElement;
 
     private _textLength = 0;
@@ -138,10 +140,23 @@ export class BodyManager {
     public setChangeTextEditorSelectionCallback(callback: (selection: body.Selection) => void) {
         const handleSelectionChange = () => {
 
+            // check if cursor is in body pane, if not, ignore
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) return;
+            if (!this._bodyPane.contains(sel.focusNode)) return;
+
+
+            // Schedule scroll correction for the next frame (after browser's own scroll)
+            if (this._correctScrollRAF) {
+                cancelAnimationFrame(this._correctScrollRAF);
+            }
+            this._correctScrollRAF = requestAnimationFrame(() => {
+                this._correctCaretScroll();
+            });
+
             if (this._changeSelectionTimer) {
                 clearTimeout(this._changeSelectionTimer);
             }
-
             this._changeSelectionTimer = setTimeout(() => {
                 const selection = this.getCurrentBodyPaneSelection();
                 if (selection) {
@@ -153,6 +168,50 @@ export class BodyManager {
 
         // Listen on document, not on BODY_PANE
         document.addEventListener('selectionchange', handleSelectionChange);
+    }
+
+    private _correctCaretScroll(): void {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) return;
+        if (!this._bodyPane.contains(sel.focusNode)) return;
+
+        const range = sel.getRangeAt(0);
+        const rects = range.getClientRects();
+        let rect = rects[0] ?? range.getBoundingClientRect();
+
+        // On empty lines, getClientRects() is empty and getBoundingClientRect() is all zeros.
+        // Insert a temporary probe element to get a measurable position.
+        let probe: HTMLElement | null = null;
+        if (!rect || (rect.width === 0 && rect.height === 0 && rect.x === 0)) {
+            probe = document.createElement("span");
+            probe.textContent = "\u200B"; // zero-width space
+            const probeRange = range.cloneRange();
+            probeRange.collapse(false);
+            probeRange.insertNode(probe);
+            rect = probe.getBoundingClientRect();
+        }
+        const pane = this._bodyPane;
+        const paneRect = pane.getBoundingClientRect();
+        const MARGIN = 24; // comfort margin in px — tune to taste
+
+
+        console.log('fixing scroll!');
+        const caretLeft = rect.left - paneRect.left;
+        if (caretLeft < MARGIN) {
+            pane.scrollLeft = Math.max(0, pane.scrollLeft - (MARGIN - caretLeft));
+        }
+        const caretRight = paneRect.right - rect.right;
+        if (caretRight < MARGIN) {
+            pane.scrollLeft += MARGIN - caretRight;
+        }
+        const caretTop = rect.top - paneRect.top;
+        if (caretTop < MARGIN) {
+            pane.scrollTop = Math.max(0, pane.scrollTop - (MARGIN - caretTop));
+        }
+        const caretBottom = paneRect.bottom - rect.bottom;
+        if (caretBottom < MARGIN) {
+            pane.scrollTop += MARGIN - caretBottom;
+        }
     }
 
     public setChangeTextEditorScrollCallback(callback: (event: number) => void) {
@@ -286,6 +345,11 @@ export class BodyManager {
         const range = domSelection.getRangeAt(0);
         if (!this._bodyPane.contains(range.commonAncestorContainer)) {
             return undefined;
+        }
+
+        if (domSelection.isCollapsed) {
+            const pos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
+            return new body.Selection(pos, pos);
         }
 
         const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
