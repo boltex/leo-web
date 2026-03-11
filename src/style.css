@@ -698,7 +698,7 @@ body.dragging-cross {
   min-height: 0;
   background-color: var(--body-pane-color);
   overflow-y: auto;
-  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-family: "Consolas", "Monaco", "Lucida Console", "DejaVu Sans Mono", "Liberation Mono", monospace;
   white-space: var(--body-pane-wrap);
   transition: var(--body-pane-transition);
 }
