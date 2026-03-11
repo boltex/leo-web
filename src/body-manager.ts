@@ -28,6 +28,7 @@ const LANGUAGE_ALIASES: Record<string, string> = {
 
 const SENTINEL_CLASS = "leo-sentinel";
 const SENTINEL_CHAR = "\u200B";
+const MAX_COLOR_LENGTH = 100000; // Max length of text to apply syntax highlighting to, to avoid performance issues.
 
 /**
  * Body Manager is responsible for managing the body pane, which includes rendering the body text, handling user interactions
@@ -295,6 +296,13 @@ export class BodyManager {
 
     private renderHighlightedBody(text: string, language: string): void {
 
+        if (text.length > MAX_COLOR_LENGTH) {
+            this._sentinel = null;
+            this._bodyPane.textContent = text;
+            this._ensureSentinel();
+            return;
+        }
+
         const normalized =
             LANGUAGE_ALIASES[language.toLowerCase()] ??
             language.toLowerCase() ??
@@ -309,10 +317,6 @@ export class BodyManager {
         }
         this._sentinel = null;  // innerHTML destroyed the old element.
         this._bodyPane.innerHTML = Prism.highlight(text, grammar, normalized);
-
-        // * non-highlighted version, for experiments.
-        // text = this._escapeBodyText(text);
-        // this._bodyPane.innerHTML = text;
 
         this._ensureSentinel();
     }
