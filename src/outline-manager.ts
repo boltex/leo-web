@@ -244,7 +244,12 @@ export class OutlineManager {
             div.style.width = (viewportWidth - leftPosition) + "px";
 
             const caret = document.createElement("span");
-            caret.className = row.toggled ? "caret toggled" : "caret";
+            if (row.toggled) {
+                caret.className = "caret toggled";
+                row.toggled = false; // remove that flag when done!
+            } else {
+                caret.className = "caret";
+            }
 
             if (row.hasChildren) {
                 caret.setAttribute("data-expanded", row.isExpanded ? "true" : "false");
