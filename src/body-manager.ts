@@ -359,14 +359,6 @@ export class BodyManager {
         this.HTML_ELEMENT.setAttribute('data-body-wrap', wrap ? 'true' : 'false');
     }
 
-    private _escapeBodyText(text: string): string {
-        return text.replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    }
-
     public getBody(): string {
         const text = this._bodyPane.textContent ?? "";
         return text.endsWith(SENTINEL_CHAR) ? text.slice(0, -1) : text;
