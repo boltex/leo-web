@@ -183,6 +183,41 @@
 
                 <!-- Configuration controls -->
                 <div id="config-controls" class="log-pane-container" role="region" aria-label="Configuration settings">
+                    <span class="sub-title">External Files Change Detection</span>
+                    <div class="config-col" aria-label="Config options">
+                        <div class="setting-input">
+
+                            <label for="checkForChangeExternalFiles">Watch external files changes</label>
+                            <select id="checkForChangeExternalFiles" class="setting-select"
+                                name="checkForChangeExternalFiles" data-setting>
+                                <option value="none">
+                                    Default from Leo's config
+                                </option>
+                                <option value="force-check">
+                                    Check for changes
+                                </option>
+                                <option value="force-ignore">
+                                    Ignore all changes
+                                </option>
+                            </select>
+                        </div>
+                        <div class="setting-input">
+
+                            <label for="defaultReloadIgnore">Force reload or ignore changes</label>
+                            <select id="defaultReloadIgnore" class="setting-select" name="defaultReloadIgnore"
+                                data-setting>
+                                <option value="none">
+                                    Choose each time
+                                </option>
+                                <option value="yes-all">
+                                    Reload All
+                                </option>
+                                <option value="no-all">
+                                    Ignore All
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                     <span class="sub-title">Visible Controls</span>
                     <div class="config-col" aria-label="Config options">
                         <label for="show-prev-next-history">

@@ -1154,10 +1154,20 @@ body.dragging-secondary .node {
   padding-top: 0.5rem;
   display: var(--settings-display);
   overflow-x: hidden;
-  overflow-y: hidden;
-}
-#config-controls:hover {
   overflow-y: auto;
+}
+/* #config-controls:hover {
+} */
+
+select.setting-select {
+  box-sizing: border-box;
+  padding: 0.2rem 0.3rem;
+  margin: 0 0 0.2rem 0.25rem;
+  border-radius: 3px;
+  border: 1px solid var(--find-border-color);
+  background: transparent;
+  color: var(--find-text-color);
+  font-family: sans-serif;
 }
 
 .config-title {
@@ -1291,7 +1301,7 @@ body.dragging-secondary .node {
   font-family: sans-serif;
 }
 
-#searchOptions {
+select.searchOptions {
   box-sizing: border-box;
   padding: 0.4rem 0.5rem;
   margin: 0;
