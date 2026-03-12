@@ -11,33 +11,29 @@ Leo is a fundamentally different way of using and organizing data, programs and 
 
 This project is a TypeScript implementation that brings the Leo Editor experience to the web. (_Scriptable in either Javascript or Typescript_)
 
-It uses the browser's **File System API** for local file access. For other usage scenarios, see [other Leo implementations](#other-leo-editor-implementations) for versions that support online repositories, or integrated as VSCode extentions.
+It uses the browser's **File System API** for local file access. For other usage scenarios, see [other Leo implementations](#other-leo-editor-implementations) for versions that support online repositories, or integrated as VSCode extensions.
 
 ## Limitations
 
-To keep Leo-Web light and fast, it does not support .db files.
-
-Running in the browser, it cannot launch OS shell commands.
-
-Absolute paths are not supported with the browser's file API. Use relative paths exclusively for external files.
-
-`Ctrl+TAB`, `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
+- To keep Leo-Web light and fast, it does not support .db files.
+- Running in the browser, leo scripts cannot launch OS shell commands.
+- Absolute paths are not supported with the browser's file API. Use relative paths exclusively for external files.
+- `Ctrl+TAB`, `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
+- There is a single log pane, shared across opened leo documents.
 
 ## Current Features
 
-- Complete UI implementation with outline, log, settings, and find panes
-- Leo's core integrated with menu system, keybindings, and mouse controls in the outline
-- Full outline pane with node selection, expansion/collapse, marking, and hoisting
-- Multiple document support with tabbed interface
+- Implementation of the outline, log, settings, and find UI panes
+- Leo's core exposed through the menu, keybindings, and context menus
+- Multi-document support with tabbed interface
 - Theme and layout customization
 - Drag-to-resize panes with persistent preferences
-- Context menus and keyboard shortcuts
 
 ### Not Yet Implemented
 
-- Body pane syntax coloring
 - Nav pane
-- Undo pane
+- \@button pane
+- Undo history pane
 
 ## Contributing
 
@@ -49,10 +45,16 @@ Absolute paths are not supported with the browser's file API. Use relative paths
 ### Build
 
 1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+
+```bash
+git clone https://github.com/boltex/leo-web.git
+```
+
+2. Install dependencies
+
+```bash
+npm install
+```
 
 ### Development
 
@@ -78,7 +80,7 @@ Build the application for production:
 npm run build
 ```
 
-The built files will be in the `dist/` directory.
+The generated files will be in the `dist/` directory.
 
 ### Other Scripts
 
@@ -87,11 +89,11 @@ The built files will be in the `dist/` directory.
 
 ## Other Leo Editor implementations
 
-To instead work with _files directly inside online repositories_, such as on GitHub and Azure-Repos, use the [LeoJS VSCode extension](https://github.com/boltex/leojs?#web-based-development) within VSCode for the web. (It also can run in the desktop version of VSCode for local file editing)
+To instead work with _files directly inside online repositories_, such as on GitHub and Azure-Repos, use the [LeoJS VSCode extension](https://github.com/boltex/leojs#web-based-development) within VSCode for the web. (It also can run in the desktop version of VSCode for local file editing)
 
-To work with the original Python implementation of Leo integrated into VSCode, use the [LeoInteg VSCode extension]().
+To work with the original Python implementation of Leo integrated into VSCode, use the [LeoInteg VSCode extension](https://github.com/boltex/leointeg#-leo-for-visual-studio-code).
 
-# Acknowledgments
+## Acknowledgments
 
 See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
 or on [github](https://github.com/leo-editor/leo-editor).
