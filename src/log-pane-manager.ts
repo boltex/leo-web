@@ -13,7 +13,7 @@ type searchSettingNames = 'entireOutline' |
     'wholeWord';
 
 /**
- * Log Pane contains Log, Find, Nav, and Settings controls. Each with its respctive tab at the top. 
+ * Log Pane contains Log, Find, Nav, and Settings controls. Each with its respective tab at the top. 
  * This class manages the UI controls within this pane, but not the layout of the pane itself (see LayoutManager).
  */
 export class LogPaneManager {
