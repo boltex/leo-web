@@ -9,9 +9,9 @@ Leo is a fundamentally different way of using and organizing data, programs and 
 
 ## About
 
-This project is a TypeScript implementation that brings the Leo Editor experience to the web. (_Scriptable in either Javascript or Typescript_)
+This project is a TypeScript implementation that brings the Leo Editor experience to the web. (_Scriptable in either Javascript or Typescript_) It uses the browser's **File System API** for local file access.
 
-It uses the browser's **File System API** for local file access. For other usage scenarios, see [other Leo implementations](#other-leo-editor-implementations) for versions that support online repositories, or integrated as VSCode extensions.
+For other usage scenarios, see [other Leo implementations](#other-leo-editor-implementations) for versions that support online repositories, or integrated as VSCode extensions.
 
 ## Limitations
 
