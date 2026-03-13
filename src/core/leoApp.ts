@@ -1170,9 +1170,6 @@ export class LeoApp {
         }
         if (useDialog) {
             await this.setIdFromDialog();
-            if (this.leoID) {
-                await this.setIDFile();
-            }
         }
         if (!this.leoID) {
             // Leo Web UI will block all commands at startup if LeoID is None/Falsy.
@@ -1271,16 +1268,6 @@ export class LeoApp {
             g.blue('leoID=' + this.leoID);
         }
 
-    }
-    //@+node:felix.20251214160339.55: *5* app.setIDFile
-    /** 
-     * Create leoID.txt. Also set Leo web own leoID config setting.
-     */
-    public async setIDFile(): Promise<boolean> {
-
-        // TODO: For leo-web, use localstorage methods from the utils module.
-
-        return false;
     }
     //@+node:felix.20251214160339.56: *4* app.setLog, lockLog, unlocklog
     // def setLog(self, log: Any) -> None:

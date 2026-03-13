@@ -44,6 +44,9 @@ export class MenuManager {
     public ACTION_DEHOIST: HTMLElement;
 
     // * Settings Menu
+    public CHECK_EXTERNAL_FILES: HTMLSelectElement;
+    public RELOAD_IGNORE_CHANGES: HTMLSelectElement;
+
     public SHOW_PREV_NEXT_MARK: HTMLInputElement;
     public SHOW_TOGGLE_MARK: HTMLInputElement;
     public SHOW_PREV_NEXT_HISTORY: HTMLInputElement;
@@ -94,6 +97,9 @@ export class MenuManager {
         this.ACTION_UNMARK = document.getElementById('action-unmark')!;
         this.ACTION_HOIST = document.getElementById('action-hoist')!;
         this.ACTION_DEHOIST = document.getElementById('action-dehoist')!;
+
+        this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
+        this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
         this.SHOW_TOGGLE_MARK = document.getElementById('show-toggle-mark')! as HTMLInputElement;

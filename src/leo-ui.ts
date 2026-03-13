@@ -2775,7 +2775,6 @@ export class LeoUI extends NullGui {
             // OK not empty
             if (g.app.leoID !== p_leoID) {
                 g.app.leoID = p_leoID;
-                void g.app.setIDFile();
                 g.blue('leoID=' + p_leoID);
             }
 
