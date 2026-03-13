@@ -269,7 +269,6 @@ export class LeoUI extends NullGui {
         // Reload the page to restart leoWeb
         window.location.reload();
 
-
         return Promise.resolve(true);
     }
 

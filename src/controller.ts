@@ -1,6 +1,6 @@
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { FlatRowLeo } from "./types";
+import { ConfigSetting, FlatRowLeo } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -54,6 +54,7 @@ export class Controller {
         this.setupButtonHandlers();
         this.setupFindPaneHandlers();
         this.setupConfigCheckboxes();
+        this.setupConfigSelectors();
         this.setupTopMenuHandlers();
     }
 
@@ -136,6 +137,25 @@ export class Controller {
         workspace.menu.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
             e.preventDefault();
         });
+    }
+
+    private setupConfigSelectors() {
+        const menu = workspace.menu;
+        menu.CHECK_EXTERNAL_FILES.addEventListener('change', this.onDropdownChanged);
+        menu.RELOAD_IGNORE_CHANGES.addEventListener('change', this.onDropdownChanged);
+    }
+
+    private onDropdownChanged = (e: Event) => {
+        const element = e.target as HTMLSelectElement;
+        if (element) {
+            const w_value = element.options[element.selectedIndex].value;
+            // frontConfig[element.id] = w_value;
+            const w_changes: ConfigSetting[] = [{
+                code: element.id,
+                value: w_value
+            }];
+            g.app.gui.config.setLeoWebSettings(w_changes);
+        }
     }
 
     private setupConfigCheckboxes() {
