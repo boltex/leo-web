@@ -1,3 +1,4 @@
+import { Constants } from './constants';
 import { Position } from './core/leoNodes';
 import { FlatRowLeo } from './types';
 import { workspace } from './workspace';
@@ -184,6 +185,14 @@ export class OutlineManager {
                     e.stopImmediatePropagation();
                     finish();
                 }
+                // If tab or shift tab, we need to focus on the body pane.
+                else if (e.key === "Tab") {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    workspace.controller.doCommand(Constants.COMMANDS.SHOW_BODY);
+                    // Loss of focus will trigger the finish function and resolve the promise.
+                }
+
             };
 
             input.onblur = () => {
