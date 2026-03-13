@@ -1120,10 +1120,14 @@ body.dragging-secondary .node {
   white-space: nowrap;
 }
 
+.setting-label {
+  min-width: 125px;
+}
+
 #nav-tab {
   background: var(--nav-tab-bg-color);
   /* Hidden while being developped */
-  display: none; /* TEMPORARY */
+  display: none; /* Temporary */
 }
 
 #nav-controls {
@@ -1268,11 +1272,12 @@ select.setting-select {
   position: absolute;
   right: 0.3em;
   line-height: 1em;
-  top: 2.36em;
+  top: 2.24em;
   font-size: 1.8em;
   color: #5c87ff80;
   padding: 0;
   margin: 0;
+  pointer-events: none;
 }
 
 .config-col label {
@@ -1291,17 +1296,6 @@ select.setting-select {
 #replace-input,
 #navText {
   width: 100%;
-  box-sizing: border-box;
-  padding: 0.4rem 0.5rem;
-  margin: 0;
-  border-radius: 3px;
-  border: 1px solid var(--find-border-color);
-  background: transparent;
-  color: var(--find-text-color);
-  font-family: sans-serif;
-}
-
-select.searchOptions {
   box-sizing: border-box;
   padding: 0.4rem 0.5rem;
   margin: 0;
@@ -1393,10 +1387,16 @@ input[type="checkbox"]:focus-visible:checked::after {
 
 #find-controls input:focus,
 #find-controls input:focus-visible,
+#find-controls select:focus,
+#find-controls select:focus-visible,
 #config-controls input:focus,
 #config-controls input:focus-visible,
+#config-controls select:focus,
+#config-controls select:focus-visible,
 #nav-controls input:focus,
-#nav-controls input:focus-visible {
+#nav-controls input:focus-visible,
+#nav-controls select:focus,
+#nav-controls select:focus-visible {
   border-color: var(--find-selection);
   outline: 2px solid var(--find-selection);
   outline-offset: -1px;

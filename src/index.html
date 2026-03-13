@@ -146,7 +146,7 @@
                 <div id="nav-controls" class="log-pane-container" role="region" aria-label="Nav Pane">
                     <div class="nav-input-holder">
                         <div class="nav-col">
-                            <select class="no-overflow" name="searchOptions" id="searchOptions"
+                            <select class="no-overflow setting-select" name="searchOptions" id="searchOptions"
                                 title="Confine search to:&#013; - All: regular search for all nodes&#013; - Subtree: current node and it's children&#013; - File: only search under a node with an @<file> directive&#013; - Chapter: only search under a node with an @chapter directer&#013; - Node: only search currently selected node">
                                 <option value="0">All</option>
                                 <option value="1">Subtree</option>
@@ -183,15 +183,16 @@
 
                 <!-- Configuration controls -->
                 <div id="config-controls" class="log-pane-container" role="region" aria-label="Configuration settings">
-                    <span class="sub-title">External Files Change Detection</span>
+                    <!-- <span class="sub-title">External Files Change Detection</span> -->
                     <div class="config-col" aria-label="Config options">
                         <div class="setting-input">
 
-                            <label for="checkForChangeExternalFiles">Watch external files changes</label>
+                            <label class="setting-label" for="checkForChangeExternalFiles">External files
+                                changes</label>
                             <select id="checkForChangeExternalFiles" class="setting-select"
                                 name="checkForChangeExternalFiles" data-setting>
                                 <option value="none">
-                                    Default from Leo's config
+                                    Default from config
                                 </option>
                                 <option value="force-check">
                                     Check for changes
@@ -203,7 +204,7 @@
                         </div>
                         <div class="setting-input">
 
-                            <label for="defaultReloadIgnore">Force reload or ignore changes</label>
+                            <label class="setting-label" for="defaultReloadIgnore">Reload or ignore</label>
                             <select id="defaultReloadIgnore" class="setting-select" name="defaultReloadIgnore"
                                 data-setting>
                                 <option value="none">
@@ -218,7 +219,8 @@
                             </select>
                         </div>
                     </div>
-                    <span class="sub-title">Visible Controls</span>
+
+                    <!-- <span class="sub-title">Visible Controls</span> -->
                     <div class="config-col" aria-label="Config options">
                         <label for="show-prev-next-history">
                             <input id="show-prev-next-history" type="checkbox" name="config-option" checked />
@@ -260,7 +262,8 @@
                         Chapters
                     </label> -->
                     </div>
-                    <span class="sub-title">Keyboard Shortcuts</span>
+
+                    <!-- <span class="sub-title">Keyboard Shortcuts</span>
                     <ul class="config-col shortcuts">
                         <li><span class="kbd-spacer"><kbd>Arrows</kbd></span> — Navigate Outline</li>
                         <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>Arrows</kbd></span> — Navigate from Body Pane
@@ -270,7 +273,9 @@
                         <li><span class="kbd-spacer"><kbd>F2</kbd>/<kbd>F3</kbd></span> — Previous/Next Match</li>
                         <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>M</kbd></span> — Mark Node</li>
                         <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>-</kbd></span> — Collapse All</li>
-                    </ul>
+                    </ul> -->
+
+
                 </div>
             </div>
         </div>
