@@ -61,7 +61,7 @@ export const keybindings: Keybinding[] = [
         command: CMD.SHOW_BODY,
         key: "tab",
         outline: true,
-        find: true,
+        // find: true,
         enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {

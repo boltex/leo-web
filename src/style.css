@@ -1169,7 +1169,7 @@ select.setting-select {
   margin: 0 0 0.2rem 0.25rem;
   border-radius: 3px;
   border: 1px solid var(--find-border-color);
-  background: transparent;
+  background: var(--find-pane-color);
   color: var(--find-text-color);
   font-family: sans-serif;
 }
@@ -1318,6 +1318,7 @@ select.setting-select {
 .bottom-scroll {
   gap: 0.35rem;
   display: flex;
+  padding: 2px 0 2px 1px;
   flex: 1;
   min-height: 0;
   overflow-y: hidden;
