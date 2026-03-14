@@ -1853,3 +1853,15 @@ mark {
     cursor: help;
   }
 }
+
+/* ### COMMON TO ALL THEMES ### */
+
+/* @comment/@delims highlighted as error */
+.token.invalid {
+  color: #f44747;
+}
+
+/* section reference name — underline like a link */
+.token.leo-section-name {
+  text-decoration: underline;
+}

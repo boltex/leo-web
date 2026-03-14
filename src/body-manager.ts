@@ -17,6 +17,56 @@ import 'prismjs/components/prism-rest';
 import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-typescript';
 
+Prism.hooks.add('before-tokenize', (env) => {
+    env.grammar = {
+        // @doc/@ ... @code/@c  →  whole block as comment, delimiters as keywords
+        'leo-doc-block': {
+            pattern: /^(?:@doc|@)(?:[ \t][^\n]*)?\n(?:[\s\S]*?^(?:@code|@c)(?:[ \t][^\n]*)?(?:\n|$)|[\s\S]*)/m,
+            greedy: true,
+            alias: 'comment',
+            inside: {
+                'keyword': /^(?:@doc|@code|@c|@)(?:[ \t][^\n]*)?/m
+            }
+        },
+        // @nocolor ... @color  →  same treatment as doc block
+        'leo-nocolor-block': {
+            pattern: /^@nocolor(?:[ \t][^\n]*)?\n(?:[\s\S]*?^@color(?:[ \t][^\n]*)?(?:\n|$)|[\s\S]*)/m,
+            greedy: true,
+            alias: 'comment',
+            inside: {
+                'keyword': /^(?:@nocolor|@color)(?:[ \t][^\n]*)?/m
+            }
+        },
+        // <<section reference>>  →  delimiters as punctuation, name as string
+        'leo-section-ref': {
+            pattern: /<<[^>\n]+>>/,
+            inside: {
+                'punctuation': /^<<|>>$/,
+                'leo-section-name': {
+                    pattern: /\S(?:[^<>]*\S)?/,
+                    alias: 'string'
+                }
+            }
+        },
+        // @comment and @delims are deprecated — invalid/error color
+        'leo-invalid': {
+            pattern: /^(?:@comment|@delims)(?=[ \t]|$)/m,
+            alias: 'invalid'
+        },
+        // @language with its argument
+        'leo-language': {
+            pattern: /^@language[ \t]+(?:batch|c|cplusplus|csharp|css|fortran|fortran90|go|haskell|html|java|javascript|json|julia|latex|lua|makefile|matlab|md|pascal|perl|php|python|rest|ruby|rust|typescript|xml)(?=[ \t]|$)/m,
+            alias: 'keyword'
+        },
+        // All other recognized Leo directives
+        'leo-directive': {
+            pattern: /^[ \t]*(?:@others|@all)(?=[ \t]|$)|^(?:@encoding|@ignore|@lineending|@path|@pagewidth|@tabwidth|@color|@killcolor|@nocolor|@nocolor-node|@first|@last|@section-delims|@wrap|@nowrap)(?=[ \t]|$)/m,
+            alias: 'keyword'
+        },
+        ...env.grammar
+    };
+});
+
 const LANGUAGE_ALIASES: Record<string, string> = {
     shell: "bash",
     sh: "bash",
