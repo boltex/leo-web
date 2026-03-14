@@ -27,6 +27,15 @@ export const keybindings: Keybinding[] = [
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
     {
+        command: CMD.MINIBUFFER,
+        key: "ctrl+shift+p",
+        mac: "cmd+shift+p",
+        outline: true,
+        body: true,
+        find: true,
+        enabledFlagsSet: [FLAGS.TREE_OPENED]
+    },
+    {
         command: CMD.SHOW_OUTLINE,
         key: "alt+t",
         body: true,
