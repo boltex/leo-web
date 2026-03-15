@@ -66,14 +66,13 @@ export class Controller {
         OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
         OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
         OUTLINE_PANE.addEventListener("scroll", utils.throttle(workspace.outline.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
-        OUTLINE_PANE.addEventListener("contextmenu", this.handleContextMenu);
-        document.addEventListener("click", (e) => {
-            workspace.menu.closeMenusEvent(e);
-        });
+        OUTLINE_PANE.addEventListener("contextmenu", this.handleOutlineContextMenu);
+
     }
 
     private setupBodyPaneHandlers() {
         workspace.layout.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
+        workspace.layout.BODY_PANE.addEventListener('contextmenu', this.handleBodyContextMenu);
     }
 
     private setupLogPaneHandlers() {
@@ -94,6 +93,9 @@ export class Controller {
         window.addEventListener('resize', utils.throttle(() => workspace.layout.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
         window.addEventListener('beforeunload', this.saveAllPreferences);
+        document.addEventListener("click", (e) => {
+            workspace.menu.closeMenusEvent(e);
+        });
     }
 
     private setupButtonHandlers() {
@@ -544,11 +546,31 @@ export class Controller {
         }
     }
 
-    private handleContextMenu = (e: MouseEvent) => {
+    private handleBodyContextMenu = (e: MouseEvent) => {
+
         e.preventDefault();
+
+        // close possible existing outline right-click menu
+        workspace.menu.OUTLINE_MENU.style.display = 'none';
+
+        const BODY_MENU = workspace.menu.BODY_MENU;
+
+        // Position and show the custom context menu
+        BODY_MENU.style.top = `${e.clientY}px`;
+        BODY_MENU.style.left = `${e.clientX}px`;
+        BODY_MENU.style.display = 'block';
+
+    }
+
+    private handleOutlineContextMenu = (e: MouseEvent) => {
+
+        e.preventDefault();
+
+        workspace.menu.BODY_MENU.style.display = 'none';
+
         const target = e.target as Element;
         const outline = workspace.outline;
-        const MENU = workspace.menu.MENU;
+        const MENU = workspace.menu.OUTLINE_MENU;
 
         const nodeEl = target.closest('.node') as HTMLElement | null;
         if (!nodeEl) {

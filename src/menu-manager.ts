@@ -13,7 +13,9 @@ export class MenuManager {
     public COLLAPSE_ALL_BTN: HTMLElement;
 
     // * Context Menu
-    public MENU: HTMLElement;
+    public OUTLINE_MENU: HTMLElement;
+
+    public BODY_MENU: HTMLElement;
 
     // * Top Menu
     public TOP_MENU: HTMLElement;
@@ -71,7 +73,8 @@ export class MenuManager {
 
         this.COLLAPSE_ALL_BTN = document.getElementById("collapse-all-btn")!;
 
-        this.MENU = document.getElementById('menu')!;
+        this.OUTLINE_MENU = document.getElementById('outline-menu')!;
+        this.BODY_MENU = document.getElementById('body-menu')!;
         this.TOP_MENU = document.getElementById("top-menu")!;
         this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
         this.TOP_MENU_TOGGLE = document.getElementById("top-menu-toggle")!;
@@ -445,7 +448,7 @@ export class MenuManager {
     }
 
     public closeMenusEvent(e: MouseEvent) {
-        this.MENU.style.display = "none";
+        this.OUTLINE_MENU.style.display = "none";
         const target = e.target as Element;
         if (!target.closest('.menu')) {
             this.closeAllSubmenus();
