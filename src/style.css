@@ -690,6 +690,12 @@ body.dragging-cross {
   flex: 1 1 0;
 }
 
+/* Remove default browser outline */
+#log-pane:focus,
+#log-pane:focus-visible {
+  outline: none;
+}
+
 #body-pane {
   flex: 1;
   padding: 0.5rem 0 0 0.5rem;

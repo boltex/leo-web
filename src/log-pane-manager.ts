@@ -44,6 +44,9 @@ export class LogPaneManager {
     public SCOPE_NODE: HTMLInputElement; // radio button
     public SCOPE_FILE: HTMLInputElement; // radio button
 
+    // Config Controls
+    public CHECK_FOR_EXTERNAL_FILES: HTMLSelectElement; // select
+    public SHOW_COLLAPSE_ALL: HTMLInputElement; // checkbox
 
     // Nav controls
     public SEARCH_OPTIONS: HTMLSelectElement; // select
@@ -118,6 +121,10 @@ export class LogPaneManager {
         this.SCOPE_SUBOUTLINE = document.getElementById('scope-suboutline')! as HTMLInputElement; // radio button
         this.SCOPE_NODE = document.getElementById('scope-node')! as HTMLInputElement; // radio button
         this.SCOPE_FILE = document.getElementById('scope-file')! as HTMLInputElement; // radio button
+
+        // Config Controls
+        this.CHECK_FOR_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement; // select
+        this.SHOW_COLLAPSE_ALL = document.getElementById('show-collapse-all')! as HTMLInputElement; // checkbox
 
         // Nav controls
         this.SEARCH_OPTIONS = document.getElementById('searchOptions') as HTMLSelectElement; // select

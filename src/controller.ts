@@ -318,7 +318,10 @@ export class Controller {
     }
 
     private setupFindPaneHandlers() {
+
         const logPane = workspace.logPane;
+
+        // * First deal with keyboard presses on specific 'find' tab controls, which is part of the log pane.
         logPane.FIND_INPUT.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && e.shiftKey) {
                 e.preventDefault();
@@ -351,6 +354,21 @@ export class Controller {
                 // this.buildRowsRenderTreeLeo(); // Re-render to update node highlighting
             });
         });
+
+        // * Second, deal with the keyboard presses on specific 'config' tab controls.
+        logPane.CHECK_FOR_EXTERNAL_FILES.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && e.shiftKey) {
+                e.preventDefault();
+                logPane.SHOW_COLLAPSE_ALL.focus();
+            }
+        });
+        logPane.SHOW_COLLAPSE_ALL.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                logPane.CHECK_FOR_EXTERNAL_FILES.focus();
+            }
+        });
+
     }
 
     public setupDocumentTabsAndHandlers() {

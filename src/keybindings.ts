@@ -65,6 +65,13 @@ export const keybindings: Keybinding[] = [
         enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
+        command: CMD.SHOW_BODY,
+        key: "shift+tab",
+        outline: true,
+        // find: true,
+        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
+    },
+    {
         command: CMD.INDENT_REGION,
         key: "tab",
         body: true,
