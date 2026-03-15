@@ -683,5 +683,12 @@ export const keybindings: Keybinding[] = [
         find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
+    {
+        command: CMD.TOGGLE_MENU,
+        key: "shift+f11",
+        outline: true,
+        body: true,
+        find: true,
+    },
 
 ];

@@ -173,7 +173,7 @@ export class TagController {
             }
         } else {
             if (!g.unitTesting) {
-                g.es(`no tags in ${c.shortFileName()}`);
+                g.es(`no tags in ${c.shortFileName() || 'untitled'}`);
             }
         }
     }

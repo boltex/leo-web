@@ -240,6 +240,10 @@ export class LeoUI extends NullGui {
         workspace.layout.equalSizedPanes();
     }
 
+    public toggleMenu(): void {
+        workspace.menu.toggleMenu();
+    }
+
     public showDocumentation(): void {
         // Open Leo Web documentation URL in new browser tab (for now, github repo)
         const docUrl = 'https://github.com/boltex/leo-web/';

@@ -476,7 +476,7 @@ export class Controller {
         const outline = workspace.outline;
         const target = event.target as Element;
         const nodeEl = target.closest('.node') as HTMLElement | null;
-        if (!nodeEl) {
+        if (!nodeEl || !g.app.windowList.length) {
             return;
         }
 
@@ -509,9 +509,6 @@ export class Controller {
     private handleOutlinePaneDblClick = (event: MouseEvent) => {
         const outline = workspace.outline;
         const target = event.target as Element;
-
-        // Currently Selected Document's Commander
-        const c = g.app.windowList[g.app.gui.frameIndex].c;
 
         if (target.classList.contains('node-text')) {
             event.preventDefault();
@@ -1104,8 +1101,8 @@ export class Controller {
             g.app.gui.positionsToAnimate = [];
             outline.setTreeDataLeo(rows);
         } else {
+            // No active Leo document found for building render tree
             outline.setTreeDataLeo([]);
-            console.warn("No active Leo document found for building render tree.");
         }
     }
 

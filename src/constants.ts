@@ -273,6 +273,7 @@ export class Constants {
         RELOAD_SETTINGS: Constants.NAME + ".reloadSettings",
 
         // Window/UI
+        TOGGLE_MENU: Constants.NAME + ".toggleMenu",
         DOCUMENTATION: Constants.NAME + ".documentation",
         ABOUT_LEO: Constants.NAME + ".aboutLeo",
         LIGHT_THEME: Constants.NAME + ".lightTheme",
