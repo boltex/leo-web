@@ -52,7 +52,6 @@ export class Controller {
         this.setupResizerHandlers();
         this.setupWindowHandlers();
         this.setupButtonHandlers();
-        this.setupFindPaneHandlers();
         this.setupConfigCheckboxes();
         this.setupConfigSelectors();
         this.setupTopMenuHandlers();
@@ -314,60 +313,6 @@ export class Controller {
                     menu.activeTopMenu = null;
                     layout.restoreLastFocusedElement();
                     break;
-            }
-        });
-
-    }
-
-    private setupFindPaneHandlers() {
-
-        const logPane = workspace.logPane;
-
-        // * First deal with keyboard presses on specific 'find' tab controls, which is part of the log pane.
-        logPane.FIND_INPUT.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && e.shiftKey) {
-                e.preventDefault();
-                logPane.OPT_BODY.focus();
-            }
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                this.findNext();
-            }
-        });
-        logPane.REPLACE_INPUT.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                // Same as find input. Do not 'replace' on enter.
-                // User must use the replace shortcuts (Ctrl+= or Ctrl+-) to trigger replacements.
-                this.findNext();
-            }
-        });
-        logPane.OPT_BODY.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && !e.shiftKey) {
-                e.preventDefault();
-                logPane.FIND_INPUT.focus();
-            }
-        });
-        const findScopeRadios = logPane.getFindScopeRadios();
-        findScopeRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                // TODO : Implement or remove when the rest of leo's core is integrated in this UI.
-                // initialFindNode = null; // Reset initial find node when scope changes
-                // this.buildRowsRenderTreeLeo(); // Re-render to update node highlighting
-            });
-        });
-
-        // * Second, deal with the keyboard presses on specific 'config' tab controls.
-        logPane.CHECK_FOR_EXTERNAL_FILES.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && e.shiftKey) {
-                e.preventDefault();
-                logPane.SHOW_COLLAPSE_ALL.focus();
-            }
-        });
-        logPane.SHOW_COLLAPSE_ALL.addEventListener('keydown', (e) => {
-            if (e.key === 'Tab' && !e.shiftKey) {
-                e.preventDefault();
-                logPane.CHECK_FOR_EXTERNAL_FILES.focus();
             }
         });
 
@@ -961,21 +906,7 @@ export class Controller {
 
     }
 
-    // * Controller Methods (Search Orchestration) *
-    private startFind() {
-        // TODO : Remove or implement for leo's core into this UI.
-    }
-
-    private findNext() {
-        // TODO : Remove or implement for leo's core into this UI.
-    }
-
-    private findPrevious() {
-        // TODO : Remove or implement for leo's core into this UI.
-    }
-
     // * Controller Methods (Persistence) *
-
     private saveAllPreferences = () => {
         this.saveLayoutPreferences();
         this.saveConfigPreferences();

@@ -1,4 +1,5 @@
 import { LeoSearchSettings } from "./types";
+import { workspace } from './workspace';
 
 type searchSettingNames = 'entireOutline' |
     'nodeOnly' |
@@ -199,6 +200,44 @@ export class LogPaneManager {
             });
         }
 
+        // Setup tab/shift-tab to manage focus between controls and/or the body/outline panes.
+        // * Deal with pressing tab in the log content area to place focus on body-pane itself.
+        this.LOG_CONTENT.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                workspace.layout.BODY_PANE.focus();
+            }
+            // Note, shift-tab works ok by itself in the log content and brings focus to outline.
+        });
+
+        // * Deal with keyboard presses on specific 'find' tab controls, which is part of the log pane.
+        this.FIND_INPUT.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && e.shiftKey) {
+                e.preventDefault();
+                this.OPT_BODY.focus();
+            }
+
+        });
+        this.OPT_BODY.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                this.FIND_INPUT.focus();
+            }
+        });
+
+        // * Deal with keyboard presses on specific 'config' tab controls.
+        this.CHECK_FOR_EXTERNAL_FILES.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && e.shiftKey) {
+                e.preventDefault();
+                this.SHOW_COLLAPSE_ALL.focus();
+            }
+        });
+        this.SHOW_COLLAPSE_ALL.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                this.CHECK_FOR_EXTERNAL_FILES.focus();
+            }
+        });
     }
 
     private processChange() {
@@ -412,10 +451,6 @@ export class LogPaneManager {
             this.LOG_CONTENT.textContent += message + '\n';
         }
         this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
-    }
-
-    public getFindScopeRadios(): NodeListOf<HTMLInputElement> {
-        return document.querySelectorAll('input[name="find-scope"]');
     }
 
 }
