@@ -449,6 +449,7 @@ export class MenuManager {
 
     public closeMenusEvent(e: MouseEvent) {
         this.OUTLINE_MENU.style.display = "none";
+        this.BODY_MENU.style.display = "none";
         const target = e.target as Element;
         if (!target.closest('.menu')) {
             this.closeAllSubmenus();
