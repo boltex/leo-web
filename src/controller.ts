@@ -935,59 +935,6 @@ export class Controller {
         workspace.layout.toggleTheme();
     }
 
-    private refreshHoistButtonStates(): void {
-        const c = g.app.windowList[g.app.gui.frameIndex].c;
-        const p = c.p;
-        let w_canHoist = true;
-        let w_topIsChapter = false;
-        if (c.hoistStack.length) {
-            const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
-            w_topIsChapter = w_ph.h.startsWith('@chapter ');
-            if (p.__eq__(w_ph)) {
-                // p is already the hoisted node
-                w_canHoist = false;
-            }
-        } else {
-            // not hoisted, was it the single top child of the real root?
-            if (c.rootPosition()!.__eq__(p) && c.hiddenRootNode.children.length === 1) {
-                w_canHoist = false;
-            }
-        }
-        workspace.menu.updateHoistButtonStates(
-            w_canHoist,
-            !!c.hoistStack.length
-        );
-    }
-
-    private refreshContextMenuState(): void {
-        const c = g.app.windowList[g.app.gui.frameIndex].c;
-        const p = c.p;
-        const isMarked = p.isMarked();
-        let w_canHoist = true;
-        let w_topIsChapter = false;
-        if (c.hoistStack.length) {
-            const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
-            w_topIsChapter = w_ph.h.startsWith('@chapter ');
-            if (p.__eq__(w_ph)) {
-                // p is already the hoisted node
-                w_canHoist = false;
-            }
-        } else {
-            // not hoisted, was it the single top child of the real root?
-            if (c.rootPosition()!.__eq__(p) && c.hiddenRootNode.children.length === 1) {
-                w_canHoist = false;
-            }
-        }
-
-        workspace.menu.updateContextMenuState(
-            !isMarked,
-            isMarked,
-            w_canHoist,
-            !!c.hoistStack.length
-        );
-
-    }
-
     private selectAndOrToggleAndRedraw(newSelectedNode: Position | null = null, nodeToToggle: Position | null = null, isCtrlClick: boolean = false) {
         let result: any;
         if (newSelectedNode) {
