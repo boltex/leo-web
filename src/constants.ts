@@ -23,7 +23,7 @@ export class Constants {
 
     public static LOCAL_STORAGE_KEY: string = "leoWebConfig";
     public static REFRESH_DEBOUNCE_DELAY: number = 0;
-    public static STATES_DEBOUNCE_DELAY: number = 40;
+    public static STATES_DEBOUNCE_DELAY: number = 20;
 
     // Fine tune those delays for better performance and user experience during dragging and scrolling!
     public static DRAG_DEBOUNCE_DELAY: number = 60;

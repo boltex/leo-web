@@ -62,18 +62,23 @@ export class Controller {
     private setupOutlinePaneHandlers() {
         const OUTLINE_PANE = workspace.layout.OUTLINE_PANE;
         // Use only mousedown for selection. Otherwise focus out of edit-headline messes with click events. We can still detect double-clicks by checking the event.detail property in the mousedown handler.
-        OUTLINE_PANE.addEventListener("mousedown", this.handleOutlinePaneMouseDown);
+        OUTLINE_PANE.addEventListener('mousedown', this.handleOutlinePaneMouseDown);
         // OUTLINE_PANE.addEventListener('click', this.handleOutlinePaneClick);
         OUTLINE_PANE.addEventListener('dblclick', this.handleOutlinePaneDblClick);
         OUTLINE_PANE.addEventListener('keydown', this.handleOutlinePaneKeyDown);
-        OUTLINE_PANE.addEventListener("scroll", utils.throttle(workspace.outline.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
-        OUTLINE_PANE.addEventListener("contextmenu", this.handleOutlineContextMenu);
+        OUTLINE_PANE.addEventListener('scroll', utils.throttle(workspace.outline.renderTree, Constants.OUTLINE_THROTTLE_DELAY));
+        OUTLINE_PANE.addEventListener('contextmenu', this.handleOutlineContextMenu);
+        // Add class allow-context to OUTLINE_PANE to allow right-click menu, but prevent it on individual nodes since they have their own context menu
+        OUTLINE_PANE.classList.add('allow-context');
 
     }
 
     private setupBodyPaneHandlers() {
-        workspace.layout.BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
-        workspace.layout.BODY_PANE.addEventListener('contextmenu', this.handleBodyContextMenu);
+        const BODY_PANE = workspace.layout.BODY_PANE;
+        BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
+        BODY_PANE.addEventListener('contextmenu', this.handleBodyContextMenu);
+        // Add class allow-context to BODY_PANE to allow right-click menu, but prevent it on certain elements if needed by checking event.target in the contextmenu handler
+        BODY_PANE.classList.add('allow-context');
     }
 
     private setupLogPaneHandlers() {
@@ -94,8 +99,15 @@ export class Controller {
         window.addEventListener('resize', utils.throttle(() => workspace.layout.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
         window.addEventListener('beforeunload', this.saveAllPreferences);
-        document.addEventListener("click", (e) => {
+        document.addEventListener('click', (e) => {
             workspace.menu.closeMenusEvent(e);
+        });
+        document.addEventListener('contextmenu', (e) => {
+            const target = e.target;
+            workspace.menu.closeMenusEvent(e);
+            if (!(target instanceof Element) || !target.closest('.allow-context')) {
+                e.preventDefault();
+            }
         });
     }
 
@@ -112,21 +124,17 @@ export class Controller {
         menu.TOGGLE_MARK_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
         menu.NEXT_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_NEXT_MARKED) });
         menu.PREV_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_PREV_MARKED) });
-        menu.ACTION_MARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
-        menu.ACTION_UNMARK.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
-        menu.ACTION_HOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.HOIST) });
-        menu.ACTION_DEHOIST.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DEHOIST) });
 
         // * Interface Only Actions *
         menu.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
         menu.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
         menu.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         menu.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab("log") });
-        logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab("find") });
-        logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab("nav") });
-        // logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab("undo") }); // Maybe add undo tab functionality later
-        logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab("settings") });
+        logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab('log') });
+        logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab('find') });
+        logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav') });
+        // logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') }); // Maybe add undo tab functionality later
+        logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab('settings') });
     }
 
 
@@ -495,26 +503,26 @@ export class Controller {
 
     private handleBodyContextMenu = (e: MouseEvent) => {
 
+        // Note: setupWindowHandlers will have called closeMenusEvent to close other menus automatically
+
         e.preventDefault();
-
-        // close possible existing outline right-click menu
-        workspace.menu.OUTLINE_MENU.style.display = 'none';
-
         const BODY_MENU = workspace.menu.BODY_MENU;
 
-        // Position and show the custom context menu
-        BODY_MENU.style.top = `${e.clientY}px`;
-        BODY_MENU.style.left = `${e.clientX}px`;
-        BODY_MENU.style.display = 'block';
+        // Position and show the custom context menu. No need to wait for state updates here since the body context menu is static and doesn't have options that depend on the current state of the application, unlike the outline context menu which needs to reflect the state of the selected node.
+        // But still use the minimal setTimeout to do it on next tick
+        setTimeout(() => {
+            BODY_MENU.style.top = `${e.clientY}px`;
+            BODY_MENU.style.left = `${e.clientX}px`;
+            BODY_MENU.style.display = 'block';
+        }, 0);
 
     }
 
     private handleOutlineContextMenu = (e: MouseEvent) => {
 
+        // Note: setupWindowHandlers will have called closeMenusEvent to close other menus automatically
+
         e.preventDefault();
-
-        workspace.menu.BODY_MENU.style.display = 'none';
-
         const target = e.target as Element;
         const outline = workspace.outline;
         const MENU = workspace.menu.OUTLINE_MENU;
@@ -535,10 +543,12 @@ export class Controller {
             this.selectAndOrToggleAndRedraw(row.node);
         }
 
-        // Position and show the custom context menu
-        MENU.style.top = `${e.clientY}px`;
-        MENU.style.left = `${e.clientX}px`;
-        MENU.style.display = 'block';
+        // Position and show the custom context menu after same delay which the states are updated to ensure the menu options are correct based on the current state of the application.
+        setTimeout(() => {
+            MENU.style.top = `${e.clientY}px`;
+            MENU.style.left = `${e.clientX}px`;
+            MENU.style.display = 'block';
+        }, Constants.STATES_DEBOUNCE_DELAY);
     }
 
     private handleOutlinePaneKeyDown = (e: KeyboardEvent) => {

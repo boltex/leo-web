@@ -1151,7 +1151,6 @@ export class LeoUI extends NullGui {
         menu.updateMarkedButtonStates(states.leoHasMarked);
         menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        menu.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
         menu.refreshMenu(menuData);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
@@ -1183,7 +1182,6 @@ export class LeoUI extends NullGui {
         menu.updateMarkedButtonStates(states.leoHasMarked);
         menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        menu.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
         menu.refreshMenu(menuData);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);

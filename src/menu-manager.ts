@@ -1,6 +1,6 @@
 import { workspace } from './workspace';
 
-import { ContextMenuEntry, MenuEntry } from "./types";
+import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
 
 /**
  * Manages the UI controls that launch commands or change settings. 
@@ -38,11 +38,6 @@ export class MenuManager {
     public NEXT_MARKED_BTN: HTMLButtonElement;
     public TOGGLE_MARK_BTN: HTMLButtonElement;
     public PREV_MARKED_BTN: HTMLButtonElement;
-
-    public ACTION_MARK: HTMLElement;
-    public ACTION_UNMARK: HTMLElement;
-    public ACTION_HOIST: HTMLElement;
-    public ACTION_DEHOIST: HTMLElement;
 
     // * Settings Menu
     public CHECK_EXTERNAL_FILES: HTMLSelectElement;
@@ -95,13 +90,6 @@ export class MenuManager {
         this.TOGGLE_MARK_BTN = document.getElementById('toggle-mark-btn')! as HTMLButtonElement;
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
 
-        // Body pane context menu actions 
-        // TODO : Replace with a more scalable way to manage context menu items and their states, especially as more are added. This is fine for now since there are only a few actions but could get unwieldy.
-        this.ACTION_MARK = document.getElementById('action-mark')!;
-        this.ACTION_UNMARK = document.getElementById('action-unmark')!;
-        this.ACTION_HOIST = document.getElementById('action-hoist')!;
-        this.ACTION_DEHOIST = document.getElementById('action-dehoist')!;
-
         this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
         this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
 
@@ -130,20 +118,95 @@ export class MenuManager {
         });
     }
 
+    private buildContextMenu(container: HTMLElement, entries: ContextMenuEntry[]) {
+        container.innerHTML = '';
+        const ul = document.createElement('ul');
+        for (const entry of entries) {
+            if (entry.kind === QuickPickItemKind.Separator) {
+                const sep = document.createElement('li');
+                sep.className = 'context-menu-separator';
+                ul.appendChild(sep);
+                continue;
+            }
+            const li = document.createElement('li');
+            // Add the class 'context-menu-item' to all actionable items for easier targeting.
+            if (entry.action) {
+                li.classList.add('context-menu-item');
+            }
+
+
+            li.textContent = entry.label;
+            if (entry.keyboardShortcut) {
+                const shortcut = document.createElement('span');
+                shortcut.className = 'menu-shortcut';
+                shortcut.textContent = entry.keyboardShortcut;
+                li.appendChild(shortcut);
+            }
+            let enabled = true;
+            if (entry.enabledFlagsSet) {
+                for (const flag of entry.enabledFlagsSet) {
+                    if (!workspace.getContext(flag)) { enabled = false; break; }
+                }
+            }
+            if (enabled && entry.enabledFlagsClear) {
+                for (const flag of entry.enabledFlagsClear) {
+                    if (workspace.getContext(flag)) { enabled = false; break; }
+                }
+            }
+            if (!enabled) {
+                li.classList.add('disabled');
+            }
+            if (entry.action) {
+                li.addEventListener('click', () => {
+                    if (!li.classList.contains('disabled')) {
+                        workspace.controller.doCommand(entry.action as string);
+                    }
+                });
+            }
+            if (entry.enabledFlagsSet || entry.enabledFlagsClear) {
+                entry.domElementRef = li;
+            }
+            ul.appendChild(li);
+        }
+        container.appendChild(ul);
+    }
+
+    private refreshContextMenu(entries: ContextMenuEntry[]) {
+        for (const entry of entries) {
+            if (!entry.domElementRef) { continue; }
+            let enabled = true;
+            if (entry.enabledFlagsSet) {
+                for (const flag of entry.enabledFlagsSet) {
+                    if (!workspace.getContext(flag)) { enabled = false; break; }
+                }
+            }
+            if (enabled && entry.enabledFlagsClear) {
+                for (const flag of entry.enabledFlagsClear) {
+                    if (workspace.getContext(flag)) { enabled = false; break; }
+                }
+            }
+            if (enabled) {
+                entry.domElementRef.classList.remove('disabled');
+            } else {
+                entry.domElementRef.classList.add('disabled');
+            }
+        }
+    }
+
     public buildBodyContextMenu(entries: ContextMenuEntry[]) {
-        // todo
+        this.buildContextMenu(this.BODY_MENU, entries);
     }
 
     public refreshBodyContextMenu(entries: ContextMenuEntry[]) {
-        // todo
+        this.refreshContextMenu(entries);
     }
 
     public buildOutlineContextMenu(entries: ContextMenuEntry[]) {
-        // todo
+        this.buildContextMenu(this.OUTLINE_MENU, entries);
     }
 
     public refreshOutlineContextMenu(entries: ContextMenuEntry[]) {
-        // todo
+        this.refreshContextMenu(entries);
     }
 
     public buildMenu(entries: MenuEntry[], level = 0) {
@@ -433,6 +496,8 @@ export class MenuManager {
     }
 
     public closeAllSubmenus() {
+        this.OUTLINE_MENU.style.display = "none";
+        this.BODY_MENU.style.display = "none";
         document.querySelectorAll(".submenu.visible").forEach(sub =>
             sub.classList.remove("visible")
         );
@@ -476,6 +541,9 @@ export class MenuManager {
 
     public toggleMenu() {
         this.isMenuShown = !this.isMenuShown;
+        this.OUTLINE_MENU.style.display = "none";
+        this.BODY_MENU.style.display = "none";
+
         this.HTML_ELEMENT.setAttribute('data-show-menu', this.isMenuShown ? 'true' : 'false');
 
         if (this.isMenuShown) {
@@ -553,13 +621,6 @@ export class MenuManager {
     public updateHistoryButtonStates(previous: boolean, next: boolean) {
         this.PREV_BTN.disabled = !previous;
         this.NEXT_BTN.disabled = !next;
-    }
-
-    public updateContextMenuState(mark: boolean, unmark: boolean, hoist: boolean, dehoist: boolean) {
-        this.toggleButtonVisibility(this.ACTION_MARK, null, mark);
-        this.toggleButtonVisibility(this.ACTION_UNMARK, null, unmark);
-        this.toggleButtonVisibility(this.ACTION_HOIST, null, hoist);
-        this.toggleButtonVisibility(this.ACTION_DEHOIST, null, dehoist);
     }
 
     // * UI utilities
