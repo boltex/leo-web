@@ -1,12 +1,47 @@
-import { MenuEntry } from "./types";
+import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
 import { Constants } from "./constants";
 
 const CMD = Constants.COMMANDS;
 const FLAGS = Constants.CONTEXT_FLAGS;
 
 // Menu "enabled flags" are more restrictive than for keybindings, because we want 
-// to disable menu entries until they are actually usable, to inform users about when
+// to hide, or disable menu entries until they are actually usable, to inform users about when
 // they can use them, even though the commands themselves also check for the necessary flags before executing.
+
+export const bodyPaneContextMenuData: ContextMenuEntry[] = [
+    { label: "Undo", action: CMD.UNDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO], keyboardShortcut: "Ctrl+Z" },
+    { label: "Redo", action: CMD.REDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO], keyboardShortcut: "Ctrl+Shift+Z" },
+    { label: "", kind: QuickPickItemKind.Separator },
+    { label: "Extract", action: CMD.EXTRACT, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "Extract-Names", action: CMD.EXTRACT_NAMES, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "Find-Def", action: CMD.FIND_DEF, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "", kind: QuickPickItemKind.Separator },
+    { label: "Cut", action: CMD.CUT_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+X" },
+    { label: "Copy", action: CMD.COPY_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+C" },
+    { label: "Paste", action: CMD.PASTE_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+V" },
+    { label: "Select All", action: CMD.SELECT_ALL_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+A" },
+];
+
+export const outlinePaneContextMenuData: ContextMenuEntry[] = [
+    { label: "Undo", action: CMD.UNDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO], keyboardShortcut: "Ctrl+Z" },
+    { label: "Redo", action: CMD.REDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO], keyboardShortcut: "Ctrl+Shift+Z" },
+    { label: "", kind: QuickPickItemKind.Separator },
+    { label: "Hoist", action: CMD.HOIST_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_HOIST] },
+    { label: "De-Hoist", action: CMD.DEHOIST, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_DEHOIST] },
+    { label: "Toggle Mark", action: CMD.MARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+M" },
+    { label: "Unmark", action: CMD.UNMARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "Tag-Node", action: CMD.TAG_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "", kind: QuickPickItemKind.Separator },
+    { label: "Cut-Node", action: CMD.CUT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+X" },
+    { label: "Copy-Node", action: CMD.COPY_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+C" },
+    { label: "Paste-Node", action: CMD.PASTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+V" },
+    { label: "Paste Node As Clone", action: CMD.PASTE_CLONE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "Insert-Node", action: CMD.INSERT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+I" },
+    { label: "Clone-Node", action: CMD.CLONE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+`" },
+    { label: "", kind: QuickPickItemKind.Separator },
+    // Todo: open URL if @url or UNL node.
+    { label: "Refresh From Disk", action: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.NODE_ATFILE] },
+];
 
 export const menuData: MenuEntry[] = [
     {

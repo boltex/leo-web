@@ -32,6 +32,15 @@ export interface FlatRowLeo {
     isInitialFind: boolean;   // Used for find scope highlighting
     icon: number;             // Icon number for the node
 }
+export interface ContextMenuEntry {
+    label: string;
+    kind?: QuickPickItemKind; // Optional kind (default or separator). If not specified, defaults to a regular entry.
+    action?: string; // Command to execute when the entry is selected
+    keyboardShortcut?: string;
+    enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled
+    enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
+    domElementRef?: HTMLElement; // Reference to the DOM element for this menu entry, used for hidden or disabled state.
+}
 export interface MenuEntry {
     label: string;
     action?: string; // Command to execute when the entry is selected

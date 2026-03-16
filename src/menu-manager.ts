@@ -12,9 +12,8 @@ export class MenuManager {
 
     public COLLAPSE_ALL_BTN: HTMLElement;
 
-    // * Context Menu
+    // * Context Menus
     public OUTLINE_MENU: HTMLElement;
-
     public BODY_MENU: HTMLElement;
 
     // * Top Menu
@@ -96,6 +95,8 @@ export class MenuManager {
         this.TOGGLE_MARK_BTN = document.getElementById('toggle-mark-btn')! as HTMLButtonElement;
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
 
+        // Body pane context menu actions 
+        // TODO : Replace with a more scalable way to manage context menu items and their states, especially as more are added. This is fine for now since there are only a few actions but could get unwieldy.
         this.ACTION_MARK = document.getElementById('action-mark')!;
         this.ACTION_UNMARK = document.getElementById('action-unmark')!;
         this.ACTION_HOIST = document.getElementById('action-hoist')!;
