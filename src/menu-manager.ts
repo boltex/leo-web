@@ -128,14 +128,17 @@ export class MenuManager {
                 ul.appendChild(sep);
                 continue;
             }
+
             const li = document.createElement('li');
-            // Add the class 'context-menu-item' to all actionable items for easier targeting.
             if (entry.action) {
-                li.classList.add('context-menu-item');
+                li.classList.add('menu-item');
             }
 
+            const label = document.createElement('span');
+            label.className = 'menu-label';
+            label.textContent = entry.label;
+            li.appendChild(label);
 
-            li.textContent = entry.label;
             if (entry.keyboardShortcut) {
                 const shortcut = document.createElement('span');
                 shortcut.className = 'menu-shortcut';
