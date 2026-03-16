@@ -31,7 +31,7 @@ import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
 import { Selection } from "./body";
 import { makeAllBindings } from "./command-bindings";
-import { menuData } from "./menu";
+import { menuData, bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
 import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
 import { QuickSearchController } from "./core/quicksearch";
@@ -1153,6 +1153,8 @@ export class LeoUI extends NullGui {
         menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
         menu.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
         menu.refreshMenu(menuData);
+        menu.refreshBodyContextMenu(bodyPaneContextMenuData);
+        menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
 
         // Refresh other panes if needed
         if (this._refreshType.documents) {
@@ -1176,13 +1178,15 @@ export class LeoUI extends NullGui {
         this.leoStates.fileOpenedReady = false;
         this._refreshOutline(RevealType.NoReveal);
         const states = this.leoStates;
-        const mwnu = workspace.menu;
-        mwnu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
-        mwnu.updateMarkedButtonStates(states.leoHasMarked);
-        mwnu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
-        mwnu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        mwnu.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
-        mwnu.refreshMenu(menuData);
+        const menu = workspace.menu;
+        menu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
+        menu.updateMarkedButtonStates(states.leoHasMarked);
+        menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
+        menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        menu.updateContextMenuState(!states.leoMarked, states.leoMarked, !states.leoRoot, states.leoCanDehoist);
+        menu.refreshMenu(menuData);
+        menu.refreshBodyContextMenu(bodyPaneContextMenuData);
+        menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
         this.refreshDocumentsPane();
         this.refreshButtonsPane();
         this.refreshUndoPane();

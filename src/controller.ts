@@ -5,7 +5,7 @@ import * as utils from './utils';
 
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
-import { menuData } from "./menu";
+import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
 import { keybindings } from "./keybindings";
 
 const defaultTitle = "Leo Editor for the web";
@@ -19,6 +19,8 @@ export class Controller {
 
     constructor() {
         workspace.menu.buildMenu(menuData);
+        workspace.menu.buildBodyContextMenu(bodyPaneContextMenuData);
+        workspace.menu.buildOutlineContextMenu(outlinePaneContextMenuData);
         workspace.layout.setWindowTitle(defaultTitle)
         workspace.layout.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
     }

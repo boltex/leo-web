@@ -1,6 +1,6 @@
 import { workspace } from './workspace';
 
-import { MenuEntry } from "./types";
+import { ContextMenuEntry, MenuEntry } from "./types";
 
 /**
  * Manages the UI controls that launch commands or change settings. 
@@ -128,6 +128,22 @@ export class MenuManager {
                 }
             }, 100); // debounce delay in ms
         });
+    }
+
+    public buildBodyContextMenu(entries: ContextMenuEntry[]) {
+        // todo
+    }
+
+    public refreshBodyContextMenu(entries: ContextMenuEntry[]) {
+        // todo
+    }
+
+    public buildOutlineContextMenu(entries: ContextMenuEntry[]) {
+        // todo
+    }
+
+    public refreshOutlineContextMenu(entries: ContextMenuEntry[]) {
+        // todo
     }
 
     public buildMenu(entries: MenuEntry[], level = 0) {
