@@ -28,8 +28,8 @@ export const outlinePaneContextMenuData: ContextMenuEntry[] = [
     { label: "", kind: QuickPickItemKind.Separator },
     { label: "Hoist", action: CMD.HOIST_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_HOIST] },
     { label: "De-Hoist", action: CMD.DEHOIST, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_DEHOIST] },
-    { label: "Mark", action: CMD.MARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.NODE_UNMARKED], keyboardShortcut: "Ctrl+M" },
-    { label: "Unmark", action: CMD.UNMARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.NODE_MARKED], keyboardShortcut: "Ctrl+M" },
+    { label: "Mark", action: CMD.MARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], enabledFlagsClear: [FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
+    { label: "Unmark", action: CMD.UNMARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
     // { label: "Tag-Node", action: CMD.TAG_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] }, // Todo: implement tagging UI & nav panel and then re-enable this.
     { label: "", kind: QuickPickItemKind.Separator },
     { label: "Cut-Node", action: CMD.CUT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+X" },
@@ -40,7 +40,7 @@ export const outlinePaneContextMenuData: ContextMenuEntry[] = [
     { label: "Clone-Node", action: CMD.CLONE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+`" },
     { label: "", kind: QuickPickItemKind.Separator },
     // Todo: open URL if @url or UNL node.
-    { label: "Refresh From Disk", action: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.NODE_ATFILE] },
+    { label: "Refresh From Disk", action: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_ATFILE] },
 ];
 
 export const menuData: MenuEntry[] = [
