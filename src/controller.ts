@@ -704,7 +704,6 @@ export class Controller {
             } else {
                 layout.OUTLINE_FIND_CONTAINER.style.width = (layout.minWidth - 3) + 'px';
             }
-            workspace.outline.renderTree();
         } else {
             let clientY = e.clientY;
             if (e.touches) {
@@ -717,6 +716,7 @@ export class Controller {
                 layout.OUTLINE_FIND_CONTAINER.style.height = (layout.minWidth - 3) + 'px';
             }
         }
+        workspace.outline.renderTree();
         layout.positionCrossDragger();
         layout.updateCollapseAllPosition();
     }, Constants.DRAG_DEBOUNCE_DELAY);
@@ -772,8 +772,8 @@ export class Controller {
                 layout.OUTLINE_PANE.style.flex = `0 0 ${relativeX - 3}px`;
                 layout.LOG_PANE.style.flex = '1 1 auto'; // Let it take the remaining space
             }
-            workspace.outline.renderTree();
         }
+        workspace.outline.renderTree();
         layout.positionCrossDragger();
         layout.updateCollapseAllPosition();
     }, Constants.DRAG_DEBOUNCE_DELAY);
