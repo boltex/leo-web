@@ -115,14 +115,6 @@ export class CommanderHelpCommands {
         'open-leo-settings',
         'Open default Leo settings as a new Leo Document.'
     )
-    @commander_command(
-        'open-leo-settings-leo',
-        'Open default Leo settings as a new Leo Document.'
-    ) // #1343.
-    @commander_command(
-        'leo-settings',
-        'Open default Leo settings as a new Leo Document.'
-    )
     public async openLeoSettings(this: Commands): Promise<Commands | undefined> {
         /* 
         c, lm = self, g.app.loadManager
@@ -185,14 +177,6 @@ export class CommanderHelpCommands {
 
     @commander_command(
         'open-my-leo-settings',
-        'Open myLeoSettings.leo in a new Leo window.'
-    )
-    @commander_command(
-        'open-my-leo-settings-leo',
-        'Open myLeoSettings.leo in a new Leo window.'
-    ) // #1343.
-    @commander_command(
-        'my-leo-settings',
         'Open myLeoSettings.leo in a new Leo window.'
     )
     public async openMyLeoSettings(

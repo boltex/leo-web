@@ -1833,7 +1833,6 @@ export class LoadManager {
         if (!hasBreak) {
             path = undefined;
         }
-
         return path;
     }
 
