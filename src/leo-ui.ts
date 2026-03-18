@@ -2381,6 +2381,60 @@ export class LeoUI extends NullGui {
     }
 
     /**
+     * * Shows the recent Leo files list, choosing one will open it
+     * @returns A promise that resolves when the a file is finally opened, rejected otherwise
+     */
+    public async showRecentLeoFiles(): Promise<unknown> {
+
+        // if shown, chosen and opened
+        let w_recentFiles: string[] = g.app.recentFilesManager.recentFiles;
+        w_recentFiles = w_recentFiles.filter(str => str.trim() !== "");
+
+        const w_recentFilesQuickPicks = w_recentFiles.map((file) => {
+            return {
+                label: file,
+                description: file
+            } as QuickPickItem;
+        });
+
+
+        let q_chooseFile: Promise<QuickPickItem | undefined>
+        if (w_recentFiles.length) {
+            q_chooseFile = workspace.dialog.showQuickPick(w_recentFilesQuickPicks, {
+                placeHolder: Constants.USER_MESSAGES.OPEN_RECENT_FILE,
+            });
+        } else {
+            // No file to list
+            return workspace.dialog.showInformationMessage('Recent files list empty');
+        }
+        const w_result = await q_chooseFile;
+        if (w_result) {
+            const filename = w_result.label;
+            // Is there a file opened?
+            if (g.app.windowList.length && g.app.windowList[this.frameIndex]) {
+                const c = g.app.windowList[this.frameIndex].c;
+                await this.triggerBodySave(true);
+                if (g.doHook("recentfiles1", { c: c, p: c.p, v: c.p.v, fileName: filename })) {
+                    return Promise.resolve(undefined);
+                }
+            }
+
+            console.log('Opening recent file: ', filename);
+            // Either way, try to open the file
+            await this.openLeoFile(new Uri(filename));
+
+            // Now, maybe there is a file opened?
+            if (g.app.windowList.length && g.app.windowList[this.frameIndex]) {
+                // Already opened file
+                const c = g.app.windowList[this.frameIndex].c;
+                g.doHook("recentfiles2", { c: c, p: c.p, v: c.p.v, fileName: filename });
+            }
+        }
+        return Promise.resolve(undefined);
+
+    }
+
+    /**
     * * Creates a new Leo file
     * @returns the promise started after it's done creating the frame and commander
     */
