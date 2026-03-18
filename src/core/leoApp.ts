@@ -1244,7 +1244,7 @@ export class LeoApp {
     }
     //@+node:felix.20251214160339.54: *5* app.setIdFromDialog
     /**
-     * Get leoID from a VSCode dialog.
+     * Get leoID from a dialog.
      */
     public async setIdFromDialog(): Promise<void> {
 
@@ -1522,7 +1522,7 @@ export class LeoApp {
         let aList: string[] = g.app.db[tag] || [];  // A list of normalized file names.
         aList = aList.map((p_fn: string) => { return p_fn.replace(/\\\\/g, '\\'); });
 
-        // ALSO FIX Filename parameter from vscode's dialog !
+        // ALSO FIX Filename parameter from a dialog !
         fn = g.os_path_fix_drive(path.normalize(fn)); // path.normalize adds BACKSLASHES ON WINDOWS! 
         let w_any: boolean = false;
         for (let z of aList) {
@@ -2692,7 +2692,7 @@ export class LoadManager {
             return;
         }
 
-        // ! ----------------------- MAYBE REPLACE WITH VSCODE FILE-CHANGE DETECTION ----------------
+        // ! ----------------------- MAYBE REPLACE WITH FILE-CHANGE DETECTION ----------------
         g.app.idleTimeManager.start();
         // ! ----------------------------------------------------------------------------------------
 
@@ -3143,12 +3143,12 @@ export class LoadManager {
         // g.app.backgroundProcessManager = new leoBackground.BackgroundProcessManager();
         g.app.externalFilesController = new ExternalFilesController();
 
-        g.app.recentFilesManager = new RecentFilesManager(); // ! HANDLED with vscode workspace recent files
+        g.app.recentFilesManager = new RecentFilesManager(); // ! HANDLED with workspace recent files
 
         g.app.config = new GlobalConfigManager();
         g.app.nodeIndices = new NodeIndices(g.app.leoID);
 
-        g.app.sessionManager = new SessionManager(); // ! HANDLED with vscode workspace recent files
+        g.app.sessionManager = new SessionManager(); // ! HANDLED with workspace recent files
 
         // TODO: plugins system ?
         // Complete the plugins class last.
@@ -3231,8 +3231,8 @@ export class LoadManager {
         // Create the commander for the .leo  file.
         const c: Commands = g.app.newCommander('', gui, w_previousSettings);
 
-        // ! LEO-WEB : SET c.openDirectory to the g.vscodeWorkspaceUri !
-        // c.openDirectory = g.vscodeWorkspaceUri?.fsPath;
+        // ! LEO-WEB : SET c.openDirectory to the workspace URI
+        // c.openDirectory = g.workspace.uri?.fsPath;
         // if (c.openDirectory) {
         //     c.frame.openDirectory = c.openDirectory;
         // }
@@ -3855,21 +3855,25 @@ export class RecentFilesManager {
         const rf = this;
         const seen: string[] = [];
         const localConfigPath: string = g.os_path_dirname(localConfigFile);
-        for (const w_path of [g.app.homeLeoDir, g.app.globalConfigDir, localConfigPath]) {
-            let realPath = w_path;
-            if (w_path) {
-                realPath = g.os_path_realpath(g.finalize(w_path));
-            }
-            if (realPath && !seen.includes(realPath)) {
-                const ok = await rf.readRecentFilesFile(realPath);
-                if (ok) {
-                    seen.push(realPath);
-                }
-            }
-        }
-        if (seen.length === 0 && rf.write_recent_files_as_needed) {
-            await rf.createRecentFiles();
-        }
+        console.log('TODO: readRecentFiles');
+        // TODO: Instead of reading .leoRecentFiles.txt files, use the workspace methods to get from localstorage.
+
+
+        // for (const w_path of [g.app.homeLeoDir, g.app.globalConfigDir, localConfigPath]) {
+        //     let realPath = w_path;
+        //     if (w_path) {
+        //         realPath = g.os_path_realpath(g.finalize(w_path));
+        //     }
+        //     if (realPath && !seen.includes(realPath)) {
+        //         const ok = await rf.readRecentFilesFile(realPath);
+        //         if (ok) {
+        //             seen.push(realPath);
+        //         }
+        //     }
+        // }
+        // if (seen.length === 0 && rf.write_recent_files_as_needed) {
+        //     await rf.createRecentFiles();
+        // }
     }
     //@+node:felix.20251214160339.137: *4* rf.createRecentFiles
     /**

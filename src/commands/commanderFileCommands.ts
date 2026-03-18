@@ -257,8 +257,8 @@ export class CommanderFileCommands {
             new PreviousSettings(lm.globalSettingsDict, lm.globalBindingsDict)
         );
 
-        // ! LEO-WEB : SET c.openDirectory to the g.app.vscodeWorkspaceUri !
-        // c.openDirectory = g.app.vscodeWorkspaceUri?.fsPath;
+        // ! LEO-WEB : SET c.openDirectory to the workspace URI
+        // c.openDirectory = g.workspace.uri?.fsPath;
         // if (c.openDirectory) {
         //     c.frame.openDirectory = c.openDirectory;
         // }
