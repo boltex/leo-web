@@ -360,7 +360,17 @@ export class Controller {
                 label = "* " + label;
             }
 
-            const tab = workspace.menu.createDocumentTab(label, isActive);
+            let tooltip = title;
+            if (c.mFileName && workspace.workspaceDirHandle) {
+                let [w_path, fn] = g.os_path_split(c.mFileName);
+                if (w_path) {
+                    tooltip = fn + ' in ' + workspace.workspaceDirHandle.name + w_path;
+                } else {
+                    tooltip = fn;
+                }
+            }
+
+            const tab = workspace.menu.createDocumentTab(label, tooltip, isActive);
             // If active, also set the broswer's title
             if (isActive) {
                 layout.setWindowTitle(label);
@@ -435,9 +445,6 @@ export class Controller {
 
 
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
-        if (e.detail === 2) {
-            e.preventDefault(); // Prevent text selection on double-click
-        }
         // Check if left mouse button:
         if (e.button === 0) {
             // Handle left mouse button actions here

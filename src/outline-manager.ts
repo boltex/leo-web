@@ -62,7 +62,6 @@ export class OutlineManager {
      * @param selectAll select whole (or falsy)
      * @param selection specific selection range (overrides selectAll if provided) its start,end and insertionn point which needs to be compared to to start and end to set direction
      * @returns A promise that resolves to a HeadlineFinishedResult containing the new headline string, a boolean indicating whether the headline was changed, and the last selection state info.
-     * TODO : should also return the cursor position : use selectionStart, selectionEnd and selectionDirection to determine a proper cursor position.
      */
     public openHeadlineInputBox(node: Position, selectAll?: boolean, selection?: [number, number, number]): Promise<HeadlineFinishedResult> {
         // Force-close any previous headline edit (resolves its pending promise)

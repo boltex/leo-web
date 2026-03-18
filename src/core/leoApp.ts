@@ -2160,12 +2160,12 @@ export class LoadManager {
         directories = [
             //  { kind: 'repository', theDir: g.app.homeDir },
             { kind: 'leo-editor', theDir: location.toString() },
-
+            { kind: 'workspace', theDir: workspace.workspaceDirHandle ? workspace.workspaceDirHandle.name : undefined },
         ];
 
         for (const { kind, theDir } of directories) {
             // g.blue calls g.es_print, and that's annoying.
-            g.es(`${kind.padStart(10, ' ')}:`, path.normalize(theDir!));  // path.normalize adds BACKSLASHES ON WINDOWS! 
+            g.es(`${kind}:`, path.normalize(theDir!));  // path.normalize adds BACKSLASHES ON WINDOWS! 
         }
     }
     //@+node:felix.20251214160339.94: *3* LM.Settings

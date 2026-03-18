@@ -568,10 +568,11 @@ export class MenuManager {
         this.DOCUMENT_TABS.innerHTML = "";
     }
 
-    public createDocumentTab(title: string, isActive: boolean): HTMLDivElement {
+    public createDocumentTab(title: string, tooltip: string, isActive: boolean): HTMLDivElement {
         const tab = document.createElement("div");
         tab.className = "document-tab" + (isActive ? " active" : "");
         tab.textContent = title;
+        tab.title = tooltip;
         this.DOCUMENT_TABS.appendChild(tab);
         // add the close button
         const closeBtn = document.createElement("div");

@@ -584,6 +584,7 @@ body.dragging-cross {
   margin: 0;
   border: none;
   outline: none;
+  user-select: text;
   background-color: transparent;
   color: var(--input-color, #000);
   display: var(--headline-input-display);
