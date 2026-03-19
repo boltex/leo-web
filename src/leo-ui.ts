@@ -218,6 +218,7 @@ export class LeoUI extends NullGui {
             }
         }
         if (!someDirty) {
+            g.app.saveSession(); // Save the latest state of the workspace.
             return;
         }
 

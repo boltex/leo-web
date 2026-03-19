@@ -324,22 +324,6 @@ export class LeoGui {
     ): Thenable<string | undefined> {
         return Promise.resolve('');
     }
-    //@+node:felix.20251213133753.227: *4* leoGui.getWorkspaceSession
-    /**
-     * Checks if Session per workspace is true, if so returns file list
-     * Undefined otherwise
-     */
-    public getWorkspaceSession(): string[] | undefined {
-        return undefined;
-    }
-
-    //@+node:felix.20251213133753.228: *4* leoGui.setWorkspaceSession
-    /**
-     * Sets session files list for this workspace
-     */
-    public setWorkspaceSession(p_files: string[]): Thenable<void> {
-        return Promise.resolve();
-    }
 
     //@+node:felix.20251213133753.229: *4* LeoGui.makeAllBindings (Leo-Web)
     public makeAllBindings(): void {

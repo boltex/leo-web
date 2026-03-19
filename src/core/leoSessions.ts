@@ -6,6 +6,7 @@
 //@+<< leoSessions imports & annotations >>
 //@+node:felix.20251214160339.1807: ** << leoSessions imports & annotations >>
 import * as g from './leoGlobals';
+import * as utils from '../utils';
 import { command } from './decorators';
 import { Commands } from './leoCommands';
 //@-<< leoSessions imports & annotations >>
@@ -110,12 +111,14 @@ export class SessionManager {
   public load_snapshot(): string[] | undefined {
     try {
       let session: string[];
-      // if Leo-Web sessionPerWorkspace is true, use it instead!
-      const workspaceSession = g.app.gui.getWorkspaceSession();
-      if (workspaceSession) {
-        session = workspaceSession;
+
+      session = g.app.db['session'];
+
+      const test = utils.safeLocalStorageGet('leoSession');
+      if (test) {
+        session = JSON.parse(test);
       } else {
-        session = g.app.db['session'];
+        g.trace('No session data found in localStorage for leoSession');
       }
 
       if (g.app.debug.includes('startup')) {
@@ -149,13 +152,8 @@ export class SessionManager {
       //   return; // #2433: don't save an empty session.
       // }
 
-      // if Leo-Web sessionPerWorkspace is true, use it instead!
-      if (g.app.gui.getWorkspaceSession()) {
-        // No need to wait for this promise.
-        void g.app.gui.setWorkspaceSession(session);
-      } else {
-        g.app.db['session'] = session;
-      }
+      g.app.db['session'] = session;
+      utils.safeLocalStorageSet('leoSession', JSON.stringify(session));
 
     } catch (e) {
       g.trace('Unexpected exception in SessionManager.save_snapshot');

@@ -1479,12 +1479,12 @@ export class LeoApp {
     /**
      * Save session data depending on command-line arguments.
      */
-    public async saveSession(): Promise<void> {
+    public saveSession(): void {
 
         if (this.sessionManager && (
             this.loaded_session || this.always_write_session_data
         )) {
-            await this.sessionManager.save_snapshot();
+            this.sessionManager.save_snapshot();
         }
 
     }
@@ -3853,12 +3853,10 @@ export class RecentFilesManager {
     public async readRecentFiles(localConfigFile?: string): Promise<void> {
         // The order of files in this list affects the order of the recent files list.
         const rf = this;
-        const seen: string[] = [];
-        const localConfigPath: string = g.os_path_dirname(localConfigFile);
-        console.log('TODO: readRecentFiles');
-        // TODO: Instead of reading .leoRecentFiles.txt files, use the workspace methods to get from localstorage.
+        await rf.readRecentFilesFile()
 
-
+        // const seen: string[] = [];
+        // const localConfigPath: string = g.os_path_dirname(localConfigFile);
         // for (const w_path of [g.app.homeLeoDir, g.app.globalConfigDir, localConfigPath]) {
         //     let realPath = w_path;
         //     if (w_path) {
@@ -3882,6 +3880,8 @@ export class RecentFilesManager {
      */
     public async createRecentFiles(): Promise<void> {
 
+        // Unused: localStorage is used instead of .leoRecentFiles.txt in the browser.
+
         for (const theDir of [g.app.homeLeoDir, g.app.globalConfigDir]) {
             if (theDir) {
                 const fn = g.os_path_join(theDir, '.leoRecentFiles.txt');
@@ -3899,45 +3899,18 @@ export class RecentFilesManager {
         }
     }
     //@+node:felix.20251214160339.138: *4* rf.readRecentFilesFile
-    public async readRecentFilesFile(path: string): Promise<boolean> {
-        const fileName = g.os_path_join(path, '.leoRecentFiles.txt');
+    public async readRecentFilesFile(): Promise<boolean> {
         let lines: string[] | undefined;
-        // TODO: implement file reading for leoRecentFiles.txt equivalent
-        console.log('TODO: implement file reading for leoRecentFiles.txt equivalent');
-        // try {
-        //     let fileContents;
-        //     if (g.isBrowserRepo()) {
-        //         // * Web
-        //         fileContents = await g.extensionContext.workspaceState.get(fileName);
-        //     } else {
-        //         const exists = await g.os_path_exists(fileName);
-        //         if (!exists) {
-        //             return false;
-        //         }
-        //         // * Desktop
-        //         fileContents = await g.readFileIntoUnicodeString(fileName);
-        //         if (!fileContents) {
-        //             fileContents = "";
-        //         }
-        //     }
 
-        //     try {
-        //         lines = fileContents?.split('\n');
-        //     } catch (err) {
-        //         lines = undefined;
-        //     }
-        // } catch (err) {
-        //     g.trace('can not open', fileName);
-        //     return false;
-        // }
-        // if (lines && lines.length && this.sanitize(lines[0]) === 'readonly') {
-        //     lines = lines.slice(1);
-        // }
-        // if (lines && lines.length) {
-        //     lines = lines.map(line => g.toUnicode(g.os_path_normpath(line)));
-        //     this.appendToRecentFiles(lines);
-        // }
-
+        const fileContents = utils.safeLocalStorageGet('leoRecentFiles');
+        lines = fileContents?.split('\n');
+        if (lines && lines.length && this.sanitize(lines[0]) === 'readonly') {
+            lines = lines.slice(1);
+        }
+        if (lines && lines.length) {
+            lines = lines.map(line => g.toUnicode(g.os_path_normpath(line)));
+            this.appendToRecentFiles(lines);
+        }
         return true;
     }
     //@+node:felix.20251214160339.139: *3* rf.sanitize
@@ -4069,18 +4042,18 @@ export class RecentFilesManager {
         if (g.unitTesting || g.app.inBridge) {
             return;
         }
+        await rf.writeRecentFilesFileHelper();
+        rf.recentFileMessageWritten = true;
 
-        const localFileName = c.fileName();
-        let localPath: string | null = null;
-        if (localFileName) {
-            localPath = g.os_path_split(localFileName)[0];
-        }
 
-        // TODO : implement file writing for leoRecentFiles.txt equivalent
-        console.log('TODO: implement file writing for leoRecentFiles.txt equivalent');
+
+        // const localFileName = c.fileName();
+        // let localPath: string | null = null;
+        // if (localFileName) {
+        //     localPath = g.os_path_split(localFileName)[0];
+        // }
         // let written = false;
         // const seen: string[] = [];
-
         // for (const w_path of [localPath, g.app.globalConfigDir, g.app.homeLeoDir]) {
         //     if (w_path) {
         //         const fileName = g.os_path_join(w_path, tag);
@@ -4142,13 +4115,11 @@ export class RecentFilesManager {
     /**
      * Don't update the file if it begins with read-only.
      */
-    public async writeRecentFilesFileHelper(fileName: string): Promise<boolean> {
+    public async writeRecentFilesFileHelper(): Promise<boolean> {
 
         const s = this.recentFiles.length ? this.recentFiles.join('\n') : '\n';
 
-        // TODO: implement file writing for leoRecentFiles.txt equivalent
-        console.log('TODO: implement file writing for leoRecentFiles.txt equivalent');
-
+        utils.safeLocalStorageSet('leoRecentFiles', s);
         return true;
         // if (g.isBrowserRepo()) {
         //     await g.extensionContext.workspaceState.update(fileName, s);
