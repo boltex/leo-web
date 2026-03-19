@@ -271,6 +271,10 @@ export class LeoUI extends NullGui {
             console.error('Error clearing workspace:', e);
         });
 
+        // Clear recent files and sessions from local storage to avoid auto-reopening them on reload
+        utils.safeLocalStorageSet('leoRecentFiles', undefined);
+        utils.safeLocalStorageSet('leoSession', undefined);
+
         // Reload the page to restart leoWeb
         window.location.reload();
 

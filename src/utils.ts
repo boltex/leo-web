@@ -46,9 +46,13 @@ export function safeLocalStorageGet(key: string): string | null {
 /**
  * Safely access localStorage.setItem with error handling
  */
-export function safeLocalStorageSet(key: string, value: string): void {
+export function safeLocalStorageSet(key: string, value: string | undefined): void {
     try {
-        localStorage.setItem(key, value);
+        if (value === undefined) {
+            localStorage.removeItem(key);
+        } else {
+            localStorage.setItem(key, value);
+        }
     } catch (e) {
         // ignore
     }
@@ -64,6 +68,18 @@ export function showHtmlInNewTab(htmlContent: string, title: string) {
         const bodyColor = isDark ? '#cdd6f4' : '#222';
         const preBg = isDark ? '#2a2536' : '#f5f5f5';
         const linkColor = isDark ? '#929bda' : '#0b5ed7';
+
+        // TODO : REPLACE write WITH THIS TECHNIQUE:
+        /*
+        const newWin = window.open('', '_blank');
+
+        newWin.document.head.innerHTML = `
+        <title>My Doc</title>
+        <link rel="icon" href="/my-icon.png">
+        `;
+
+        newWin.document.body.innerHTML = `<h1>Hello</h1>`;
+        */
 
         newWindow.document.open();
         newWindow.document.write(`
