@@ -4,7 +4,6 @@
 //@+node:felix.20251214160339.406: ** << imports >>
 import * as path from 'path';
 import * as os from 'os';
-// import * as crypto from 'crypto';
 import * as et from 'elementtree';
 import * as g from './leoGlobals';
 import { LeoGui } from './leoGui';
@@ -54,10 +53,6 @@ import KSUID from 'ksuid';
 // import KSUID = require('ksuid');
 import { Uri, workspace } from '../workspace';
 import { OutlineViewerHtml } from '../outline-viewer-html';
-
-// Make sure crypto functions are available.
-// crypto.randomUUID = globalThis.crypto.randomUUID;
-// crypto.getRandomValues = globalThis.crypto.getRandomValues;
 
 //@-<< imports >>
 //@+others

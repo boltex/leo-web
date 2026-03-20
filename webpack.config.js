@@ -48,7 +48,7 @@ module.exports = (env, argv) => {
                 assert: require.resolve("assert"),
                 buffer: require.resolve('buffer'),
                 // console: require.resolve('console-browserify'),
-                crypto: require.resolve('crypto-browserify'),
+                crypto: require.resolve('crypto-browserify'), // Needed for ksuid which was written for node.
                 os: require.resolve('os-browserify/browser'),
                 path: require.resolve('path-browserify'),
                 process: require.resolve('process/browser'),
