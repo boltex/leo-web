@@ -2536,7 +2536,7 @@ export class LoadManager {
             // This occurs early in startup, so use the following.
             let s;
             if (fn === 'leoSettings.leo') {
-                s = `reading settings in leojsSettings.leojs`;
+                s = `reading settings in leoSettings.leojs`;
             } else {
                 s = `reading settings in ${path.normalize(fn)}`;
             }

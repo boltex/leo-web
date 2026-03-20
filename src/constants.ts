@@ -270,6 +270,7 @@ export class Constants {
         SELECT_ALL_TEXT: Constants.NAME + ".selectAllText",
 
         OPEN_LEO_SETTINGS: Constants.NAME + ".openLeoSettings",
+        OPEN_MY_LEO_SETTINGS: Constants.NAME + ".openMyLeoSettings",
         RELOAD_SETTINGS: Constants.NAME + ".reloadSettings",
 
         // Window/UI
@@ -593,6 +594,7 @@ export class Constants {
         WRITE_DIRTY_AT_FILE_NODES: 'write-dirty-at-file-nodes',
         REVERT: 'revert',
         OPEN_LEO_SETTINGS: 'open-leo-settings',
+        OPEN_MY_LEO_SETTINGS: 'open-my-leo-settings',
         RELOAD_SETTINGS: 'reload-settings',
 
         // * More Commands

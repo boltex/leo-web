@@ -81,6 +81,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.MINIBUFFER, () => leoUI.minibuffer()], // Is referenced in package.json
         [CMD.SET_LEO_ID, () => leoUI.setLeoIDCommand()],
         [CMD.OPEN_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
+        [CMD.OPEN_MY_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_MY_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
         [CMD.RELOAD_SETTINGS, () => leoUI.command(LEOCMD.RELOAD_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
 
         [CMD.HANDLE_UNL, (p_arg: { unl: string }) => leoUI.handleUnl(p_arg)],

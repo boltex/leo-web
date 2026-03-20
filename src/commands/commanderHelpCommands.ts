@@ -228,7 +228,7 @@ export class CommanderHelpCommands {
             //     leosettings.close();
             // }
 
-            // now create "~/.leo/myLeoSettings.leo" OR /myLeoSettings if leo-web runs in browser!
+            // now create /myLeoSettings because leo-web runs in browser!
             if (homeLeoDir) {
                 fileName = g.os_path_join(homeLeoDir, name);
             } else {
@@ -268,6 +268,7 @@ export class CommanderHelpCommands {
             //     "# You can define keyboard shortcuts here of the form:\n" +
             //     "#\n" +
             //     "#    some-command Shift-F5\n";
+            c2!.setChanged()
 
             c2!.redraw();
 
