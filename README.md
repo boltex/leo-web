@@ -20,14 +20,7 @@ For other usage scenarios, see [other Leo implementations](#other-leo-editor-imp
 - Absolute paths are not supported with the browser's file API. Use relative paths exclusively for external files.
 - `Ctrl+TAB`, `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
 - There is a single log pane, shared across opened leo documents.
-
-## Current Features
-
-- Implementation of the outline, log, settings, and find UI panes
-- Leo's core exposed through the menu, keybindings, and context menus
-- Multi-document support with tabbed interface
-- Theme and layout customization
-- Drag-to-resize panes with persistent preferences
+- Leo-Web shares the same core implementation as LeoJS for the web, so the original Leo docutils and git-diff features are missing.
 
 ### Not Yet Implemented
 
