@@ -152,10 +152,6 @@
       "vh": "@settings",
       "children": [
         {
-          "gnx": "ekr.20201010141557.1",
-          "vh": "@string theme-name = None"
-        },
-        {
           "gnx": "ekr.20041119034357.10",
           "vh": "Command options",
           "children": [
@@ -170,10 +166,6 @@
             {
               "gnx": "ekr.20150227102835.1",
               "vh": "@bool make-node-conflicts-node = True"
-            },
-            {
-              "gnx": "ekr.20180117074230.1",
-              "vh": "@bool show-tips = True"
             },
             {
               "gnx": "ekr.20060323131801",
@@ -210,24 +202,6 @@
             {
               "gnx": "ekr.20041119041019.1",
               "vh": "@string remove-sentinels-extension = .txt"
-            },
-            {
-              "gnx": "ekr.20110917104720.9414",
-              "vh": "c-to-python settings",
-              "children": [
-                {
-                  "gnx": "ekr.20110917104720.9415",
-                  "vh": "@data c-to-python-class-list"
-                },
-                {
-                  "gnx": "ekr.20110917104720.9416",
-                  "vh": "@data c-to-python-type-list"
-                },
-                {
-                  "gnx": "ekr.20110917104720.9417",
-                  "vh": "@data c-to-python-ivars-dict"
-                }
-              ]
             },
             {
               "gnx": "ekr.20110611092035.16482",
@@ -298,20 +272,6 @@
                 {
                   "gnx": "ekr.20160127051243.1",
                   "vh": "@string stub-output-directory = ~/stubs"
-                }
-              ]
-            },
-            {
-              "gnx": "ekr.20160316111054.1",
-              "vh": "python-to-coffeescript settings",
-              "children": [
-                {
-                  "gnx": "ekr.20160316112407.2",
-                  "vh": "@bool py2cs-overwrite = True"
-                },
-                {
-                  "gnx": "ekr.20160316112407.8",
-                  "vh": "@string py2cs-output-directory = ~/py2cs"
                 }
               ]
             },
@@ -828,28 +788,6 @@
                   "vh": "@int scripting-max-button-size = 18"
                 }
               ]
-            },
-            {
-              "gnx": "felix.20240809011610.1",
-              "vh": "sphinx settings",
-              "children": [
-                {
-                  "gnx": "felix.20240809011610.2",
-                  "vh": "@string sphinx-command-directory = None"
-                },
-                {
-                  "gnx": "felix.20240809011610.3",
-                  "vh": "@string sphinx-default-command = make html"
-                },
-                {
-                  "gnx": "felix.20240809011610.4",
-                  "vh": "@string sphinx-input-directory = None"
-                },
-                {
-                  "gnx": "felix.20240809011610.5",
-                  "vh": "@string sphinx-output-directory = None"
-                }
-              ]
             }
           ]
         },
@@ -1107,12 +1045,10 @@
     "ekr.20041120155431.2": "Not implemented yet.\n\nAutments the settings parser and the dialog creator with scripts.",
     "ekr.20061011082224": "@language rest\n@wrap\n\nmyLeoSettings.leo contains your personal settings.\n\nSettings in myLeoSettings.leo override the settings in this file.\n\nPut myLeoSettings.leo at the root of your workspace.\n\nLeo-Web never changes your personal myLeoSettings.leo file.",
     "ekr.20041119034357.1": "@language rest\n@wrap\n\nThis @settings tree contains all active settings.\n\nSettings outside this tree have no effect.\n\nThe node \"Qt Gui Stylesheet settings\" contains most of the setting relating to appearance.\n",
-    "ekr.20201010141557.1": "The name of Leo's active theme, or None, which gives Leo's legacy (light) theme.\n\nTo enable a theme, put the following setting in myLeoSettings.leo:\n\n@string theme-name = <name of .leo file>\n\nThe .leo suffix is optional. Leo looks for the named .leo file in this order:\n\n~  (The user's home directory)\n~/themes\n~/.leo\n~/.leo/themes\nleo/themes\n\nThe .leo file in the leo/themes folder are:\n\nBreezeDarkTheme.leo\nBreezeDark2Theme.leo\nDefaultTheme.leo\nEKRDark.leo\nEKRLight.leo\nLeoBlackSolarized.leo\nPaperLightTheme.leo\nZephyrDarkTheme.leo",
     "ekr.20041119034357.10": "See the \"Tree Operation\" node for settings that affect how the tree pane works.",
     "felix.20250623214443.1": "True: Leo's git-diff command will diff .leo and .leojs files.",
     "ekr.20131112150804.18737": "True: the execute-script command executes the entire body, even if text is selected.",
     "ekr.20150227102835.1": "True: (Recommended) Make a \"Recovered Nodes\" node whenever Leo reads a file that has been changed outside of Leo.\n",
-    "ekr.20180117074230.1": "# True: Show user tips on startup.",
     "ekr.20060323131801": "True: warn if a command has no setting.",
     "ekr.20220105172501.1": "# comma-separated pairs of strings: (argument-name, typescript-type)\n\n# Note: add-mypy-annotations can automatically annotate kwargs initialized to \n#       bool, float, int or string constants.\n\n# Define default annotations for arguments and return types.\n\nDEFAULT, str\nDEFAULT_RETURN, None\n\n# Naming conventions used in Leo.\n\nc, Cmdr\ncallback, Callable\nch, str\nchar, str\nd, Dict[str, str]\nevent, Event\ngnx, str\ni, int\nj, int\nk, int\nn, int\np, Pos\ns, str\nv, VNode\nw, Wrapper\n",
     "ekr.20210530064911.1": "# This node contains the commands needed to execute a program in a particular language.\n\n# Format: language-name: command\n\n# Create a temporary file if c.p is not any kind of @<file> node.\n\n# Compute the final command as follows:\n\n# 1. If command contains <FILE>, replace <FILE> with the full path to the external file.\n# 2. If command contains <NO-FILE>, just remove <NO-FILE>.\n# 3. Otherwise, append the full path to the external file to the command.\n\ngo: go run . <NO-FILE>\npython: python\nrust: rustc\n",
@@ -1122,9 +1058,6 @@
     "ekr.20190608085550.1": "The maximum line length allowed by the find-long-lines command.",
     "ekr.20180301060510.1": "The maximum number of lines to show in @data nodes.\n\n0 causes all lines to be shown.\n",
     "ekr.20041119041019.1": "The string to be appended to file names resulting from the Remove Sentinels command.\nIf the value starts with . the extension is appended to the original file name.\nOtherwise, the extension is appended before the file extension.\nExample 1:\n  File name x.y\n  remove_sentinels_extension = _ns\n  Result: x_ns.y\nExample 2:\n  File name x.y\n  remove_sentinels_extension = .txt\n  Result: x.y.txt\n\n",
-    "ekr.20110917104720.9415": "# The names of your classes, one per line.\n\nCommands\nvnode\nposition\n",
-    "ekr.20110917104720.9416": "# The names of your typedef types and standard types, one per line.\n#\n# c-to-python converts::\n#\n#   new aType(...)\n#\n# to::\n#\n#   aType(...)\n\nchar\nvoid\nshort\nlong\nint\ndouble\nfloat\nunsigned",
-    "ekr.20110917104720.9417": "# The instance variables (ivars) used by your programs classes.\n# This creates a dictionary.  Keys are class names, values are lists of ivars.\n\n# Lines ending with a colon specify keys.\n# All other lines are comma-delimited lists of ivars for the last-seen key.\n# Trailing commas are ignored.\n\natFile:\n    mCommands, mErrors, mStructureErrors,\n    mTargetFileName, mOutputFileName, mOutputStream,\n    mStartSentinelComment, mEndSentinelComment, mRoot\n\nvnode:\n    mCommands, mJoinList, mIconVal, mTreeID, mT, mStatusBits\n\ntnode:\n    mBodyString, mBodyRTF, mJoinHead, mStatusBits, mFileIndex,\n    mSelectionStart, mSelectionLength, mCloneIndex,\n\nLeoFrame:\n    mNextFrame, mPrevFrame, mCommands,\n\nCommands:\n# public\n    mCurrentVnode, mLeoFrame, mInhibitOnTreeChanged, mMaxTnodeIndex,\n    mTreeCtrl, mBodyCtrl, mFirstWindowAndNeverSaved,\n#private\n    mTabWidth, mChanged, mOutlineExpansionLevel, mUsingClipboard,\n    mFileName, mMemoryInputStream, mMemoryOutputStream, mFileInputStream,\n    mInputFile, mFileOutputStream, mFileSize, mTopVnode, mTagList,\n    mMaxVnodeTag,\n    mUndoType, mUndoVnode, mUndoParent, mUndoBack, mUndoN,\n    mUndoDVnodes, mUndoLastChild, mUndoablyDeletedVnode,\n",
     "ekr.20041119050749.10": "The format string used when creating the Time/Date string for the Insert Time/Date command.\n\nSee the Python documentation for time.strftime for full details.\n\nExamples:\n1/30\n%m/%d\n\n1/30/03 8:31:02\n%m/%d/%y %H:%M:%S\n\nThu, 30 Jan 2003 16:57:12\n%a, %d %b %Y %H:%M:%S\n",
     "ekr.20160127051552.1": "True: allow stub files to be overwritten\n",
     "ekr.20181018103813.1": "True: use verbose mode.",
@@ -1134,8 +1067,6 @@
     "ekr.20160112111247.1": "# Lines to be inserted at the start of each stub file.\n\nfrom typing import Any, Dict, Optional, Sequence, Tuple, Union\n\n# At present, I don't understand how to tell mypy about ast.Node\n# import ast\n# Node = ast.Node\n\nNode = Any\n",
     "ekr.20160317062151.1": "# Regular expression patterns.\n\n.*__name__: str\n",
     "ekr.20160127051243.1": "The directory to which stub files are written.",
-    "ekr.20160316112407.2": "True: allow stub files to be overwritten\n",
-    "ekr.20160316112407.8": "The directory to which stub files are written.",
     "ekr.20071213060239": "@color",
     "ekr.20071213061811.2": "**True**: write additional informational messages to the log.",
     "ekr.20071213061454.1": "True: Writes **node markers** for use by the http plugin.\n\nNode markers are rst named hyperlink targets. By default they look like:\n``.. _http-node-marker-N``, where N is a unique node number.\n\n`@string rst3-node-begin-marker` specifies the format of these node markers.\n\n",
@@ -1219,10 +1150,6 @@
     "felix.20230927161926.8": "True: create Run Script button.\n\nNote: The plugin creates the press-run-script-button command regardless of this setting.",
     "felix.20230927161926.9": "True: create Script Button button in icon area.\n\nNote: The plugin creates the press-script-button-button regardless of this setting.",
     "felix.20230927161926.10": "The maximum length of button names.\n",
-    "felix.20240809011610.2": "If given, the sphinx command will cd to this directory.\n\nOtherwise, the sphinx command will cd to the directory containing the input file.",
-    "felix.20240809011610.3": "If given, *only* this command will be executed after the cd command.",
-    "felix.20240809011610.4": "Used only if the default command is *not* given.\n\nThe input_dir directory specified in the command:\n\nsphinx-build {input_dir} {output_dir} {i_path}",
-    "felix.20240809011610.5": "Used only if the default command is *not* given.\n\nThe output_dir directory specified in the command:\n\nsphinx-build {input_dir} {output_dir} {i_path}",
     "ekr.20060930085532": "True: (Recommended) The find commands collapse all nodes that are not ancestors of the node containing the match.\nFalse: The find command expands nodes needed to show the match, but does not collapse any nodes.",
     "ekr.20080315083057.7": "True: (Recommended) The spell commands collapse all nodes that are not ancestors of the node containing the match.\nFalse: The spell commands do not collapse any nodes.",
     "felix.20220506230435.1": "True: (Legacy) The goto-first-visible-node and goto-first-visible-node commands collapse all nodes that are not ancestors of the target node that is selected.\n\nFalse: (Recommended) The commands act as simple navigation commands, and do not change the outline state.",
