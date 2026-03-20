@@ -1364,7 +1364,8 @@ export class LeoApp {
 
         if (!finish_quit) {
             // NOT FINISH_QUIT SO SAVE NEW SESSION WITH THIS FILE REMOVED FROM SESSION LIST!
-            await g.app.saveSession();
+            g.app.saveSession();
+            g.app.global_cacher.commit(); // Save the latest state of the cache.
         }
 
         if (g.app.windowList.length) {
@@ -3213,7 +3214,8 @@ export class LoadManager {
         c = await lm.openFileByName(fn, gui, old_c, previousSettings);
 
         if (!skipSaveSession) {
-            await g.app.saveSession(); // IN LEO-WEB: Save sessions here to skip saving session on program exit.
+            g.app.saveSession(); // IN LEO-WEB: Save sessions here to skip saving session on program exit.
+            g.app.global_cacher.commit(); // Save the latest state of the cache.
         }
 
         return c;

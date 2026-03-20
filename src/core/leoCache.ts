@@ -7,6 +7,7 @@
 //@+node:felix.20251214160339.334: ** << leoCache imports & annotations >>
 import * as pako from 'pako';
 import * as g from './leoGlobals';
+import * as utils from '../utils';
 import { Commands } from './leoCommands';
 // import * as fs from 'fs';
 import { Uri } from '../workspace';
@@ -138,7 +139,8 @@ export class CommanderWrapper {
  */
 export class GlobalCacher {
 
-    public db: SqlitePickleShare;
+    public db: SqlitePickleShare | Record<string, any>; // This ends up as g.app.db.
+    public commitTimeout: ReturnType<typeof setTimeout> | undefined; // To be used when no SqlitePickleShare is available, so that we don't commit too often to the plain dict.
 
     /**
      * Ctor for the GlobalCacher class.
@@ -164,8 +166,12 @@ export class GlobalCacher {
                 g.es_exception(e);
             }
             // Use a plain dict as a dummy.
-            // @ts-expect-error
-            this.db = {};
+            const dbString = utils.safeLocalStorageGet('leoCache') as string;
+            if (dbString) {
+                this.db = JSON.parse(dbString);
+            } else {
+                this.db = {};
+            }
         }
     }
 
@@ -192,11 +198,20 @@ export class GlobalCacher {
             // except Exception
             g.trace('unexpected exception');
             g.es_exception(e);
-            // @ts-expect-error
             this.db = {}; // self.db was a dict.
         }
 
     }
+    //@+node:felix.20260319003409.1: *3* g_cacher.commit
+    /**
+     * Save the data in this.db. To be used only when a dict and not a SqlitePickleShare is used.
+     */
+    public commit(): void {
+        console.log('Saving cache to localStorage: ', this.db);
+        utils.safeLocalStorageSet('leoCache', JSON.stringify(this.db));
+
+    }
+
     //@+node:felix.20251214160339.339: *3* g_cacher.commit_and_close()
     public async commit_and_close(): Promise<void> {
         // Careful: this.db may be a dict.
@@ -302,7 +317,7 @@ export class SqlitePickleShare {
 
                 } catch (e) {
                     console.log('SqlitePickleShare failed init Error:', e);
-                    reject('LEOJS: SqlitePickleShare failed init');
+                    reject('LEO-WEB: SqlitePickleShare failed init');
                 }
                 */
             })();
@@ -363,7 +378,7 @@ export class SqlitePickleShare {
     }
     //@+node:felix.20251214160339.344: *4* __contains__(SqlitePickleShare)
     public __contains__(key: string): boolean {
-
+        console.log('Trying to check if key exists:', key);
         return this.has_key(key);  // NOQA
 
     }
@@ -372,7 +387,7 @@ export class SqlitePickleShare {
      * del db["key"] 
      */
     public __delitem__(key: string): void {
-
+        console.log('Trying to delete key:', key);
         try {
             if (this.conn) {
                 this.conn.exec('delete from cachevalues where key=?', [key]);
@@ -388,6 +403,7 @@ export class SqlitePickleShare {
     public __getitem__(key: string): any {
         let obj = undefined;
         let w_found = false;
+        console.log('Trying to get key:', key);
         if (this.conn) {
 
             try {
@@ -425,6 +441,7 @@ export class SqlitePickleShare {
      */
     public __setitem__(key: string, value: any): void {
         try {
+            console.log('tried to set key:', key, ' to value: ', value);
             const data = this.dumper(value);
             if (this.conn) {
                 this.conn.exec(
@@ -506,7 +523,7 @@ export class SqlitePickleShare {
                 clearTimeout(this._refreshTimeout);
             }
 
-            // That was code from LeoJS. Uncomment and replace below with indexedDB instead of g.SQL Database for this web version.
+            // That was code from LeoJS. Delete or Uncomment and replace below with indexedDB instead of g.SQL Database for this web version.
             /*
 
             // 100 millisecond debounce
@@ -537,6 +554,8 @@ export class SqlitePickleShare {
         if (this.commitTimeout) {
             clearTimeout(this.commitTimeout);
         }
+
+        console.log('Committing cache to file...');
 
         if (this.conn) {
             let db_data: Uint8Array;
@@ -765,11 +784,17 @@ export class SqlitePickleShare {
 /**
  * Dump the given cache. 
  */
-function dump_cache(db: SqlitePickleShare, tag: string): void {
+function dump_cache(db: SqlitePickleShare | Record<string, any>, tag: string): void {
 
     g.es_print(`\n===== ${tag} =====\n`);
     if (db == null) {
         g.es_print('db is None!');
+        return;
+    }
+    if (!(db instanceof SqlitePickleShare)) {
+        // Plain dict, not SqlitePickleShare. Dump it directly.
+        const items = Object.entries(db);
+        dump_list('', items);
         return;
     }
     // Create a dict, sorted by file prefixes.

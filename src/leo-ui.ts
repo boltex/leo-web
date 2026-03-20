@@ -219,6 +219,13 @@ export class LeoUI extends NullGui {
         }
         if (!someDirty) {
             g.app.saveSession(); // Save the latest state of the workspace.
+
+            // Consider all commanders closed now, to avoid triggering the "this document is already opened".
+            for (const c of g.app.commanders()) {
+                g.app.forgetOpenFile(c.fileName());
+            }
+
+            g.app.global_cacher.commit(); // Save the latest state of the cache.
             return;
         }
 

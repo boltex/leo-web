@@ -561,6 +561,8 @@ export class CommanderFileCommands {
                 await do_save(c, final_file_name);
 
                 g.app.saveSession(); // IN LEO-WEB: To skip saving session on program exit.
+                g.app.global_cacher.commit(); // Save the latest state of the cache.
+
             }
 
         } finally {
@@ -620,7 +622,7 @@ export class CommanderFileCommands {
             await g.chdir(new_file_name);
 
             g.app.saveSession(); // IN LEO-WEB: To skip saving session on program exit.
-
+            g.app.global_cacher.commit(); // Save the latest state of the cache.
             return new_file_name;
         };
 

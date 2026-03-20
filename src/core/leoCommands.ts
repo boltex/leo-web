@@ -2814,8 +2814,7 @@ export class Commands {
             if (c && c.exists) {
                 if (c.requestCloseWindow) {
                     c.requestCloseWindow = false;
-                    // g.app.closeLeoWindow(c.frame);
-                    console.log('g.app.closeLeoWindow was called!');
+                    g.app.closeLeoWindow(c.frame);
                 } else {
                     c.outerUpdate();
                 }

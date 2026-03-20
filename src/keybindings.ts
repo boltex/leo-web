@@ -196,7 +196,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_DOWN_SELECTION,
-        key: "shift+d",
+        key: "shift+arrowdown",
         outline: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
@@ -204,6 +204,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.MOVE_DOWN_SELECTION,
         key: "shift+alt+arrowdown",
         outline: true,
+        body: true,
+        find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
     {
@@ -217,7 +219,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_LEFT_SELECTION,
-        key: "shift+l",
+        key: "shift+arrowleft",
         outline: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
@@ -225,6 +227,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.MOVE_LEFT_SELECTION,
         key: "shift+alt+arrowleft",
         outline: true,
+        body: true,
+        find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
     {
@@ -238,7 +242,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_RIGHT_SELECTION,
-        key: "shift+r",
+        key: "shift+arrowright",
         outline: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
@@ -246,6 +250,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.MOVE_RIGHT_SELECTION,
         key: "shift+alt+arrowright",
         outline: true,
+        body: true,
+        find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
     {
@@ -259,7 +265,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.MOVE_UP_SELECTION,
-        key: "shift+u",
+        key: "shift+arrowup",
         outline: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
@@ -267,6 +273,8 @@ export const keybindings: Keybinding[] = [
         command: CMD.MOVE_UP_SELECTION,
         key: "shift+alt+arrowup",
         outline: true,
+        body: true,
+        find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
     {
