@@ -1,3 +1,7 @@
+/*@+leo-ver=5-thin*/
+/*@+node:felix.20251103001111.1: * @file src/style.css*/
+/*@+others*/
+/*@+node:felix.20260321142048.1: ** CSS Variables & State*/
 :root {
   /* light theme (default) */
   --background-color: #ffffec;
@@ -220,6 +224,7 @@
   --menu-toggle-line-height: 27px;
 }
 
+/*@+node:felix.20260321142058.1: ** Base / Reset*/
 html {
   font-size: 100%; /* Default to browser's base font size, typically 16px */
 }
@@ -231,7 +236,6 @@ body {
   height: 100vh;
 }
 
-/* Custom scrollbars */
 * {
   /* Firefox */
   scrollbar-color: var(--resizer-color) transparent;
@@ -257,7 +261,7 @@ body {
   background-color: var(--hover-bg);
 }
 
-/* Top Bar */
+/*@+node:felix.20260321142102.1: ** Top Bar*/
 #top-bar {
   flex-shrink: 0;
   display: var(--menu-display);
@@ -458,6 +462,7 @@ body {
   color: var(--find-placeholder-color);
 }
 
+/*@+node:felix.20260321142107.1: ** Node Icons*/
 .icon0 {
   background-image: url('data:image/svg+xml;utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path d="M0 4v9h15.15V4zm1 1h13.15v7H1z" fill="%234d4d4d"/></svg>');
 }
@@ -522,6 +527,7 @@ body {
   background-image: url('data:image/svg+xml;utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path d="M7.074 4.5v8h1v-8z" fill="%23e54a16"/><path d="M0 4v9h15.15V4zm1 1h13.15v7H1z" fill="%23a4a59e"/><path d="M9.075 6v5h4.075V6zm1 1h2.076v3h-2.076z" fill="%2342a5f5"/><path d="M3.56 5.65v2h1v-.279a1.5 1.5 0 11-2.27 1.904l-.923.395A2.5 2.5 0 006.074 8.5a2.5 2.5 0 00-.824-1.85h.31v-1z" fill="%23e54a16"/></svg>');
 }
 
+/*@+node:felix.20260321142123.1: ** Layout & Resizers*/
 #main-container {
   z-index: 0;
   margin: 0;
@@ -545,67 +551,6 @@ body.dragging-secondary {
 
 body.dragging-cross {
   cursor: move !important;
-}
-
-#outline-pane {
-  position: relative;
-  white-space: nowrap;
-  padding-top: 6px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  font-family: sans-serif;
-  user-select: none;
-}
-
-#spacer {
-  position: relative;
-}
-
-#collapse-all-btn {
-  display: var(--collapse-all-btn-display);
-  position: fixed;
-  z-index: 100;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-}
-
-#outline-pane:hover #collapse-all-btn {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-#headline-input {
-  position: absolute;
-  z-index: 10;
-  font-size: inherit;
-  font-family: inherit;
-  padding: 2px 0 2px 0px;
-  margin: 0;
-  border: none;
-  outline: none;
-  user-select: text;
-  background-color: transparent;
-  color: var(--input-color, #000);
-  display: var(--headline-input-display);
-}
-
-#menu-icon {
-  font-size: 27px;
-}
-
-.outline-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-}
-
-.outline-icon:hover svg {
-  transform: scale(1.1);
-  transition: transform 0.1s ease;
 }
 
 #main-resizer {
@@ -715,21 +660,62 @@ body.dragging-cross {
   outline-offset: -3px;
 }
 
-#body-pane {
-  flex: 1;
-  padding: 0.5rem 0 0 0.5rem;
-  min-height: 0;
-  background-color: var(--body-pane-color);
+/*@+node:felix.20260321142128.1: ** Outline Pane*/
+#outline-pane {
+  position: relative;
+  white-space: nowrap;
+  padding-top: 6px;
+  overflow-x: hidden;
   overflow-y: auto;
-  font-family:
-    "Consolas", "Monaco", "Lucida Console", "DejaVu Sans Mono",
-    "Liberation Mono", monospace;
-  white-space: var(--body-pane-wrap);
-  transition: var(--body-pane-transition);
+  font-family: sans-serif;
+  user-select: none;
 }
 
-#body-pane a {
-  color: var(--body-link-color);
+#spacer {
+  position: relative;
+}
+
+#collapse-all-btn {
+  display: var(--collapse-all-btn-display);
+  position: fixed;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+#outline-pane:hover #collapse-all-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#headline-input {
+  position: absolute;
+  z-index: 10;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 2px 0 2px 0px;
+  margin: 0;
+  border: none;
+  outline: none;
+  user-select: text;
+  background-color: transparent;
+  color: var(--input-color, #000);
+  display: var(--headline-input-display);
+}
+
+.outline-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.outline-icon:hover svg {
+  transform: scale(1.1);
+  transition: transform 0.1s ease;
 }
 
 .node-text:hover::before,
@@ -875,7 +861,44 @@ body.dragging-secondary .node {
   }
 }
 
-/* buttons */
+/*@+node:felix.20260321142132.1: ** Body Pane*/
+#body-pane {
+  flex: 1;
+  padding: 0.5rem 0 0 0.5rem;
+  min-height: 0;
+  background-color: var(--body-pane-color);
+  overflow-y: auto;
+  font-family:
+    "Consolas", "Monaco", "Lucida Console", "DejaVu Sans Mono",
+    "Liberation Mono", monospace;
+  white-space: var(--body-pane-wrap);
+  transition: var(--body-pane-transition);
+}
+
+#body-pane a {
+  color: var(--body-link-color);
+}
+
+.leo-sentinel {
+  /* TODO : Should go with body pane related styling */
+  /* Use 'inline' NOT 'inline-block' to stay in the same text flow */
+  display: inline;
+
+  /* Inherit everything to keep the caret thickness consistent */
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+
+  /* Standard protection */
+  pointer-events: none;
+  user-select: none;
+
+  /* Hide the actual character visually */
+  color: transparent;
+  width: 0;
+}
+
+/*@+node:felix.20260321142146.1: ** Buttons*/
 #button-container {
   display: var(--buttons-display);
   position: fixed;
@@ -904,6 +927,10 @@ body.dragging-secondary .node {
   width: 200px;
   height: 40px;
   z-index: 999;
+}
+
+#menu-icon {
+  font-size: 27px;
 }
 
 .action-button {
@@ -1023,7 +1050,7 @@ body.dragging-secondary .node {
   display: none !important;
 }
 
-/* log pane */
+/*@+node:felix.20260321142156.1: ** Log Pane*/
 #log-pane {
   display: flex;
   flex-direction: column;
@@ -1411,7 +1438,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   outline-offset: -1px;
 }
 
-/* context menu */
+/*@+node:felix.20260321142220.1: ** Overlays & Popups*/
 .context-menu {
   position: absolute;
   display: none;
@@ -1438,7 +1465,6 @@ input[type="checkbox"]:focus-visible:checked::after {
   background: var(--hover-bg);
 }
 
-/* toast */
 #toast {
   position: fixed;
   top: 16px;
@@ -1670,26 +1696,7 @@ mark {
   text-overflow: ellipsis;
 }
 
-.leo-sentinel {
-  /* TODO : Should go with body pane related styling */
-  /* Use 'inline' NOT 'inline-block' to stay in the same text flow */
-  display: inline;
-
-  /* Inherit everything to keep the caret thickness consistent */
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-
-  /* Standard protection */
-  pointer-events: none;
-  user-select: none;
-
-  /* Hide the actual character visually */
-  color: transparent;
-  width: 0;
-}
-
-/* Themes */
+/*@+node:felix.20260321142234.1: ** Syntax Highlighting*/
 [data-theme="dark"] {
   .token.comment,
   .token.prolog,
@@ -1869,3 +1876,10 @@ mark {
 .token.leo-section-name {
   text-decoration: underline;
 }
+
+/*@-others*/
+
+
+
+
+/*@-leo*/
