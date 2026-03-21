@@ -243,18 +243,21 @@ export class BodyManager {
     }
 
     public setCtrlClickLinkCallback(
-        callback: (link: string, type: 'url' | 'unl-gnx' | 'unl-headline' | 'unl-gnxonly') => void
+        callback: (link: string, type: 'none' | 'url' | 'unl-gnx' | 'unl-headline' | 'unl-gnxonly') => void
     ) {
         this._bodyPane.addEventListener('click', (e) => {
             if (!e.ctrlKey) return;
 
+            e.preventDefault();
+            e.stopPropagation();
+
             const span = (e.target as Element).closest(
                 '.token.leo-url, .token.leo-unl-gnx, .token.leo-unl-headline, .token.leo-unl-gnxonly'
             );
-            if (!span) return;
-
-            e.preventDefault();
-            e.stopPropagation();
+            if (!span) {
+                callback('', 'none'); // No link found, but still treat as handled to avoid unwanted text selection
+                return;
+            }
 
             const link = span.textContent ?? '';
             let type: 'url' | 'unl-gnx' | 'unl-headline' | 'unl-gnxonly' = 'url';

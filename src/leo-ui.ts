@@ -317,6 +317,15 @@ export class LeoUI extends NullGui {
 
         workspace.body.setCtrlClickLinkCallback((url, type) => {
             console.log('Ctrl-clicked link: ', url, 'Type: ', type);
+            // If url is empty, it means the click was on a non-link element, so try the 'FIND_DEF' command, else handle the unl.
+            if (!url) {
+                workspace.controller.doCommand(Constants.COMMANDS.FIND_DEF);
+                return;
+            }
+            if (type === 'unl-gnxonly') {
+                url = "";
+            }
+            this.handleUnl({ unl: url });
         });
 
         workspace.outline.setEditFinishedCallback(this._finishEditHeadline.bind(this));
@@ -390,25 +399,21 @@ export class LeoUI extends NullGui {
         this.triggerBodySave();
         try {
 
-            if (p_arg.unl) {
-                this.setupRefresh(
-                    Focus.Body, // Finish in body pane given explicitly because last focus was in input box.
-                    {
-                        tree: true,
-                        body: true,
-                        goto: true,
-                        states: true,
-                        documents: true,
-                        buttons: true
-                    }
-                );
-                await g.openUrlOnClick(c, p_arg.unl);
-                void this.launchRefresh();
-                this.loadSearchSettings();
+            this.setupRefresh(
+                Focus.Body, // Finish in body pane given explicitly because last focus was in input box.
+                {
+                    tree: true,
+                    body: true,
+                    goto: true,
+                    states: true,
+                    documents: true,
+                    buttons: true
+                }
+            );
+            await g.openUrlOnClick(c, p_arg.unl);
+            void this.launchRefresh();
+            this.loadSearchSettings();
 
-            } else {
-                console.log('NO ARGUMENT FOR HANDLE URL! ', p_arg);
-            }
         }
         catch (e) {
             console.log('FAILED HANDLE URL! ', p_arg);

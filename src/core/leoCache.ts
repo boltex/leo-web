@@ -207,7 +207,6 @@ export class GlobalCacher {
      * Save the data in this.db. To be used only when a dict and not a SqlitePickleShare is used.
      */
     public commit(): void {
-        console.log('Saving cache to localStorage: ', this.db);
         utils.safeLocalStorageSet('leoCache', JSON.stringify(this.db));
     }
 

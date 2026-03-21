@@ -3726,6 +3726,17 @@ export function es(...args: any[]): void {
     if (app && app.logIsLocked) {
         return;
     }
+    // if last argument is an object with a 'color' member, remove it and use it as the color.
+    if (args.length > 0) {
+        const lastArg = args[args.length - 1];
+        if (typeof lastArg === 'object' && lastArg !== null && 'color' in lastArg) {
+            // const color = lastArg.color;
+            args.pop();
+            // TODO : Use color in some way, e.g. by passing it to app.gui.addLogPaneEntry.
+            console.log('EMIT STRING: Color argument detected:', lastArg.color);
+        }
+    }
+
     let s: string = '';
     args.forEach((p_entry) => {
         if (s) {
@@ -6253,7 +6264,7 @@ export async function openUrlHelper(c: Commands, url?: string): Promise<string |
     //     event.widget = w
 
     // Part 1: get the url.
-    if (url == null) {
+    if (!url) {
         const s = w.getAllText();
         const ins = w.getInsertPoint();
         let [i, j] = w.getSelectionRange();
