@@ -224,6 +224,13 @@ html {
   font-size: 100%; /* Default to browser's base font size, typically 16px */
 }
 
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 /* Custom scrollbars */
 * {
   /* Firefox */
@@ -515,13 +522,6 @@ html {
   background-image: url('data:image/svg+xml;utf8, <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path d="M7.074 4.5v8h1v-8z" fill="%23e54a16"/><path d="M0 4v9h15.15V4zm1 1h13.15v7H1z" fill="%23a4a59e"/><path d="M9.075 6v5h4.075V6zm1 1h2.076v3h-2.076z" fill="%2342a5f5"/><path d="M3.56 5.65v2h1v-.279a1.5 1.5 0 11-2.27 1.904l-.923.395A2.5 2.5 0 006.074 8.5a2.5 2.5 0 00-.824-1.85h.31v-1z" fill="%23e54a16"/></svg>');
 }
 
-body {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
 #main-container {
   z-index: 0;
   margin: 0;
@@ -703,6 +703,18 @@ body.dragging-cross {
   outline: none;
 }
 
+#outline-pane:focus,
+#body-pane:focus,
+#outline-pane:focus-visible,
+#body-pane:focus-visible {
+  /* 
+    Note: Outline will appear under the items positioned absolutely.
+    See pseudo-elements with "z-index: -1" that appear below this outline.
+  */
+  outline: 3px solid var(--focus-outline);
+  outline-offset: -3px;
+}
+
 #body-pane {
   flex: 1;
   padding: 0.5rem 0 0 0.5rem;
@@ -718,18 +730,6 @@ body.dragging-cross {
 
 #body-pane a {
   color: var(--body-link-color);
-}
-
-#outline-pane:focus,
-#body-pane:focus,
-#outline-pane:focus-visible,
-#body-pane:focus-visible {
-  /* 
-    Note: Outline will appear under the items positioned absolutely.
-    See pseudo-elements with "z-index: -1" that appear below this outline.
-  */
-  outline: 3px solid var(--focus-outline);
-  outline-offset: -3px;
 }
 
 .node-text:hover::before,
@@ -1035,7 +1035,7 @@ body.dragging-secondary .node {
   position: relative;
   transition: var(--find-pane-transition);
   container-type: inline-size;
-  container-name: find-pane;
+  container-name: log-pane;
 }
 
 #find-controls,
@@ -1055,9 +1055,8 @@ body.dragging-secondary .node {
 #log-pane-tabs {
   display: flex;
   gap: 2px;
-  /* background: #222; */
   padding: 0 0 0 0.2rem;
-  /* border-bottom: 1px solid #444; */
+  user-select: none;
 }
 
 #log-pane-tabs .tab {
@@ -1171,8 +1170,6 @@ body.dragging-secondary .node {
   overflow-x: hidden;
   overflow-y: auto;
 }
-/* #config-controls:hover {
-} */
 
 select.setting-select {
   box-sizing: border-box;
@@ -1414,19 +1411,6 @@ input[type="checkbox"]:focus-visible:checked::after {
   outline-offset: -1px;
 }
 
-a {
-  color: var(--caret-dim-color);
-  text-decoration: underline;
-}
-
-a:hover {
-  color: var(--find-text-color);
-}
-
-.footer {
-  margin-bottom: 1rem;
-}
-
 /* context menu */
 .context-menu {
   position: absolute;
@@ -1584,16 +1568,6 @@ a:hover {
   white-space: pre;
 }
 
-/*
-#input-dialog-btn:focus {
-  //
-}
-
-.modal-dialog-btn:focus {
-  //
-}
-*/
-
 /* QuickPick dialog */
 #quickpick-dialog {
   display: var(--quickpick-dialog-display);
@@ -1672,6 +1646,7 @@ a:hover {
   font-weight: 500;
 }
 
+/* mark element is used in quick list to mark the matched text */
 mark {
   background-color: var(--find-selection);
   color: var(--body-pane-color);
@@ -1696,6 +1671,7 @@ mark {
 }
 
 .leo-sentinel {
+  /* TODO : Should go with body pane related styling */
   /* Use 'inline' NOT 'inline-block' to stay in the same text flow */
   display: inline;
 
