@@ -1793,7 +1793,7 @@ mark {
   .token.leo-unl-gnx,
   .token.leo-unl-headline,
   .token.leo-unl-gnxonly {
-    color: #4fc3f7;
+    color: #3a84f1;
     text-decoration: underline;
     cursor: pointer;
   }
@@ -1876,7 +1876,7 @@ mark {
   .token.leo-unl-gnx,
   .token.leo-unl-headline,
   .token.leo-unl-gnxonly {
-    color: #06138d;
+    color: #100dad;
     text-decoration: underline;
     cursor: pointer;
   }

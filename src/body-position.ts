@@ -1,9 +1,9 @@
 
 /**
  * Represents a line and character position, such as the position of the cursor.
- * Position objects are __immutable__.
+ * bodyPosition objects are __immutable__.
  */
-export class Position {
+export class bodyPosition {
 
     /**
      * The zero-based line value.
@@ -37,7 +37,7 @@ export class Position {
      * @returns `true` if position is on a smaller line
      * or on the same line on a smaller character.
      */
-    isBefore(other: Position): boolean {
+    isBefore(other: bodyPosition): boolean {
         if (this.line < other.line) {
             return true;
         }
@@ -54,7 +54,7 @@ export class Position {
      * @returns `true` if position is on a smaller line
      * or on the same line on a smaller or equal character.
      */
-    isBeforeOrEqual(other: Position): boolean {
+    isBeforeOrEqual(other: bodyPosition): boolean {
         if (this.line < other.line) {
             return true;
         }
@@ -71,7 +71,7 @@ export class Position {
      * @returns `true` if position is on a greater line
      * or on the same line on a greater character.
      */
-    isAfter(other: Position): boolean {
+    isAfter(other: bodyPosition): boolean {
         return !this.isBeforeOrEqual(other);
     }
 
@@ -82,7 +82,7 @@ export class Position {
      * @returns `true` if position is on a greater line
      * or on the same line on a greater or equal character.
      */
-    isAfterOrEqual(other: Position): boolean {
+    isAfterOrEqual(other: bodyPosition): boolean {
         return !this.isBefore(other);
     }
 
@@ -92,7 +92,7 @@ export class Position {
      * @param other A position.
      * @returns `true` if the line and character of both positions are equal.
      */
-    isEqual(other: Position): boolean {
+    isEqual(other: bodyPosition): boolean {
         return this.line === other.line && this.character === other.character;
     }
 
@@ -104,7 +104,7 @@ export class Position {
      * a number greater than zero if this position is after the given position, or zero when
      * this and the given position are equal.
      */
-    compareTo(other: Position): number {
+    compareTo(other: bodyPosition): number {
         if (this.line < other.line) {
             return -1;
         } else if (this.line > other.line) {
@@ -129,7 +129,7 @@ export class Position {
      * @returns A position which line and character is the sum of the current line and
      * character and the corresponding deltas.
      */
-    translate(lineDelta?: number, characterDelta?: number): Position {
+    translate(lineDelta?: number, characterDelta?: number): bodyPosition {
         if (lineDelta === null || lineDelta === undefined) {
             lineDelta = 0;
         }
@@ -139,7 +139,7 @@ export class Position {
         if (lineDelta === 0 && characterDelta === 0) {
             return this;
         }
-        return new Position(this.line + lineDelta, this.character + characterDelta);
+        return new bodyPosition(this.line + lineDelta, this.character + characterDelta);
     }
 
     /**
@@ -149,7 +149,7 @@ export class Position {
      * @param character Value that should be used as character value, default is the existing value
      * @returns A position where line and character are replaced by the given values.
      */
-    with(line?: number, character?: number): Position {
+    with(line?: number, character?: number): bodyPosition {
         if (line === null || line === undefined) {
             line = this.line;
         }
@@ -159,7 +159,7 @@ export class Position {
         if (line === this.line && character === this.character) {
             return this;
         }
-        return new Position(line, character);
+        return new bodyPosition(line, character);
     }
 
 }
@@ -176,12 +176,12 @@ export class Range {
     /**
      * The start position. It is before or equal to end.
      */
-    readonly start: Position;
+    readonly start: bodyPosition;
 
     /**
      * The end position. It is after or equal to start.
      */
-    readonly end: Position;
+    readonly end: bodyPosition;
 
     /**
      * Create a new range from two positions. If `start` is not
@@ -190,7 +190,7 @@ export class Range {
      * @param start A position.
      * @param end A position.
      */
-    constructor(start: Position, end: Position);
+    constructor(start: bodyPosition, end: bodyPosition);
 
     /**
      * Create a new range from number coordinates. It is a shorter equivalent of
@@ -203,16 +203,16 @@ export class Range {
      */
     constructor(startLine: number, startCharacter: number, endLine: number, endCharacter: number);
 
-    constructor(startOrLine: Position | number, endOrCharacter: Position | number, endLine?: number, endCharacter?: number) {
-        let start: Position;
-        let end: Position;
+    constructor(startOrLine: bodyPosition | number, endOrCharacter: bodyPosition | number, endLine?: number, endCharacter?: number) {
+        let start: bodyPosition;
+        let end: bodyPosition;
 
         if (typeof startOrLine === 'number' && typeof endOrCharacter === 'number' &&
             typeof endLine === 'number' && typeof endCharacter === 'number') {
             // constructor(startLine: number, startCharacter: number, endLine: number, endCharacter: number)
-            start = new Position(startOrLine, endOrCharacter);
-            end = new Position(endLine, endCharacter);
-        } else if (startOrLine instanceof Position && endOrCharacter instanceof Position) {
+            start = new bodyPosition(startOrLine, endOrCharacter);
+            end = new bodyPosition(endLine, endCharacter);
+        } else if (startOrLine instanceof bodyPosition && endOrCharacter instanceof bodyPosition) {
             // constructor(start: Position, end: Position)
             start = startOrLine;
             end = endOrCharacter;
@@ -251,10 +251,10 @@ export class Range {
      * @returns `true` if the position or range is inside or equal
      * to this range.
      */
-    contains(positionOrRange: Position | Range): boolean {
+    contains(positionOrRange: bodyPosition | Range): boolean {
         if (positionOrRange instanceof Range) {
             return this.contains(positionOrRange.start) && this.contains(positionOrRange.end);
-        } else if (positionOrRange instanceof Position) {
+        } else if (positionOrRange instanceof bodyPosition) {
             return positionOrRange.isAfterOrEqual(this.start) && positionOrRange.isBeforeOrEqual(this.end);
         }
         return false;
@@ -308,7 +308,7 @@ export class Range {
      * @returns A range derived from this range with the given start and end position.
      * If start and end are not different `this` range will be returned.
      */
-    with(start?: Position, end?: Position): Range {
+    with(start?: bodyPosition, end?: bodyPosition): Range {
         if (start === null || start === undefined) {
             start = this.start;
         }
@@ -332,13 +332,13 @@ export class Selection extends Range {
      * The position at which the selection starts.
      * This position might be before or after active.
      */
-    anchor: Position;
+    anchor: bodyPosition;
 
     /**
      * The position of the cursor.
      * This position might be before or after anchor.
      */
-    active: Position;
+    active: bodyPosition;
 
     /**
      * Create a selection from two positions.
@@ -346,7 +346,7 @@ export class Selection extends Range {
      * @param anchor A position.
      * @param active A position.
      */
-    constructor(anchor: Position, active: Position);
+    constructor(anchor: bodyPosition, active: bodyPosition);
 
     /**
      * Create a selection from four coordinates.
@@ -358,16 +358,16 @@ export class Selection extends Range {
      */
     constructor(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number);
 
-    constructor(anchorOrLine: Position | number, activeOrCharacter: Position | number, activeLine?: number, activeCharacter?: number) {
-        let anchor: Position;
-        let active: Position;
+    constructor(anchorOrLine: bodyPosition | number, activeOrCharacter: bodyPosition | number, activeLine?: number, activeCharacter?: number) {
+        let anchor: bodyPosition;
+        let active: bodyPosition;
 
         if (typeof anchorOrLine === 'number' && typeof activeOrCharacter === 'number' &&
             typeof activeLine === 'number' && typeof activeCharacter === 'number') {
             // constructor(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number)
-            anchor = new Position(anchorOrLine, activeOrCharacter);
-            active = new Position(activeLine, activeCharacter);
-        } else if (anchorOrLine instanceof Position && activeOrCharacter instanceof Position) {
+            anchor = new bodyPosition(anchorOrLine, activeOrCharacter);
+            active = new bodyPosition(activeLine, activeCharacter);
+        } else if (anchorOrLine instanceof bodyPosition && activeOrCharacter instanceof bodyPosition) {
             // constructor(anchor: Position, active: Position)
             anchor = anchorOrLine;
             active = activeOrCharacter;

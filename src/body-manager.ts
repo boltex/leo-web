@@ -1,5 +1,5 @@
 import { workspace } from './workspace';
-import * as body from './body'
+import { bodyPosition, Selection } from './body-position'
 import * as Prism from 'prismjs';
 // Css, Html and XML are supported by default, so we don't need to import them explicitly.
 // See https://prismjs.com/#supported-languages
@@ -158,7 +158,7 @@ export class BodyManager {
         this._lineStartsDirty = false;
     }
 
-    private _offsetToPositionFast(offset: number): body.Position {
+    private _offsetToPositionFast(offset: number): bodyPosition {
         const lineStarts = this._getLineStarts();
         const safeOffset = Math.max(0, Math.min(offset, this._textLength));
 
@@ -170,7 +170,7 @@ export class BodyManager {
 
             if (lineStarts[mid] <= safeOffset) {
                 if (mid === lineStarts.length - 1 || lineStarts[mid + 1] > safeOffset) {
-                    return new body.Position(mid, safeOffset - lineStarts[mid]);
+                    return new bodyPosition(mid, safeOffset - lineStarts[mid]);
                 }
                 low = mid + 1;
             } else {
@@ -178,12 +178,12 @@ export class BodyManager {
             }
         }
 
-        return new body.Position(0, safeOffset);
+        return new bodyPosition(0, safeOffset);
     }
 
     // Helper method to convert DOM offset to Position
-    private offsetToPosition(offset: number, node: Node | null): body.Position {
-        if (!node) return new body.Position(0, 0);
+    private offsetToPosition(offset: number, node: Node | null): bodyPosition {
+        if (!node) return new bodyPosition(0, 0);
 
         const totalOffset = this._domPointToTextOffset(node, offset);
         return this._offsetToPositionFast(totalOffset);
@@ -208,7 +208,7 @@ export class BodyManager {
         this._bodyPane.appendChild(this._sentinel);
     }
 
-    public setChangeTextEditorSelectionCallback(callback: (selection: body.Selection) => void) {
+    public setChangeTextEditorSelectionCallback(callback: (selection: Selection) => void) {
         const handleSelectionChange = () => {
             if (this._probingRect) return;
 
@@ -326,8 +326,8 @@ export class BodyManager {
         this._bodyPane.scrollTop = scroll;
     }
 
-    public setBodySelection(selection: body.Selection, scrollSelectionIntoView: boolean = false) {
-        // Convert body.Selection to DOM Range and set it in the BODY_PANE
+    public setBodySelection(selection: Selection, scrollSelectionIntoView: boolean = false) {
+        // Convert Selection to DOM Range and set it in the BODY_PANE
         const BODY_PANE = this._bodyPane;
         const { anchor, active } = selection;
         const anchorInfo = this.positionToNodeOffset(anchor);
@@ -355,7 +355,7 @@ export class BodyManager {
         }
     }
 
-    private positionToNodeOffset(position: body.Position): { node: Node; offset: number } {
+    private positionToNodeOffset(position: bodyPosition): { node: Node; offset: number } {
         // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
         const BODY_PANE = this._bodyPane;
         const lineStarts = this._getLineStarts();
@@ -431,7 +431,7 @@ export class BodyManager {
         });
     }
 
-    private getCurrentBodyPaneSelection(): body.Selection | undefined {
+    private getCurrentBodyPaneSelection(): Selection | undefined {
         const domSelection = document.getSelection();
         if (!domSelection || domSelection.rangeCount === 0) {
             return undefined;
@@ -444,13 +444,13 @@ export class BodyManager {
 
         if (domSelection.isCollapsed) {
             const pos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
-            return new body.Selection(pos, pos);
+            return new Selection(pos, pos);
         }
 
         const anchorPos = this.offsetToPosition(domSelection.anchorOffset, domSelection.anchorNode);
         const activePos = this.offsetToPosition(domSelection.focusOffset, domSelection.focusNode);
 
-        return new body.Selection(anchorPos, activePos);
+        return new Selection(anchorPos, activePos);
     }
 
     private renderHighlightedBody(text: string, language: string): void {
