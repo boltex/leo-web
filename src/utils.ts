@@ -1,10 +1,13 @@
+//@+leo-ver=5-thin
+//@+node:felix.20251211000427.1: * @file src/utils.ts
 
 import { Uri, workspace } from "./workspace";
-// import { Position } from "./core/leoNodes";
-type Position = any;
+import { Position } from "./core/leoNodes";
 
-// String and other types/structures helper functions, along with common vscode API calls
-
+//@@language typescript
+//@@tabwidth -4
+//@+others
+//@+node:felix.20251211212644.1: ** throttle
 /**
  * Throttle function execution to limit how often it can be called
  * @param func Function to throttle
@@ -32,6 +35,7 @@ export function throttle<T extends any[]>(func: (...args: T) => void, limit: num
     };
 }
 
+//@+node:felix.20251211212701.1: ** safeLocalStorageGet
 /**
  * Safely access localStorage.getItem with error handling
  */
@@ -43,6 +47,7 @@ export function safeLocalStorageGet(key: string): string | null {
     }
 }
 
+//@+node:felix.20251211212717.1: ** safeLocalStorageSet
 /**
  * Safely access localStorage.setItem with error handling
  */
@@ -58,6 +63,7 @@ export function safeLocalStorageSet(key: string, value: string | undefined): voi
     }
 }
 
+//@+node:felix.20260226215039.1: ** showHtmlInNewTab
 export function showHtmlInNewTab(htmlContent: string, title: string) {
     const newWindow = window.open('', '_blank');
     if (newWindow) {
@@ -135,6 +141,7 @@ export function showHtmlInNewTab(htmlContent: string, title: string) {
     }
 }
 
+//@+node:felix.20260226215651.1: ** showTextDocument
 export function showTextDocument(uri: Uri): void {
     // Read the file, and open in a new tab or window
     workspace.fs.readFile(uri).then(data => {
@@ -151,6 +158,7 @@ export function showTextDocument(uri: Uri): void {
     });
 }
 
+//@+node:felix.20251211212732.1: ** preventDefault
 /**
  * Prevent default event behavior - useful as event handler
  */
@@ -158,6 +166,7 @@ export function preventDefault(e: Event): void {
     e.preventDefault();
 }
 
+//@+node:felix.20251211212832.1: ** readDirectory
 /**
  * Read all entries from a directory handle, returning an array of name/kind/handle objects
  */
@@ -173,6 +182,7 @@ export async function readDirectory(dirHandle: FileSystemDirectoryHandle): Promi
     return entries;
 }
 
+//@+node:felix.20251211000427.2: ** performanceNow
 /**
  * * window.performace.now browser/node crossover utility
  */
@@ -182,6 +192,7 @@ export function performanceNow(): number {
     return w_secs * 1000 + Math.floor(w_nanosecs / 1000000);
 }
 
+//@+node:felix.20251211000427.6: ** getUniqueId
 /**
  * * Unique numeric Id
  */
@@ -195,6 +206,7 @@ export function getUniqueId(): string {
     return id.toString();
 }
 
+//@+node:felix.20251211000427.7: ** getOnce
 export function getNonce(): string {
     let text = '';
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -204,6 +216,7 @@ export function getNonce(): string {
     return text;
 }
 
+//@+node:felix.20251211000427.8: ** padNumber2
 /**
  * * Build a string for representing a number that's 2 digits wide, padding with a zero if needed
  * @param p_number Between 0 and 99
@@ -213,6 +226,7 @@ export function padNumber2(p_number: number): string {
     return ("0" + p_number).slice(-2);
 }
 
+//@+node:felix.20251211000427.16: ** convertLeoFiletypes
 /**
  * Convert Leo's internal filetype descriptions array
  * to vscode's option format for open/save dialogs.
@@ -267,6 +281,7 @@ export function convertLeoFiletypes(p_filetypes: [string, string][]): { [name: s
     return w_types;
 }
 
+//@+node:felix.20251211000427.17: ** getDurationMilliseconds
 /**
  * * Returns milliseconds between the p_start process.hrtime tuple and p_end (or current call to process.hrtime)
  * @param p_start starting process.hrtime to subtract from p_end or current immediate time
@@ -283,6 +298,7 @@ export function getDurationMs(p_start: [number, number], p_end?: [number, number
     return w_secs * 1000 + Math.floor(w_nanosecs / 1000000);
 }
 
+//@+node:felix.20251211000427.18: ** getDurationSeconds
 /**
  * Milliseconds converted into seconds, limiting to two decimals. 
  */
@@ -290,6 +306,7 @@ export function getDurationSeconds(p_start: [number, number], p_end?: [number, n
     return parseFloat((getDurationMs(p_start, p_end) / 1000).toFixed(2));
 }
 
+//@+node:felix.20251211000427.19: ** getFileFromPath
 /**
  * * Extracts the file name from a full path, such as "foo.bar" from "/abc/def/foo.bar"
  * @param p_path Full path such as "/var/drop/foo/boo/moo.js" or "C:\Documents and Settings\img\recycled log.jpg"
@@ -299,6 +316,7 @@ export function getFileFromPath(p_path: string): string {
     return p_path.replace(/^.*[\\\/]/, '');
 }
 
+//@+node:felix.20251211000427.20: ** isAlphaNumeric
 export function isAlphaNumeric(str: string): boolean {
     let code: number;
     let i: number;
@@ -315,6 +333,7 @@ export function isAlphaNumeric(str: string): boolean {
     return true;
 };
 
+//@+node:felix.20251211000427.21: ** isIconChangedByEdit
 /**
  * * Checks if a node would become dirty if it were to now have body content at all
  * @param p_node LeoNode from vscode's outline
@@ -329,6 +348,7 @@ export function isIconChangedByEdit(p_node: Position, p_newHasBody: boolean): bo
     return false;
 }
 
+//@+node:felix.20251211000427.22: ** isHexColor
 /**
  * * Checks if a string is formatted as a valid rrggbb color code.
  * @param p_hexString hexadecimal 6 digits string, without leading '0x'
@@ -340,16 +360,16 @@ export function isHexColor(p_hexString: string): boolean {
         && !isNaN(Number('0x' + p_hexString));
 }
 
+//@+node:felix.20251231002650.1: ** setContext
 /**
  * * Sets a context variable to be used by the UI (e.g. enabling/disabling commands, etc.)
  * @param p_key Key string name such as constants 'leoReady' or 'treeOpened', etc.
  * @param p_value Value to be assigned to the p_key 'key'
  */
 export function setContext(p_key: string, p_value: any): Thenable<unknown> {
-
-    // return vscode.commands.executeCommand(Constants.VSCODE_COMMANDS.SET_CONTEXT, p_key, p_value);
     workspace.setContext(p_key, p_value);
-
     return Promise.resolve();
 }
 
+//@-others
+//@-leo

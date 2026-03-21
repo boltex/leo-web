@@ -1,16 +1,16 @@
-/**
- * Text and numeric constants used throughout leo-web.
- */
+//@+leo-ver=5-thin
+//@+node:felix.20251210234420.1: * @file src/constants.ts
+//@@language typescript
+//@@tabwidth -4
+//@+others
+//@+node:felix.20251210234420.2: ** class Constants
 export class Constants {
-
-    /**
-     * Identity of account that can publish extensions to the Visual Studio Code Marketplace. 
-     */
-    public static PUBLISHER: string = "boltex";
 
     /**
      * The name of the extension - should be all lowercase with no spaces.
      */
+    //@+others
+    //@+node:felix.20251210234420.3: *3* general constants
     public static NAME: string = "leoWeb";
 
     public static VERSION_STATE_KEY: string = "leoWebVersion";
@@ -29,10 +29,7 @@ export class Constants {
     public static DRAG_DEBOUNCE_DELAY: number = 60;
     public static OUTLINE_THROTTLE_DELAY: number = 33;
 
-
-    /**
-     * Supported Languages
-     */
+    //@+node:felix.20251210234420.4: *3* suported languages
     public static LANGUAGES = [
         "plain",
         "julia",
@@ -56,28 +53,26 @@ export class Constants {
         "xml",
     ];
 
-    /**
-     * * Configuration Defaults used in config.ts
-     */
+    //@+node:felix.20260102223425.1: *3* config defaults
     public static CONFIG_DEFAULTS = {
         CHECK_FOR_CHANGE_EXTERNAL_FILES: "none",
         DEFAULT_RELOAD_IGNORE: "none",
         LEO_ID: ""
     };
+
     public static CHECK_FOR_CHANGE_EXTERNAL_FILES_OPTIONS = {
         "none": "Default from Leo's config",
         "force-check": "Check for changes",
         "force-ignore": "Ignore all changes"
     }
+
     public static DEFAULT_RELOAD_IGNORE_OPTIONS = {
         "none": "Choose each time",
         "yes-all": "Reload All",
         "no-all": "Ignore All"
     }
 
-    /**
-     * Basic user messages strings for messages and dialogs
-     */
+    //@+node:felix.20251210234420.6: *3* user messages
     public static USER_MESSAGES = {
         SCRIPT_BUTTON: "from selected node",
         SCRIPT_BUTTON_TOOLTIP:
@@ -179,9 +174,7 @@ export class Constants {
         ENTER_LEO_ID: "Enter Leo id"
     };
 
-    /**
-     * Used in 'when' clauses, set with vscode.commands.executeCommand("setContext",...)
-     */
+    //@+node:felix.20251210234420.13: *3* context flags
     public static CONTEXT_FLAGS = {
         // Main flags for connection and opened file
         LEO_STARTUP_DONE: "leoWebStartupDone",
@@ -248,19 +241,7 @@ export class Constants {
 
     };
 
-    /**
-     * Command strings to be used with vscode.commands.executeCommand
-     * See https://code.visualstudio.com/api/extension-guides/command#programmatically-executing-a-command
-     */
-    public static VSCODE_COMMANDS = {
-        SET_CONTEXT: "setContext",
-        CLOSE_ACTIVE_EDITOR: "workbench.action.closeActiveEditor",
-        QUICK_OPEN: "workbench.action.quickOpen"
-    };
-
-    /**
-     * All commands this expansion exposes to the user via GUI/keybindings in package.json
-     */
+    //@+node:felix.20251210234420.16: *3* commands strings
     public static COMMANDS = {
 
         // Frame body text commands 
@@ -580,8 +561,9 @@ export class Constants {
         YANK_POP: Constants.NAME + ".yankPop",
     };
 
+    //@+node:felix.20251210234420.17: *3* leo commands
     /**
-     * Leo command names that are called from vscode's gui/menu/buttons/keybindings triggers
+     * Leo command names that are called from leo-web's menu and keybindings.
      */
     public static LEO_COMMANDS = {
 
@@ -834,6 +816,7 @@ export class Constants {
         YANK_POP: "yank-pop"
     };
 
+    //@+node:felix.20251210234420.18: *3* keep-selection old position offsets
     /**
      * List of command names for both categories of possible offsets when keeping selection.
      */
@@ -842,9 +825,7 @@ export class Constants {
         ADD: ["clone-node", "async-paste-node", "async-paste-retaining-clones"]
     };
 
-    /**
-     * * Overridden 'good' minibuffer command name strings
-     */
+    //@+node:felix.20251210234420.19: *3* minibuffer overridden names
     public static MINIBUFFER_OVERRIDDEN_NAMES: { [key: string]: string } = {
         'paste-node': 'async-paste-node',
         'paste-retaining-clones': 'async-paste-retaining-clones',
@@ -856,4 +837,8 @@ export class Constants {
         // 'insert-node-before': 'async-insert-node-before',
     };
 
+    //@-others
 }
+
+//@-others
+//@-leo

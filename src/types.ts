@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20251211000618.1: * @file src/types.ts
 import { Position } from "./core/leoNodes";
 // import { RClick } from "./core/mod_scripting";
 
@@ -6,20 +8,25 @@ import { Uri } from "./workspace";
 // For now, these imports are commented out until implemented.
 type RClick = any;
 
+//@@language typescript
+//@@tabwidth -4
+//@+others
+//@+node:felix.20251214225420.1: ** messageOptions
 export interface MessageOptions {
 
     /**
-        * Indicates that this message should be modal.
-        */
+     * Indicates that this message should be modal.
+     */
     modal?: boolean;
 
     /**
-        * Human-readable detail message that is rendered less prominent. _Note_ that detail
-        * is only shown for modal messages.
-        */
+     * Human-readable detail message that is rendered less prominent. _Note_ that detail
+     * is only shown for modal messages.
+     */
     detail?: string;
 }
 
+//@+node:felix.20251211213151.1: ** FlatRowLeo
 export interface FlatRowLeo {
     label: string;
     depth: number;
@@ -41,6 +48,7 @@ export interface ContextMenuEntry {
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
     domElementRef?: HTMLElement; // Reference to the DOM element for this menu entry, used for hidden or disabled state.
 }
+//@+node:felix.20251211213155.1: ** MenuEntry
 export interface MenuEntry {
     label: string;
     action?: string; // Command to execute when the entry is selected
@@ -50,6 +58,7 @@ export interface MenuEntry {
     entries?: MenuEntry[]; // Submenu entries
     domElementRef?: HTMLElement; // Reference to the DOM element for this menu entry, used for disabled state.
 }
+//@+node:felix.20260208204728.1: ** Keybinding
 export type Keybinding = {
     command: string;
     key: string;
@@ -63,32 +72,36 @@ export type Keybinding = {
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
 };
 
+//@+node:felix.20251211213200.1: ** FileStat
 export interface FileStat {
     type: 'file' | 'directory';
     size?: number;
     mtime?: number;
     permissions?: FilePermission;
 }
+//@+node:felix.20251215225409.1: ** FilePermission
 /**
-    * Permissions of a file.
-    */
+ * Permissions of a file.
+ */
 export enum FilePermission {
     /**
-        * The file is readonly.
-        *
-        * *Note:* All `FileStat` from a `FileSystemProvider` that is registered with
-        * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`
-        * is set. As a consequence, it is not possible to have a readonly file system provider
-        * registered where some `FileStat` are not readonly.
-        */
+     * The file is readonly.
+     *
+     * *Note:* All `FileStat` from a `FileSystemProvider` that is registered with
+     * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`
+     * is set. As a consequence, it is not possible to have a readonly file system provider
+     * registered where some `FileStat` are not readonly.
+     */
     Readonly = 1
 };
 
+//@+node:felix.20251211213205.1: ** FilePath
 export interface FilePath {
     name: string;
     handle: FileSystemDirectoryHandle;
 }
 
+//@+node:felix.20251211213209.1: ** OpenDialogOptions
 /**
  * Options to configure the behaviour of a file open dialog.
  *
@@ -144,6 +157,7 @@ export interface OpenDialogOptions {
     title?: string;
 }
 
+//@+node:felix.20251211213213.1: ** SaveDialogOptions
 /**
  * Options to configure the behaviour of a file save dialog.
  */
@@ -178,12 +192,16 @@ export interface SaveDialogOptions {
      */
     title?: string;
 }
+
+//@+node:felix.20251211213217.1: ** InputDialogOptions
 export interface InputDialogOptions {
     title: string;
     prompt: string;
     placeholder?: string;
     value?: string;
 }
+
+//@+node:felix.20251211000618.2: ** ConfigMembers
 /**
  * * Types of the various JSON configuration keys such as treeKeepFocus, defaultReloadIgnore, etc.
  */
@@ -193,6 +211,7 @@ export interface ConfigMembers {
     leoID: string;
 }
 
+//@+node:felix.20251211000618.3: ** ConfigSetting
 /**
  * * Structure for configuration settings changes used along with welcome/settings webview.
  */
@@ -201,6 +220,7 @@ export interface ConfigSetting {
     value: any;
 }
 
+//@+node:felix.20251211000618.4: ** Focus
 /**
  * * Location of focus to be set when current/last command is resolved
  */
@@ -211,6 +231,7 @@ export const enum Focus {
     Goto
 }
 
+//@+node:felix.20251211000618.5: ** RevealType
 /**
  * * When refreshing the outline and getting to Leo's selected node
  */
@@ -221,6 +242,7 @@ export const enum RevealType {
     RevealSelectFocus
 }
 
+//@+node:felix.20251211000618.6: ** ReqRefresh
 /**
  * * Required Refresh Dictionary of "elements to refresh" flags
  */
@@ -241,6 +263,7 @@ export interface ReqRefresh {
     goto?: boolean; // Goto pane needs refresh
 }
 
+//@+node:felix.20251211000618.7: ** CommandOptions
 export interface CommandOptions {
     node?: Position, // facultative, precise node onto which the command is run (also see p_keepSelection)
     refreshType: ReqRefresh, // Object containing flags for sections needing to refresh after command ran
@@ -249,6 +272,7 @@ export interface CommandOptions {
     isNavigation?: boolean // Navigation commands force-show the body and outline
 }
 
+//@+node:felix.20251211000618.8: ** BodyTimeInfo
 /**
  * * LeoBody virtual file time information object
  */
@@ -258,6 +282,7 @@ export interface BodyTimeInfo {
     lastBodyLength?: number;
 }
 
+//@+node:felix.20251211000618.9: ** LeoPackageStates
 /**
  * * General state flags for UI representation and controls visibility.
  */
@@ -275,6 +300,7 @@ export interface LeoPackageStates {
     hasMarked: boolean; // Has at least one marked node in the outline
 }
 
+//@+node:felix.20251211000618.10: ** LeoDocument
 /**
  * * Leo document structure used in the 'Opened Leo Documents' tree view provider
  */
@@ -285,6 +311,7 @@ export interface LeoDocument {
     selected: boolean;
 }
 
+//@+node:felix.20251211000618.11: ** LeoButton
 /**
  * * Leo '@button' structure used in the '@buttons' tree view provider
  */
@@ -294,14 +321,17 @@ export interface LeoButton {
     rclicks?: RClick[];
 }
 
+//@+node:felix.20251211000618.12: ** TGotoTypes
 export type TGotoTypes = "tag" | "headline" | "body" | "parent" | "generic";
 
+//@+node:felix.20251211000618.13: ** LeoGoto
 export interface LeoGoto {
     key: number; // id from python
     h: string;
     t: TGotoTypes;
 }
 
+//@+node:felix.20251211000618.14: ** LeoGotoNavKey
 export const enum LeoGotoNavKey {
     prev = 0,
     next,
@@ -309,6 +339,7 @@ export const enum LeoGotoNavKey {
     last
 }
 
+//@+node:felix.20251211000618.15: ** LeoSearchScope
 /**
  * * Enum type for the search scope radio buttons of the find panel.
  */
@@ -319,6 +350,7 @@ export const enum LeoSearchScope {
     fileOnly
 }
 
+//@+node:felix.20251211000618.16: ** LeoSearchSettings
 /**
  * * Search settings structure for use with the 'find' webview
  */
@@ -342,6 +374,7 @@ export interface LeoSearchSettings {
     searchScope: LeoSearchScope; // 0, 1 or 2 for outline, sub-outline, or node.
 }
 
+//@+node:felix.20251211000618.17: ** LeoGuiFindTabManagerSettings
 /**
  * * Leo's GUI search settings internal structure
  */
@@ -367,6 +400,7 @@ export interface LeoGuiFindTabManagerSettings {
     whole_word: boolean
 }
 
+//@+node:felix.20251211000618.19: ** BodyTimeInfo
 /**
  * * LeoBody virtual file time information object
  */
@@ -375,6 +409,7 @@ export interface BodyTimeInfo {
     mtime: number;
 }
 
+//@+node:felix.20251211000618.20: ** BodyPosition
 /**
  * * Body position
  * Used in BodySelectionInfo interface
@@ -384,6 +419,7 @@ export interface BodyPosition {
     col: number;
 }
 
+//@+node:felix.20251211000618.21: ** BodySelectionInfo
 /**
  * * LeoBody cursor active position and text selection state, along with gnx
  */
@@ -401,6 +437,7 @@ export interface BodySelectionInfo {
     end: BodyPosition;
 }
 
+//@+node:felix.20251211000618.22: ** showSaveAsDialogParameters
 /**
  * * Parameter structure used in the 'runSaveFileDialog' equivalent when asking user input
  */
@@ -411,6 +448,7 @@ export interface showSaveAsDialogParameters {
     "filetypes": string[];
 }
 
+//@+node:felix.20251211000618.23: ** runAskYesNoDialogParameters
 /**
  * * Parameter structure used in the 'runAskYesNoDialog' equivalent when asking user input
  */
@@ -421,6 +459,7 @@ export interface runAskYesNoDialogParameters {
     "no_all": boolean;
 }
 
+//@+node:felix.20251211000618.24: ** runWarnMessageDialogParameters
 /**
  * * Parameter structure used in the 'runAskOkDialog' equivalent when showing a warning
  */
@@ -429,6 +468,7 @@ export interface runWarnMessageDialogParameters {
     "message": string;
 }
 
+//@+node:felix.20251211000618.25: ** runInfoMessageDialogParameters
 /**
  * * Parameter structure for non-blocking info message about detected file changes
  */
@@ -436,6 +476,7 @@ export interface runInfoMessageDialogParameters {
     "message": string;
 }
 
+//@+node:felix.20251211000618.26: ** AskMessageItem
 /**
  * * Used in showAskModalDialog to get answer from user interaction
  */
@@ -445,6 +486,7 @@ export interface AskMessageItem {
     value: string;
 }
 
+//@+node:felix.20251211000618.27: ** ChooseDocumentItem
 /**
  * * Used in switch Leo document to get answer from user interaction
  */
@@ -454,6 +496,7 @@ export interface ChooseDocumentItem {
     description?: string;
 }
 
+//@+node:felix.20251211000618.28: ** ChooseRClickItem
 /**
  * * Used to select a button's rclick by index
  */
@@ -464,6 +507,7 @@ export interface ChooseRClickItem {
     description?: string;
 }
 
+//@+node:felix.20251211000618.29: ** MinibufferCommand
 /**
  * * Used by the minibuffer command pallette
  */
@@ -473,82 +517,86 @@ export interface MinibufferCommand {
     description?: string;
 }
 
+//@+node:felix.20251211000618.30: ** UnlType
 export type UnlType = 'shortGnx' | 'fullGnx' | 'shortLegacy' | 'fullLegacy';
 
+//@+node:felix.20251219214939.1: ** QuickPickItem
 
 /**
-    * Represents an item that can be selected from
-    * a list of items.
-    */
+ * Represents an item that can be selected from
+ * a list of items.
+ */
 export interface QuickPickItem {
 
     /**
-        * A human-readable string which is rendered prominent. 
-        */
+     * A human-readable string which is rendered prominent. 
+     */
     label: string;
 
     /**
-        * The kind of QuickPickItem that will determine how this item is rendered in the quick pick. When not specified,
-        * the default is QuickPickItemKind.Default.
-        */
+     * The kind of QuickPickItem that will determine how this item is rendered in the quick pick. When not specified,
+     * the default is QuickPickItemKind.Default.
+     */
     kind?: QuickPickItemKind;
 
     /**
-        * A human-readable string which is rendered less prominent in the same line.
-        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
-        */
+     * A human-readable string which is rendered less prominent in the same line.
+     * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+     */
     description?: string;
 
     /**
-        * A human-readable string which is rendered less prominent in a separate line. 
-        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
-        */
+     * A human-readable string which is rendered less prominent in a separate line. 
+     * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+     */
     detail?: string;
 
     /**
-        * Optional flag indicating if this item is picked initially. 
-        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
-        */
+     * Optional flag indicating if this item is picked initially. 
+     * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+     */
     picked?: boolean;
 
     /**
-        * Always show this item.
-        *
-        * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
-        */
+     * Always show this item.
+     *
+     * Note: this property is ignored when kind is set to QuickPickItemKind.Separator
+     */
     alwaysShow?: boolean;
 
 }
 
 export enum QuickPickItemKind {
     /**
-        * The item is just a visual separator and does not represent a real item.
-        */
+     * The item is just a visual separator and does not represent a real item.
+     */
     Separator = -1,
     /**
-        * The default is an item that can be selected in the quick pick.
-        */
+     * The default is an item that can be selected in the quick pick.
+     */
     Default = 0,
 }
 
 
 /**
-    * Options to configure the behavior of the quick pick UI.
-    */
+ * Options to configure the behavior of the quick pick UI.
+ */
 export interface QuickPickOptions {
 
     /**
-        * An optional string that represents the title of the quick pick.
-        */
+     * An optional string that represents the title of the quick pick.
+     */
     title?: string;
 
     /**
-        * An optional string to show as placeholder in the input box to guide the user what to pick on.
-        */
+     * An optional string to show as placeholder in the input box to guide the user what to pick on.
+     */
     placeHolder?: string;
 
     /**
-        * An optional function that is invoked whenever an item is selected.
-        */
+     * An optional function that is invoked whenever an item is selected.
+     */
     onDidSelectItem?(item: QuickPickItem | string): any;
 }
+//@-others
+//@-leo

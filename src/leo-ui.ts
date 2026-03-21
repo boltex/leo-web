@@ -29,7 +29,7 @@ import { StringTextWrapper } from "./core/leoFrame";
 import { Position } from "./core/leoNodes";
 import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
-import { Selection } from "./body-position";
+import { Selection } from "./cursor-position";
 import { makeAllBindings } from "./command-bindings";
 import { menuData, bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
 import { StringFindTabManager } from "./core/findTabManager";
