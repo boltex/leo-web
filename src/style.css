@@ -1073,11 +1073,11 @@ body.dragging-secondary .node {
   flex-wrap: wrap;
 }
 
-@container log-pane (min-width: 450px) {
+/* @container log-pane (min-width: 450px) {
   #config-controls {
     justify-content: center;
   }
-}
+} */
 
 #log-pane-tabs {
   display: flex;
@@ -1292,6 +1292,14 @@ select.setting-select {
   color: var(--find-text-color);
 }
 
+.config-col.config-dropdowns {
+  flex-basis: 100%;
+}
+
+.config-col label {
+  padding-left: 0.5rem;
+}
+
 #log-pane .nav-col {
   display: flex;
   flex-direction: row; /* TEST IF NEEDED ! horizontal layout for navigation buttons */
@@ -1313,10 +1321,6 @@ select.setting-select {
   padding: 0;
   margin: 0;
   pointer-events: none;
-}
-
-.config-col label {
-  padding-left: 0.5rem;
 }
 
 #log-pane input[type="checkbox"],
@@ -1878,8 +1882,5 @@ mark {
 }
 
 /*@-others*/
-
-
-
 
 /*@-leo*/

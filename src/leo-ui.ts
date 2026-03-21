@@ -316,7 +316,6 @@ export class LeoUI extends NullGui {
         });
 
         workspace.body.setCtrlClickLinkCallback((url, type) => {
-            console.log('Ctrl-clicked link: ', url, 'Type: ', type);
             // If url is empty, it means the click was on a non-link element, so try the 'FIND_DEF' command, else handle the unl.
             if (!url) {
                 workspace.controller.doCommand(Constants.COMMANDS.FIND_DEF);
