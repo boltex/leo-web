@@ -63,6 +63,26 @@ Prism.hooks.add('before-tokenize', (env) => {
             pattern: /^[ \t]*(?:@others|@all)(?=[ \t]|$)|^(?:@encoding|@ignore|@lineending|@path|@pagewidth|@tabwidth|@color|@killcolor|@nocolor|@nocolor-node|@first|@last|@section-delims|@wrap|@nowrap)(?=[ \t]|$)/m,
             alias: 'keyword'
         },
+        // Leo UNL: unl:gnx://...#<gnx>  (must be before leo-unl-headline)
+        'leo-unl-gnx': {
+            pattern: /\bunl:gnx:\/\/[^\r\n#]*#\S*/,
+            greedy: true
+        },
+        // Leo UNL: unl://...#<headline path>
+        'leo-unl-headline': {
+            pattern: /\bunl:\/\/[^\r\n#]*#[^\r\n]*\S/,
+            greedy: true
+        },
+        // Bare gnx reference: gnx:felix.20251231182235.2  (not inside a unl:gnx: match)
+        'leo-unl-gnxonly': {
+            pattern: /(?<![:\w])gnx:[\w.]+/,
+            greedy: true
+        },
+        // Standard URLs
+        'leo-url': {
+            pattern: /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/i,
+            greedy: true
+        },
         ...env.grammar
     };
 });
@@ -220,6 +240,30 @@ export class BodyManager {
 
         // Listen on document, not on BODY_PANE
         document.addEventListener('selectionchange', handleSelectionChange);
+    }
+
+    public setCtrlClickLinkCallback(
+        callback: (link: string, type: 'url' | 'unl-gnx' | 'unl-headline' | 'unl-gnxonly') => void
+    ) {
+        this._bodyPane.addEventListener('click', (e) => {
+            if (!e.ctrlKey) return;
+
+            const span = (e.target as Element).closest(
+                '.token.leo-url, .token.leo-unl-gnx, .token.leo-unl-headline, .token.leo-unl-gnxonly'
+            );
+            if (!span) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const link = span.textContent ?? '';
+            let type: 'url' | 'unl-gnx' | 'unl-headline' | 'unl-gnxonly' = 'url';
+            if (span.classList.contains('leo-unl-gnx')) type = 'unl-gnx';
+            else if (span.classList.contains('leo-unl-headline')) type = 'unl-headline';
+            else if (span.classList.contains('leo-unl-gnxonly')) type = 'unl-gnxonly';
+
+            callback(link, type);
+        });
     }
 
     private _correctCaretScroll(): void {

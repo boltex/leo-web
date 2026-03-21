@@ -1788,6 +1788,15 @@ mark {
   .token.entity {
     cursor: help;
   }
+
+  .token.leo-url,
+  .token.leo-unl-gnx,
+  .token.leo-unl-headline,
+  .token.leo-unl-gnxonly {
+    color: #4fc3f7;
+    text-decoration: underline;
+    cursor: pointer;
+  }
 }
 
 [data-theme="light"] {
@@ -1862,6 +1871,14 @@ mark {
 
   .token.entity {
     cursor: help;
+  }
+  .token.leo-url,
+  .token.leo-unl-gnx,
+  .token.leo-unl-headline,
+  .token.leo-unl-gnxonly {
+    color: #06138d;
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
 

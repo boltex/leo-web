@@ -315,6 +315,10 @@ export class LeoUI extends NullGui {
             this.triggerBodySave(true);
         });
 
+        workspace.body.setCtrlClickLinkCallback((url, type) => {
+            console.log('Ctrl-clicked link: ', url, 'Type: ', type);
+        });
+
         workspace.outline.setEditFinishedCallback(this._finishEditHeadline.bind(this));
 
         window.addEventListener('beforeunload', this.onBeforeUnload);
