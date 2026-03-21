@@ -1,8 +1,5 @@
-/**
- * Leo Web Editor - Main Entry Point
- * A web-based version of the Leo Editor
- */
-
+//@+leo-ver=5-thin
+//@+node:felix.20260320222223.1: * @file src/index.ts
 import './style.css';
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager } from './core/leoApp';
@@ -21,29 +18,21 @@ process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of pro
 class LeoWebApp {
 
     constructor() {
-        this.init();
-    }
 
-    private init(): void {
-
-        // Wait for all resources to be loaded before removing the gray 'loading screen'
         window.addEventListener('load', () => {
-            document.body.classList.add('loaded');
-            document.documentElement.classList.add('loaded');
+            document.body.classList.add('loaded'); // Sets opacity to 1 (was 0 to prevent FOUC)
+            document.documentElement.classList.add('loaded'); // Resets background (was gray to prevent FOUC)
         });
 
-        // Wait for DOM to be ready to setup the app
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.setupApp());
         } else {
             this.setupApp();
         }
-
     }
-
+    
     private async setupApp(): Promise<void> {
 
-        // Initialize the components
         const dialog = new DialogManager();
         workspace.setDialogManager(dialog);
 
@@ -64,11 +53,9 @@ class LeoWebApp {
 
         const controller = new Controller();
         workspace.setController(controller);
-
         await controller.initialize();
-
-        // Ok, now properly start the app
-        const w_start = process.hrtime(); // For calculating total startup time duration
+        
+        const w_start = process.hrtime();
         (g.workspaceUri as Uri) = new Uri('/');
         // #1472: bind to g immediately.
         (g.app as LeoApp) = new LeoApp();
@@ -81,5 +68,5 @@ class LeoWebApp {
 
 }
 
-// Initialize the application
-new LeoWebApp();
+new LeoWebApp(); // Initialize the application
+//@-leo
