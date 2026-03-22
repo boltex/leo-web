@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["main"] # Or your default branch name
+    branches: ["master"]
 
 permissions:
   contents: read
@@ -26,12 +26,12 @@ jobs:
         run: npm install
 
       - name: Build
-        run: npm run build # This creates your 'dist' folder
+        run: npm run build # Creates  'dist' folder
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist # Points to your compiled files
+          path: ./dist # Points to compiled files
 
       - name: Deploy to GitHub Pages
         id: deployment
