@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321195657.1: * @file src/keybindings.ts
 import { Constants } from "./constants";
 import { Keybinding } from "./types";
 
@@ -707,3 +709,4 @@ export const keybindings: Keybinding[] = [
     },
 
 ];
+//@-leo

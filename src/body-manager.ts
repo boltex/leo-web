@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321194813.1: * @file src/body-manager.ts
 import { workspace } from './workspace';
 import { cursorPosition, Selection } from './cursor-position'
 import * as Prism from 'prismjs';
@@ -580,3 +582,4 @@ export class BodyManager {
     }
 
 }
+//@-leo

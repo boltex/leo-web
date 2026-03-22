@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321200500.1: * @file src/outline-manager.ts
 import { Constants } from './constants';
 import { Position } from './core/leoNodes';
 import { FlatRowLeo } from './types';
@@ -331,3 +333,4 @@ export class OutlineManager {
     }
 
 }
+//@-leo

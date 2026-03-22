@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321195752.1: * @file src/layout-manager.ts
 import * as utils from './utils';
 import { workspace } from './workspace';
 
@@ -272,3 +274,4 @@ export class LayoutManager {
 
 
 }
+//@-leo

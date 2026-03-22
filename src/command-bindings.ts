@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321195044.1: * @file src/command-bindings.ts
 import { Constants } from "./constants";
 import { Position } from "./core/leoNodes";
 import { Controller } from "./controller";
@@ -400,3 +402,4 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
 
 }
 
+//@-leo

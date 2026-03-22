@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 import { LeoSearchSettings } from "./types";
 import { workspace } from './workspace';
 
@@ -455,3 +457,4 @@ export class LogPaneManager {
 
 }
 
+//@-leo

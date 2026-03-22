@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321200113.1: * @file src/leo-ui.ts
 
 import { NullGui } from "./core/leoGui";
 import * as g from './core/leoGlobals';
@@ -3181,3 +3183,4 @@ export class LeoUI extends NullGui {
     }
 
 }
+//@-leo

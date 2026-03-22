@@ -28,20 +28,84 @@
       "vh": "UI",
       "children": [
         {
+          "gnx": "felix.20260321194813.1",
+          "vh": "@file src/body-manager.ts"
+        },
+        {
+          "gnx": "felix.20260321195044.1",
+          "vh": "@file src/command-bindings.ts"
+        },
+        {
+          "gnx": "felix.20260321195107.1",
+          "vh": "@file src/config.ts"
+        },
+        {
           "gnx": "felix.20251210234420.1",
           "vh": "@file src/constants.ts"
+        },
+        {
+          "gnx": "felix.20260321195438.1",
+          "vh": "@file src/controller.ts"
+        },
+        {
+          "gnx": "felix.20260321195525.1",
+          "vh": "@file src/cursor-position.ts"
         },
         {
           "gnx": "felix.20251210234451.1",
           "vh": "@file src/declarations.d.ts"
         },
         {
-          "gnx": "felix.20251211000427.1",
-          "vh": "@file src/utils.ts"
+          "gnx": "felix.20260321195553.1",
+          "vh": "@file src/dialog-manager.ts"
+        },
+        {
+          "gnx": "felix.20260321195619.1",
+          "vh": "@file src/global.d.ts"
+        },
+        {
+          "gnx": "felix.20260321195657.1",
+          "vh": "@file src/keybindings.ts"
+        },
+        {
+          "gnx": "felix.20260321195752.1",
+          "vh": "@file src/layout-manager.ts"
+        },
+        {
+          "gnx": "felix.20260321200054.1",
+          "vh": "@file src/leo-states.ts"
+        },
+        {
+          "gnx": "felix.20260321200113.1",
+          "vh": "@file src/leo-ui.ts"
+        },
+        {
+          "gnx": "felix.20260321200150.1",
+          "vh": "@file src/log-pane-manager.ts"
+        },
+        {
+          "gnx": "felix.20260321200216.1",
+          "vh": "@file src/menu-manager.ts"
+        },
+        {
+          "gnx": "felix.20260321200436.1",
+          "vh": "@file src/menu.ts"
+        },
+        {
+          "gnx": "felix.20260321200500.1",
+          "vh": "@file src/outline-manager.ts"
         },
         {
           "gnx": "felix.20251211000618.1",
           "vh": "@file src/types.ts"
+        },
+        {
+          "gnx": "felix.20251211000427.1",
+          "vh": "@file src/utils.ts"
+        },
+        {
+          "gnx": "felix.20260321201242.1",
+          "vh": "@file src/workspace.ts"
         }
       ]
     },

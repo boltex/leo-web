@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321195107.1: * @file src/config.ts
 import { Constants } from "./constants";
 import { ConfigMembers, ConfigSetting } from "./types";
 import * as utils from './utils';
@@ -11,10 +13,6 @@ export class Config {
     public checkForChangeExternalFiles: string = Constants.CONFIG_DEFAULTS.CHECK_FOR_CHANGE_EXTERNAL_FILES;
     public defaultReloadIgnore: string = Constants.CONFIG_DEFAULTS.DEFAULT_RELOAD_IGNORE;
     public leoID: string = Constants.CONFIG_DEFAULTS.LEO_ID;
-
-    constructor() {
-        // Nothing for now
-    }
 
     public getConfig(): ConfigMembers {
         return {
@@ -30,7 +28,6 @@ export class Config {
      * @returns a promise that resolves upon completion
      */
     public setLeoWebSettings(p_changes: ConfigSetting[]): void {
-
         p_changes.forEach(i_change => {
             switch (i_change.code) {
                 case 'checkForChangeExternalFiles':
@@ -45,7 +42,6 @@ export class Config {
             }
         });
         utils.safeLocalStorageSet(Constants.LOCAL_STORAGE_KEY, JSON.stringify(this.getConfig()));
-
     }
 
     public buildFromSavedSettings(): void {
@@ -59,3 +55,4 @@ export class Config {
 
     }
 }
+//@-leo

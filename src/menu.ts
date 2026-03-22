@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321200436.1: * @file src/menu.ts
 import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
 import { Constants } from "./constants";
 
@@ -420,3 +422,4 @@ export const menuData: MenuEntry[] = [
         ],
     },
 ];
+//@-leo

@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321195553.1: * @file src/dialog-manager.ts
 import {
     OpenDialogOptions,
     SaveDialogOptions,
@@ -924,3 +926,4 @@ export class DialogManager {
     }
 
 }
+//@-leo

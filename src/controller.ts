@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321195438.1: * @file src/controller.ts
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
 import { ConfigSetting, FlatRowLeo } from "./types";
@@ -1111,3 +1113,4 @@ export class Controller {
     }
 
 }
+//@-leo

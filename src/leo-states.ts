@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321200054.1: * @file src/leo-states.ts
 import * as utils from "./utils";
 import { LeoUI } from "./leo-ui";
 import { Constants } from "./constants";
@@ -349,3 +351,4 @@ export class LeoStates {
         this.leoHasMarked = p_states.hasMarked;
     }
 }
+//@-leo

@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321195525.1: * @file src/cursor-position.ts
 
 /**
  * Represents a line and character position, such as the position of the cursor.
@@ -389,3 +391,4 @@ export class Selection extends Range {
         return this.anchor === this.end;
     }
 }
+//@-leo

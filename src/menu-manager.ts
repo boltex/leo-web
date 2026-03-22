@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321200216.1: * @file src/menu-manager.ts
 import { workspace } from './workspace';
 
 import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
@@ -671,3 +673,4 @@ export class MenuManager {
     }
 
 }
+//@-leo

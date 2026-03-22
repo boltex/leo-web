@@ -1,3 +1,5 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260321201242.1: * @file src/workspace.ts
 import { openDB } from "idb";
 import * as showdown from "showdown";
 import { Controller } from "./controller";
@@ -274,3 +276,4 @@ class Workspace {
 
 export let workspace = new Workspace();
 
+//@-leo
