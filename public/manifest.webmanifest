@@ -1,7 +1,10 @@
 {
+  "id": "./",
   "short_name": "Leo-Web",
   "name": "Leo Editor for the Web",
-  "start_url": "./index.html",
+  "description": "Leo Editor, the scriptable outliner-based editor, running in your browser.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "icons": [
     {
