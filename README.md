@@ -11,15 +11,27 @@ Leo is a fundamentally different way of using and organizing data, programs and 
 
 This project is a TypeScript implementation that brings the Leo Editor experience to the web. (_Scriptable in either Javascript or Typescript_) It uses the browser's **File System API** for local file access.
 
+### Commonly Prohibited or Restricted Locations:
+
+- **System Directories:** C:\Windows, C:\Program Files, C:\Program Files (x86).
+- **Root Directories:** The root of the C: drive or other fixed drives.
+- **User Profiles:** Often directly, Documents, Downloads, Desktop.
+- **System Files:** Any folder containing crucial system data or "sensitive" locations.
+
+### How to Overcome Restrictions:
+
+- **Subdirectories:** The API usually allows access to subdirectories within user folders (e.g., Documents/MyProject), just not the top-level restricted folders themselves.
+
 For other usage scenarios, see [other Leo implementations](#other-leo-editor-implementations) for versions that support online repositories, or integrated as VSCode extensions.
 
 ## Limitations
 
+- U.I. related settings are accessed in a tab from the log pane instead of the usual 'LeoSettings/myLeoSettings' files.
 - To keep Leo-Web light and fast, it does not support .db files.
-- Running in the browser, leo scripts cannot launch OS shell commands.
+- Running in the browser, Leo scripts cannot launch OS shell commands.
 - Absolute paths are not supported with the browser's file API. Use relative paths exclusively for external files.
 - `Ctrl+TAB`, `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
-- There is a single log pane, shared across opened leo documents.
+- There is a single log pane, shared across opened Leo documents.
 - Leo-Web shares the same core implementation as LeoJS for the web, so the original Leo docutils features are missing.
 
 ### Not Yet Implemented
@@ -93,6 +105,6 @@ or on [github](https://github.com/leo-editor/leo-editor).
 
 ### _Special Thanks to_
 
-All who have participated, no matter how small or big the contribution, to the creation of the original Leo Editor!
+Edward K. Ream, and to all who have participated, no matter how small or big the contribution, to the creation of the original Leo Editor!
 
 ## 🤍 To sponsor, donate or contribute see my [user page 🦁](https://boltex.github.io/)
