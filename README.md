@@ -1,6 +1,6 @@
 # Leo Web Editor
 
-A browser-based version of the Leo Editor.
+A browser-based version of the Leo Editor, available at [https://boltex.github.io/leo-web/](https://boltex.github.io/leo-web/)
 
 Leo is a fundamentally different way of using and organizing data, programs and scripts. [📺 Introduction Video](https://www.youtube.com/watch?v=SYwlfdEukD4)
 
