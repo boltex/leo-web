@@ -14,7 +14,7 @@ export const bodyPaneContextMenuData: ContextMenuEntry[] = [
     { label: "Undo", action: CMD.UNDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO], keyboardShortcut: "Ctrl+Z" },
     { label: "Redo", action: CMD.REDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO], keyboardShortcut: "Ctrl+Shift+Z" },
     { label: "", kind: QuickPickItemKind.Separator },
-    { label: "Extract", action: CMD.EXTRACT, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "Extract", action: CMD.EXTRACT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+D" },
     { label: "Extract-Names", action: CMD.EXTRACT_NAMES, enabledFlagsSet: [FLAGS.TREE_OPENED] },
     { label: "Find-Def", action: CMD.FIND_DEF, enabledFlagsSet: [FLAGS.TREE_OPENED] },
     { label: "", kind: QuickPickItemKind.Separator },
@@ -135,7 +135,7 @@ export const menuData: MenuEntry[] = [
                     {
                         label: "Create Sections", entries: [
                             { label: "Extract-Names", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT_NAMES },
-                            { label: "Extract", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT },
+                            { label: "Extract", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT, keyboardShortcut: "Ctrl+Shift+D" },
                         ]
                     },
                     {

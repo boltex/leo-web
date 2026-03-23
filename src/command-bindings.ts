@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321195044.1: * @file src/command-bindings.ts
+//@+<< imports >>
+//@+node:felix.20260322213601.1: ** << imports >>
 import { Constants } from "./constants";
 import { Position } from "./core/leoNodes";
 import { Controller } from "./controller";
@@ -7,6 +9,10 @@ import { LeoUI } from "./leo-ui";
 import { Focus, ReqRefresh } from "./types";
 import { Uri } from "./workspace";
 
+//@-<< imports >>
+//@+others
+//@+node:felix.20260322213911.1: ** makeAllBindings
+makeAllBindings
 /**
  * Make all command/key bindings for the application.
  */
@@ -401,5 +407,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
     controller.setCommands(commands);
 
 }
-
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

@@ -180,7 +180,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.EXTRACT_NAMES,
-        key: "ctrl+shift+n",
+        key: "ctrl+shift+n", // Maybe browser will intercept?
         mac: "cmd+shift+n",
         outline: true,
         body: true,
