@@ -12,7 +12,6 @@ import { Uri } from "./workspace";
 //@-<< imports >>
 //@+others
 //@+node:felix.20260322213911.1: ** makeAllBindings
-makeAllBindings
 /**
  * Make all command/key bindings for the application.
  */

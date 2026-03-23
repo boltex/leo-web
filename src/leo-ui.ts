@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321200113.1: * @file src/leo-ui.ts
+//@+<< imports >>
+//@+node:felix.20260322232646.1: ** << imports >>
 
 import { NullGui } from "./core/leoGui";
 import * as g from './core/leoGlobals';
@@ -38,7 +40,9 @@ import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
 import { QuickSearchController } from "./core/quicksearch";
 import { HeadlineFinishedResult } from "./outline-manager";
-
+//@-<< imports >>
+//@+others
+//@+node:felix.20260322232711.1: ** Leo UI
 /**
  * Implements LeoGUI instanced as g.app.gui at startup.
  * Uses workspace members such as workspace.controller, workspace.body, workspace.outline, etc. to manipulate the UI and react to user interactions. 
@@ -112,13 +116,9 @@ export class LeoUI extends NullGui {
 
         this.idleTimeClass = IdleTime;
 
-        // * Setup States
         this.leoStates = new LeoStates(this);
 
-        // * Get configuration settings
         this.config = new Config();
-
-        // * also check workbench.editor.enablePreview
         this.config.buildFromSavedSettings();
 
         // If app.leoId is set, then save it in the config.
@@ -142,73 +142,8 @@ export class LeoUI extends NullGui {
 
     }
 
-    private _resolveFindPaneMessage = (message: any): void => {
-        switch (message.type) {
-            case 'leoNavEnter': {
-                void this.navEnter();
-                break;
-            }
-            case 'leoNavTextChange': {
-                void this.navTextChange();
-                break;
-            }
-            case 'leoNavClear': {
-                void this.navTextClear();
-                break;
-            }
-            // TODO.
-            // case 'leoNavMarkedList': {
-            //     void this.findQuickMarked(true);
-            //     break;
-            // }
-            case 'leoFindNext': {
-                this.find(false);
-                break;
-            }
-            case 'leoFindPrevious': {
-                this.find(true);
-                break;
-            }
-            case 'searchConfig': {
-                void this.saveSearchSettings(message.value);
-                break;
-            }
-            case 'replace': {
-                void this.replace(false);
-                break;
-            }
-            case 'replaceThenFind': {
-                void this.replace(true);
-                break;
-            }
-            // TODO.
-            // case 'navigateNavEntry': {
-            //     void this.navigateNavEntry(message.value);
-            //     break;
-            // }
-            case 'refreshSearchConfig': {
-                void this.triggerBodySave();
-                // Leave a cycle before getting settings
-                setTimeout(() => {
-                    this.loadSearchSettings();
-                }, 0);
-                break;
-            }
-            // TODO.
-            // case 'gotoCommand': {
-            //     try {
-            //         const w_index = Number(message.value);
-            //         if (!isNaN(w_index) && this.leoGotoProvider.nodeList[w_index]) {
-            //         }
-            //         void this.gotoNavEntry(this.leoGotoProvider.nodeList[w_index]);
-            //     } catch (e) {
-            //         console.log('goto nav entry failed for index: ', message.value);
-            //     }
-            //     break;
-            // }
-        }
-    }
-
+    //@+others
+    //@+node:felix.20260323003644.1: *3* onBeforeUnload Exit Handler
     private onBeforeUnload = (event: BeforeUnloadEvent) => {
 
         // Loop all opened commanders and check for dirty ones
@@ -235,63 +170,7 @@ export class LeoUI extends NullGui {
         event.preventDefault();
         event.returnValue = '';
     };
-
-    public lightTheme(): void {
-        workspace.layout.applyTheme('light');
-    }
-    public darkTheme(): void {
-        workspace.layout.applyTheme('dark');
-    }
-
-    public applyLayout(orientation: string): void {
-        workspace.layout.applyLayout(orientation);
-    }
-    public equalSizedPanes(): void {
-        workspace.layout.equalSizedPanes();
-    }
-
-    public toggleMenu(): void {
-        workspace.menu.toggleMenu();
-    }
-
-    public showDocumentation(): void {
-        // Open Leo Web documentation URL in new browser tab (for now, github repo)
-        const docUrl = 'https://github.com/boltex/leo-web/';
-        window.open(docUrl, '_blank');
-    }
-
-    public todo(): void {
-        workspace.dialog.showInformationMessage("TODO: Not yet implemented.");
-    }
-
-    public async chooseNewWorkspace(): Promise<boolean> {
-        // Perform the 'quit' command to force asking to save unsaved changes
-        // Then clear the workspace from db and force-refresh the page to restart leoWeb
-        // This will have the effect of closing all opened documents and then asking for a new workspace
-        for (const c of g.app.commanders()) {
-            const closed = await g.app.closeLeoWindow(c.frame)
-            const allow = c.exists && closed;
-            if (!allow) {
-                return Promise.resolve(false);
-            }
-        }
-
-        workspace.clearWorkspace().catch((e) => {
-            console.error('Error clearing workspace:', e);
-        });
-
-        // Clear recent files, DB cache and sessions from local storage to avoid auto-reopening them on reload
-        utils.safeLocalStorageSet('leoRecentFiles', undefined);
-        utils.safeLocalStorageSet('leoSession', undefined);
-        utils.safeLocalStorageSet('leoCache', undefined);
-
-        // Reload the page to restart leoWeb
-        window.location.reload();
-
-        return Promise.resolve(true);
-    }
-
-
+    //@+node:felix.20260323003355.1: *3* runMainLoop
     /**
      * * Set all remaining local objects, set ready flag(s) and refresh all panels
      */
@@ -367,26 +246,84 @@ export class LeoUI extends NullGui {
         this.leoStates.leoWebStartupDone = true;
         this.fullRefresh();
     }
-
+    //@+node:felix.20260323003341.1: *3* makeAllBindings
     /**
      * Make all key and commands bindings
      */
     public makeAllBindings(): void {
         makeAllBindings(this, workspace.controller);
     }
+    //@+node:felix.20260323004032.1: *3* GUI Commands
+    //@+others
+    //@+node:felix.20260323003609.1: *4* Themes
+    public lightTheme(): void {
+        workspace.layout.applyTheme('light');
+    }
+    public darkTheme(): void {
+        workspace.layout.applyTheme('dark');
+    }
+    //@+node:felix.20260323003605.1: *4* Layout
+    public applyLayout(orientation: string): void {
+        workspace.layout.applyLayout(orientation);
+    }
+    public equalSizedPanes(): void {
+        workspace.layout.equalSizedPanes();
+    }
+    //@+node:felix.20260323003601.1: *4* Menu
+    public toggleMenu(): void {
+        workspace.menu.toggleMenu();
+    }
+    //@+node:felix.20260323003442.1: *4* showDocumentation
+    public showDocumentation(): void {
+        // Open Leo Web documentation URL in new browser tab (for now, github repo)
+        const docUrl = 'https://github.com/boltex/leo-web/';
+        window.open(docUrl, '_blank');
+    }
+    //@+node:felix.20260323003430.1: *4* todo
+    public todo(): void {
+        workspace.dialog.showInformationMessage("TODO: Not yet implemented.");
+    }
+    //@+node:felix.20260323003423.1: *4* chooseNewWorkspace
+    public async chooseNewWorkspace(): Promise<boolean> {
+        // Perform the 'quit' command to force asking to save unsaved changes
+        // Then clear the workspace from db and force-refresh the page to restart leoWeb
+        // This will have the effect of closing all opened documents and then asking for a new workspace
+        for (const c of g.app.commanders()) {
+            const closed = await g.app.closeLeoWindow(c.frame)
+            const allow = c.exists && closed;
+            if (!allow) {
+                return Promise.resolve(false);
+            }
+        }
 
+        workspace.clearWorkspace().catch((e) => {
+            console.error('Error clearing workspace:', e);
+        });
+
+        // Clear recent files, DB cache and sessions from local storage to avoid auto-reopening them on reload
+        utils.safeLocalStorageSet('leoRecentFiles', undefined);
+        utils.safeLocalStorageSet('leoSession', undefined);
+        utils.safeLocalStorageSet('leoCache', undefined);
+
+        // Reload the page to restart leoWeb
+        window.location.reload();
+
+        return Promise.resolve(true);
+    }
+    //@+node:felix.20260323003332.1: *4* showSettings
     public showSettings(): Promise<unknown> {
-        // TODO !
+        // TODO : Remove? or implement a settings/welcome UI ?
         console.log('TODO ! showSettings called to show settings UI');
         return Promise.resolve();
     }
-
+    //@+node:felix.20260323003252.1: *4* put_help
     public put_help(c: Commands, s: string, short_title: string): void {
         s = g.dedent(s.trimEnd());
         s = workspace.showdownConverter.makeHtml(s);
         utils.showHtmlInNewTab(s, short_title);
     }
-
+    //@-others
+    //@+node:felix.20260323003057.1: *3* handleUnl
     /**
      * Handles the calls from the DocumentLinkProvider for clicks on UNLs.
      */
@@ -420,7 +357,7 @@ export class LeoUI extends NullGui {
             console.log('FAILED HANDLE URL! ', p_arg);
         }
     }
-
+    //@+node:felix.20260323002920.1: *3* Log Pane
     /**
      * * Bind the log output to the log pane of the web UI
      */
@@ -450,7 +387,7 @@ export class LeoUI extends NullGui {
     public showLogPane(p_focus?: boolean): void {
         workspace.logPane.showTab('log');
     }
-
+    //@+node:felix.20260323002847.1: *3* Body States Change Handlers
     /**
      * * Handles detection of the active editor's selection change or cursor position
      * @param p_event a change event containing the active editor's selection, if any.
@@ -513,9 +450,9 @@ export class LeoUI extends NullGui {
     }
 
     /**
- * * Refresh body states after a small debounced delay.
- */
-    public debouncedRefreshBodyStates(p_delay?: number) {
+     * * Refresh body states after a small debounced delay.
+     */
+    private debouncedRefreshBodyStates(p_delay?: number) {
 
         if (!p_delay) {
             p_delay = 0;
@@ -538,15 +475,7 @@ export class LeoUI extends NullGui {
             }, p_delay);
         }
     }
-
-    public endEditHeadline(p_saveSelectionOnly?: boolean): HeadlineFinishedResult | undefined {
-        if (workspace.outline.headlineFinish) {
-            const result = workspace.outline.headlineFinish(false, p_saveSelectionOnly);
-            return result;
-        }
-        return undefined;
-    }
-
+    //@+node:felix.20260323002618.1: *3* Save Body states to Leo
     /**
      * * Validate headline edit input box if active, or, Save body to the Leo app if its dirty.
      *   That is, only if a change has been made to the body 'document' so far
@@ -686,38 +615,11 @@ export class LeoUI extends NullGui {
         this.getStates();
 
     }
-
-    public refreshDocumentsPane(): void {
-        workspace.controller.setupDocumentTabsAndHandlers();
-    }
-
-    public refreshUndoPane(): void {
-        // TODO : implement undo pane refresh
-    }
-
-    public refreshBodyStates(): void {
-        const c = g.app.windowList[this.frameIndex].c;
-        const [w_language, w_wrap] = this._getBodyLanguage(c.p);
-
-        // Set document language
-        this._setBodyLanguage(w_language);
-
-        // Set document wrap
-        workspace.body.setBodyWrap(w_wrap);
-    }
-
-    public refreshGotoPane(): void {
-        // TODO : implement goto pane refresh
-    }
-
-    public refreshButtonsPane(): void {
-        // TODO : implement buttons pane refresh
-    }
-
+    //@+node:felix.20260323002420.1: *3* showOutline
     public showOutline(): void {
         workspace.layout.OUTLINE_PANE.focus();
     }
-
+    //@+node:felix.20260323002416.1: *3* showBody
     public showBody(): void {
         const c = g.app.windowList[this.frameIndex].c;
         const p = c.p;
@@ -771,7 +673,7 @@ export class LeoUI extends NullGui {
         this._refreshType.scroll = false;
 
     }
-
+    //@+node:felix.20260323002150.1: *3* Refresh & helpers
     /**
      * * Setup global refresh options
      * @param p_finalFocus kind of pane for focus to be placed after refresh, if any. If not specified, focus will be preserved.
@@ -886,9 +788,9 @@ export class LeoUI extends NullGui {
     }
 
     /**
-         * * Refreshes the outline. A reveal type can be passed along to specify the reveal type for the selected node
-         * @param p_revealType Facultative reveal type to specify type of reveal when the 'selected node' is encountered
-         */
+     * * Refreshes the outline. A reveal type can be passed along to specify the reveal type for the selected node
+     * @param p_revealType Facultative reveal type to specify type of reveal when the 'selected node' is encountered
+     */
     private _refreshOutline(p_revealType?: RevealType): void {
 
         if (p_revealType !== undefined && p_revealType.valueOf() >= this._revealType.valueOf()) { // To check if selected node should self-select while redrawing whole tree
@@ -912,6 +814,29 @@ export class LeoUI extends NullGui {
         }
     }
 
+    public refreshDocumentsPane(): void {
+        workspace.controller.setupDocumentTabsAndHandlers();
+    }
+
+    public refreshUndoPane(): void {
+        // TODO : implement undo pane refresh
+    }
+
+    public refreshBodyStates(): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const [w_language, w_wrap] = this._getBodyLanguage(c.p);
+        workspace.body.setBodyLanguage(w_language);
+        workspace.body.setBodyWrap(w_wrap);
+    }
+
+    public refreshGotoPane(): void {
+        // TODO : implement goto pane refresh
+    }
+
+    public refreshButtonsPane(): void {
+        // TODO : implement buttons pane refresh
+    }
+    //@+node:felix.20260323002101.1: *3* selectTreeNode
     /**
      * * Called by UI when the user selects in the tree (click or 'open aside' through context menu)
      * @param node is the position node selected in the tree
@@ -1017,7 +942,7 @@ export class LeoUI extends NullGui {
         return this._tryApplyNodeToBody(node, true);
 
     }
-
+    //@+node:felix.20260323002042.1: *3* _tryApplyNodeToBody
     private _tryApplyNodeToBody(node: Position, showBodyNoFocus: boolean): void {
         // In LeoJS, this required a bunch of helper methods because the body pane itself was not readily available and the body text was not directly settable,
         // so it required to find the right "editor" object in the DOM, then set its value, then restore scroll and selection, etc.   
@@ -1046,7 +971,7 @@ export class LeoUI extends NullGui {
         }
 
     }
-
+    //@+node:felix.20260323002027.1: *3* Row Col Convertion Utilities
     /**
      * Utility to convert a string index into a line, col dict
      */
@@ -1073,8 +998,7 @@ export class LeoUI extends NullGui {
         [line, col] = wrapper.toPythonIndexRowCol(i);
         return { "line": line, "col": col, "index": i };
     }
-
-
+    //@+node:felix.20260323001955.1: *3* _getBodyLanguage
     /**
      * * Looks for given position's coloring language and wrap, taking account of '@killcolor', etc.
      */
@@ -1100,12 +1024,7 @@ export class LeoUI extends NullGui {
 
         return [w_language, w_wrap];
     }
-
-    private _setBodyLanguage(w_language: string): void {
-
-        workspace.body.setBodyLanguage(w_language);
-    }
-
+    //@+node:felix.20260323001345.1: *3* Trigger GetStates
     /**
      * * 'getStates' action for use in debounced method call
      */
@@ -1192,7 +1111,7 @@ export class LeoUI extends NullGui {
             this.refreshButtonsPane();
         }
     }
-
+    //@+node:felix.20260323001309.1: *3* Setup open and no-open document
     /**
      * * Setup UI for having no opened Leo documents
      */
@@ -1251,7 +1170,7 @@ export class LeoUI extends NullGui {
         this.loadSearchSettings();
 
     }
-
+    //@+node:felix.20260323001205.1: *3* Leo Command
     /**
      * Leo Command. This is used in "command bindings" from the UI to execute commands.
      * @param p_cmd Command name string
@@ -1363,7 +1282,7 @@ export class LeoUI extends NullGui {
         }
 
     }
-
+    //@+node:felix.20260323001131.1: *3* Minibuffer & helpers
     /**
      * Opens quickPick minibuffer pallette to choose from all commands in this file's commander
      * @returns Promise from the command resolving - or resolve with undefined if cancelled
@@ -1613,9 +1532,7 @@ export class LeoUI extends NullGui {
         // Add to top of minibuffer history
         c.commandHistory.unshift(p_command.label);
     }
-
-
-
+    //@+node:felix.20260323001118.1: *3* saveLeoFile
     /**
      * * Invokes the commander.save() command
      * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
@@ -1643,8 +1560,7 @@ export class LeoUI extends NullGui {
 
         return Promise.resolve();
     }
-
-
+    //@+node:felix.20260323001112.1: *3* selectOpenedLeoDocument
     /**
      * * Switches Leo document directly by index number.
      */
@@ -1689,7 +1605,7 @@ export class LeoUI extends NullGui {
         }
 
     }
-
+    //@+node:felix.20260323000247.1: *3* editHeadline & helper
     /**
      * * Asks for a new headline label, and replaces the current label with this new one one the specified, or currently selected node
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
@@ -1725,6 +1641,14 @@ export class LeoUI extends NullGui {
         }
         void this._launchRefresh();
         return w_p;
+    }
+
+    public endEditHeadline(p_saveSelectionOnly?: boolean): HeadlineFinishedResult | undefined {
+        if (workspace.outline.headlineFinish) {
+            const result = workspace.outline.headlineFinish(false, p_saveSelectionOnly);
+            return result;
+        }
+        return undefined;
     }
 
     private _finishEditHeadline(result: HeadlineFinishedResult): void {
@@ -1779,7 +1703,7 @@ export class LeoUI extends NullGui {
             g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
         }
     }
-
+    //@+node:felix.20260323000155.1: *3* Clipboard
     /**
      * Replaces the system's clipboard with the given string
      * @param s actual string content to go onto the clipboard
@@ -1842,9 +1766,9 @@ export class LeoUI extends NullGui {
         }
         return this.replaceClipboardWith(unl);
     }
-
+    //@+node:felix.20260322235938.1: *3* goAnywhere
     /**
-     * Mimic vscode's CTRL+P to find any position by it's headline
+     * Mimic vscode and sublime-text's CTRL+P to find any position by it's headline
      */
     public async goAnywhere(): Promise<unknown> {
         this.triggerBodySave();
@@ -1903,21 +1827,13 @@ export class LeoUI extends NullGui {
         return Promise.resolve(undefined); // Canceled
 
     }
-
-
+    //@+node:felix.20260322235907.1: *3* Nav and Goto
     /**
      * * Goto the next, previous, first or last nav entry via arrow keys in
      */
     public navigateNavEntry(p_nav: LeoGotoNavKey): void {
         // TODO : Finish nav entry navigation implementation!
         // void this.leoGotoProvider.navigateNavEntry(p_nav);
-    }
-
-    private _get_focus(): string {
-        const c = g.app.windowList[this.frameIndex].c;
-        const w = g.app.gui.get_focus(c);
-        const focus = g.app.gui.widget_name(w);
-        return focus;
     }
 
     /**
@@ -1970,7 +1886,7 @@ export class LeoUI extends NullGui {
         // TODO: Implement proper goto provider refresh!
         // this.leoGotoProvider.refreshTreeRoot();
     }
-
+    //@+node:felix.20260322235817.1: *3* Search and Replace
     /**
      * * Opens the find panel and selects all & focuses on the find field.
      */
@@ -2359,6 +2275,73 @@ export class LeoUI extends NullGui {
         return Promise.resolve();
     }
 
+    private _resolveFindPaneMessage = (message: any): void => {
+        switch (message.type) {
+            case 'leoNavEnter': {
+                void this.navEnter();
+                break;
+            }
+            case 'leoNavTextChange': {
+                void this.navTextChange();
+                break;
+            }
+            case 'leoNavClear': {
+                void this.navTextClear();
+                break;
+            }
+            // TODO.
+            // case 'leoNavMarkedList': {
+            //     void this.findQuickMarked(true);
+            //     break;
+            // }
+            case 'leoFindNext': {
+                this.find(false);
+                break;
+            }
+            case 'leoFindPrevious': {
+                this.find(true);
+                break;
+            }
+            case 'searchConfig': {
+                void this.saveSearchSettings(message.value);
+                break;
+            }
+            case 'replace': {
+                void this.replace(false);
+                break;
+            }
+            case 'replaceThenFind': {
+                void this.replace(true);
+                break;
+            }
+            // TODO.
+            // case 'navigateNavEntry': {
+            //     void this.navigateNavEntry(message.value);
+            //     break;
+            // }
+            case 'refreshSearchConfig': {
+                void this.triggerBodySave();
+                // Leave a cycle before getting settings
+                setTimeout(() => {
+                    this.loadSearchSettings();
+                }, 0);
+                break;
+            }
+            // TODO.
+            // case 'gotoCommand': {
+            //     try {
+            //         const w_index = Number(message.value);
+            //         if (!isNaN(w_index) && this.leoGotoProvider.nodeList[w_index]) {
+            //         }
+            //         void this.gotoNavEntry(this.leoGotoProvider.nodeList[w_index]);
+            //     } catch (e) {
+            //         console.log('goto nav entry failed for index: ', message.value);
+            //     }
+            //     break;
+            // }
+        }
+    }
+    //@+node:felix.20260322234219.1: *3* tabCycle
     /**
      * * Cycle opened documents
      */
@@ -2381,28 +2364,9 @@ export class LeoUI extends NullGui {
 
         return this.selectOpenedLeoDocument(w_chosenIndex);
     }
-
-    public async cutText(): Promise<unknown> {
-        // TODO : This is for body pane text only!
-        workspace.dialog.showToast('Cut Text: TODO Implement');
-        return Promise.resolve();
-    }
-    public async copyText(): Promise<unknown> {
-        // TODO : This is for body pane text only!
-        workspace.dialog.showToast('Copy Text: TODO Implement');
-        return Promise.resolve();
-    }
-    public async pasteText(): Promise<unknown> {
-        // TODO : This is for body pane text only!
-        workspace.dialog.showToast('Paste Text: TODO Implement');
-        return Promise.resolve();
-    }
-    public async selectAllText(): Promise<unknown> {
-        // TODO : This is for body pane text only!
-        workspace.dialog.showToast('Select All Text: TODO Implement');
-        return Promise.resolve();
-    }
-
+    //@+node:felix.20260322233732.1: *3* File Commands
+    //@+others
+    //@+node:felix.20260322234040.1: *4* showRecentLeoFiles
     /**
      * * Shows the recent Leo files list, choosing one will open it
      * @returns A promise that resolves when the a file is finally opened, rejected otherwise
@@ -2456,7 +2420,7 @@ export class LeoUI extends NullGui {
         return Promise.resolve(undefined);
 
     }
-
+    //@+node:felix.20260322234034.1: *4* newLeoFile
     /**
     * * Creates a new Leo file
     * @returns the promise started after it's done creating the frame and commander
@@ -2501,8 +2465,7 @@ export class LeoUI extends NullGui {
         this.loadSearchSettings();
         return this.launchRefresh();
     }
-
-
+    //@+node:felix.20260322234028.1: *4* closeLeoFile
     public async closeLeoFile(index?: number): Promise<unknown> {
         // If no index, find current
         if (index === undefined) {
@@ -2538,7 +2501,7 @@ export class LeoUI extends NullGui {
         return this.loadSearchSettings();
 
     }
-
+    //@+node:felix.20260322234024.1: *4* openLeoFile
     /**
      * * Sets up the call to the 'open-outline' command and its possible file url parameter.
      * @param p_leoFileUri optional uri for specifying a file, if missing, a dialog will open
@@ -2627,7 +2590,7 @@ export class LeoUI extends NullGui {
         }
         return this.loadSearchSettings();
     }
-
+    //@+node:felix.20260322234018.1: *4* saveAsLeoFile
     /**
      * * Asks for file name and path, then saves the Leo file
      * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
@@ -2659,7 +2622,7 @@ export class LeoUI extends NullGui {
         void this.launchRefresh();
         return;
     }
-
+    //@+node:felix.20260322234010.1: *4* saveAsLeoJsFile
     /**
      * * Asks for .leojs file name and path, then saves the JSON Leo file
      * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
@@ -2707,8 +2670,8 @@ export class LeoUI extends NullGui {
         void this.launchRefresh();
         return;
     }
-
-
+    //@-others
+    //@+node:felix.20260322233644.1: *3* switchLeoFile
     /**
      * * Show switch document 'QuickPick' dialog and switch file if selection is made, or just return if no files are opened.
      * @returns A promise that resolves with a textEditor of the selected node's body from the newly selected document
@@ -2757,7 +2720,7 @@ export class LeoUI extends NullGui {
             return Promise.resolve(undefined);
         }
     }
-
+    //@+node:felix.20260322233602.1: *3* show_find_success
     /**
      * Handle a successful find match.
      */
@@ -2802,12 +2765,11 @@ export class LeoUI extends NullGui {
         //     w.cursor_line = row
         //     self.focus_to_body(c)  # Does not return.
     }
-
-
+    //@+node:felix.20260322233307.1: *3* Leo ID
     /**
-     * Show info window about requiring leoID to start
-     * and a button to perform the 'set leoID' command.
-     */
+        * Show info window about requiring leoID to start
+        * and a button to perform the 'set leoID' command.
+        */
     public showLeoIDMessage(): void {
         void workspace.dialog.showInformationMessage(
             Constants.USER_MESSAGES.SET_LEO_ID_MESSAGE,
@@ -2821,9 +2783,9 @@ export class LeoUI extends NullGui {
     }
 
     /**
-     * * Command to get the LeoID from dialog, save it to user settings.
-     * Start Leo-Web if the ID is valid, and not already started.
-     */
+        * * Command to get the LeoID from dialog, save it to user settings.
+        * Start Leo-Web if the ID is valid, and not already started.
+        */
     public setLeoIDCommand(): Thenable<unknown> {
         return g.IDDialog().then((p_id) => {
             p_id = p_id.trim();
@@ -2838,9 +2800,10 @@ export class LeoUI extends NullGui {
         });
     }
 
+
     /**
-     * * Returns the leoID from the Leo-Web settings
-     */
+        * * Returns the leoID from the Leo-Web settings
+        */
     public getIdFromSetting(): string {
         return this.config.leoID;
     }
@@ -2890,7 +2853,7 @@ export class LeoUI extends NullGui {
         }
         return Promise.resolve();
     }
-
+    //@+node:felix.20260322233253.1: *3* widget_name
     public widget_name(w: any): string {
         let name: string;
         if (!w) {
@@ -2908,7 +2871,7 @@ export class LeoUI extends NullGui {
         }
         return name;
     }
-
+    //@+node:felix.20260322233248.1: *3* Get & Set Focus
     public set_focus(commander: Commands, widget: any): void {
         this.focusWidget = widget;
         const w_widgetName = this.widget_name(widget);
@@ -2930,7 +2893,7 @@ export class LeoUI extends NullGui {
     public get_focus(c?: Commands): StringTextWrapper {
         return this.focusWidget!;
     }
-
+    //@+node:felix.20260322233148.1: *3* get1Arg
     public get1Arg(
         options: {
             title: string;
@@ -2958,7 +2921,7 @@ export class LeoUI extends NullGui {
             return workspace.dialog.showInputDialog(options);
         }
     }
-
+    //@+node:felix.20260322233136.1: *3* get1Char
     /**
      * * Gets a single character input from the user, automatically accepting as soon as a character is entered
      * @param options Options for the input box
@@ -2980,7 +2943,7 @@ export class LeoUI extends NullGui {
         }
         return workspace.dialog.showSingleCharInputDialog(options);
     }
-
+    //@+node:felix.20260322233127.1: *3* About Leo Dialog
     public runAboutLeoDialog(
         c: Commands | undefined,
         version: string,
@@ -2995,7 +2958,7 @@ export class LeoUI extends NullGui {
                 detail: theCopyright
             });
     }
-
+    //@+node:felix.20260322232941.1: *3* Ask Dialogs
     public runAskOkDialog(
         c: Commands | undefined,
         title: string,
@@ -3097,7 +3060,7 @@ export class LeoUI extends NullGui {
                 }
             });
     }
-
+    //@+node:felix.20260322232836.1: *3* File Dialogs
     public runOpenFileDialog(
         c: Commands | undefined,
         title: string,
@@ -3181,6 +3144,10 @@ export class LeoUI extends NullGui {
             }
         });
     }
+    //@-others
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

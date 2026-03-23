@@ -1,11 +1,15 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321200054.1: * @file src/leo-states.ts
+//@+<< imports >>
+//@+node:felix.20260322231748.1: ** << imports >>
 import * as utils from "./utils";
 import { LeoUI } from "./leo-ui";
 import { Constants } from "./constants";
 import { LeoPackageStates } from "./types";
 import { Position } from "./core/leoNodes";
-
+//@-<< imports >>
+//@+others
+//@+node:felix.20260322231830.1: ** LeoStates
 /**
  * * Global states service
  * Holds state flags used to restrict command availability and icon visibility
@@ -13,6 +17,10 @@ import { Position } from "./core/leoNodes";
  */
 export class LeoStates {
 
+    constructor(private _leoUI: LeoUI) { }
+
+    //@+others
+    //@+node:felix.20260322232013.1: *3* Getters and Setters
     /**
      * Used mostly for leoWebOutline ViewsWelcome content
      */
@@ -317,9 +325,7 @@ export class LeoStates {
         this._leoRoot = p_value;
         utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_HOIST, !p_value);
     }
-
-    constructor(private _leoUI: LeoUI) { }
-
+    //@+node:felix.20260322231940.1: *3* setSelectedNodeFlags
     public setSelectedNodeFlags(p_node: Position): void {
         const hasParent = p_node.hasParent();
         const isExpanded = p_node.isExpanded();
@@ -336,7 +342,7 @@ export class LeoStates {
         this.leoHasParent = hasParent;
         this.leoExpandedOrHasParent = isExpanded || hasParent;
     }
-
+    //@+node:felix.20260322231936.1: *3* setLeoStateFlags
     public setLeoStateFlags(p_states: LeoPackageStates): void {
         this.leoChanged = p_states.changed;
         this.leoCanUndo = p_states.canUndo;
@@ -350,5 +356,10 @@ export class LeoStates {
         this.leoTopHoistChapter = p_states.topIsChapter;
         this.leoHasMarked = p_states.hasMarked;
     }
+    //@-others
+
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo
