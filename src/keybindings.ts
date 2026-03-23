@@ -45,12 +45,12 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.SHOW_OUTLINE,
-        key: "ctrl+t", // BROWSER MAY INTERCEPT! TODO: test if browser intercepts on all platforms
+        key: "ctrl+t", // BROWSER MAY INTERCEPT!
         body: true
     },
     {
         command: CMD.SHOW_BODY,
-        key: "ctrl+t", // BROWSER MAY INTERCEPT! TODO: test if browser intercepts on all platforms
+        key: "ctrl+t", // BROWSER MAY INTERCEPT!
         outline: true
     },
     {
@@ -289,7 +289,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.PROMOTE_SELECTION,
-        key: "ctrl+[", // TODO : test if browser intercepts on all platforms
+        key: "ctrl+[", // TODO : test if browser intercepts
         // mac: "cmd+[",
         // linux: "ctrl+[",
         outline: true,
@@ -299,7 +299,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.DEMOTE_SELECTION,
-        key: "ctrl+]", // TODO : test if browser intercepts on all platforms
+        key: "ctrl+]", // TODO : test if browser intercepts
         // mac: "cmd+]",
         // linux: "ctrl+]",
         outline: true,
@@ -351,9 +351,9 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.CLONE_SELECTION,
         key: "ctrl+`",
-        // win: "ctrl+oem_3",  // TODO : test if browser intercepts on all platforms
-        // linux: "ctrl+`",  // TODO : test if browser intercepts on all platforms
-        // mac: "cmd+`",  // TODO : test if browser intercepts on all platforms
+        // win: "ctrl+oem_3",
+        // linux: "ctrl+`",
+        // mac: "cmd+`",
         outline: true,
         body: true,
         find: true,

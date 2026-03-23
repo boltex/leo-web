@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321195553.1: * @file src/dialog-manager.ts
+//@+<< imports & annotations >>
+//@+node:felix.20260322223745.1: *3* << imports & annotations >>
 import {
     OpenDialogOptions,
     SaveDialogOptions,
@@ -11,7 +13,9 @@ import {
 import { Uri, workspace } from './workspace';
 
 type QuickPickInternalItem = QuickPickItem & { renderedLabel?: string };
-
+//@-<< imports & annotations >>
+//@+others
+//@+node:felix.20260322224447.1: ** DialogManager
 /**
  * Dialog Manager is responsible for managing all modal and non-modal dialogs in the application.
  * It maintains a queue of dialog requests to ensure that only one dialog is open at a time and handles focus management.
@@ -58,7 +62,6 @@ export class DialogManager {
     private __activeFocusTrap: (() => void) | null = null;
     private __preDialogFocusedElement: HTMLElement | null = null;
 
-
     constructor() {
         this.HTML_ELEMENT = document.documentElement;
 
@@ -78,6 +81,8 @@ export class DialogManager {
 
     }
 
+    //@+others
+    //@+node:felix.20260322225911.1: *3* requestWorkspaceDirectory
     public requestWorkspaceDirectory(): Promise<FileSystemDirectoryHandle> {
         // First, check if window.showDirectoryPicker is available to adapt the message in the dialog, and just reject if not.
         if (!('showDirectoryPicker' in window)) {
@@ -120,8 +125,7 @@ export class DialogManager {
             });
         }
     }
-
-
+    //@+node:felix.20260322225900.1: *3* showToast
     public showToast(message: string, duration = 2000, detail?: string): Promise<undefined> {
         if (!this.TOAST) return Promise.resolve(undefined);
 
@@ -158,9 +162,7 @@ export class DialogManager {
             this.__toastResolvers.push(resolve);
         });
     }
-
-
-
+    //@+node:felix.20260322225851.1: *3* showMessageDialog
     public showMessageDialog(
         message: string, options?: MessageOptions, ...items: string[]
     ): Thenable<string | undefined> {
@@ -178,7 +180,7 @@ export class DialogManager {
             }
         });
     }
-
+    //@+node:felix.20260322225841.1: *3* showInputDialog
     public async showInputDialog(options: InputDialogOptions): Promise<string | undefined> {
         return new Promise((resolve) => {
             this.__dialogQueue.push({
@@ -192,7 +194,7 @@ export class DialogManager {
             }
         });
     }
-
+    //@+node:felix.20260322225831.1: *3* showSingleCharInputDialog
     public showSingleCharInputDialog(options: InputDialogOptions): Promise<string | undefined> {
         return new Promise((resolve) => {
             this.__dialogQueue.push({
@@ -206,7 +208,7 @@ export class DialogManager {
             }
         });
     }
-
+    //@+node:felix.20260322225819.1: *3* showQuickPick
     public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | undefined> {
         if (!items || items.length === 0) {
             return Promise.resolve(undefined);
@@ -224,7 +226,7 @@ export class DialogManager {
             }
         });
     }
-
+    //@+node:felix.20260322225815.1: *3* showOpenDialog
     public async showOpenDialog(options?: OpenDialogOptions): Promise<Uri[] | null> {
         return new Promise((resolve) => {
             this.__dialogQueue.push({
@@ -238,7 +240,7 @@ export class DialogManager {
             }
         });
     }
-
+    //@+node:felix.20260322225750.1: *3* showSaveDialog
     public async showSaveDialog(options?: SaveDialogOptions): Promise<Uri | null> {
         return new Promise((resolve) => {
             this.__dialogQueue.push({
@@ -252,7 +254,7 @@ export class DialogManager {
             }
         });
     }
-
+    //@+node:felix.20260322225731.1: *3* _restorePreDialogFocus
     private _restorePreDialogFocus(): void {
         if (this.__preDialogFocusedElement && this.__preDialogFocusedElement['focus']) {
             // first check if another dialog did not instantly open and capture focus again, in which case we should not restore focus to the previous element as it would steal focus from the new dialog. We can check this by seeing if __preDialogFocusedElement is still the same, if it was overwritten by a new dialog opening, it would be different or null.
@@ -267,7 +269,7 @@ export class DialogManager {
             this.__preDialogFocusedElement = null;
         }
     }
-
+    //@+node:felix.20260322225722.1: *3* _processDialogQueue
     private _processDialogQueue(): void {
         if (this.__dialogQueue.length === 0 || this.isDialogOpen) {
             return;
@@ -304,7 +306,7 @@ export class DialogManager {
                 break;
         }
     }
-
+    //@+node:felix.20260322225602.1: *3* showInformationMessage
     /**
      * Method that mimics VSCode's showInformationMessage API.
      */
@@ -336,9 +338,7 @@ export class DialogManager {
             }
         }
     }
-
-
-
+    //@+node:felix.20260322225524.1: *3* _showMessageDialogInternal
     private _showMessageDialogInternal(dialog: any): void {
         this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
 
@@ -382,7 +382,7 @@ export class DialogManager {
             }, 0);
         }
     }
-
+    //@+node:felix.20260322225432.1: *3* _showInputDialogInternal
     private _showInputDialogInternal(dialog: any): void {
         const options = dialog.inputOptions;
         this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'true');
@@ -428,7 +428,7 @@ export class DialogManager {
             this.INPUT_DIALOG_INPUT.focus();
         }, 0);
     }
-
+    //@+node:felix.20260322225350.1: *3* _showSingleCharInputDialogInternal
     private _showSingleCharInputDialogInternal(dialog: any): void {
         const options = dialog.inputOptions;
         this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'true');
@@ -470,7 +470,7 @@ export class DialogManager {
             this.INPUT_DIALOG_INPUT.focus();
         }, 0);
     }
-
+    //@+node:felix.20260322224330.1: *3* _showQuickPickInternal
     private _showQuickPickInternal(dialog: any): void {
         const items: QuickPickItem[] = dialog.quickPickItems;
         const options = dialog.quickPickOptions;
@@ -724,7 +724,7 @@ export class DialogManager {
             this.QUICKPICK_DIALOG_INPUT.focus();
         }, 0);
     }
-
+    //@+node:felix.20260322224248.1: *3* _showOpenDialogInternal
     private async _showOpenDialogInternal(dialog: any): Promise<void> {
         const options = dialog.openDialogOptions;
 
@@ -797,7 +797,7 @@ export class DialogManager {
             setTimeout(() => this._processDialogQueue(), 100);
         }
     }
-
+    //@+node:felix.20260322224224.1: *3* _showSaveDialogInternal
     private async _showSaveDialogInternal(dialog: any): Promise<void> {
         const options = dialog.saveDialogOptions;
 
@@ -872,8 +872,7 @@ export class DialogManager {
             setTimeout(() => this._processDialogQueue(), 100);
         }
     }
-
-
+    //@+node:felix.20260322223935.1: *3* _setupFocusTrap
     private _setupFocusTrap(container: HTMLElement): () => void {
         // Get all focusable elements within the container
         const getFocusableElements = (): HTMLElement[] => {
@@ -913,17 +912,21 @@ export class DialogManager {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }
-
+    //@+node:felix.20260322223915.1: *3* _cleanupFocusTrap
     private _cleanupFocusTrap(): void {
         if (this.__activeFocusTrap) {
             this.__activeFocusTrap();
             this.__activeFocusTrap = null;
         }
     }
-
+    //@+node:felix.20260322223859.1: *3* getLastQuickPickInput
     public getLastQuickPickInput(): string | undefined {
         return this.QUICKPICK_DIALOG_INPUT.value;
     }
+    //@-others
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo
