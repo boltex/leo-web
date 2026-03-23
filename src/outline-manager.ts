@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321200500.1: * @file src/outline-manager.ts
+//@+<< imports & annotations >>
+//@+node:felix.20260323010902.1: ** << imports & annotations >>
 import { Constants } from './constants';
 import { Position } from './core/leoNodes';
 import { FlatRowLeo } from './types';
@@ -12,7 +14,9 @@ export type HeadlineFinishedResult = {
     newHeadline: string;
     selection: [number, number, number];
 };
-
+//@-<< imports & annotations >>
+//@+others
+//@+node:felix.20260323010932.1: ** OutlineManager
 /**
  * Outline Manager renders only the visible portion of the tree and provides a responsive UI for headline editing.
  * It receives the flat list of visible nodes (flatRowsLeo) from the controller, which computes it based on the current tree state and user interactions.
@@ -46,18 +50,26 @@ export class OutlineManager {
         this.SPACER = document.getElementById("spacer")!;
         this.HEADLINE_INPUT = document.getElementById("headline-input")! as HTMLInputElement;
         this.HTML_ELEMENT = document.documentElement;
-
     }
 
+
+
+
+    
+
+
+
+    //@+others
+    //@+node:felix.20260323011156.1: *3* setEditFinishedCallback
     public setEditFinishedCallback(callback: (result: HeadlineFinishedResult) => void) {
         this._headlineFinishedCallback = callback;
     }
-
+    //@+node:felix.20260323011149.1: *3* updateNodeIcons
     public updateNodeIcons = () => {
         this.HTML_ELEMENT.setAttribute('data-show-icons', workspace.menu.SHOW_NODE_ICONS.checked ? 'true' : 'false');
         this.renderTree(); // Re-render to apply icon changes
     }
-
+    //@+node:felix.20260323011107.1: *3* openHeadlineInputBox
     /**
      * Open an input box for editing the headline of a node.
      * @param node The Position for which to find corresponding outlive view node.
@@ -201,7 +213,7 @@ export class OutlineManager {
             };
         });
     }
-
+    //@+node:felix.20260323011044.1: *3* renderTree
     public renderTree = () => {
         const OUTLINE_PANE: HTMLElement = workspace.layout.OUTLINE_PANE;
         if (!this._flatRowsLeo) {
@@ -288,7 +300,7 @@ export class OutlineManager {
             }
         }
     }
-
+    //@+node:felix.20260323011031.1: *3* scrollNodeIntoView
     public scrollNodeIntoView(node: Position) {
         const OUTLINE_PANE = workspace.layout.OUTLINE_PANE;
         if (!this._flatRowsLeo) return; // Not initialized yet
@@ -306,7 +318,7 @@ export class OutlineManager {
             OUTLINE_PANE.scrollTop = nodeOffsetY - viewportHeight + this.ROW_HEIGHT;
         }
     }
-
+    //@+node:felix.20260323011026.1: *3* highlightMatchInHeadline
     public highlightMatchInHeadline(startIndex: number, endIndex: number) {
         // Use the global selectedLabelElement which is already set after selectAndOrToggleAndRedraw
         if (!this.selectedLabelElement) return;
@@ -331,6 +343,11 @@ export class OutlineManager {
             console.error('Error setting headline selection:', e);
         }
     }
+    //@-others
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
+
 //@-leo

@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
+//@+<< imports & annotations >>
+//@+node:felix.20260323005130.1: ** << imports & annotations >>
 import { LeoSearchSettings } from "./types";
 import { workspace } from './workspace';
 
@@ -14,7 +16,9 @@ type searchSettingNames = 'entireOutline' |
     'searchBody' |
     'searchHeadline' |
     'wholeWord';
-
+//@-<< imports & annotations >>
+//@+others
+//@+node:felix.20260323005219.1: ** LogPaneManager
 /**
  * Log Pane contains Log, Find, Nav, and Settings controls. Each with its respective tab at the top. 
  * This class manages the UI controls within this pane, but not the layout of the pane itself (see LayoutManager).
@@ -242,6 +246,8 @@ export class LogPaneManager {
         });
     }
 
+    //@+others
+    //@+node:felix.20260323005956.1: *3* processChange
     private processChange() {
         clearTimeout(this.timer);
         this.dirty = true;
@@ -249,12 +255,11 @@ export class LogPaneManager {
             this.sendSearchConfig();
         }, 300);
     }
-
-
+    //@+node:felix.20260323005953.1: *3* setPostMessageCallback
     public setPostMessageCallback(callback: (message: any) => void) {
         this._postMessageCallback = callback;
     }
-
+    //@+node:felix.20260323005938.1: *3* setSearchSetting
     public setSearchSetting(name: searchSettingNames) {
         // Only for checkboxes and radios:
         // If a checkbox, toggle it. if a radio button, set it to true.
@@ -291,7 +296,7 @@ export class LogPaneManager {
         }
 
     }
-
+    //@+node:felix.20260323005924.1: *3* setSettings
     /**
      * Set this.searchSettings and update the UI DOM controls accordingly. 
      * Called when receiving settings from Leo.
@@ -334,7 +339,7 @@ export class LogPaneManager {
                 break;
         }
     }
-
+    //@+node:felix.20260323005915.1: *3* handleIsTagSwitch
     public handleIsTagSwitch(wasSet: boolean) {
         if (this.searchSettings.isTag) {
 
@@ -357,12 +362,12 @@ export class LogPaneManager {
             this.SEARCH_OPTIONS.disabled = false;
         }
     }
-
+    //@+node:felix.20260323005904.1: *3* sendSearchConfig
     public sendSearchConfig() {
         this.dirty = false;
         this._postMessageCallback?.({ type: 'searchConfig', value: this.searchSettings });
     }
-
+    //@+node:felix.20260323005851.1: *3* navTextChange
     public navTextChange() {
         // cancel timer, reset 'debounced' timer after checks, if still needed
         if (this.navSearchTimer) {
@@ -412,7 +417,7 @@ export class LogPaneManager {
         }, 400); // almost half second
 
     }
-
+    //@+node:felix.20260323005837.1: *3* setFrozen
     public setFrozen(focus: boolean) {
         this.frozen = focus;
         // TODO : REPLACE THIS WITH A CSS VARIABLE TO AVOID DIRECT DOM MANIPULATION IN THIS CLASS
@@ -424,7 +429,7 @@ export class LogPaneManager {
             }
         }
     }
-
+    //@+node:felix.20260323005828.1: *3* resetTagNav
     public resetTagNav() {
         this.navSearchTimer = setTimeout(() => {
             if (this.navTextDirty) {
@@ -437,15 +442,15 @@ export class LogPaneManager {
             this._postMessageCallback?.({ type: 'leoNavTextChange' });
         }, 250); // quarter second
     }
-
+    //@+node:felix.20260323005820.1: *3* showTab
     public showTab(tabName: string) {
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
     }
-
+    //@+node:felix.20260323005812.1: *3* focusFindInput
     public focusFindInput() {
         this.FIND_INPUT.select();
     }
-
+    //@+node:felix.20260323005755.1: *3* addToLogPane
     public addToLogPane(message: string, replace = false) {
         if (replace) {
             this.LOG_CONTENT.textContent = message + (message ? '\n' : '');
@@ -454,7 +459,12 @@ export class LogPaneManager {
         }
         this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
     }
+    //@-others
 
 }
+
+//@-others
+//@@language typescript
+//@@tabwidth -4
 
 //@-leo
