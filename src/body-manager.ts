@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321194813.1: * @file src/body-manager.ts
+//@+<< imports >>
+//@+node:felix.20260322204135.1: ** << imports >>
 import { workspace } from './workspace';
 import { cursorPosition, Selection } from './cursor-position'
 import * as Prism from 'prismjs';
@@ -19,6 +21,9 @@ import 'prismjs/components/prism-rest';
 import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-typescript';
 
+//@-<< imports >>
+//@+others
+//@+node:felix.20260322204256.1: ** Prism Regex Colorization Rules
 Prism.hooks.add('before-tokenize', (env) => {
     env.grammar = {
         // @doc/@ ... @code/@c  →  whole block as comment, delimiters as keywords
@@ -89,6 +94,7 @@ Prism.hooks.add('before-tokenize', (env) => {
     };
 });
 
+//@+node:felix.20260322204358.1: ** Constants
 const LANGUAGE_ALIASES: Record<string, string> = {
     shell: "bash",
     sh: "bash",
@@ -101,7 +107,7 @@ const LANGUAGE_ALIASES: Record<string, string> = {
 const SENTINEL_CLASS = "leo-sentinel";
 const SENTINEL_CHAR = "\u200B";
 const MAX_COLOR_LENGTH = 100000; // Max length of text to apply syntax highlighting to, to avoid performance issues.
-
+//@+node:felix.20260322204416.1: ** BodyManager
 /**
  * Body Manager is responsible for managing the body pane, which includes rendering the body text, handling user interactions
  * (selection, scroll, input), and providing an API for the controller to manipulate the body content and state.
@@ -134,6 +140,9 @@ export class BodyManager {
         }
 
     }
+
+    //@+others
+    //@-others
 
     private _getLineStarts(): number[] {
         if (this._lineStartsDirty) {
@@ -232,7 +241,7 @@ export class BodyManager {
                 clearTimeout(this._changeSelectionTimer);
             }
             this._changeSelectionTimer = setTimeout(() => {
-                const selection = this.getCurrentBodyPaneSelection();
+                const selection = this._getCurrentBodyPaneSelection();
                 if (selection) {
                     callback(selection);
                 }
@@ -332,8 +341,8 @@ export class BodyManager {
         // Convert Selection to DOM Range and set it in the BODY_PANE
         const BODY_PANE = this._bodyPane;
         const { anchor, active } = selection;
-        const anchorInfo = this.positionToNodeOffset(anchor);
-        const activeInfo = this.positionToNodeOffset(active);
+        const anchorInfo = this._positionToNodeOffset(anchor);
+        const activeInfo = this._positionToNodeOffset(active);
 
         const selectionObj = window.getSelection();
         if (selectionObj) {
@@ -357,7 +366,7 @@ export class BodyManager {
         }
     }
 
-    private positionToNodeOffset(position: cursorPosition): { node: Node; offset: number } {
+    private _positionToNodeOffset(position: cursorPosition): { node: Node; offset: number } {
         // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
         const BODY_PANE = this._bodyPane;
         const lineStarts = this._getLineStarts();
@@ -433,7 +442,7 @@ export class BodyManager {
         });
     }
 
-    private getCurrentBodyPaneSelection(): Selection | undefined {
+    private _getCurrentBodyPaneSelection(): Selection | undefined {
         const domSelection = document.getSelection();
         if (!domSelection || domSelection.rangeCount === 0) {
             return undefined;
@@ -455,7 +464,7 @@ export class BodyManager {
         return new Selection(anchorPos, activePos);
     }
 
-    private renderHighlightedBody(text: string, language: string): void {
+    private _renderHighlightedBody(text: string, language: string): void {
 
         if (text.length > MAX_COLOR_LENGTH) {
             this._sentinel = null;
@@ -487,10 +496,10 @@ export class BodyManager {
 
         // Only grab selection if the body pane is focused, otherwise it might be stale and cause issues after re-rendering.
         if (document.activeElement === this._bodyPane) {
-            selection = this.getCurrentBodyPaneSelection();
+            selection = this._getCurrentBodyPaneSelection();
         }
 
-        this.renderHighlightedBody(this.getBody(), language);
+        this._renderHighlightedBody(this.getBody(), language);
 
         if (selection) {
             this.setBodySelection(selection, true);
@@ -500,7 +509,7 @@ export class BodyManager {
     public setBody(text: string, wrap: boolean, language = "plain"): void {
         this.setBodyWrap(wrap);
         this._rebuildLineIndex(text);
-        this.renderHighlightedBody(text, language);
+        this._renderHighlightedBody(text, language);
     }
 
     public setBodyEditable(editable: boolean) {
@@ -525,7 +534,7 @@ export class BodyManager {
         return text.endsWith(SENTINEL_CHAR) ? text.slice(0, -1) : text;
     }
 
-    private getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
+    private _getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
         const SENTINEL_CLASS = "leo-sentinel";
 
         const walker = document.createTreeWalker(
@@ -562,8 +571,8 @@ export class BodyManager {
         if (!BODY_PANE.firstChild) return;
         try {
             const range = document.createRange();
-            const start = this.getTextNodeAtIndex(BODY_PANE, startIndex);
-            const end = this.getTextNodeAtIndex(BODY_PANE, endIndex);
+            const start = this._getTextNodeAtIndex(BODY_PANE, startIndex);
+            const end = this._getTextNodeAtIndex(BODY_PANE, endIndex);
 
             if (!start || !end) {
                 console.warn("Invalid range: could not resolve text nodes");
@@ -582,4 +591,8 @@ export class BodyManager {
     }
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
+
 //@-leo
