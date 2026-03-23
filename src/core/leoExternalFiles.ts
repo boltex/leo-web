@@ -7,7 +7,7 @@ import md5 from 'md5';
 import * as os from 'os';
 import * as g from './leoGlobals';
 import { LeoFrame } from './leoFrame';
-import { Position } from './leoNodes';
+import { Position, VNode } from './leoNodes';
 import { Commands } from './leoCommands';
 import { workspace } from '../workspace';
 import { FileStat } from '../types';
@@ -280,14 +280,16 @@ export class ExternalFilesController {
 
                 // #4565: set all ancestor file nodes dirty and redraw.
                 p.v.setDirty();
+                const to_do_set: Set<VNode> = new Set();
                 for (const p2 of c.all_positions()) {
                     if (p2.isDirty()) {
-                        p2.v.setAllAncestorAtFileNodesDirty();
+                        to_do_set.add(p2.v);
                     }
                 }
+                p.v.setAllAncestorAtFileNodesDirty(to_do_set);
                 c.redraw();
 
-                // ! LEO-WEB : KEEP SELECTION ON CURRENT NODE IF CHILD OF AT-ANY-FILE REFRESHED !
+                // ! LEOJS : KEEP SELECTION ON CURRENT NODE IF CHILD OF AT-ANY-FILE REFRESHED !
                 // TODO : Add config option in Leo for this!
                 if (true) {
                     if (c.positionExists(old_p) && c.p.isAncestorOf(old_p)) {
@@ -295,7 +297,7 @@ export class ExternalFilesController {
                     }
                 }
 
-                // ! LEO-WEB : FORCE GUI REFRESH AFTER A refreshFromDisk COMMAND !
+                // ! LEOJS : FORCE GUI REFRESH AFTER A refreshFromDisk COMMAND !
                 g.app.gui.fullRefresh(true);
             }
         }
