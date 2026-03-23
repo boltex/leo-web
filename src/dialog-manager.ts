@@ -1,7 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321195553.1: * @file src/dialog-manager.ts
 //@+<< imports & annotations >>
-//@+node:felix.20260322223745.1: *3* << imports & annotations >>
+//@+node:felix.20260322223745.1: *2* << imports & annotations >>
 import {
     OpenDialogOptions,
     SaveDialogOptions,
