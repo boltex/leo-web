@@ -52,13 +52,6 @@ export class OutlineManager {
         this.HTML_ELEMENT = document.documentElement;
     }
 
-
-
-
-    
-
-
-
     //@+others
     //@+node:felix.20260323011156.1: *3* setEditFinishedCallback
     public setEditFinishedCallback(callback: (result: HeadlineFinishedResult) => void) {
