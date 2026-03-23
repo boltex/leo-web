@@ -1,15 +1,21 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321195657.1: * @file src/keybindings.ts
+//@+<< imports >>
+//@+node:felix.20260323140207.1: ** << imports >>
 import { Constants } from "./constants";
 import { Keybinding } from "./types";
-
-const CMD = Constants.COMMANDS;
-const FLAGS = Constants.CONTEXT_FLAGS;
+//@-<< imports >>
+//@+others
+//@+node:felix.20260323140218.1: ** Documentation
 
 // Keybinding "enabled flags" are less restrictive than for the menu, 
 // because we dont want to have to wait for flags, and the commands
 // themselves do check for the necessary flags before executing.
 
+//@+node:felix.20260323140223.1: ** Constants
+const CMD = Constants.COMMANDS;
+const FLAGS = Constants.CONTEXT_FLAGS;
+//@+node:felix.20260323140231.1: ** Keybindings
 export const keybindings: Keybinding[] = [
     {
         command: CMD.EXECUTE,
@@ -709,4 +715,7 @@ export const keybindings: Keybinding[] = [
     },
 
 ];
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

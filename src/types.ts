@@ -1,15 +1,14 @@
 //@+leo-ver=5-thin
 //@+node:felix.20251211000618.1: * @file src/types.ts
+//@+<< imports >>
+//@+node:felix.20260323135543.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 // import { RClick } from "./core/mod_scripting";
-
 import { Uri } from "./workspace";
 
 // For now, these imports are commented out until implemented.
 type RClick = any;
-
-//@@language typescript
-//@@tabwidth -4
+//@-<< imports >>
 //@+others
 //@+node:felix.20251214225420.1: ** messageOptions
 export interface MessageOptions {
@@ -599,4 +598,6 @@ export interface QuickPickOptions {
     onDidSelectItem?(item: QuickPickItem | string): any;
 }
 //@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo
