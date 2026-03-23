@@ -3,7 +3,7 @@
 //@+<< imports >>
 //@+node:felix.20260322204135.1: ** << imports >>
 import { workspace } from './workspace';
-import { cursorPosition, Selection } from './cursor-position'
+import { CursorPosition, Selection } from './cursor-position'
 import * as Prism from 'prismjs';
 // Css, Html and XML are supported by default, so we don't need to import them explicitly.
 // See https://prismjs.com/#supported-languages
@@ -168,7 +168,7 @@ export class BodyManager {
         this._lineStartsDirty = false;
     }
     //@+node:felix.20260322210720.1: *3* _offsetToPositionFast
-    private _offsetToPositionFast(offset: number): cursorPosition {
+    private _offsetToPositionFast(offset: number): CursorPosition {
         const lineStarts = this._getLineStarts();
         const safeOffset = Math.max(0, Math.min(offset, this._textLength));
 
@@ -180,7 +180,7 @@ export class BodyManager {
 
             if (lineStarts[mid] <= safeOffset) {
                 if (mid === lineStarts.length - 1 || lineStarts[mid + 1] > safeOffset) {
-                    return new cursorPosition(mid, safeOffset - lineStarts[mid]);
+                    return new CursorPosition(mid, safeOffset - lineStarts[mid]);
                 }
                 low = mid + 1;
             } else {
@@ -188,12 +188,12 @@ export class BodyManager {
             }
         }
 
-        return new cursorPosition(0, safeOffset);
+        return new CursorPosition(0, safeOffset);
     }
     //@+node:felix.20260322210714.1: *3* offsetToPosition
     // Helper method to convert DOM offset to Position
-    private offsetToPosition(offset: number, node: Node | null): cursorPosition {
-        if (!node) return new cursorPosition(0, 0);
+    private offsetToPosition(offset: number, node: Node | null): CursorPosition {
+        if (!node) return new CursorPosition(0, 0);
 
         const totalOffset = this._domPointToTextOffset(node, offset);
         return this._offsetToPositionFast(totalOffset);
@@ -364,7 +364,7 @@ export class BodyManager {
         }
     }
     //@+node:felix.20260322210524.1: *3* _positionToNodeOffset
-    private _positionToNodeOffset(position: cursorPosition): { node: Node; offset: number } {
+    private _positionToNodeOffset(position: CursorPosition): { node: Node; offset: number } {
         // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
         const BODY_PANE = this._bodyPane;
         const lineStarts = this._getLineStarts();

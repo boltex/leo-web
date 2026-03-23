@@ -13,6 +13,8 @@ export class Constants {
     //@+node:felix.20251210234420.3: *3* general constants
     public static NAME: string = "leoWeb";
 
+    public static DEFAULT_WINDOW_TITLE: string = "Leo Editor for the web";
+
     public static VERSION_STATE_KEY: string = "leoWebVersion";
 
     public static FILE_EXTENSION: string = "leo";

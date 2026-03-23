@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321195438.1: * @file src/controller.ts
+//@+<< imports >>
+//@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
 import { ConfigSetting, FlatRowLeo } from "./types";
@@ -10,8 +12,9 @@ import { Constants } from "./constants";
 import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
 import { keybindings } from "./keybindings";
 
-const defaultTitle = "Leo Editor for the web";
-
+//@-<< imports >>
+//@+others
+//@+node:felix.20260322215901.1: ** Controller
 export class Controller {
 
     private _commands: Record<string, (...args: any[]) => any> = {};
@@ -23,16 +26,18 @@ export class Controller {
         workspace.menu.buildMenu(menuData);
         workspace.menu.buildBodyContextMenu(bodyPaneContextMenuData);
         workspace.menu.buildOutlineContextMenu(outlinePaneContextMenuData);
-        workspace.layout.setWindowTitle(defaultTitle)
+        workspace.layout.setWindowTitle(Constants.DEFAULT_WINDOW_TITLE);
         workspace.layout.initializeThemeAndLayout(); // gets ratios from localStorage and applies layout and theme
     }
 
+    //@+others
+    //@+node:felix.20260322222042.1: *3* setCommands
     public setCommands(commands: [string, (...args: any[]) => any][]) {
         for (const [name, func] of commands) {
             this._commands[name] = func;
         }
     }
-
+    //@+node:felix.20260322222039.1: *3* doCommand
     public doCommand(commandName: string, ...args: any[]): any {
         const command = this._commands[commandName];
         if (command) {
@@ -41,14 +46,16 @@ export class Controller {
             console.warn(`Command not found: ${commandName}`);
         }
     }
-
+    //@+node:felix.20260322222300.1: *3* Initialization & Setup
+    //@+others
+    //@+node:felix.20260322222024.1: *4* initializeInteractions
     // * Controller Methods (Initialization & Setup) *
     public initializeInteractions() {
         this.setupEventHandlers();
         this.setupButtonFocusPrevention();
         workspace.layout.setupLastFocusedElementTracking();
     }
-
+    //@+node:felix.20260322222014.1: *4* setupEventHandlers
     private setupEventHandlers() {
         this.setupOutlinePaneHandlers();
         this.setupBodyPaneHandlers();
@@ -60,7 +67,7 @@ export class Controller {
         this.setupConfigSelectors();
         this.setupTopMenuHandlers();
     }
-
+    //@+node:felix.20260322222009.1: *4* setupOutlinePaneHandlers
     private setupOutlinePaneHandlers() {
         const OUTLINE_PANE = workspace.layout.OUTLINE_PANE;
         // Use only mousedown for selection. Otherwise focus out of edit-headline messes with click events. We can still detect double-clicks by checking the event.detail property in the mousedown handler.
@@ -74,7 +81,7 @@ export class Controller {
         OUTLINE_PANE.classList.add('allow-context');
 
     }
-
+    //@+node:felix.20260322222003.1: *4* setupBodyPaneHandlers
     private setupBodyPaneHandlers() {
         const BODY_PANE = workspace.layout.BODY_PANE;
         BODY_PANE.addEventListener('keydown', this.handleBodyPaneKeyDown);
@@ -82,11 +89,11 @@ export class Controller {
         // Add class allow-context to BODY_PANE to allow right-click menu, but prevent it on certain elements if needed by checking event.target in the contextmenu handler
         BODY_PANE.classList.add('allow-context');
     }
-
+    //@+node:felix.20260322221959.1: *4* setupLogPaneHandlers
     private setupLogPaneHandlers() {
         workspace.layout.LOG_PANE.addEventListener('keydown', this.handleLogPaneKeyDown);
     }
-
+    //@+node:felix.20260322221954.1: *4* setupResizerHandlers
     private setupResizerHandlers() {
         const layout = workspace.layout;
         layout.VERTICAL_RESIZER.addEventListener('mousedown', this.startDrag);
@@ -96,7 +103,7 @@ export class Controller {
         layout.CROSS_RESIZER.addEventListener('mousedown', this.startCrossDrag);
         layout.CROSS_RESIZER.addEventListener('touchstart', this.startCrossDrag);
     }
-
+    //@+node:felix.20260322221948.1: *4* setupWindowHandlers
     private setupWindowHandlers() {
         window.addEventListener('resize', utils.throttle(() => workspace.layout.handleWindowResize(), Constants.DRAG_DEBOUNCE_DELAY));
         window.addEventListener('keydown', this.handleGlobalKeyDown);
@@ -112,7 +119,7 @@ export class Controller {
             }
         });
     }
-
+    //@+node:felix.20260322221923.1: *4* setupButtonHandlers
     private setupButtonHandlers() {
         const logPane = workspace.logPane;
         const menu = workspace.menu;
@@ -138,8 +145,7 @@ export class Controller {
         // logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') }); // Maybe add undo tab functionality later
         logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab('settings') });
     }
-
-
+    //@+node:felix.20260322221915.1: *4* setupButtonFocusPrevention
     private setupButtonFocusPrevention() {
         const actionButtons = document.querySelectorAll('.action-button');
         actionButtons.forEach(button => {
@@ -151,13 +157,13 @@ export class Controller {
             e.preventDefault();
         });
     }
-
+    //@+node:felix.20260322221910.1: *4* setupConfigSelectors
     private setupConfigSelectors() {
         const menu = workspace.menu;
         menu.CHECK_EXTERNAL_FILES.addEventListener('change', this.onDropdownChanged);
         menu.RELOAD_IGNORE_CHANGES.addEventListener('change', this.onDropdownChanged);
     }
-
+    //@+node:felix.20260322221852.1: *4* onDropdownChanged
     private onDropdownChanged = (e: Event) => {
         const element = e.target as HTMLSelectElement;
         if (element) {
@@ -170,7 +176,7 @@ export class Controller {
             g.app.gui.config.setLeoWebSettings(w_changes);
         }
     }
-
+    //@+node:felix.20260322221838.1: *4* setupConfigCheckboxes
     private setupConfigCheckboxes() {
         const menu = workspace.menu;
         menu.SHOW_PREV_NEXT_MARK.addEventListener('change', this.refreshButtonVisibility);
@@ -182,7 +188,7 @@ export class Controller {
         menu.SHOW_NODE_ICONS.addEventListener('change', workspace.outline.updateNodeIcons);
         menu.SHOW_COLLAPSE_ALL.addEventListener('change', this.refreshButtonVisibility);
     }
-
+    //@+node:felix.20260322221812.1: *4* refreshButtonVisibility
     private refreshButtonVisibility = () => {
         let hasMarked = false;
         let hasHistory = false;
@@ -193,7 +199,7 @@ export class Controller {
         workspace.menu.updateButtonVisibility(hasMarked, hasHistory);
 
     }
-
+    //@+node:felix.20260322221747.1: *4* setupTopMenuHandlers
     private setupTopMenuHandlers() {
         const menu = workspace.menu;
         const layout = workspace.layout;
@@ -329,7 +335,7 @@ export class Controller {
         });
 
     }
-
+    //@+node:felix.20260322221701.1: *4* setupDocumentTabsAndHandlers
     public setupDocumentTabsAndHandlers() {
         // The opened documents are in g.app.windowList.
         // The selected document index is this.frameIndex,
@@ -346,7 +352,7 @@ export class Controller {
         workspace.menu.clearDocumentTabs();
 
         if (g.app.windowList.length === 0) {
-            layout.setWindowTitle(defaultTitle);
+            layout.setWindowTitle(Constants.DEFAULT_WINDOW_TITLE);
         }
 
         // call view to create the document-tabs, and setup handlers
@@ -403,8 +409,10 @@ export class Controller {
             });
         }
     }
-
-    // * Controller Methods (Event Handlers) *
+    //@-others
+    //@+node:felix.20260322222433.1: *3* Event Handlers
+    //@+others
+    //@+node:felix.20260322221549.1: *4* initialize
     public async initialize() {
         // outline-find-container is initially hidden to prevent FOUC
         workspace.layout.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
@@ -444,8 +452,7 @@ export class Controller {
         this.initializeInteractions();
         workspace.layout.OUTLINE_PANE.focus();
     }
-
-
+    //@+node:felix.20260322221455.1: *4* handleOutlinePaneMouseDown
     private handleOutlinePaneMouseDown = (e: MouseEvent) => {
         // Check if left mouse button:
         if (e.button === 0) {
@@ -455,7 +462,7 @@ export class Controller {
             // and can call preventDefault to stop text selection on double-click
         }
     }
-
+    //@+node:felix.20260322221442.1: *4* handleOutlinePaneClick
     private handleOutlinePaneClick = (event: MouseEvent) => {
         const outline = workspace.outline;
         const target = event.target as Element;
@@ -489,7 +496,7 @@ export class Controller {
             }
         }
     }
-
+    //@+node:felix.20260322221432.1: *4* handleOutlinePaneDblClick
     private handleOutlinePaneDblClick = (event: MouseEvent) => {
         const outline = workspace.outline;
         const target = event.target as Element;
@@ -509,7 +516,7 @@ export class Controller {
             }
         }
     }
-
+    //@+node:felix.20260322221423.1: *4* handleBodyContextMenu
     private handleBodyContextMenu = (e: MouseEvent) => {
 
         // Note: setupWindowHandlers will have called closeMenusEvent to close other menus automatically
@@ -526,7 +533,7 @@ export class Controller {
         }, 0);
 
     }
-
+    //@+node:felix.20260322221401.1: *4* handleOutlineContextMenu
     private handleOutlineContextMenu = (e: MouseEvent) => {
 
         // Note: setupWindowHandlers will have called closeMenusEvent to close other menus automatically
@@ -559,7 +566,7 @@ export class Controller {
             MENU.style.display = 'block';
         }, Constants.STATES_DEBOUNCE_DELAY);
     }
-
+    //@+node:felix.20260322221338.1: *4* handleOutlinePaneKeyDown
     private handleOutlinePaneKeyDown = (e: KeyboardEvent) => {
 
         // Block if its CTRL+S even if its not enabled 
@@ -577,7 +584,7 @@ export class Controller {
         this.handlePaneKeyDown(e, "outline");
 
     }
-
+    //@+node:felix.20260322221320.1: *4* handleBodyPaneKeyDown
     private handleBodyPaneKeyDown = (e: KeyboardEvent) => {
         // Block if its CTRL+S even if its not enabled 
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
@@ -586,7 +593,7 @@ export class Controller {
 
         this.handlePaneKeyDown(e, "body");
     }
-
+    //@+node:felix.20260322221302.1: *4* handleLogPaneKeyDown
     private handleLogPaneKeyDown = (e: KeyboardEvent) => {
 
         // Block if its CTRL+S even if its not enabled 
@@ -606,7 +613,7 @@ export class Controller {
         this.handlePaneKeyDown(e, "find");
 
     }
-
+    //@+node:felix.20260322221225.1: *4* handlePaneKeyDown
     private handlePaneKeyDown(e: KeyboardEvent, pane: "outline" | "body" | "find"): void {
         // Build key string representation (e.g., "ctrl+shift+q", "shift+alt+left")
         const parts: string[] = [];
@@ -679,7 +686,7 @@ export class Controller {
         }
 
     };
-
+    //@+node:felix.20260322221155.1: *4* handleGlobalKeyDown
     // Global key handlers (work anywhere)
     private handleGlobalKeyDown = (e: KeyboardEvent) => {
 
@@ -699,7 +706,7 @@ export class Controller {
         }
 
     }
-
+    //@+node:felix.20260322221118.1: *4* Primary Drag
     private handleDrag = utils.throttle((e) => {
         const layout = workspace.layout;
         if (layout.currentLayout === 'vertical') {
@@ -753,7 +760,7 @@ export class Controller {
             workspace.outline.renderTree();
         }
     }
-
+    //@+node:felix.20260322221036.1: *4* Secondary Drag
     private handleSecondaryDrag = utils.throttle((e) => {
         const layout = workspace.layout;
 
@@ -810,7 +817,7 @@ export class Controller {
             workspace.outline.renderTree();
         }
     }
-
+    //@+node:felix.20260322220944.1: *4* Cross Drag
     private handleCrossDrag = utils.throttle((e) => {
         const layout = workspace.layout;
 
@@ -888,19 +895,21 @@ export class Controller {
             workspace.outline.renderTree();
         }
     }
-
+    //@+node:felix.20260322220436.1: *4* handle ToggleClick Methods
     private handleLayoutToggleClick = () => {
         workspace.layout.toggleLayout();
     }
+
 
     private handleMenuToggleClick = () => {
         workspace.menu.toggleMenu();
     }
 
+
     private handleThemeToggleClick = () => {
         workspace.layout.toggleTheme();
     }
-
+    //@+node:felix.20260322220332.1: *4* selectAndOrToggleAndRedraw
     private selectAndOrToggleAndRedraw(newSelectedNode: Position | null = null, nodeToToggle: Position | null = null, isCtrlClick: boolean = false) {
         let result: any;
         if (newSelectedNode) {
@@ -926,18 +935,15 @@ export class Controller {
         }
 
     }
-
-    // * Controller Methods (Persistence) *
+    //@-others
+    //@+node:felix.20260322222608.1: *3* Persistence
+    //@+others
+    //@+node:felix.20260322220201.1: *4* saveAllPreferences
     private saveAllPreferences = () => {
         this.saveLayoutPreferences();
         this.saveConfigPreferences();
-        this.saveDocumentStateToLocalStorage();
     }
-
-    private saveDocumentStateToLocalStorage() {
-        // TODO : Implement or remove when the rest of leo's core is integrated in this UI.
-    }
-
+    //@+node:felix.20260322220121.1: *4* saveLayoutPreferences
     private saveLayoutPreferences() {
         const layout = workspace.layout;
         const layoutPreferences = {
@@ -949,7 +955,7 @@ export class Controller {
         };
         utils.safeLocalStorageSet('layoutPreferences', JSON.stringify(layoutPreferences));
     }
-
+    //@+node:felix.20260322220100.1: *4* saveConfigPreferences
     private saveConfigPreferences() {
         const logPane = workspace.logPane;
         const menu = workspace.menu;
@@ -975,7 +981,7 @@ export class Controller {
         };
         utils.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
     }
-
+    //@+node:felix.20260322220049.1: *4* loadConfigPreferences
     private loadConfigPreferences() {
 
         const savedPrefs = utils.safeLocalStorageGet('configPreferences');
@@ -1015,7 +1021,19 @@ export class Controller {
             workspace.outline.updateNodeIcons();
         }
     }
-
+    //@+node:felix.20260322215951.1: *4* getFindScope
+    private getFindScope(): string {
+        let selectedRadioValue = '';
+        const selectedRadio = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
+        if (selectedRadio) {
+            selectedRadioValue = selectedRadio.value;
+        }
+        return selectedRadioValue;
+    }
+    //@-others
+    //@+node:felix.20260322222738.1: *3* Render Tree
+    //@+others
+    //@+node:felix.20260322220022.1: *4* buildRowsRenderTreeLeo
     // * Controller Methods (Finally, the actual render tree building) *
     public buildRowsRenderTreeLeo(): void {
         const outline = workspace.outline;
@@ -1044,7 +1062,7 @@ export class Controller {
             outline.setTreeDataLeo([]);
         }
     }
-
+    //@+node:felix.20260322220006.1: *4* flattenTreeLeo
     public flattenTreeLeo(
         node: Position | null,
         depth = 0,
@@ -1102,15 +1120,13 @@ export class Controller {
         }
         return flatRowsLeo;
     }
-
-    private getFindScope(): string {
-        let selectedRadioValue = '';
-        const selectedRadio = document.querySelector('input[name="find-scope"]:checked') as HTMLInputElement | null;
-        if (selectedRadio) {
-            selectedRadioValue = selectedRadio.value;
-        }
-        return selectedRadioValue;
-    }
+    //@-others
+    //@-others
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
+
+
 //@-leo
