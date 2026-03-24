@@ -8,6 +8,10 @@
       "vh": "@auto README.md"
     },
     {
+      "gnx": "felix.20260323214506.1",
+      "vh": "@auto CHANGELOG.md"
+    },
+    {
       "gnx": "felix.20260321121928.1",
       "vh": "@auto package.json"
     },

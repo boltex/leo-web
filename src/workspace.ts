@@ -1,5 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321201242.1: * @file src/workspace.ts
+//@+<< imports >>
+//@+node:felix.20260323135008.1: ** << imports >>
 import { openDB } from "idb";
 import * as showdown from "showdown";
 import { Controller } from "./controller";
@@ -10,11 +12,13 @@ import { LayoutManager } from "./layout-manager";
 import { LogPaneManager } from "./log-pane-manager";
 import { MenuManager } from "./menu-manager";
 import { OutlineManager } from "./outline-manager";
-
+//@-<< imports >>
+//@+others
+//@+node:felix.20260323135107.1: ** Constants
 const DB_NAME = "leo-workspace";
 const DB_VERSION = 1;
 const STORE_HANDLES = "handles";
-
+//@+node:felix.20260323135126.1: ** openWorkspaceDB
 async function openWorkspaceDB() {
     return openDB(DB_NAME, DB_VERSION, {
         upgrade(db) {
@@ -24,7 +28,7 @@ async function openWorkspaceDB() {
         }
     });
 }
-
+//@+node:felix.20260323135209.1: ** Uri
 export class Uri {
     // Absolute, root-anchored path (e.g., "/folder/sub/file.txt")
     public resolves: string[]; // path segments under workspace root
@@ -64,7 +68,7 @@ export class Uri {
         return new Uri(joined);
     }
 }
-
+//@+node:felix.20260323135240.1: ** Fs
 class Fs {
     private _workspaceDirHandle: FileSystemDirectoryHandle;
 
@@ -158,7 +162,7 @@ class Fs {
         return entries;
     }
 }
-
+//@+node:felix.20260323135303.1: ** Workspace
 class Workspace {
 
     public showdownConverter = new showdown.Converter();
@@ -273,7 +277,9 @@ class Workspace {
     }
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
 
 export let workspace = new Workspace();
-
 //@-leo

@@ -39,6 +39,7 @@ For other usage scenarios, see [other Leo implementations](#other-leo-editor-imp
 - Nav pane
 - \@button pane
 - Undo history pane
+- Abbreviations
 
 ## Contributing
 

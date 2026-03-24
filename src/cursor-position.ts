@@ -1,11 +1,12 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321195525.1: * @file src/cursor-position.ts
-
+//@+others
+//@+node:felix.20260322223041.1: ** CursorPosition
 /**
  * Represents a line and character position, such as the position of the cursor.
  * bodyPosition objects are __immutable__.
  */
-export class cursorPosition {
+export class CursorPosition {
 
     /**
      * The zero-based line value.
@@ -39,7 +40,7 @@ export class cursorPosition {
      * @returns `true` if position is on a smaller line
      * or on the same line on a smaller character.
      */
-    isBefore(other: cursorPosition): boolean {
+    isBefore(other: CursorPosition): boolean {
         if (this.line < other.line) {
             return true;
         }
@@ -56,7 +57,7 @@ export class cursorPosition {
      * @returns `true` if position is on a smaller line
      * or on the same line on a smaller or equal character.
      */
-    isBeforeOrEqual(other: cursorPosition): boolean {
+    isBeforeOrEqual(other: CursorPosition): boolean {
         if (this.line < other.line) {
             return true;
         }
@@ -73,7 +74,7 @@ export class cursorPosition {
      * @returns `true` if position is on a greater line
      * or on the same line on a greater character.
      */
-    isAfter(other: cursorPosition): boolean {
+    isAfter(other: CursorPosition): boolean {
         return !this.isBeforeOrEqual(other);
     }
 
@@ -84,7 +85,7 @@ export class cursorPosition {
      * @returns `true` if position is on a greater line
      * or on the same line on a greater or equal character.
      */
-    isAfterOrEqual(other: cursorPosition): boolean {
+    isAfterOrEqual(other: CursorPosition): boolean {
         return !this.isBefore(other);
     }
 
@@ -94,7 +95,7 @@ export class cursorPosition {
      * @param other A position.
      * @returns `true` if the line and character of both positions are equal.
      */
-    isEqual(other: cursorPosition): boolean {
+    isEqual(other: CursorPosition): boolean {
         return this.line === other.line && this.character === other.character;
     }
 
@@ -106,7 +107,7 @@ export class cursorPosition {
      * a number greater than zero if this position is after the given position, or zero when
      * this and the given position are equal.
      */
-    compareTo(other: cursorPosition): number {
+    compareTo(other: CursorPosition): number {
         if (this.line < other.line) {
             return -1;
         } else if (this.line > other.line) {
@@ -131,7 +132,7 @@ export class cursorPosition {
      * @returns A position which line and character is the sum of the current line and
      * character and the corresponding deltas.
      */
-    translate(lineDelta?: number, characterDelta?: number): cursorPosition {
+    translate(lineDelta?: number, characterDelta?: number): CursorPosition {
         if (lineDelta === null || lineDelta === undefined) {
             lineDelta = 0;
         }
@@ -141,7 +142,7 @@ export class cursorPosition {
         if (lineDelta === 0 && characterDelta === 0) {
             return this;
         }
-        return new cursorPosition(this.line + lineDelta, this.character + characterDelta);
+        return new CursorPosition(this.line + lineDelta, this.character + characterDelta);
     }
 
     /**
@@ -151,7 +152,7 @@ export class cursorPosition {
      * @param character Value that should be used as character value, default is the existing value
      * @returns A position where line and character are replaced by the given values.
      */
-    with(line?: number, character?: number): cursorPosition {
+    with(line?: number, character?: number): CursorPosition {
         if (line === null || line === undefined) {
             line = this.line;
         }
@@ -161,12 +162,11 @@ export class cursorPosition {
         if (line === this.line && character === this.character) {
             return this;
         }
-        return new cursorPosition(line, character);
+        return new CursorPosition(line, character);
     }
 
 }
-
-
+//@+node:felix.20260322223026.1: ** Range
 /**
  * A range represents an ordered pair of two positions.
  * It is guaranteed that start.isBeforeOrEqual(end)
@@ -178,12 +178,12 @@ export class Range {
     /**
      * The start position. It is before or equal to end.
      */
-    readonly start: cursorPosition;
+    readonly start: CursorPosition;
 
     /**
      * The end position. It is after or equal to start.
      */
-    readonly end: cursorPosition;
+    readonly end: CursorPosition;
 
     /**
      * Create a new range from two positions. If `start` is not
@@ -192,7 +192,7 @@ export class Range {
      * @param start A position.
      * @param end A position.
      */
-    constructor(start: cursorPosition, end: cursorPosition);
+    constructor(start: CursorPosition, end: CursorPosition);
 
     /**
      * Create a new range from number coordinates. It is a shorter equivalent of
@@ -205,16 +205,16 @@ export class Range {
      */
     constructor(startLine: number, startCharacter: number, endLine: number, endCharacter: number);
 
-    constructor(startOrLine: cursorPosition | number, endOrCharacter: cursorPosition | number, endLine?: number, endCharacter?: number) {
-        let start: cursorPosition;
-        let end: cursorPosition;
+    constructor(startOrLine: CursorPosition | number, endOrCharacter: CursorPosition | number, endLine?: number, endCharacter?: number) {
+        let start: CursorPosition;
+        let end: CursorPosition;
 
         if (typeof startOrLine === 'number' && typeof endOrCharacter === 'number' &&
             typeof endLine === 'number' && typeof endCharacter === 'number') {
             // constructor(startLine: number, startCharacter: number, endLine: number, endCharacter: number)
-            start = new cursorPosition(startOrLine, endOrCharacter);
-            end = new cursorPosition(endLine, endCharacter);
-        } else if (startOrLine instanceof cursorPosition && endOrCharacter instanceof cursorPosition) {
+            start = new CursorPosition(startOrLine, endOrCharacter);
+            end = new CursorPosition(endLine, endCharacter);
+        } else if (startOrLine instanceof CursorPosition && endOrCharacter instanceof CursorPosition) {
             // constructor(start: Position, end: Position)
             start = startOrLine;
             end = endOrCharacter;
@@ -253,10 +253,10 @@ export class Range {
      * @returns `true` if the position or range is inside or equal
      * to this range.
      */
-    contains(positionOrRange: cursorPosition | Range): boolean {
+    contains(positionOrRange: CursorPosition | Range): boolean {
         if (positionOrRange instanceof Range) {
             return this.contains(positionOrRange.start) && this.contains(positionOrRange.end);
-        } else if (positionOrRange instanceof cursorPosition) {
+        } else if (positionOrRange instanceof CursorPosition) {
             return positionOrRange.isAfterOrEqual(this.start) && positionOrRange.isBeforeOrEqual(this.end);
         }
         return false;
@@ -310,7 +310,7 @@ export class Range {
      * @returns A range derived from this range with the given start and end position.
      * If start and end are not different `this` range will be returned.
      */
-    with(start?: cursorPosition, end?: cursorPosition): Range {
+    with(start?: CursorPosition, end?: CursorPosition): Range {
         if (start === null || start === undefined) {
             start = this.start;
         }
@@ -324,7 +324,7 @@ export class Range {
     }
 
 }
-
+//@+node:felix.20260322223009.1: ** Selection
 /**
  * Represents a text selection in an editor.
  */
@@ -334,13 +334,13 @@ export class Selection extends Range {
      * The position at which the selection starts.
      * This position might be before or after active.
      */
-    anchor: cursorPosition;
+    anchor: CursorPosition;
 
     /**
      * The position of the cursor.
      * This position might be before or after anchor.
      */
-    active: cursorPosition;
+    active: CursorPosition;
 
     /**
      * Create a selection from two positions.
@@ -348,7 +348,7 @@ export class Selection extends Range {
      * @param anchor A position.
      * @param active A position.
      */
-    constructor(anchor: cursorPosition, active: cursorPosition);
+    constructor(anchor: CursorPosition, active: CursorPosition);
 
     /**
      * Create a selection from four coordinates.
@@ -360,16 +360,16 @@ export class Selection extends Range {
      */
     constructor(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number);
 
-    constructor(anchorOrLine: cursorPosition | number, activeOrCharacter: cursorPosition | number, activeLine?: number, activeCharacter?: number) {
-        let anchor: cursorPosition;
-        let active: cursorPosition;
+    constructor(anchorOrLine: CursorPosition | number, activeOrCharacter: CursorPosition | number, activeLine?: number, activeCharacter?: number) {
+        let anchor: CursorPosition;
+        let active: CursorPosition;
 
         if (typeof anchorOrLine === 'number' && typeof activeOrCharacter === 'number' &&
             typeof activeLine === 'number' && typeof activeCharacter === 'number') {
             // constructor(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number)
-            anchor = new cursorPosition(anchorOrLine, activeOrCharacter);
-            active = new cursorPosition(activeLine, activeCharacter);
-        } else if (anchorOrLine instanceof cursorPosition && activeOrCharacter instanceof cursorPosition) {
+            anchor = new CursorPosition(anchorOrLine, activeOrCharacter);
+            active = new CursorPosition(activeLine, activeCharacter);
+        } else if (anchorOrLine instanceof CursorPosition && activeOrCharacter instanceof CursorPosition) {
             // constructor(anchor: Position, active: Position)
             anchor = anchorOrLine;
             active = activeOrCharacter;
@@ -391,4 +391,7 @@ export class Selection extends Range {
         return this.anchor === this.end;
     }
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

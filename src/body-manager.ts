@@ -1,7 +1,9 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321194813.1: * @file src/body-manager.ts
+//@+<< imports >>
+//@+node:felix.20260322204135.1: ** << imports >>
 import { workspace } from './workspace';
-import { cursorPosition, Selection } from './cursor-position'
+import { CursorPosition, Selection } from './cursor-position'
 import * as Prism from 'prismjs';
 // Css, Html and XML are supported by default, so we don't need to import them explicitly.
 // See https://prismjs.com/#supported-languages
@@ -19,6 +21,9 @@ import 'prismjs/components/prism-rest';
 import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-typescript';
 
+//@-<< imports >>
+//@+others
+//@+node:felix.20260322204256.1: ** Prism Regex Colorization Rules
 Prism.hooks.add('before-tokenize', (env) => {
     env.grammar = {
         // @doc/@ ... @code/@c  →  whole block as comment, delimiters as keywords
@@ -89,6 +94,7 @@ Prism.hooks.add('before-tokenize', (env) => {
     };
 });
 
+//@+node:felix.20260322204358.1: ** Constants
 const LANGUAGE_ALIASES: Record<string, string> = {
     shell: "bash",
     sh: "bash",
@@ -101,7 +107,7 @@ const LANGUAGE_ALIASES: Record<string, string> = {
 const SENTINEL_CLASS = "leo-sentinel";
 const SENTINEL_CHAR = "\u200B";
 const MAX_COLOR_LENGTH = 100000; // Max length of text to apply syntax highlighting to, to avoid performance issues.
-
+//@+node:felix.20260322204416.1: ** BodyManager
 /**
  * Body Manager is responsible for managing the body pane, which includes rendering the body text, handling user interactions
  * (selection, scroll, input), and providing an API for the controller to manipulate the body content and state.
@@ -135,6 +141,8 @@ export class BodyManager {
 
     }
 
+    //@+others
+    //@+node:felix.20260322210727.1: *3* _getLineStarts
     private _getLineStarts(): number[] {
         if (this._lineStartsDirty) {
             const text = this.getBody();
@@ -148,7 +156,7 @@ export class BodyManager {
         }
         return this._lineStarts;
     }
-
+    //@+node:felix.20260322210724.1: *3* _rebuildLineIndex
     private _rebuildLineIndex(text: string): void {
         this._lineStarts = [0];
         this._textLength = text.length;
@@ -159,8 +167,8 @@ export class BodyManager {
         }
         this._lineStartsDirty = false;
     }
-
-    private _offsetToPositionFast(offset: number): cursorPosition {
+    //@+node:felix.20260322210720.1: *3* _offsetToPositionFast
+    private _offsetToPositionFast(offset: number): CursorPosition {
         const lineStarts = this._getLineStarts();
         const safeOffset = Math.max(0, Math.min(offset, this._textLength));
 
@@ -172,7 +180,7 @@ export class BodyManager {
 
             if (lineStarts[mid] <= safeOffset) {
                 if (mid === lineStarts.length - 1 || lineStarts[mid + 1] > safeOffset) {
-                    return new cursorPosition(mid, safeOffset - lineStarts[mid]);
+                    return new CursorPosition(mid, safeOffset - lineStarts[mid]);
                 }
                 low = mid + 1;
             } else {
@@ -180,26 +188,25 @@ export class BodyManager {
             }
         }
 
-        return new cursorPosition(0, safeOffset);
+        return new CursorPosition(0, safeOffset);
     }
-
+    //@+node:felix.20260322210714.1: *3* offsetToPosition
     // Helper method to convert DOM offset to Position
-    private offsetToPosition(offset: number, node: Node | null): cursorPosition {
-        if (!node) return new cursorPosition(0, 0);
+    private offsetToPosition(offset: number, node: Node | null): CursorPosition {
+        if (!node) return new CursorPosition(0, 0);
 
         const totalOffset = this._domPointToTextOffset(node, offset);
         return this._offsetToPositionFast(totalOffset);
 
     }
-
+    //@+node:felix.20260322210659.1: *3* _domPointToTextOffset
     private _domPointToTextOffset(node: Node, offset: number): number {
         const range = document.createRange();
         range.setStart(this._bodyPane, 0);
         range.setEnd(node, offset);
         return range.toString().length;
     }
-
-
+    //@+node:felix.20260322210656.1: *3* _ensureSentinel
     private _ensureSentinel(): void {
         if (!this._sentinel) {
             this._sentinel = document.createElement("span");
@@ -209,7 +216,7 @@ export class BodyManager {
         }
         this._bodyPane.appendChild(this._sentinel);
     }
-
+    //@+node:felix.20260322210629.1: *3* setChangeTextEditorSelectionCallback
     public setChangeTextEditorSelectionCallback(callback: (selection: Selection) => void) {
         const handleSelectionChange = () => {
             if (this._probingRect) return;
@@ -232,7 +239,7 @@ export class BodyManager {
                 clearTimeout(this._changeSelectionTimer);
             }
             this._changeSelectionTimer = setTimeout(() => {
-                const selection = this.getCurrentBodyPaneSelection();
+                const selection = this._getCurrentBodyPaneSelection();
                 if (selection) {
                     callback(selection);
                 }
@@ -243,7 +250,7 @@ export class BodyManager {
         // Listen on document, not on BODY_PANE
         document.addEventListener('selectionchange', handleSelectionChange);
     }
-
+    //@+node:felix.20260322210624.1: *3* setCtrlClickLinkCallback
     public setCtrlClickLinkCallback(
         callback: (link: string, type: 'none' | 'url' | 'unl-gnx' | 'unl-headline' | 'unl-gnxonly') => void
     ) {
@@ -270,7 +277,7 @@ export class BodyManager {
             callback(link, type);
         });
     }
-
+    //@+node:felix.20260322210607.1: *3* _correctCaretScroll
     private _correctCaretScroll(): void {
         const sel = window.getSelection();
         if (!sel || sel.rangeCount === 0) return;
@@ -310,7 +317,7 @@ export class BodyManager {
         }
 
     }
-
+    //@+node:felix.20260322210550.1: *3* setChangeTextEditorScrollCallback
     public setChangeTextEditorScrollCallback(callback: (event: number) => void) {
         this._bodyPane.addEventListener('scroll', (e) => {
             if (this._changeScrollTimer) {
@@ -323,17 +330,17 @@ export class BodyManager {
             }, 100); // debounce delay in ms
         });
     }
-
+    //@+node:felix.20260322210546.1: *3* setBodyScroll
     public setBodyScroll(scroll: number) {
         this._bodyPane.scrollTop = scroll;
     }
-
+    //@+node:felix.20260322210543.1: *3* setBodySelection
     public setBodySelection(selection: Selection, scrollSelectionIntoView: boolean = false) {
         // Convert Selection to DOM Range and set it in the BODY_PANE
         const BODY_PANE = this._bodyPane;
         const { anchor, active } = selection;
-        const anchorInfo = this.positionToNodeOffset(anchor);
-        const activeInfo = this.positionToNodeOffset(active);
+        const anchorInfo = this._positionToNodeOffset(anchor);
+        const activeInfo = this._positionToNodeOffset(active);
 
         const selectionObj = window.getSelection();
         if (selectionObj) {
@@ -356,8 +363,8 @@ export class BodyManager {
             }
         }
     }
-
-    private positionToNodeOffset(position: cursorPosition): { node: Node; offset: number } {
+    //@+node:felix.20260322210524.1: *3* _positionToNodeOffset
+    private _positionToNodeOffset(position: CursorPosition): { node: Node; offset: number } {
         // Convert body.Position (line/character) to a DOM node and offset within BODY_PANE
         const BODY_PANE = this._bodyPane;
         const lineStarts = this._getLineStarts();
@@ -400,7 +407,7 @@ export class BodyManager {
         // Fallback to the end of BODY_PANE
         return { node: BODY_PANE, offset: BODY_PANE.childNodes.length };
     }
-
+    //@+node:felix.20260322210506.1: *3* setEditorTouchedCallback
     public setEditorTouchedCallback(callback: () => void) {
         const BODY_PANE = this._bodyPane;
 
@@ -426,14 +433,14 @@ export class BodyManager {
         });
 
     }
-
+    //@+node:felix.20260322210502.1: *3* setBodyFocusOutCallback
     public setBodyFocusOutCallback(callback: () => void) {
         this._bodyPane.addEventListener('blur', () => {
             callback();
         });
     }
-
-    private getCurrentBodyPaneSelection(): Selection | undefined {
+    //@+node:felix.20260322210443.1: *3* _getCurrentBodyPaneSelection
+    private _getCurrentBodyPaneSelection(): Selection | undefined {
         const domSelection = document.getSelection();
         if (!domSelection || domSelection.rangeCount === 0) {
             return undefined;
@@ -454,8 +461,8 @@ export class BodyManager {
 
         return new Selection(anchorPos, activePos);
     }
-
-    private renderHighlightedBody(text: string, language: string): void {
+    //@+node:felix.20260322210437.1: *3* _renderHighlightedBody
+    private _renderHighlightedBody(text: string, language: string): void {
 
         if (text.length > MAX_COLOR_LENGTH) {
             this._sentinel = null;
@@ -481,28 +488,28 @@ export class BodyManager {
 
         this._ensureSentinel();
     }
-
+    //@+node:felix.20260322210418.1: *3* setBodyLanguage
     public setBodyLanguage(language: string): void {
         let selection;
 
         // Only grab selection if the body pane is focused, otherwise it might be stale and cause issues after re-rendering.
         if (document.activeElement === this._bodyPane) {
-            selection = this.getCurrentBodyPaneSelection();
+            selection = this._getCurrentBodyPaneSelection();
         }
 
-        this.renderHighlightedBody(this.getBody(), language);
+        this._renderHighlightedBody(this.getBody(), language);
 
         if (selection) {
             this.setBodySelection(selection, true);
         }
     }
-
+    //@+node:felix.20260322210404.1: *3* setBody
     public setBody(text: string, wrap: boolean, language = "plain"): void {
         this.setBodyWrap(wrap);
         this._rebuildLineIndex(text);
-        this.renderHighlightedBody(text, language);
+        this._renderHighlightedBody(text, language);
     }
-
+    //@+node:felix.20260322210351.1: *3* setBodyEditable
     public setBodyEditable(editable: boolean) {
         const BODY_PANE = this._bodyPane;
         if (editable) {
@@ -515,17 +522,17 @@ export class BodyManager {
             BODY_PANE.contentEditable = "false";
         }
     }
-
+    //@+node:felix.20260322210327.1: *3* setBodyWrap
     public setBodyWrap(wrap: boolean) {
         this.HTML_ELEMENT.setAttribute('data-body-wrap', wrap ? 'true' : 'false');
     }
-
+    //@+node:felix.20260322210322.1: *3* getBody
     public getBody(): string {
         const text = this._bodyPane.textContent ?? "";
         return text.endsWith(SENTINEL_CHAR) ? text.slice(0, -1) : text;
     }
-
-    private getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
+    //@+node:felix.20260322210318.1: *3* _getTextNodeAtIndex
+    private _getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
         const SENTINEL_CLASS = "leo-sentinel";
 
         const walker = document.createTreeWalker(
@@ -555,15 +562,15 @@ export class BodyManager {
         }
         return null;
     }
-
+    //@+node:felix.20260322205944.1: *3* highlightMatchInBody
     public highlightMatchInBody(startIndex: number, endIndex: number) {
         const BODY_PANE = this._bodyPane;
         // The body pane content is set directly as textContent, so it's a single text node
         if (!BODY_PANE.firstChild) return;
         try {
             const range = document.createRange();
-            const start = this.getTextNodeAtIndex(BODY_PANE, startIndex);
-            const end = this.getTextNodeAtIndex(BODY_PANE, endIndex);
+            const start = this._getTextNodeAtIndex(BODY_PANE, startIndex);
+            const end = this._getTextNodeAtIndex(BODY_PANE, endIndex);
 
             if (!start || !end) {
                 console.warn("Invalid range: could not resolve text nodes");
@@ -580,6 +587,10 @@ export class BodyManager {
             console.error('Error setting body selection:', e);
         }
     }
+    //@-others
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

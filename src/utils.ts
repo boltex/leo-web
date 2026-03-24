@@ -1,11 +1,10 @@
 //@+leo-ver=5-thin
 //@+node:felix.20251211000427.1: * @file src/utils.ts
-
+//@+<< imports >>
+//@+node:felix.20260323135439.1: ** << imports >>
 import { Uri, workspace } from "./workspace";
 import { Position } from "./core/leoNodes";
-
-//@@language typescript
-//@@tabwidth -4
+//@-<< imports >>
 //@+others
 //@+node:felix.20251211212644.1: ** throttle
 /**
@@ -372,4 +371,6 @@ export function setContext(p_key: string, p_value: any): Thenable<unknown> {
 }
 
 //@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

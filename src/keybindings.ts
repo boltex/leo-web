@@ -1,15 +1,21 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321195657.1: * @file src/keybindings.ts
+//@+<< imports >>
+//@+node:felix.20260323140207.1: ** << imports >>
 import { Constants } from "./constants";
 import { Keybinding } from "./types";
-
-const CMD = Constants.COMMANDS;
-const FLAGS = Constants.CONTEXT_FLAGS;
+//@-<< imports >>
+//@+others
+//@+node:felix.20260323140218.1: ** Documentation
 
 // Keybinding "enabled flags" are less restrictive than for the menu, 
 // because we dont want to have to wait for flags, and the commands
 // themselves do check for the necessary flags before executing.
 
+//@+node:felix.20260323140223.1: ** Constants
+const CMD = Constants.COMMANDS;
+const FLAGS = Constants.CONTEXT_FLAGS;
+//@+node:felix.20260323140231.1: ** Keybindings
 export const keybindings: Keybinding[] = [
     {
         command: CMD.EXECUTE,
@@ -45,12 +51,12 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.SHOW_OUTLINE,
-        key: "ctrl+t", // BROWSER MAY INTERCEPT! TODO: test if browser intercepts on all platforms
+        key: "ctrl+t", // BROWSER MAY INTERCEPT!
         body: true
     },
     {
         command: CMD.SHOW_BODY,
-        key: "ctrl+t", // BROWSER MAY INTERCEPT! TODO: test if browser intercepts on all platforms
+        key: "ctrl+t", // BROWSER MAY INTERCEPT!
         outline: true
     },
     {
@@ -180,7 +186,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.EXTRACT_NAMES,
-        key: "ctrl+shift+n",
+        key: "ctrl+shift+n", // Maybe browser will intercept?
         mac: "cmd+shift+n",
         outline: true,
         body: true,
@@ -289,7 +295,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.PROMOTE_SELECTION,
-        key: "ctrl+[", // TODO : test if browser intercepts on all platforms
+        key: "ctrl+[", // TODO : test if browser intercepts
         // mac: "cmd+[",
         // linux: "ctrl+[",
         outline: true,
@@ -299,7 +305,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.DEMOTE_SELECTION,
-        key: "ctrl+]", // TODO : test if browser intercepts on all platforms
+        key: "ctrl+]", // TODO : test if browser intercepts
         // mac: "cmd+]",
         // linux: "ctrl+]",
         outline: true,
@@ -351,9 +357,9 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.CLONE_SELECTION,
         key: "ctrl+`",
-        // win: "ctrl+oem_3",  // TODO : test if browser intercepts on all platforms
-        // linux: "ctrl+`",  // TODO : test if browser intercepts on all platforms
-        // mac: "cmd+`",  // TODO : test if browser intercepts on all platforms
+        // win: "ctrl+oem_3",
+        // linux: "ctrl+`",
+        // mac: "cmd+`",
         outline: true,
         body: true,
         find: true,
@@ -709,4 +715,7 @@ export const keybindings: Keybinding[] = [
     },
 
 ];
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

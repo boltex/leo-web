@@ -1,9 +1,12 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321200216.1: * @file src/menu-manager.ts
+//@+<< imports >>
+//@+node:felix.20260323010551.1: ** << imports >>
 import { workspace } from './workspace';
-
 import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
-
+//@-<< imports >>
+//@+others
+//@+node:felix.20260323010625.1: ** MenuManager
 /**
  * Manages the UI controls that launch commands or change settings. 
  * (see LayoutManager for layout related controls and LogPaneManager for log, find, nav, and settings tabs.)
@@ -120,6 +123,8 @@ export class MenuManager {
         });
     }
 
+    //@+others
+    //@+node:felix.20260323010814.1: *3* Context Menus
     private buildContextMenu(container: HTMLElement, entries: ContextMenuEntry[]) {
         container.innerHTML = '';
         const ul = document.createElement('ul');
@@ -213,7 +218,7 @@ export class MenuManager {
     public refreshOutlineContextMenu(entries: ContextMenuEntry[]) {
         this.refreshContextMenu(entries);
     }
-
+    //@+node:felix.20260323010803.1: *3* Top Menu
     public buildMenu(entries: MenuEntry[], level = 0) {
         const menu = level === 0 ? this.TOP_MENU : document.createElement("div");
 
@@ -564,8 +569,7 @@ export class MenuManager {
         workspace.layout.updateOutlineContainerSize();
         workspace.layout.positionCrossDragger();
     }
-
-
+    //@+node:felix.20260323010746.1: *3* Document Tabs
     public clearDocumentTabs() {
         this.DOCUMENT_TABS.innerHTML = "";
     }
@@ -582,8 +586,7 @@ export class MenuManager {
         tab.appendChild(closeBtn);
         return tab;
     }
-
-    // * Button states
+    //@+node:felix.20260323010715.1: *3* Buttons State and Visibility
     public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean) => {
         this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked);
         this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked);
@@ -629,7 +632,6 @@ export class MenuManager {
         this.NEXT_BTN.disabled = !next;
     }
 
-    // * UI utilities
     public toggleButtonVisibility(button1: HTMLElement | null, button2: HTMLElement | null, isVisible: boolean) {
         if (button1) {
             button1.classList.toggle('hidden-button', !isVisible);
@@ -671,6 +673,10 @@ export class MenuManager {
             this.BUTTON_CONTAINER.classList.add('hidden');
         }, 1500);
     }
+    //@-others
 
 }
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

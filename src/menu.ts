@@ -1,20 +1,26 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260321200436.1: * @file src/menu.ts
+//@+<< imports >>
+//@+node:felix.20260323132739.1: ** << imports >>
 import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
 import { Constants } from "./constants";
-
-const CMD = Constants.COMMANDS;
-const FLAGS = Constants.CONTEXT_FLAGS;
+//@-<< imports >>
+//@+others
+//@+node:felix.20260323134913.1: ** Documentation
 
 // Menu "enabled flags" are more restrictive than for keybindings, because we want 
 // to hide, or disable menu entries until they are actually usable, to inform users about when
 // they can use them, even though the commands themselves also check for the necessary flags before executing.
 
+//@+node:felix.20260323132814.1: ** Constants
+const CMD = Constants.COMMANDS;
+const FLAGS = Constants.CONTEXT_FLAGS;
+//@+node:felix.20260323132852.1: ** Body Context Menu
 export const bodyPaneContextMenuData: ContextMenuEntry[] = [
     { label: "Undo", action: CMD.UNDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO], keyboardShortcut: "Ctrl+Z" },
     { label: "Redo", action: CMD.REDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO], keyboardShortcut: "Ctrl+Shift+Z" },
     { label: "", kind: QuickPickItemKind.Separator },
-    { label: "Extract", action: CMD.EXTRACT, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+    { label: "Extract", action: CMD.EXTRACT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+D" },
     { label: "Extract-Names", action: CMD.EXTRACT_NAMES, enabledFlagsSet: [FLAGS.TREE_OPENED] },
     { label: "Find-Def", action: CMD.FIND_DEF, enabledFlagsSet: [FLAGS.TREE_OPENED] },
     { label: "", kind: QuickPickItemKind.Separator },
@@ -23,7 +29,7 @@ export const bodyPaneContextMenuData: ContextMenuEntry[] = [
     { label: "Paste", action: CMD.PASTE_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+V" },
     { label: "Select All", action: CMD.SELECT_ALL_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+A" },
 ];
-
+//@+node:felix.20260323132915.1: ** Outline Context Menu
 export const outlinePaneContextMenuData: ContextMenuEntry[] = [
     { label: "Undo", action: CMD.UNDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO], keyboardShortcut: "Ctrl+Z" },
     { label: "Redo", action: CMD.REDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO], keyboardShortcut: "Ctrl+Shift+Z" },
@@ -44,7 +50,7 @@ export const outlinePaneContextMenuData: ContextMenuEntry[] = [
     // Todo: open URL if @url or UNL node.
     { label: "Refresh From Disk", action: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_ATFILE] },
 ];
-
+//@+node:felix.20260323132948.1: ** Top Menu
 export const menuData: MenuEntry[] = [
     {
         label: "File",
@@ -135,7 +141,7 @@ export const menuData: MenuEntry[] = [
                     {
                         label: "Create Sections", entries: [
                             { label: "Extract-Names", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT_NAMES },
-                            { label: "Extract", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT },
+                            { label: "Extract", enabledFlagsSet: [FLAGS.TREE_OPENED], action: CMD.EXTRACT, keyboardShortcut: "Ctrl+Shift+D" },
                         ]
                     },
                     {
@@ -422,4 +428,7 @@ export const menuData: MenuEntry[] = [
         ],
     },
 ];
+//@-others
+//@@language typescript
+//@@tabwidth -4
 //@-leo

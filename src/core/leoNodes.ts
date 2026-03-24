@@ -3707,24 +3707,32 @@ export class VNode {
      * Modified by EKR.
      * Translated by Félix Malboeuf
      */
-    public setAllAncestorAtFileNodesDirty(): void {
+    public setAllAncestorAtFileNodesDirty(to_do_set?: Set<VNode>): void {
         const v: VNode = this;
-        const hiddenRootVnode: VNode = v.context.hiddenRootNode;
+        // Init seen and to_do_list.
+        const seen: Set<VNode> = new Set([v.context.hiddenRootNode]);
+        let to_do_list: VNode[] = to_do_set ? Array.from(to_do_set) : [v];
 
-        function* v_and_parents(v: VNode): Generator<VNode> {
-            if (v.fileIndex !== hiddenRootVnode.fileIndex) {
-                yield v;
-                for (let parent_v of v.parents) {
-                    yield* v_and_parents(parent_v);
-                }
+        if (to_do_set) {
+            for (const v2 of to_do_set) {
+                to_do_list.push(...v2.parents);
             }
         }
+        to_do_list = Array.from(new Set(to_do_list));
 
-        // There is no harm in calling v2.setDirty redundantly.
-
-        for (let v2 of v_and_parents(v)) {
+        // The main loop.
+        while (to_do_list.length > 0) {
+            const v2 = to_do_list.pop()!;
+            seen.add(v2);
             if (v2.isAnyAtFileNode()) {
                 v2.setDirty();
+            }
+            // Scan all parents of v2, even if v2 is and @<file> node.
+            // Doing so maintains compatibility with legacy code.
+            for (const parent_v of v2.parents) {
+                if (!seen.has(parent_v)) {
+                    to_do_list.push(parent_v);
+                }
             }
         }
     }
