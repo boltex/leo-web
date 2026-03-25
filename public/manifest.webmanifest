@@ -1,11 +1,13 @@
 {
-  "id": "./",
+  "id": "/leo-web/",
   "short_name": "Leo-Web",
   "name": "Leo Editor for the Web",
   "description": "Leo Editor, the scriptable outliner-based editor, running in your browser.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "theme_color": "#555555",
+  "background_color": "#b84b05",
   "icons": [
     {
       "src": "icon-192.png",
