@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.2
+
+- Improved manifest with theme/background colors and to support more platforms.
+
 ## 1.0.1
 
 - Fixed 'extract' command to limit finding 'defs' to first line for javascript/typescript.
