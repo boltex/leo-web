@@ -2,7 +2,8 @@
 
 ## 1.0.2
 
-- Improved manifest with theme/background colors and to support more platforms.
+- Modified webmanifest file to set app id to 'leo-web', to offer 'install as app', theme/background colors and to support more platforms.
+- Improved external file refreshing logic involving clones as per Leo's #4565 
 
 ## 1.0.1
 
