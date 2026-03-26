@@ -26,6 +26,8 @@ For other usage scenarios, see [other Leo implementations](#other-leo-editor-imp
 
 ## Limitations
 
+- Unlike LeoInteg & LeoJS, Leo-Web cannot access your ~/.leo folder nor its 'myLeoSettings.leo' file. It can only access your chosen workspace.
+- A myLeoSettings file can still be used if it is located at the root of your chosen workspace. (_Leo-Web will generate one for you if absent with the 'open myLeoSettings' command_)
 - U.I. related settings are accessed in a tab from the log pane instead of the usual 'LeoSettings/myLeoSettings' files.
 - To keep Leo-Web light and fast, it does not support .db files.
 - Running in the browser, Leo scripts cannot launch OS shell commands.
