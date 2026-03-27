@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.5
+
+- ...
+
 ## 1.0.4
 
 - Changed keybinding for clone, promote and demote with positional codes.
