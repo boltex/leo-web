@@ -84,10 +84,10 @@
                 <div id="log-pane-tabs">
                     <div class="tab" id="log-tab" title="Log Pane">Log</div>
                     <div class="tab" id="find-tab" title="Find Pane">Find</div>
-                    <!-- Future possible tab -->
                     <div class="tab" id="nav-tab" title="Nav Pane">Nav</div>
-                    <!-- <div class="tab" id="undo-tab" title="Undo Pane">Undo</div> -->
+                    <div class="tab" id="undo-tab" title="Undo Pane">Undo</div>
                     <div class="tab" id="settings-tab" title="Settings Pane">Settings</div>
+                    <div class="tab" id="help-tab" title="Help Pane">Help</div>
                 </div>
 
                 <!--@-<< Log Pane Tabs >>-->
@@ -95,7 +95,6 @@
                 <!--@+node:felix.20260321125852.1: *4* << Log Controls >>-->
                 <div id="log-controls" class="log-pane-container" role="region" aria-label="Log Pane"
                     spellcheck="false">
-                    <!-- <div id="log-content" contenteditable="plaintext-only" spellcheck="false"></div> -->
                 </div>
 
                 <!--@-<< Log Controls >>-->
@@ -201,9 +200,11 @@
                 <!--@-<< Nav Controls >>-->
                 <!--@+<< Undo Controls >>-->
                 <!--@+node:felix.20260321125915.1: *4* << Undo Controls >>-->
-                <!-- <div id="undo-controls" class="log-pane-container" role="region" aria-label="Undo history">
-                    <div id="undo-content" ></div>
-                </div> -->
+                <div id="undo-controls" class="log-pane-container" role="region" aria-label="Undo history">
+                    <div id="undo-content">
+                        Undo history content goes here.
+                    </div>
+                </div>
 
                 <!--@-<< Undo Controls >>-->
                 <!--@+<< Config Controls >>-->
@@ -289,21 +290,51 @@
                     </label> -->
                     </div>
 
-                    <!-- <span class="sub-title">Keyboard Shortcuts</span>
-                    <ul class="config-col shortcuts">
-                        <li><span class="kbd-spacer"><kbd>Arrows</kbd></span> — Navigate Outline</li>
-                        <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>Arrows</kbd></span> — Navigate from Body Pane
-                        </li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>F</kbd></span> — Find (Reset Scope)
-                        </li>
-                        <li><span class="kbd-spacer"><kbd>F2</kbd>/<kbd>F3</kbd></span> — Previous/Next Match</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>M</kbd></span> — Mark Node</li>
-                        <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>-</kbd></span> — Collapse All</li>
-                    </ul> -->
-
                 </div>
 
                 <!--@-<< Config Controls >>-->
+                <!--@+<< Help Controls >>-->
+                <!--@+node:felix.20260326223113.1: *4* << Help Controls >>-->
+                <div id="help-controls" class="log-pane-container" role="region" aria-label="Leo Web Help">
+                    <div id="help-content">
+                        <div class="help-column">
+                            <!-- <span class="sub-title">Outline Editing</span> -->
+                            <ul class="config-col shortcuts">
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>I</kbd></span> — Insert Node</li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>U</kbd></span> — Move Up</li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>D</kbd></span> — Move Down</li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>L</kbd></span> — Move Left</li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>R</kbd></span> — Move Right</li>
+
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></span> —
+                                    Copy
+                                    Node</li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></span> —
+                                    Paste
+                                    Node</li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd></span> —
+                                    Cut Node
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="help-column">
+                            <!-- <span class="sub-title">Navigation</span> -->
+                            <ul class="config-col shortcuts">
+                                <li><span class="kbd-spacer"><kbd>Arrows</kbd></span> — Navigate Outline</li>
+                                <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>Arrows</kbd></span> — Navigate from
+                                    anywhere</li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>F</kbd></span> — Find (Reset Scope)
+                                </li>
+                                <li><span class="kbd-spacer"><kbd>F2</kbd>/<kbd>F3</kbd></span> — Previous/Next Match
+                                </li>
+                                <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>M</kbd></span> — Mark Node</li>
+                                <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>-</kbd></span> — Collapse All</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!--@-<< Help Controls >>-->
             </div>
         </div>
         <div id="main-resizer"></div>

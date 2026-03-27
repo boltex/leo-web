@@ -29,8 +29,9 @@ export class LogPaneManager {
     public LOG_TAB: HTMLDivElement;
     public FIND_TAB: HTMLDivElement;
     public NAV_TAB: HTMLDivElement;
-    // public UNDO_TAB: HTMLDivElement; // Maybe add undo tab functionality later
+    public UNDO_TAB: HTMLDivElement;
     public SETTINGS_TAB: HTMLDivElement;
+    public HELP_TAB: HTMLDivElement;
 
     // Log text content
     public LOG_CONTENT: HTMLElement;
@@ -106,8 +107,9 @@ export class LogPaneManager {
         this.LOG_TAB = document.getElementById('log-tab')! as HTMLDivElement;
         this.FIND_TAB = document.getElementById('find-tab')! as HTMLDivElement;
         this.NAV_TAB = document.getElementById('nav-tab')! as HTMLDivElement;
-        // this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
+        this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
         this.SETTINGS_TAB = document.getElementById('settings-tab')! as HTMLDivElement;
+        this.HELP_TAB = document.getElementById('help-tab')! as HTMLDivElement;
 
         // Log text content
         this.LOG_CONTENT = document.getElementById('log-controls')!;

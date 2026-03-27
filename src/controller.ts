@@ -142,8 +142,9 @@ export class Controller {
         logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab('log') });
         logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab('find') });
         logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav') });
-        // logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') }); // Maybe add undo tab functionality later
+        logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') });
         logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab('settings') });
+        logPane.HELP_TAB.addEventListener('click', () => { logPane.showTab('help') });
     }
     //@+node:felix.20260322221915.1: *4* setupButtonFocusPrevention
     private setupButtonFocusPrevention() {
