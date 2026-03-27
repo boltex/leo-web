@@ -20,7 +20,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.EXECUTE,
         key: "ctrl+b",
-        mac: "cmd+b",
+        mac: "meta+b",
         outline: true,
         body: true,
         find: true,
@@ -37,7 +37,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MINIBUFFER,
         key: "ctrl+shift+p",
-        mac: "cmd+shift+p",
+        mac: "meta+shift+p",
         outline: true,
         body: true,
         find: true,
@@ -100,7 +100,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TAB_CYCLE_NEXT,
         key: "ctrl+tab", // Maybe browser will intercept?
-        mac: "cmd+tab",
+        mac: "meta+tab",
         outline: true,
         body: true,
         find: true,
@@ -109,7 +109,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SAVE_FILE,
         key: "ctrl+s",
-        mac: "cmd+s",
+        mac: "meta+s",
         outline: true,
         body: true,
         find: true,
@@ -118,7 +118,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.NEW_FILE,
         key: "ctrl+n", // Maybe browser will intercept?
-        mac: "cmd+n",
+        mac: "meta+n",
         outline: true,
         body: true,
         find: true
@@ -126,7 +126,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.OPEN_FILE,
         key: "ctrl+o",
-        mac: "cmd+o",
+        mac: "meta+o",
         outline: true,
         body: true,
         find: true
@@ -134,7 +134,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.WRITE_AT_FILE_NODES,
         key: "ctrl+shift+w",
-        mac: "cmd+shift+w",
+        mac: "meta+shift+w",
         outline: true,
         body: true,
         find: true,
@@ -143,7 +143,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.WRITE_DIRTY_AT_FILE_NODES,
         key: "ctrl+shift+q",
-        mac: "cmd+shift+q",
+        mac: "meta+shift+q",
         outline: true,
         body: true,
         find: true,
@@ -160,7 +160,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.HEADLINE_SELECTION,
         key: "ctrl+h",
-        mac: "cmd+h",
+        mac: "meta+h",
         outline: true,
         body: true,
         find: true,
@@ -169,7 +169,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MARK_SELECTION,
         key: "ctrl+m",
-        mac: "cmd+m",
+        mac: "meta+m",
         outline: true,
         body: true,
         find: true,
@@ -178,7 +178,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.EXTRACT,
         key: "ctrl+shift+d",
-        mac: "cmd+shift+d",
+        mac: "meta+shift+d",
         outline: true,
         body: true,
         find: true,
@@ -187,7 +187,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.EXTRACT_NAMES,
         key: "ctrl+shift+n", // Maybe browser will intercept?
-        mac: "cmd+shift+n",
+        mac: "meta+shift+n",
         outline: true,
         body: true,
         find: true,
@@ -196,7 +196,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MOVE_DOWN_SELECTION,
         key: "ctrl+d",
-        mac: "cmd+d",
+        mac: "meta+d",
         outline: true,
         body: true,
         find: true,
@@ -219,7 +219,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MOVE_LEFT_SELECTION,
         key: "ctrl+l",
-        mac: "cmd+l",
+        mac: "meta+l",
         outline: true,
         body: true,
         find: true,
@@ -242,7 +242,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MOVE_RIGHT_SELECTION,
         key: "ctrl+r",
-        mac: "cmd+r",
+        mac: "meta+r",
         outline: true,
         body: true,
         find: true,
@@ -265,7 +265,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MOVE_UP_SELECTION,
         key: "ctrl+u",
-        mac: "cmd+u",
+        mac: "meta+u",
         outline: true,
         body: true,
         find: true,
@@ -296,7 +296,9 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.PROMOTE_SELECTION,
         key: "ctrl+[", // TODO : test if browser intercepts
-        // mac: "cmd+[",
+        code: "ctrl+bracketleft", // Has priority over key when specified
+
+        // mac: "meta+[",
         // linux: "ctrl+[",
         outline: true,
         body: true,
@@ -306,7 +308,8 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.DEMOTE_SELECTION,
         key: "ctrl+]", // TODO : test if browser intercepts
-        // mac: "cmd+]",
+        code: "ctrl+bracketright", // Has priority over key when specified.
+        // mac: "meta+]",
         // linux: "ctrl+]",
         outline: true,
         body: true,
@@ -316,7 +319,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.INSERT_SELECTION,
         key: "ctrl+i",
-        mac: "cmd+i",
+        mac: "meta+i",
         outline: true,
         body: true,
         find: true,
@@ -348,7 +351,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.INSERT_CHILD_SELECTION,
         key: "ctrl+insert",
-        mac: "cmd+insert",
+        mac: "meta+insert",
         outline: true,
         body: true,
         find: true,
@@ -357,9 +360,10 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.CLONE_SELECTION,
         key: "ctrl+`",
+        code: "ctrl+backquote", // Has priority over key when specified.
         // win: "ctrl+oem_3",
         // linux: "ctrl+`",
-        // mac: "cmd+`",
+        // mac: "meta+`",
         outline: true,
         body: true,
         find: true,
@@ -368,7 +372,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.CUT_SELECTION,
         key: "ctrl+shift+x",
-        mac: "cmd+shift+x",
+        mac: "meta+shift+x",
         outline: true,
         body: true,
         find: true,
@@ -377,7 +381,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.COPY_SELECTION,
         key: "ctrl+shift+c",
-        mac: "cmd+shift+c",
+        mac: "meta+shift+c",
         outline: true,
         body: true,
         find: true,
@@ -386,7 +390,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.PASTE_SELECTION,
         key: "ctrl+shift+v",
-        mac: "cmd+shift+v",
+        mac: "meta+shift+v",
         outline: true,
         body: true,
         find: true,
@@ -395,7 +399,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.DELETE_SELECTION,
         key: "ctrl+shift+backspace",
-        mac: "cmd+shift+backspace",
+        mac: "meta+shift+backspace",
         outline: true,
         body: true,
         find: true,
@@ -411,7 +415,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.UNDO,
         key: "ctrl+z",
-        mac: "cmd+z",
+        mac: "meta+z",
         outline: true,
         body: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO],
@@ -420,7 +424,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.REDO,
         key: "ctrl+shift+z",
-        mac: "cmd+shift+z",
+        mac: "meta+shift+z",
         outline: true,
         body: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO],
@@ -429,7 +433,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.FIND_QUICK_GO_ANYWHERE,
         key: "ctrl+p",
-        mac: "cmd+p",
+        mac: "meta+p",
         outline: true,
         body: true,
         find: true,
@@ -438,7 +442,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.START_SEARCH,
         key: "ctrl+f",
-        mac: "cmd+f",
+        mac: "meta+f",
         outline: true,
         body: true,
         find: true,
@@ -448,7 +452,7 @@ export const keybindings: Keybinding[] = [
     // {
     //     command: CMD.FIND_QUICK_SELECTED,
     //     key: "ctrl+shift+f",
-    //     mac: "cmd+shift+f",
+    //     mac: "meta+shift+f",
     //     outline: true,
     //     body: true,
     //     find: true
@@ -472,7 +476,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.REPLACE,
         key: "ctrl+=",
-        mac: "cmd+=",
+        mac: "meta+=",
         outline: true,
         body: true,
         find: true,
@@ -481,7 +485,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.REPLACE_THEN_FIND,
         key: "ctrl+-",
-        mac: "cmd+-",
+        mac: "meta+-",
         outline: true,
         body: true,
         find: true,
@@ -498,7 +502,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SET_FIND_EVERYWHERE_OPTION,
         key: "ctrl+alt+e",
-        mac: "cmd+alt+e",
+        mac: "meta+alt+e",
         outline: true,
         body: true,
         find: true,
@@ -507,7 +511,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SET_FIND_NODE_ONLY_OPTION,
         key: "ctrl+alt+n",
-        mac: "cmd+alt+n",
+        mac: "meta+alt+n",
         outline: true,
         body: true,
         find: true,
@@ -516,7 +520,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SET_FIND_FILE_ONLY_OPTION,
         key: "ctrl+alt+l",
-        mac: "cmd+alt+l",
+        mac: "meta+alt+l",
         outline: true,
         body: true,
         find: true,
@@ -525,7 +529,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SET_FIND_SUBOUTLINE_ONLY_OPTION,
         key: "ctrl+alt+s",
-        mac: "cmd+alt+s",
+        mac: "meta+alt+s",
         outline: true,
         body: true,
         find: true,
@@ -534,7 +538,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TOGGLE_FIND_IGNORE_CASE_OPTION,
         key: "ctrl+alt+i",
-        mac: "cmd+alt+i",
+        mac: "meta+alt+i",
         outline: true,
         body: true,
         find: true,
@@ -543,7 +547,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TOGGLE_FIND_MARK_CHANGES_OPTION,
         key: "ctrl+alt+c",
-        mac: "cmd+alt+c",
+        mac: "meta+alt+c",
         outline: true,
         body: true,
         find: true,
@@ -552,7 +556,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TOGGLE_FIND_MARK_FINDS_OPTION,
         key: "ctrl+alt+f",
-        mac: "cmd+alt+f",
+        mac: "meta+alt+f",
         outline: true,
         body: true,
         find: true,
@@ -561,7 +565,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TOGGLE_FIND_REGEXP_OPTION,
         key: "ctrl+alt+x",
-        mac: "cmd+alt+x",
+        mac: "meta+alt+x",
         outline: true,
         body: true,
         find: true,
@@ -570,7 +574,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TOGGLE_FIND_WORD_OPTION,
         key: "ctrl+alt+w",
-        mac: "cmd+alt+w",
+        mac: "meta+alt+w",
         outline: true,
         body: true,
         find: true,
@@ -579,7 +583,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TOGGLE_FIND_SEARCH_BODY_OPTION,
         key: "ctrl+alt+b",
-        mac: "cmd+alt+b",
+        mac: "meta+alt+b",
         outline: true,
         body: true,
         find: true,
@@ -588,7 +592,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.TOGGLE_FIND_SEARCH_HEADLINE_OPTION,
         key: "ctrl+alt+h",
-        mac: "cmd+alt+h",
+        mac: "meta+alt+h",
         outline: true,
         body: true,
         find: true,

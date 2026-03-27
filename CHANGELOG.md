@@ -2,7 +2,8 @@
 
 ## 1.0.4
 
-- ...
+- Changed keybinding for clone, promote and demote with positional codes.
+- Enabled and Updated key mappings for macOS.
 
 ## 1.0.3
 

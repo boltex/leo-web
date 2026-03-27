@@ -622,35 +622,32 @@ export class Controller {
         if (e.altKey) parts.push('alt');
         if (e.shiftKey) parts.push('shift');
         if (e.metaKey) parts.push('meta');
-
+        let code = e.code.toLowerCase();
         let key = e.key.toLowerCase(); // Normalize the key name to lowercase
 
         // Handle special cases for consistency with keybindings
         if (key === ' ') key = 'space';
 
-        parts.push(key);
-
-        const keyString = parts.join('+');
-
-        // Find matching keybinding for the specified pane
-        // const platform = navigator.platform.toLowerCase();
-        // const isMac = platform.includes('mac');
-        // const isLinux = platform.includes('linux');
+        const keyString = [...parts, key].join('+');
+        let codeString = [...parts, code].join('+');
 
         for (const keybind of keybindings) {
             if (!keybind[pane]) continue;
             let targetKey = keybind.key;
+            let targetCode = keybind.code;
 
-            // // Determine which key property to check based on platform
-            // if (isMac && keybind.mac) {
-            //     targetKey = keybind.mac;
-            // } else if (isLinux && keybind.linux) {
-            //     targetKey = keybind.linux;
-            // } else if (!isMac && !isLinux && keybind.win) {
-            //     targetKey = keybind.win;
-            // }
+            if (targetCode && g.isMac) {
+                targetCode = targetCode.replace('ctrl', 'meta');
+            }
+            if (g.isMac && keybind.mac) {
+                targetKey = keybind.mac;
+            } else if (g.isLinux && keybind.linux) {
+                targetKey = keybind.linux;
+            } else if (!g.isMac && !g.isLinux && keybind.win) {
+                targetKey = keybind.win;
+            }
 
-            if (targetKey.toLowerCase() === keyString) {
+            if ((targetCode && targetCode.toLowerCase() === codeString) || (!targetCode && targetKey.toLowerCase() === keyString)) {
 
                 // First check for enabledFlagsSet and enabledFlagsClear to determine
                 // if the command should run based on the current state of the application.
@@ -692,6 +689,7 @@ export class Controller {
 
         // Uncomment to see key details for debugging keybinding issues. Will log every keydown, so can be noisy!
         // console.log('Global keydown:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Meta:', e.metaKey);
+        // console.log('Global keydown:', e);
 
         // Block if its CTRL+A if it's not in the body pane nor in an input/textarea, 
         // to prevent selecting all sorts of unintended things on the page. We want to allow Ctrl+A in the body pane for text selection,
