@@ -13,6 +13,7 @@ import * as path from 'path';
 import * as showdownObj from "showdown";
 import * as pakoObj from 'pako';
 import * as md5Obj from 'md5';
+import * as Bowser from 'bowser';
 const dayjsObj = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 dayjsObj.extend(utc);
@@ -33,6 +34,14 @@ import { LeoGui } from './leoGui';
 //@-<< leoGlobals: annotations >>
 //@+<< leoGlobals: global constants >>
 //@+node:felix.20251207215313.4: ** << leoGlobals: global constants >>
+
+const name = (Bowser.getParser(window.navigator.userAgent).getOS().name || '').toLowerCase();
+export const isMac: boolean = name.includes('mac');
+export const isWindows: boolean = name.includes('windows');
+export const isLinux: boolean = name.includes('linux');
+export const isIOS: boolean = name.includes('ios');
+export const isAndroid: boolean = name.includes('android');
+
 /** For accessing files in the current workspace */
 export let workspaceUri: Uri;
 export let pako: typeof pakoObj = pakoObj;

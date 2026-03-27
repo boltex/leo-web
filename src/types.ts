@@ -64,6 +64,7 @@ export type Keybinding = {
     win?: string; // Only if different from key
     mac?: string; // Only if different from key
     linux?: string; // Only if different from key
+    code?: string; // Optional code property for more specific keybinding (Has priority over key when specified)
     outline?: boolean; // Whether this binding is active in the outline pane
     body?: boolean; // Whether this binding is active in the body pane
     find?: boolean; // Whether this binding is active in the find pane
