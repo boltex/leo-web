@@ -12,6 +12,10 @@
       "vh": "@auto CHANGELOG.md"
     },
     {
+      "gnx": "felix.20260327214516.1",
+      "vh": "@auto CONTRIBUTING.md"
+    },
+    {
       "gnx": "felix.20260321121928.1",
       "vh": "@auto package.json"
     },
