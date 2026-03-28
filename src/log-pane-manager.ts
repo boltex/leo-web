@@ -2,7 +2,7 @@
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
-import { LeoSearchSettings } from "./types";
+import { LeoSearchSettings, LeoUndoNode } from "./types";
 import { workspace } from './workspace';
 
 type searchSettingNames = 'entireOutline' |
@@ -100,6 +100,8 @@ export class LogPaneManager {
     };
 
     private _postMessageCallback: ((message: any) => void) | undefined; // Set by controller, used to send messages to LeoWeb when settings change or when user interacts with the controls.
+    private _undoSelection: LeoUndoNode | undefined; // Keep track of the currently selected undo node, so that we can maintain selection when refreshing the undo pane.
+    private _undoNodes: LeoUndoNode[] = []; // Keep track of the current list of undo nodes, so that we can refresh the undo pane when it changes.
 
     constructor() {
 
@@ -452,6 +454,14 @@ export class LogPaneManager {
     public focusFindInput() {
         this.FIND_INPUT.select();
     }
+    //@+node:felix.20260327222254.1: *3* refreshUndoPane
+    public refreshUndoPane(): void {
+        // TODO: implement this method to refresh the undo pane in the UI
+        // use this._undoNodes and this._undoSelection to set a 'selected' class on the selected one.
+        console.log('Refreshing undo pane with nodes:', this._undoNodes, 'and selection:', this._undoSelection);
+
+    }
+
     //@+node:felix.20260323005755.1: *3* addToLogPane
     public addToLogPane(message: string, replace = false) {
         if (replace) {
@@ -461,6 +471,17 @@ export class LogPaneManager {
         }
         this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
     }
+    //@+node:felix.20260327225825.1: *3* setUndoSelection
+    public setUndoSelection(undoNode: LeoUndoNode | undefined) {
+        this._undoSelection = undoNode;
+    }
+
+    //@+node:felix.20260327225927.1: *3* setUndoNodes
+    public setUndoNodes(undoNodes: LeoUndoNode[]) {
+        this._undoNodes = undoNodes;
+        this.refreshUndoPane();
+    }
+
     //@-others
 
 }

@@ -4,7 +4,7 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo } from "./types";
+import { ConfigSetting, FlatRowLeo, LeoUndoNode } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -1120,6 +1120,71 @@ export class Controller {
         return flatRowsLeo;
     }
     //@-others
+    //@+node:felix.20260327223045.1: *3* buildUndoElements
+    public buildUndoElements(): void {
+        const w_children: LeoUndoNode[] = [];
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const undoer = c.undoer;
+
+        if (undoer.beads.length) {
+
+            let w_foundNode: LeoUndoNode | undefined;
+            let i: number = 0;
+            let w_defaultIcon = 1;
+
+            undoer.beads.forEach(p_bead => {
+                let w_description: string = "";
+                let w_undoFlag: boolean = false;
+                let w_icon = w_defaultIcon;
+                if (i === undoer.bead) {
+                    w_description = "Undo";
+                    w_undoFlag = true;
+                    w_icon = 0;
+                    w_defaultIcon = 2;
+                }
+                if (i === undoer.bead + 1) {
+                    w_description = "Redo";
+                    w_icon = 2;
+                    w_defaultIcon = 3;
+                    if (!w_foundNode) {
+                        w_undoFlag = true; // Passed all nodes until 'redo', no undo found.
+                    }
+                }
+                const w_node: LeoUndoNode = {
+                    label: p_bead.undoType || "unknown",
+                    description: w_description,
+                    contextValue: Constants.CONTEXT_FLAGS.UNDO_BEAD,
+                    beadIndex: i - undoer.bead,
+                    icon: w_icon
+                };
+                w_children.push(w_node);
+                if (w_undoFlag) {
+                    w_foundNode = w_node;
+                }
+                i++;
+            });
+            if (w_foundNode) {
+                workspace.logPane.setUndoSelection(w_foundNode);
+            }
+        } else {
+            const w_node = {
+                label: "Unchanged",
+                description: "",
+                contextValue: Constants.CONTEXT_FLAGS.NOT_UNDO_BEAD,
+                beadIndex: 0,
+                icon: undefined
+                //          "Unchanged",
+                // "",
+                // (this._beadId++).toString(),
+                // Constants.CONTEXT_FLAGS.NOT_UNDO_BEAD,
+                // 0,
+                // undefined
+            };
+            w_children.push(w_node);
+        }
+        workspace.logPane.setUndoNodes(w_children);
+    }
+
     //@-others
 
 }

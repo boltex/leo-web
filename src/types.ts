@@ -321,6 +321,14 @@ export interface LeoButton {
     rclicks?: RClick[];
 }
 
+//@+node:felix.20260327223704.1: ** LeoUndoNode
+export type LeoUndoNode = {
+    label: string,
+    description: string,
+    contextValue: string,
+    beadIndex: number,
+    icon?: number
+};
 //@+node:felix.20251211000618.12: ** TGotoTypes
 export type TGotoTypes = "tag" | "headline" | "body" | "parent" | "generic";
 

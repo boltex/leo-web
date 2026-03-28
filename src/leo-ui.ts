@@ -819,7 +819,7 @@ export class LeoUI extends NullGui {
     }
 
     public refreshUndoPane(): void {
-        // TODO : implement undo pane refresh
+        workspace.controller.buildUndoElements();
     }
 
     public refreshBodyStates(): void {
