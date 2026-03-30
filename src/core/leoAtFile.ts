@@ -971,9 +971,6 @@ export class AtFile {
         ) {
             return;
         }
-        if (!g.unitTesting) {
-            g.es_print('updating:', root.h);
-        }
         root.clearVisitedInTree();
         const gnx2vnode = at.fileCommands.gnxDict;
         const contents = new_private_lines.join('');
@@ -4137,7 +4134,7 @@ export class AtFile {
         return '';
     }
 
-    public setPathUa(p: Position, path: any): void {
+    public setPathUa(p: Position, path: string): void {
         if (!p.v.tempAttributes) {
             p.v.tempAttributes = {};
         }

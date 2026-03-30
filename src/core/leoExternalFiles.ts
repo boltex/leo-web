@@ -253,7 +253,10 @@ export class ExternalFilesController {
         //
         // #1100: always scan the entire file for @<file> nodes.
         // #1134: Nested @<file> nodes are no longer valid, but this will do no harm.
+        let changed = false;
         let state = 'no';
+        const old_p = c.p;  // To restore selection if refresh option set to yes-all & is descendant of at-file
+
         for (const p of c.all_unique_positions()) {
             if (!p.isAnyAtFileNode()) {
                 continue;
@@ -275,7 +278,7 @@ export class ExternalFilesController {
                 state = await this.ask(c, w_path, p);
             }
             if (['yes', 'yes-all'].includes(state)) {
-                const old_p = c.p;  // To restore selection if refresh option set to yes-all & is descendant of at-file
+                changed = true;
                 await c.refreshFromDisk(p, false);
                 // #4565: set all clones in p's subtree dirty.
                 for (const p2 of p.subtree()) {
@@ -293,20 +296,37 @@ export class ExternalFilesController {
                     }
                 }
                 p.v.setAllAncestorAtFileNodesDirty(to_do_set);
-                c.redraw();
 
-                // ! LEOJS : KEEP SELECTION ON CURRENT NODE IF CHILD OF AT-ANY-FILE REFRESHED !
-                // TODO : Add config option in Leo for this!
-                if (true) {
-                    if (c.positionExists(old_p) && c.p.isAncestorOf(old_p)) {
-                        c.selectPosition(old_p);
-                    }
-                }
-
-                // ! LEOJS : FORCE GUI REFRESH AFTER A refreshFromDisk COMMAND !
-                g.app.gui.fullRefresh(true);
             }
         }
+        if (!changed) {
+            return;
+        }
+
+        // ! LEO-WEB : KEEP SELECTION ON CURRENT NODE IF CHILD OF AT-ANY-FILE REFRESHED !
+        // TODO : Add config option in Leo for this!
+        if (true) {
+            if (c.positionExists(old_p) && c.p.isAncestorOf(old_p)) {
+                c.selectPosition(old_p);
+            }
+        }
+        // #4570: Write all update messages here, and only here.
+        if (!g.unitTesting) {
+            const changed_roots: Set<string> = new Set();
+            for (const p2 of c.all_positions()) {
+                if (p2.isAnyAtFileNode() && p2.isDirty()) {
+                    changed_roots.add(p2.h);
+                }
+            }
+            for (const s of Array.from(changed_roots).sort()) {
+                g.es_print('update:', s);
+            }
+        }
+        c.redraw();
+        // ! LEO-WEB : FORCE GUI REFRESH AFTER A refreshFromDisk COMMAND !
+        g.app.gui.fullRefresh(true);
+
+
     }
     //@+node:felix.20251214160339.847: *5* efc.idle_check_leo_file
     /**
@@ -735,12 +755,14 @@ export class ExternalFilesController {
         p_path: string,
         p?: Position
     ): Promise<string> {
-        if (g.unitTesting) {
+        if (g.unitTesting || !g.app.commanders().includes(c)) {
             return '';
         }
-        if (!g.app.commanders().includes(c)) {
-            return '';
+        // #4570: Don't raise dialogs unless the user setting is True.
+        if (!c.config.getBool('raise-file-update-dialogs', false)) {
+            return 'yes';
         }
+
         const is_leo = p_path.endsWith('.db') || p_path.endsWith('.leo') || p_path.endsWith('.leojs');
         const is_external_file = !is_leo;
 
@@ -758,24 +780,24 @@ export class ExternalFilesController {
             //     "Ignore All"
             //   ]
 
-            if (g.app.gui.config && g.app.gui.config.defaultReloadIgnore) {
-                const checkConfig =
-                    g.app.gui.config.defaultReloadIgnore.toLowerCase();
-                if (!checkConfig.includes('none')) {
-                    let w_message = 'Changes to external files were detected.';
-                    if (checkConfig.includes('yes')) {
-                        void workspace.dialog.showInformationMessage(
-                            w_message + ' Nodes refreshed.'
-                        );
-                        return 'yes-all';
-                    } else {
-                        void workspace.dialog.showInformationMessage(
-                            w_message + ' They were ignored.'
-                        );
-                        return 'no-all';
-                    }
-                }
-            }
+            // if (g.app.gui.config && g.app.gui.config.defaultReloadIgnore) {
+            //     const checkConfig =
+            //         g.app.gui.config.defaultReloadIgnore.toLowerCase();
+            //     if (!checkConfig.includes('none')) {
+            //         let w_message = 'Changes to external files were detected.';
+            //         if (checkConfig.includes('yes')) {
+            //             void workspace.dialog.showInformationMessage(
+            //                 w_message + ' Nodes refreshed.'
+            //             );
+            //             return 'yes-all';
+            //         } else {
+            //             void workspace.dialog.showInformationMessage(
+            //                 w_message + ' They were ignored.'
+            //             );
+            //             return 'no-all';
+            //         }
+            //     }
+            // }
         }
 
         //
@@ -920,15 +942,15 @@ export class ExternalFilesController {
      * Return the cached @bool check_for_changed_external_file setting.
      */
     public is_enabled(c: Commands): boolean {
-        const checkConfig = g.app.gui.config.checkForChangeExternalFiles;
-        if (checkConfig) {
-            if (checkConfig.toLowerCase().includes('check')) {
-                return true;
-            }
-            if (checkConfig.toLowerCase().includes('ignore')) {
-                return false;
-            }
-        }
+        // const checkConfig = g.app.gui.config.checkForChangeExternalFiles;
+        // if (checkConfig) {
+        //     if (checkConfig.toLowerCase().includes('check')) {
+        //         return true;
+        //     }
+        //     if (checkConfig.toLowerCase().includes('ignore')) {
+        //         return false;
+        //     }
+        // }
 
         // Else is default from settings
         const d = this.enabled_d;

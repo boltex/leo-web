@@ -20,6 +20,7 @@ export class MenuManager {
     // * Context Menus
     public OUTLINE_MENU: HTMLElement;
     public BODY_MENU: HTMLElement;
+    public UNDO_MENU: HTMLElement;
 
     // * Top Menu
     public TOP_MENU: HTMLElement;
@@ -45,8 +46,8 @@ export class MenuManager {
     public PREV_MARKED_BTN: HTMLButtonElement;
 
     // * Settings Menu
-    public CHECK_EXTERNAL_FILES: HTMLSelectElement;
-    public RELOAD_IGNORE_CHANGES: HTMLSelectElement;
+    // public CHECK_EXTERNAL_FILES: HTMLSelectElement;
+    // public RELOAD_IGNORE_CHANGES: HTMLSelectElement;
 
     public SHOW_PREV_NEXT_MARK: HTMLInputElement;
     public SHOW_TOGGLE_MARK: HTMLInputElement;
@@ -74,6 +75,7 @@ export class MenuManager {
 
         this.OUTLINE_MENU = document.getElementById('outline-menu')!;
         this.BODY_MENU = document.getElementById('body-menu')!;
+        this.UNDO_MENU = document.getElementById('undo-menu')!;
         this.TOP_MENU = document.getElementById("top-menu")!;
         this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
         this.TOP_MENU_TOGGLE = document.getElementById("top-menu-toggle")!;
@@ -95,8 +97,8 @@ export class MenuManager {
         this.TOGGLE_MARK_BTN = document.getElementById('toggle-mark-btn')! as HTMLButtonElement;
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
 
-        this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
-        this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
+        // this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
+        // this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
         this.SHOW_TOGGLE_MARK = document.getElementById('show-toggle-mark')! as HTMLInputElement;
@@ -508,6 +510,7 @@ export class MenuManager {
     public closeAllSubmenus() {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
+        this.UNDO_MENU.style.display = "none";
         document.querySelectorAll(".submenu.visible").forEach(sub =>
             sub.classList.remove("visible")
         );
@@ -542,6 +545,7 @@ export class MenuManager {
     public closeMenusEvent(e: MouseEvent) {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
+        this.UNDO_MENU.style.display = "none";
         const target = e.target as Element;
         if (!target.closest('.menu')) {
             this.closeAllSubmenus();
@@ -553,7 +557,7 @@ export class MenuManager {
         this.isMenuShown = !this.isMenuShown;
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
-
+        this.UNDO_MENU.style.display = "none";
         this.HTML_ELEMENT.setAttribute('data-show-menu', this.isMenuShown ? 'true' : 'false');
 
         if (this.isMenuShown) {

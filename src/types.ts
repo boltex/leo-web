@@ -206,8 +206,8 @@ export interface InputDialogOptions {
  * * Types of the various JSON configuration keys such as treeKeepFocus, defaultReloadIgnore, etc.
  */
 export interface ConfigMembers {
-    checkForChangeExternalFiles: string;
-    defaultReloadIgnore: string;
+    // checkForChangeExternalFiles: string;
+    // defaultReloadIgnore: string;
     leoID: string;
 }
 

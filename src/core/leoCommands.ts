@@ -2713,26 +2713,30 @@ export class Commands {
     // These are all new in Leo 4.5.1.
 
     //@+node:felix.20251214160339.534: *4* c.getLanguageAtCursor
-    // def getLanguageAtCursor(self, p, language):
-    //     """
-    //     Return the language in effect at the present insert point.
-    //     Use the language argument as a default if no @language directive seen.
-    //     """
-    //     c = self
-    //     tag = '@language'
-    //     w = c.frame.body.wrapper
-    //     ins = w.getInsertPoint()
-    //     n = 0
-    //     for s in g.splitLines(p.b):
-    //         if g.match_word(s, 0, tag):
-    //             i = g.skip_ws(s, len(tag))
-    //             j = g.skip_id(s, i)
-    //             language = s[i:j]
-    //         if n <= ins < n + len(s):
-    //             break
-    //         else:
-    //             n += len(s)
-    //     return language
+    /**
+     * Return the language in effect at the present insert point.
+     * Use the language argument as a default if no @language directive seen.
+     */
+    public getLanguageAtCursor(p: Position, language: string) {
+        const c: Commands = this;
+        const tag = '@language';
+        const w = c.frame.body.wrapper;
+        const ins = w.getInsertPoint();
+        let n = 0;
+        for (const s of g.splitLines(p.b)) {
+            if (g.match_word(s, 0, tag)) {
+                const i = g.skip_ws(s, tag.length);
+                const j = g.skip_id(s, i);
+                language = s.slice(i, j);
+            }
+            if (n <= ins && ins < n + s.length) {
+                break;
+            } else {
+                n += s.length;
+            }
+        }
+        return language;
+    }
     //@+node:felix.20251214160339.535: *4* c.hasAmbiguousLanguage
     public hasAmbiguousLanguage(p: Position): boolean {
         const languages = new Set<string>();
