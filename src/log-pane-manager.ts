@@ -465,6 +465,8 @@ export class LogPaneManager {
     }
     //@+node:felix.20260327222254.1: *3* refreshUndoPane
     public refreshUndoPane(): void {
+        // If the undo tab is not active, no need to refresh the pane.
+        // It will be refreshed when the user clicks on the undo tab.
         if (this.HTML_ELEMENT.getAttribute('data-active-tab') !== 'undo') {
             return;
         }
@@ -473,6 +475,7 @@ export class LogPaneManager {
 
         const ul = document.createElement('ul');
         ul.classList.add('undo-list');
+        let selectedLi: HTMLLIElement | undefined;
 
         this._undoNodes.forEach((node) => {
             const li = document.createElement('li');
@@ -483,6 +486,7 @@ export class LogPaneManager {
             li.title = "Undo bead " + node.beadIndex;
             if (this._undoSelection && node.beadIndex === this._undoSelection.beadIndex) {
                 li.classList.add('selected');
+                selectedLi = li;
             }
 
             const labelSpan = document.createElement('span');
@@ -499,6 +503,10 @@ export class LogPaneManager {
         });
 
         this.UNDO_CONTENT.appendChild(ul);
+        // If selectedLi is not null, scroll it into view:
+        if (selectedLi != null) {
+            selectedLi.scrollIntoView({ block: 'center' });
+        }
     }
 
     //@+node:felix.20260323005755.1: *3* addToLogPane
