@@ -257,7 +257,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.REDO, () => leoUI.command(LEOCMD.REDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.UNDO, () => leoUI.command(LEOCMD.UNDO, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        // [CMD.REVERT_TO_UNDO, (p_undo: LeoUndoNode) => p_leoUI.revertToUndo(p_undo)], // Repeat undos/redo to given undo node.
+        [CMD.REVERT_TO_UNDO, (beadIndex: number) => leoUI.revertToUndo(beadIndex)], // Repeat undos/redo to given undo node.
 
         [CMD.COPY_MARKED, () => leoUI.command(LEOCMD.COPY_MARKED, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
         [CMD.DIFF_MARKED_NODES, () => leoUI.command(LEOCMD.DIFF_MARKED_NODES, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],

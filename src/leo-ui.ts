@@ -819,7 +819,7 @@ export class LeoUI extends NullGui {
     }
 
     public refreshUndoPane(): void {
-        // TODO : implement undo pane refresh
+        workspace.controller.buildUndoElements();
     }
 
     public refreshBodyStates(): void {
@@ -1592,7 +1592,6 @@ export class LeoUI extends NullGui {
                     buttons: true,
                     states: true,
                     goto: true
-
                 }
             );
             const result = this.launchRefresh();
@@ -1618,12 +1617,18 @@ export class LeoUI extends NullGui {
 
         this.triggerBodySave();
 
+        // If coming from an 'insert-node' the STATES SHOULD BE REFRESHED (undo pane, dirty document indicator, etc.)
+        this.getStates();
+
         // For now, always focus outline after insert, since the editable headline input box will be in the outline. 
         this.setupRefresh(Focus.Outline, { tree: true, states: true });
 
         this.inEditHeadline++;
         this.leoStates.inHeadlineEdit = true;
+
+        // this await will pause so the debounced 'getStates' can run and refresh the undo pane and other states.
         let headlineResult = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);
+
         this.inEditHeadline--;
         if (!this.inEditHeadline) {
             this.leoStates.inHeadlineEdit = false;
@@ -1631,8 +1636,9 @@ export class LeoUI extends NullGui {
 
         if (headlineResult.saveSelectionOnly) {
             return w_p;
-
         }
+
+        // refreshing states AGAIN after headline edit.
         this.setupRefresh(Focus.Outline, { tree: true, states: true });
 
         if (headlineResult.blurred) {
@@ -2364,6 +2370,44 @@ export class LeoUI extends NullGui {
 
         return this.selectOpenedLeoDocument(w_chosenIndex);
     }
+    //@+node:felix.20260329222451.1: *3* revertToUndo
+    /**
+     * * Reverts to a particular undo bead state
+     */
+    public revertToUndo(beadIndex: number): Promise<any> {
+
+        let action = "redo";
+        let repeat = beadIndex;
+        if (beadIndex <= 0) {
+            action = "undo";
+            repeat = (-beadIndex) + 1;
+        }
+        const c = g.app.windowList[this.frameIndex].c;
+        const u = c.undoer;
+        for (let x = 0; x < repeat; x++) {
+            if (action === "redo") {
+                if (u.canRedo()) {
+                    u.redo();
+                }
+            } else if (action === "undo") {
+                if (u.canUndo()) {
+                    u.undo();
+                }
+            }
+        }
+        this.setupRefresh(
+            Focus.Outline,
+            {
+                tree: true,
+                body: true,
+                documents: true,
+                states: true,
+                buttons: true,
+            }
+        );
+        return Promise.resolve(this.launchRefresh());
+    }
+
     //@+node:felix.20260322233732.1: *3* File Commands
     //@+others
     //@+node:felix.20260322234040.1: *4* showRecentLeoFiles

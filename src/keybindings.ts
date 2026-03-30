@@ -418,6 +418,7 @@ export const keybindings: Keybinding[] = [
         mac: "meta+z",
         outline: true,
         body: true,
+        find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO],
         enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
@@ -427,6 +428,7 @@ export const keybindings: Keybinding[] = [
         mac: "meta+shift+z",
         outline: true,
         body: true,
+        find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO],
         enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },

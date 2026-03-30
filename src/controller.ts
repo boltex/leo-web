@@ -4,13 +4,14 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo } from "./types";
+import { ConfigSetting, FlatRowLeo, LeoGoto, LeoUndoNode, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
 import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
 import { keybindings } from "./keybindings";
+import { QuickSearchController } from "./core/quicksearch";
 
 //@-<< imports >>
 //@+others
@@ -21,6 +22,8 @@ export class Controller {
 
     // Unused for now, but we can use this regex to detect URLs in the future if we want to add link-clicking functionality in the body pane or elsewhere.
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
+
+    private _lastUndoBeadIndex: number | null = null; // To track the last right-clicked undo bead index for showing context menu options
 
     constructor() {
         workspace.menu.buildMenu(menuData);
@@ -39,6 +42,7 @@ export class Controller {
     }
     //@+node:felix.20260322222039.1: *3* doCommand
     public doCommand(commandName: string, ...args: any[]): any {
+        workspace.menu.closeAllSubmenus();
         const command = this._commands[commandName];
         if (command) {
             return command(...args);
@@ -64,7 +68,6 @@ export class Controller {
         this.setupWindowHandlers();
         this.setupButtonHandlers();
         this.setupConfigCheckboxes();
-        this.setupConfigSelectors();
         this.setupTopMenuHandlers();
     }
     //@+node:felix.20260322222009.1: *4* setupOutlinePaneHandlers
@@ -92,6 +95,36 @@ export class Controller {
     //@+node:felix.20260322221959.1: *4* setupLogPaneHandlers
     private setupLogPaneHandlers() {
         workspace.layout.LOG_PANE.addEventListener('keydown', this.handleLogPaneKeyDown);
+        workspace.logPane.UNDO_CONTENT.classList.add('allow-context');
+        workspace.logPane.UNDO_CONTENT.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const target = e.target as Element;
+            const nodeEl = target.closest('li.undo-node') as HTMLElement | null;
+            if (nodeEl && nodeEl.classList.contains('undo-node')) {
+                const beadIndex = parseInt(nodeEl.getAttribute('data-bead-index') || '-1');
+                const contextValue = nodeEl.getAttribute('data-undo-context') || 'default';
+                if (contextValue === Constants.CONTEXT_FLAGS.UNDO_BEAD) {
+                    this._lastUndoBeadIndex = beadIndex;
+                    const UNDO_MENU = workspace.menu.UNDO_MENU;
+                    setTimeout(() => {
+                        UNDO_MENU.style.top = `${e.clientY}px`;
+                        UNDO_MENU.style.left = `${e.clientX}px`;
+                        UNDO_MENU.style.display = 'block';
+                    }, 0);
+
+                }
+            }
+        });
+        // Setup handler for the "Revert to Undo State" option in the undo context menu
+        workspace.menu.UNDO_MENU.querySelector('.menu-item')?.addEventListener('click', () => {
+            if (this._lastUndoBeadIndex !== null) {
+                workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
+                this._lastUndoBeadIndex = null; // Reset after handling
+            }
+            // close the undo context menu after clicking the option
+            workspace.menu.UNDO_MENU.style.display = 'none';
+        });
+
     }
     //@+node:felix.20260322221954.1: *4* setupResizerHandlers
     private setupResizerHandlers() {
@@ -157,12 +190,6 @@ export class Controller {
         workspace.menu.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
             e.preventDefault();
         });
-    }
-    //@+node:felix.20260322221910.1: *4* setupConfigSelectors
-    private setupConfigSelectors() {
-        const menu = workspace.menu;
-        menu.CHECK_EXTERNAL_FILES.addEventListener('change', this.onDropdownChanged);
-        menu.RELOAD_IGNORE_CHANGES.addEventListener('change', this.onDropdownChanged);
     }
     //@+node:felix.20260322221852.1: *4* onDropdownChanged
     private onDropdownChanged = (e: Event) => {
@@ -1120,6 +1147,110 @@ export class Controller {
         return flatRowsLeo;
     }
     //@-others
+    //@+node:felix.20260327223045.1: *3* buildUndoElements
+    public buildUndoElements(): void {
+        const w_children: LeoUndoNode[] = [];
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const undoer = c.undoer;
+
+        if (undoer.beads.length) {
+
+            let w_foundNode: LeoUndoNode | undefined;
+            let i: number = 0;
+            let w_defaultIcon = 1;
+
+            undoer.beads.forEach(p_bead => {
+                let w_description: string = "";
+                let w_undoFlag: boolean = false;
+                let w_icon = w_defaultIcon;
+                if (i === undoer.bead) {
+                    w_description = "Undo";
+                    w_undoFlag = true;
+                    w_icon = 0;
+                    w_defaultIcon = 2;
+                }
+                if (i === undoer.bead + 1) {
+                    w_description = "Redo";
+                    w_icon = 2;
+                    w_defaultIcon = 3;
+                    if (!w_foundNode) {
+                        w_undoFlag = true; // Passed all nodes until 'redo', no undo found.
+                    }
+                }
+                const w_node: LeoUndoNode = {
+                    label: p_bead.undoType || "unknown",
+                    description: w_description,
+                    contextValue: Constants.CONTEXT_FLAGS.UNDO_BEAD,
+                    beadIndex: i - undoer.bead,
+                    icon: w_icon
+                };
+                w_children.push(w_node);
+                if (w_undoFlag) {
+                    w_foundNode = w_node;
+                }
+                i++;
+            });
+            if (w_foundNode) {
+                workspace.logPane.setUndoSelection(w_foundNode);
+            }
+        } else {
+            const w_node = {
+                label: "Unchanged",
+                description: "",
+                contextValue: Constants.CONTEXT_FLAGS.NOT_UNDO_BEAD,
+                beadIndex: 0,
+                icon: undefined
+                //          "Unchanged",
+                // "",
+                // (this._beadId++).toString(),
+                // Constants.CONTEXT_FLAGS.NOT_UNDO_BEAD,
+                // 0,
+                // undefined
+            };
+            w_children.push(w_node);
+        }
+        workspace.logPane.setUndoNodes(w_children);
+    }
+
+    //@+node:felix.20260327235321.1: *3* buildGotoElements
+    public buildGotoElements(): void {
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+
+        const scon: QuickSearchController = c.quicksearchController;
+
+        const result: { [key: string]: any } = {};
+
+        const navlist: LeoGoto[] = [];
+        for (let k = 0; k < scon.its.length; k++) {
+            navlist.push(
+                {
+                    "key": k,
+                    "h": scon.its[k][0]["label"],
+                    "t": scon.its[k][0]["type"] as TGotoTypes
+                }
+            );
+        }
+
+        result["navList"] = navlist;
+        result["messages"] = scon.lw;
+        result["navText"] = scon.navText;
+        result["navOptions"] = { "isTag": scon.isTag, "showParents": scon.showParents };
+
+        // TODO : FINISH building goto elements !! (see leojs!)
+        // this.nodeList = [];
+        // if (result && result.navList) {
+
+        //     const w_navList: LeoGoto[] = result.navList;
+        //     if (w_navList && w_navList.length) {
+        //         w_navList.forEach((p_goto: LeoGoto) => {
+        //             const w_newNode = new LeoGotoNode(this._leoUI, p_goto, result.navOptions!);
+        //             this.nodeList.push(w_newNode);
+        //         });
+        //     }
+        //     return this.nodeList;
+        // }
+    }
+
     //@-others
 
 }

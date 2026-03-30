@@ -2,7 +2,7 @@
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
-import { LeoSearchSettings } from "./types";
+import { LeoSearchSettings, LeoUndoNode } from "./types";
 import { workspace } from './workspace';
 
 type searchSettingNames = 'entireOutline' |
@@ -52,8 +52,11 @@ export class LogPaneManager {
     public SCOPE_NODE: HTMLInputElement; // radio button
     public SCOPE_FILE: HTMLInputElement; // radio button
 
+    // Undo controls
+    public UNDO_CONTENT: HTMLElement; // Container for undo nodes, which will be rendered as child elements within this container.
+
     // Config Controls
-    public CHECK_FOR_EXTERNAL_FILES: HTMLSelectElement; // select
+    public PREVIOUS_NEXT_HISTORY: HTMLInputElement; // checkbox
     public SHOW_COLLAPSE_ALL: HTMLInputElement; // checkbox
 
     // Nav controls
@@ -100,6 +103,8 @@ export class LogPaneManager {
     };
 
     private _postMessageCallback: ((message: any) => void) | undefined; // Set by controller, used to send messages to LeoWeb when settings change or when user interacts with the controls.
+    private _undoSelection: LeoUndoNode | undefined; // Keep track of the currently selected undo node, so that we can maintain selection when refreshing the undo pane.
+    private _undoNodes: LeoUndoNode[] = []; // Keep track of the current list of undo nodes, so that we can refresh the undo pane when it changes.
 
     constructor() {
 
@@ -113,6 +118,9 @@ export class LogPaneManager {
 
         // Log text content
         this.LOG_CONTENT = document.getElementById('log-controls')!;
+
+        // Undo content
+        this.UNDO_CONTENT = document.getElementById('undo-controls')!;
 
         // Find controls
         this.FIND_INPUT = document.getElementById('find-input')! as HTMLInputElement; // text input
@@ -132,7 +140,7 @@ export class LogPaneManager {
         this.SCOPE_FILE = document.getElementById('scope-file')! as HTMLInputElement; // radio button
 
         // Config Controls
-        this.CHECK_FOR_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement; // select
+        this.PREVIOUS_NEXT_HISTORY = document.getElementById('show-prev-next-history')! as HTMLInputElement; // checkbox
         this.SHOW_COLLAPSE_ALL = document.getElementById('show-collapse-all')! as HTMLInputElement; // checkbox
 
         // Nav controls
@@ -234,7 +242,7 @@ export class LogPaneManager {
         });
 
         // * Deal with keyboard presses on specific 'config' tab controls.
-        this.CHECK_FOR_EXTERNAL_FILES.addEventListener('keydown', (e) => {
+        this.PREVIOUS_NEXT_HISTORY.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && e.shiftKey) {
                 e.preventDefault();
                 this.SHOW_COLLAPSE_ALL.focus();
@@ -243,7 +251,7 @@ export class LogPaneManager {
         this.SHOW_COLLAPSE_ALL.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && !e.shiftKey) {
                 e.preventDefault();
-                this.CHECK_FOR_EXTERNAL_FILES.focus();
+                this.PREVIOUS_NEXT_HISTORY.focus();
             }
         });
     }
@@ -447,11 +455,52 @@ export class LogPaneManager {
     //@+node:felix.20260323005820.1: *3* showTab
     public showTab(tabName: string) {
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
+        if (tabName === 'undo') {
+            this.refreshUndoPane();
+        }
     }
     //@+node:felix.20260323005812.1: *3* focusFindInput
     public focusFindInput() {
         this.FIND_INPUT.select();
     }
+    //@+node:felix.20260327222254.1: *3* refreshUndoPane
+    public refreshUndoPane(): void {
+        if (this.HTML_ELEMENT.getAttribute('data-active-tab') !== 'undo') {
+            return;
+        }
+
+        this.UNDO_CONTENT.innerHTML = '';
+
+        const ul = document.createElement('ul');
+        ul.classList.add('undo-list');
+
+        this._undoNodes.forEach((node) => {
+            const li = document.createElement('li');
+            li.classList.add('undo-node');
+            li.classList.add('undo-icon-' + (node.icon || 'default'));
+            li.setAttribute('data-undo-context', node.contextValue || 'default');
+            li.setAttribute('data-bead-index', node.beadIndex.toString());
+            li.title = "Undo bead " + node.beadIndex;
+            if (this._undoSelection && node.beadIndex === this._undoSelection.beadIndex) {
+                li.classList.add('selected');
+            }
+
+            const labelSpan = document.createElement('span');
+            labelSpan.classList.add('undo-label');
+            labelSpan.textContent = node.label;
+
+            const descSpan = document.createElement('span');
+            descSpan.classList.add('undo-description');
+            descSpan.textContent = node.description;
+
+            li.appendChild(labelSpan);
+            li.appendChild(descSpan);
+            ul.appendChild(li);
+        });
+
+        this.UNDO_CONTENT.appendChild(ul);
+    }
+
     //@+node:felix.20260323005755.1: *3* addToLogPane
     public addToLogPane(message: string, replace = false) {
         if (replace) {
@@ -461,6 +510,17 @@ export class LogPaneManager {
         }
         this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
     }
+    //@+node:felix.20260327225825.1: *3* setUndoSelection
+    public setUndoSelection(undoNode: LeoUndoNode | undefined) {
+        this._undoSelection = undoNode;
+    }
+
+    //@+node:felix.20260327225927.1: *3* setUndoNodes
+    public setUndoNodes(undoNodes: LeoUndoNode[]) {
+        this._undoNodes = undoNodes;
+        this.refreshUndoPane();
+    }
+
     //@-others
 
 }

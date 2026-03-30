@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.5
+- Added undo pane.
+- Fixed context menu behavior.
+- Added setting to bypass file-update dialogs as per Leo's #4570 and Removed now unused UI file-update settings.
+
 ## 1.0.4
 
 - Changed keybinding for clone, promote and demote with positional codes.
