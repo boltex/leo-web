@@ -1188,8 +1188,6 @@ body.dragging-secondary .node {
 
 #nav-tab {
   background: var(--nav-tab-bg-color);
-  /* Hidden while being developped */
-  display: none; /* Temporary */
 }
 
 #nav-controls {
@@ -1203,8 +1201,6 @@ body.dragging-secondary .node {
 
 #undo-tab {
   background: var(--undo-tab-bg-color);
-  /* Hidden while being developped */
-  /* display: none;  Temporary */
 }
 
 #undo-controls {

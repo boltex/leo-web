@@ -339,6 +339,16 @@ export interface LeoGoto {
     t: TGotoTypes;
 }
 
+//@+node:felix.20260330221944.1: ** LeoGotoNode
+export type LeoGotoNode = {
+    label: string,
+    description: string,
+    tooltip: string,
+    entryType: TGotoTypes,
+    icon?: number
+    key: number; // id from python
+}
+
 //@+node:felix.20251211000618.14: ** LeoGotoNavKey
 export const enum LeoGotoNavKey {
     prev = 0,

@@ -2,7 +2,7 @@
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
-import { LeoSearchSettings, LeoUndoNode } from "./types";
+import { LeoGoto, LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
 import { workspace } from './workspace';
 
 type searchSettingNames = 'entireOutline' |
@@ -105,6 +105,9 @@ export class LogPaneManager {
     private _postMessageCallback: ((message: any) => void) | undefined; // Set by controller, used to send messages to LeoWeb when settings change or when user interacts with the controls.
     private _undoSelection: LeoUndoNode | undefined; // Keep track of the currently selected undo node, so that we can maintain selection when refreshing the undo pane.
     private _undoNodes: LeoUndoNode[] = []; // Keep track of the current list of undo nodes, so that we can refresh the undo pane when it changes.
+
+    private _gotoContent: LeoGotoNode[] = []; // Keep track of the current list of goto nodes, so that we can refresh the goto pane when it changes.
+    private lastSelectedGotoItem: HTMLDivElement | undefined; // Keep track of the currently selected goto item in the DOM, so that we can maintain selection when refreshing the goto pane.
 
     constructor() {
 
@@ -459,6 +462,15 @@ export class LogPaneManager {
             this.refreshUndoPane();
         }
     }
+    //@+node:felix.20260323005755.1: *3* addToLogPane
+    public addToLogPane(message: string, replace = false) {
+        if (replace) {
+            this.LOG_CONTENT.textContent = message + (message ? '\n' : '');
+        } else {
+            this.LOG_CONTENT.textContent += message + '\n';
+        }
+        this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
+    }
     //@+node:felix.20260323005812.1: *3* focusFindInput
     public focusFindInput() {
         this.FIND_INPUT.select();
@@ -509,15 +521,6 @@ export class LogPaneManager {
         }
     }
 
-    //@+node:felix.20260323005755.1: *3* addToLogPane
-    public addToLogPane(message: string, replace = false) {
-        if (replace) {
-            this.LOG_CONTENT.textContent = message + (message ? '\n' : '');
-        } else {
-            this.LOG_CONTENT.textContent += message + '\n';
-        }
-        this.LOG_CONTENT.scrollTop = this.LOG_CONTENT.scrollHeight;
-    }
     //@+node:felix.20260327225825.1: *3* setUndoSelection
     public setUndoSelection(undoNode: LeoUndoNode | undefined) {
         this._undoSelection = undoNode;
@@ -527,6 +530,59 @@ export class LogPaneManager {
     public setUndoNodes(undoNodes: LeoUndoNode[]) {
         this._undoNodes = undoNodes;
         this.refreshUndoPane();
+    }
+
+    //@+node:felix.20260330213017.1: *3* refreshGotoPane
+    public refreshGotoPane(): void {
+        // If the nav tab is not active, no need to refresh the pane.
+        // It will be refreshed when the user clicks on the nav tab.
+        if (this.HTML_ELEMENT.getAttribute('data-active-tab') !== 'nav') {
+            return;
+        }
+        const gotoPaneContainer = this.GOTO_PANE;
+        if (!gotoPaneContainer) {
+            return;
+        }
+        let i = 0;
+        if (this.lastSelectedGotoItem) {
+            this.lastSelectedGotoItem.classList.remove('selected');
+            this.lastSelectedGotoItem = undefined;
+        }
+        while (gotoPaneContainer && gotoPaneContainer.firstChild) {
+            gotoPaneContainer.removeChild(gotoPaneContainer.firstChild);
+        }
+        let hasParent = false;
+        for (const gotoItem of this._gotoContent) {
+            const smallerDiv = document.createElement('div');
+            smallerDiv.dataset.order = i.toString();
+            smallerDiv.className = 'goto-item ' + gotoItem.entryType;
+            smallerDiv.textContent = gotoItem.label;
+            // smallerDiv.title = gotoItem.tooltip; // TOOLTIPS CANNOT BE STYLED!
+            smallerDiv.setAttribute('tabindex', '0');
+            if (gotoItem.entryType === 'parent') {
+                hasParent = true;
+            }
+            smallerDiv.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                console.log('Clicked goto item with key', gotoItem.key);
+            });
+            gotoPaneContainer.appendChild(smallerDiv);
+            i = i + 1;
+        }
+        gotoPaneContainer.classList.remove('show-parents');
+        if (hasParent) {
+            gotoPaneContainer.classList.add('show-parents');
+        }
+    }
+
+    //@+node:felix.20260330213042.1: *3* setGotoSelection
+    public setGotoSelection(selection: LeoGotoNode) {
+        // todo
+    }
+
+    //@+node:felix.20260330213117.1: *3* setGotoNodes
+    public setGotoNodes(gotoNodes: LeoGotoNode[]): void {
+        this._gotoContent = gotoNodes;
     }
 
     //@-others
