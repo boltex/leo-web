@@ -480,7 +480,7 @@ export class LogPaneManager {
         this._undoNodes.forEach((node) => {
             const li = document.createElement('li');
             li.classList.add('undo-node');
-            li.classList.add('undo-icon-' + (node.icon || 'default'));
+            li.classList.add('undo-icon-' + (node.icon == null ? 'default' : node.icon));
             li.setAttribute('data-undo-context', node.contextValue || 'default');
             li.setAttribute('data-bead-index', node.beadIndex.toString());
             li.title = "Undo bead " + node.beadIndex;
