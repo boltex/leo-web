@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.7
+
+- ...
+
 ## 1.0.6
 
 - Fixed 'enter' to insert a newline while respecting the indentation of the current line. Fixes [#9](https://github.com/boltex/leo-web/issues/9)
