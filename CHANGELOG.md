@@ -1,6 +1,12 @@
 # Change Log
 
+## 1.0.6
+
+- Fixed 'enter' to insert a newline while respecting the indentation of the current line. Fixes [#9](https://github.com/boltex/leo-web/issues/9)
+- Improved Undo Pane.
+
 ## 1.0.5
+
 - Added undo pane.
 - Fixed context menu behavior.
 - Added setting to bypass file-update dialogs as per Leo's #4570 and Removed now unused UI file-update settings.

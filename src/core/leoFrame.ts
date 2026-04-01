@@ -109,8 +109,18 @@ export class LeoFrame {
 
     //@+node:felix.20251213133753.138: *3* destroySelf
     public destroySelf(): void {
-        // console.log('TODO: FRAME DestroySelf');
-        // TODO : Check if needed (are subsriptions disposed?)
+        // Original python code:
+        /*
+            # Remember these: we are about to destroy all of our ivars!
+            c, top = self.c, self.top
+            if hasattr(g.app.gui, 'frameFactory'):
+                g.app.gui.frameFactory.deleteFrame(top)
+            # Indicate that the commander is no longer valid.
+            c.exists = False
+            top.close()
+        */
+        const c = this.c;
+        c.exists = false;
     }
     //@+node:felix.20251213133753.139: *3* finishCreate
     public finishCreate() {

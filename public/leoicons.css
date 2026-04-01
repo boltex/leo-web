@@ -1,0 +1,263 @@
+@font-face {
+  font-family: "leoicons";
+  src: url("leoicons.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+.glicon {
+  font: normal normal normal 16px/1 leoicons;
+  display: inline-block;
+  text-decoration: none;
+  text-rendering: auto;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+/*---------------------
+ *  Modifiers
+ *-------------------*/
+
+@keyframes glicon-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.glicon-sync.glicon-modifier-spin,
+.glicon-loading.glicon-modifier-spin,
+.glicon-gear.glicon-modifier-spin {
+  /* Use steps to throttle FPS to reduce CPU usage */
+  animation: glicon-spin 1.5s steps(30) infinite;
+}
+
+.glicon-modifier-disabled {
+  opacity: 0.5;
+}
+
+.glicon-modifier-hidden {
+  opacity: 0;
+}
+
+/* custom speed & easing for loading icon */
+.glicon-loading {
+  animation-duration: 1s !important;
+  animation-timing-function: cubic-bezier(0.53, 0.21, 0.29, 0.67) !important;
+}
+
+/*---------------------
+ *  Icons
+ *-------------------*/
+
+.leojs-arrow-down:before {
+  content: "\f101";
+}
+.leojs-arrow-left:before {
+  content: "\f102";
+}
+.leojs-arrow-right:before {
+  content: "\f103";
+}
+.leojs-arrow-small-down:before {
+  content: "\f104";
+}
+.leojs-arrow-small-left:before {
+  content: "\f105";
+}
+.leojs-arrow-small-right:before {
+  content: "\f106";
+}
+.leojs-arrow-small-up:before {
+  content: "\f107";
+}
+.leojs-arrow-up:before {
+  content: "\f108";
+}
+.leojs-chapter-back:before {
+  content: "\f109";
+}
+.leojs-chapter-main:before {
+  content: "\f10a";
+}
+.leojs-chapter-next:before {
+  content: "\f10b";
+}
+.leojs-chapter-select:before {
+  content: "\f10c";
+}
+.leojs-clear-files:before {
+  content: "\f10d";
+}
+.leojs-clipboard:before {
+  content: "\f10e";
+}
+.leojs-close:before {
+  content: "\f10f";
+}
+.leojs-close-server:before {
+  content: "\f110";
+}
+.leojs-collapse:before {
+  content: "\f111";
+}
+.leojs-connect:before {
+  content: "\f112";
+}
+.leojs-cut:before {
+  content: "\f113";
+}
+.leojs-dehoist:before {
+  content: "\f114";
+}
+.leojs-delete:before {
+  content: "\f115";
+}
+.leojs-demote:before {
+  content: "\f116";
+}
+.leojs-edit:before {
+  content: "\f117";
+}
+.leojs-extract:before {
+  content: "\f118";
+}
+.leojs-extract-name:before {
+  content: "\f119";
+}
+.leojs-find-next:before {
+  content: "\f11a";
+}
+.leojs-find-previous:before {
+  content: "\f11b";
+}
+.leojs-find-quick:before {
+  content: "\f11c";
+}
+.leojs-find-quick-changed:before {
+  content: "\f11d";
+}
+.leojs-find-quick-history:before {
+  content: "\f11e";
+}
+.leojs-find-quick-marked:before {
+  content: "\f11f";
+}
+.leojs-find-quick-selected:before {
+  content: "\f120";
+}
+.leojs-find-quick-timeline:before {
+  content: "\f121";
+}
+.leojs-folder:before {
+  content: "\f122";
+}
+.leojs-gear:before {
+  content: "\f123";
+}
+.leojs-hoist:before {
+  content: "\f124";
+}
+.leojs-icon-leo-fill:before {
+  content: "\f125";
+}
+.leojs-icon-leo-outline:before {
+  content: "\f126";
+}
+.leojs-import:before {
+  content: "\f127";
+}
+.leojs-insert:before {
+  content: "\f128";
+}
+.leojs-insert-child:before {
+  content: "\f129";
+}
+.leojs-link:before {
+  content: "\f12a";
+}
+.leojs-mark:before {
+  content: "\f12b";
+}
+.leojs-new-file:before {
+  content: "\f12c";
+}
+.leojs-next:before {
+  content: "\f12d";
+}
+.leojs-node:before {
+  content: "\f12e";
+}
+.leojs-open-recent:before {
+  content: "\f12f";
+}
+.leojs-parent:before {
+  content: "\f130";
+}
+.leojs-paste:before {
+  content: "\f131";
+}
+.leojs-paste-clone:before {
+  content: "\f132";
+}
+.leojs-plus:before {
+  content: "\f133";
+}
+.leojs-plus-small:before {
+  content: "\f134";
+}
+.leojs-prev:before {
+  content: "\f135";
+}
+.leojs-promote:before {
+  content: "\f136";
+}
+.leojs-redo:before {
+  content: "\f137";
+}
+.leojs-refresh:before {
+  content: "\f138";
+}
+.leojs-save:before {
+  content: "\f139";
+}
+.leojs-save-as:before {
+  content: "\f13a";
+}
+.leojs-save-as-leojs:before {
+  content: "\f13b";
+}
+.leojs-show-log:before {
+  content: "\f13c";
+}
+.leojs-sort-children:before {
+  content: "\f13d";
+}
+.leojs-sort-siblings:before {
+  content: "\f13e";
+}
+.leojs-start-server:before {
+  content: "\f13f";
+}
+.leojs-switch:before {
+  content: "\f140";
+}
+.leojs-tag:before {
+  content: "\f141";
+}
+.leojs-undo:before {
+  content: "\f142";
+}
+.leojs-unmark:before {
+  content: "\f143";
+}
+.leojs-write-at-file-nodes:before {
+  content: "\f144";
+}
+.leojs-write-dirty-at-file-nodes:before {
+  content: "\f145";
+}

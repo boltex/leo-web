@@ -1203,8 +1203,6 @@ body.dragging-secondary .node {
 
 #undo-tab {
   background: var(--undo-tab-bg-color);
-  /* Hidden while being developped */
-  /* display: none;  Temporary */
 }
 
 #undo-controls {
@@ -1509,9 +1507,12 @@ input[type="checkbox"]:focus-visible:checked::after {
   width: 100%;
   box-sizing: border-box;
   padding: 0.45rem 0.65rem;
-  /* border-bottom: none; */
   cursor: default;
   user-select: none;
+}
+
+.undo-node.undo-icon-default {
+  gap: 0;
 }
 
 .undo-node:hover {
@@ -1539,13 +1540,27 @@ input[type="checkbox"]:focus-visible:checked::after {
 /* Optional icon lane driven by class names from TS (undo-icon-*) */
 .undo-node::before {
   content: "";
+  position: relative;
+  top: -2px;
   width: 0.65rem;
   height: 0.65rem;
   border-radius: 2px;
-  margin-right: 0.5rem;
+  margin-right: 0.2rem;
   display: inline-block;
-  background: var(--find-border-color);
-  vertical-align: middle;
+  font: normal normal normal 16px/1 leoicons;
+  color: var(--find-border-color);
+}
+
+.undo-node.undo-icon-default::before {
+  width: 0rem;
+}
+
+.undo-node.undo-icon-0::before {
+  content: "\f142";
+}
+
+.undo-node.undo-icon-2::before {
+  content: "\f137";
 }
 
 /*@+node:felix.20260321142220.1: ** Overlays & Popups*/

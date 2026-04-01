@@ -831,10 +831,12 @@ export class LeoUI extends NullGui {
 
     public refreshGotoPane(): void {
         // TODO : implement goto pane refresh
+        // console.log('TODO ! in leo-ui: refreshGotoPane called to refresh goto pane');
     }
 
     public refreshButtonsPane(): void {
         // TODO : implement buttons pane refresh
+        // console.log('TODO ! in leo-ui: refreshButtonsPane called to refresh buttons pane');
     }
     //@+node:felix.20260323002101.1: *3* selectTreeNode
     /**

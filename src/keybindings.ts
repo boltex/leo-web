@@ -83,19 +83,22 @@ export const keybindings: Keybinding[] = [
         command: CMD.INDENT_REGION,
         key: "tab",
         body: true,
-        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.UNINDENT_REGION,
         key: "shift+tab",
         body: true,
-        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.SHOW_BODY,
         key: "enter",
         outline: true,
-        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
+    },
+    {
+        command: CMD.INSERT_NEWLINE,
+        key: "enter",
+        body: true,
+        enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
     {
         command: CMD.TAB_CYCLE_NEXT,

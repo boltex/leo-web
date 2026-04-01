@@ -4,7 +4,7 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, LeoGoto, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -24,6 +24,11 @@ export class Controller {
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
 
     private _lastUndoBeadIndex: number | null = null; // To track the last right-clicked undo bead index for showing context menu options
+
+    // Goto Nodes Variables
+    public nodeList: LeoGotoNode[] = [];
+    public selectedNodeIndex: number = 0;
+    public isSelected = false;
 
     constructor() {
         workspace.menu.buildMenu(menuData);
@@ -1149,52 +1154,56 @@ export class Controller {
     //@-others
     //@+node:felix.20260327223045.1: *3* buildUndoElements
     public buildUndoElements(): void {
-        const w_children: LeoUndoNode[] = [];
+        const children: LeoUndoNode[] = [];
+        if (!g.app.windowList.length) {
+            workspace.logPane.setUndoNodes(children);
+            return;
+        }
         const c = g.app.windowList[g.app.gui.frameIndex].c;
         const undoer = c.undoer;
 
         if (undoer.beads.length) {
 
-            let w_foundNode: LeoUndoNode | undefined;
+            let foundNode: LeoUndoNode | undefined;
             let i: number = 0;
-            let w_defaultIcon = 1;
+            let defaultIcon = 1;
 
             undoer.beads.forEach(p_bead => {
-                let w_description: string = "";
-                let w_undoFlag: boolean = false;
-                let w_icon = w_defaultIcon;
+                let description: string = "";
+                let undoFlag: boolean = false;
+                let icon = defaultIcon;
                 if (i === undoer.bead) {
-                    w_description = "Undo";
-                    w_undoFlag = true;
-                    w_icon = 0;
-                    w_defaultIcon = 2;
+                    description = "Undo";
+                    undoFlag = true;
+                    icon = 0;
+                    defaultIcon = 2;
                 }
                 if (i === undoer.bead + 1) {
-                    w_description = "Redo";
-                    w_icon = 2;
-                    w_defaultIcon = 3;
-                    if (!w_foundNode) {
-                        w_undoFlag = true; // Passed all nodes until 'redo', no undo found.
+                    description = "Redo";
+                    icon = 2;
+                    defaultIcon = 3;
+                    if (!foundNode) {
+                        undoFlag = true; // Passed all nodes until 'redo', no undo found.
                     }
                 }
-                const w_node: LeoUndoNode = {
+                const node: LeoUndoNode = {
                     label: p_bead.undoType || "unknown",
-                    description: w_description,
+                    description: description,
                     contextValue: Constants.CONTEXT_FLAGS.UNDO_BEAD,
                     beadIndex: i - undoer.bead,
-                    icon: w_icon
+                    icon: icon
                 };
-                w_children.push(w_node);
-                if (w_undoFlag) {
-                    w_foundNode = w_node;
+                children.push(node);
+                if (undoFlag) {
+                    foundNode = node;
                 }
                 i++;
             });
-            if (w_foundNode) {
-                workspace.logPane.setUndoSelection(w_foundNode);
+            if (foundNode) {
+                workspace.logPane.setUndoSelection(foundNode);
             }
         } else {
-            const w_node = {
+            const node = {
                 label: "Unchanged",
                 description: "",
                 contextValue: Constants.CONTEXT_FLAGS.NOT_UNDO_BEAD,
@@ -1207,9 +1216,9 @@ export class Controller {
                 // 0,
                 // undefined
             };
-            w_children.push(w_node);
+            children.push(node);
         }
-        workspace.logPane.setUndoNodes(w_children);
+        workspace.logPane.setUndoNodes(children);
     }
 
     //@+node:felix.20260327235321.1: *3* buildGotoElements
@@ -1236,20 +1245,136 @@ export class Controller {
         result["navText"] = scon.navText;
         result["navOptions"] = { "isTag": scon.isTag, "showParents": scon.showParents };
 
-        // TODO : FINISH building goto elements !! (see leojs!)
-        // this.nodeList = [];
-        // if (result && result.navList) {
+        this.nodeList = [];
+        if (result && result.navList) {
 
-        //     const w_navList: LeoGoto[] = result.navList;
-        //     if (w_navList && w_navList.length) {
-        //         w_navList.forEach((p_goto: LeoGoto) => {
-        //             const w_newNode = new LeoGotoNode(this._leoUI, p_goto, result.navOptions!);
-        //             this.nodeList.push(w_newNode);
-        //         });
-        //     }
-        //     return this.nodeList;
-        // }
+            const navList: LeoGoto[] = result.navList;
+            if (navList && navList.length) {
+                navList.forEach((p_goto: LeoGoto) => {
+                    // (from leojs) new LeoGotoNode(this._leoUI, p_goto, result.navOptions!)
+                    let leoPaneLabel = "";
+                    let leoPaneDescription = "";
+                    let leoPaneTooltip = p_goto.h.trim();
+                    let leoPaneIcon: number | undefined = undefined;
+                    if (p_goto.t !== 'generic') {
+                        leoPaneTooltip = p_goto.t.charAt(0).toUpperCase() + p_goto.t.slice(1)
+                    }
+                    // if (["tag", "headline"].includes(p_goto.t)) {
+                    //     leoPaneLabel = p_goto.h;
+                    // }
+                    let w_spacing = "";
+                    if (scon.showParents && !scon.isTag) {
+                        w_spacing = "    ";
+                    }
+                    let w_label = "";
+                    if (["tag", "headline"].includes(p_goto.t)) {
+                        w_label = w_spacing + p_goto.h;
+                    }
+                    leoPaneLabel = "";
+                    if (["tag", "headline"].includes(p_goto.t)) {
+                        leoPaneLabel = p_goto.h;
+                    }
+                    const headline = p_goto.h.trim();
+
+                    if (p_goto.t === 'body') {
+                        leoPaneIcon = 2;
+                        if (scon.showParents) {
+                            leoPaneDescription = "    " + headline;
+                        } else {
+                            leoPaneDescription = "  " + headline;
+                        }
+                        leoPaneLabel = headline;
+                    } else if (p_goto.t === 'parent') {
+                        leoPaneIcon = 0;
+                        leoPaneDescription = headline.trim();
+                        leoPaneLabel = leoPaneDescription;
+                    } else if (p_goto.t === 'generic') {
+                        leoPaneIcon = 4;
+                        leoPaneDescription = headline;
+                        leoPaneLabel = leoPaneDescription;
+                    } else if (p_goto.t === 'headline') {
+                        leoPaneIcon = 1;
+                    } else {
+                        leoPaneIcon = 3; // tag
+                    }
+
+                    this.nodeList.push(
+                        {
+                            // Empty for now...
+                            label: leoPaneLabel,
+                            description: leoPaneDescription,
+                            tooltip: leoPaneTooltip,
+                            entryType: p_goto.t,
+                            key: p_goto.key,
+                            icon: leoPaneIcon
+                        }
+                    );
+                });
+            }
+
+        }
+        workspace.logPane.setGotoNodes(this.nodeList);
     }
+
+    //@+node:felix.20260330235648.1: *3* resetSelectedNode
+    public resetSelectedNode(p_node?: LeoGotoNode): void {
+        this.selectedNodeIndex = 0;
+        this.isSelected = false;
+        if (p_node) {
+            const w_found = this.nodeList.indexOf(p_node);
+            if (w_found >= 0) {
+                this.selectedNodeIndex = w_found;
+                this.isSelected = true;
+                return;
+            }
+        }
+    }
+    //@+node:felix.20260330235927.1: *3* navigateNavEntry
+    public async navigateNavEntry(p_nav: LeoGotoNavKey): Promise<void> {
+        if (!this.nodeList.length) {
+            this.selectedNodeIndex = 0;
+            this.isSelected = false;
+            return;
+        }
+        switch (p_nav.valueOf()) {
+            case LeoGotoNavKey.first:
+                this.selectedNodeIndex = 0;
+                this.isSelected = true;
+                break;
+
+            case LeoGotoNavKey.last:
+                this.selectedNodeIndex = this.nodeList.length - 1;
+                this.isSelected = true;
+                break;
+
+            case LeoGotoNavKey.next:
+                if (this.selectedNodeIndex < this.nodeList.length - 1) {
+                    this.selectedNodeIndex += 1;
+                    this.isSelected = true;
+                }
+                break;
+
+            case LeoGotoNavKey.prev:
+                if (this.selectedNodeIndex > 0) {
+                    this.selectedNodeIndex -= 1;
+                    this.isSelected = true;
+                }
+                break;
+        }
+        // Check if array long enough!
+        if (!this.nodeList[this.selectedNodeIndex]) {
+            this.selectedNodeIndex = 0;
+            this.isSelected = true;
+            return; // Cancel
+        }
+        const node = this.nodeList[this.selectedNodeIndex];
+
+        // TODO : implement actual navigation then uncomment this ! 
+        // await this._leoUI.gotoNavEntry(node);
+        // this._leoUI.revealGotoNavEntry(this.selectedNodeIndex);
+
+    }
+
 
     //@-others
 
