@@ -1188,6 +1188,8 @@ body.dragging-secondary .node {
 
 #nav-tab {
   background: var(--nav-tab-bg-color);
+  /* Hidden while being developped */
+  display: none; /* Temporary */
 }
 
 #nav-controls {
@@ -1505,9 +1507,12 @@ input[type="checkbox"]:focus-visible:checked::after {
   width: 100%;
   box-sizing: border-box;
   padding: 0.45rem 0.65rem;
-  /* border-bottom: none; */
   cursor: default;
   user-select: none;
+}
+
+.undo-node.undo-icon-default {
+  gap: 0;
 }
 
 .undo-node:hover {
@@ -1544,6 +1549,10 @@ input[type="checkbox"]:focus-visible:checked::after {
   display: inline-block;
   font: normal normal normal 16px/1 leoicons;
   color: var(--find-border-color);
+}
+
+.undo-node.undo-icon-default::before {
+  width: 0rem;
 }
 
 .undo-node.undo-icon-0::before {

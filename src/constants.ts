@@ -494,6 +494,7 @@ export class Constants {
         TOGGLE_FIND_SEARCH_HEADLINE_OPTION: Constants.NAME + ".toggleFindSearchHeadlineOption",
 
         // Edit Commands
+        INSERT_NEWLINE: Constants.NAME + ".insertNewline",
         BACKWARD_DELETE_CHAR: Constants.NAME + ".backwardDeleteChar",
         CENTER_LINE: Constants.NAME + ".centerLine",
         CENTER_REGION: Constants.NAME + ".centerRegion",
@@ -750,6 +751,7 @@ export class Constants {
         PASTE_TEXT: "paste-text",
         SELECT_ALL_TEXT: "select-all",
 
+        INSERT_NEWLINE: "insert-newline",
         BACKWARD_DELETE_CHAR: "backward-delete-char",
         CENTER_LINE: "center-line",
         CENTER_REGION: "center-region",

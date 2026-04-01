@@ -334,6 +334,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.TOGGLE_FIND_SEARCH_HEADLINE_OPTION, () => leoUI.command(LEOCMD.TOGGLE_FIND_SEARCH_HEADLINE_OPTION, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
 
         // Edit Commands
+        [CMD.INSERT_NEWLINE, () => leoUI.command(LEOCMD.INSERT_NEWLINE, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.BACKWARD_DELETE_CHAR, () => leoUI.command(LEOCMD.BACKWARD_DELETE_CHAR, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.CENTER_LINE, () => leoUI.command(LEOCMD.CENTER_LINE, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
         [CMD.CENTER_REGION, () => leoUI.command(LEOCMD.CENTER_REGION, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],

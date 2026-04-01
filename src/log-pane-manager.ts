@@ -495,7 +495,9 @@ export class LogPaneManager {
             li.classList.add('undo-icon-' + (node.icon == null ? 'default' : node.icon));
             li.setAttribute('data-undo-context', node.contextValue || 'default');
             li.setAttribute('data-bead-index', node.beadIndex.toString());
-            li.title = "Undo bead " + node.beadIndex;
+            if (node.icon != null) {
+                li.title = "Undo Bead " + node.beadIndex;
+            }
             if (this._undoSelection && node.beadIndex === this._undoSelection.beadIndex) {
                 li.classList.add('selected');
                 selectedLi = li;

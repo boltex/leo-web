@@ -1709,7 +1709,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
     public insertNewLine(): void {
         this.insertNewlineBase();
     }
-    public insertNewline(): void {
+    public insertNewline(): void { // Capitalisation.
         this.insertNewlineBase();
     }
 
@@ -1718,6 +1718,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         // Note: insertNewlineHelper already exists.
         const c = this.c;
         const w = this.editWidget();
+        console.log('hi');
         if (!w) {
             return;
         }
