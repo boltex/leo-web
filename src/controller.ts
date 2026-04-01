@@ -1155,6 +1155,10 @@ export class Controller {
     //@+node:felix.20260327223045.1: *3* buildUndoElements
     public buildUndoElements(): void {
         const children: LeoUndoNode[] = [];
+        if (!g.app.windowList.length) {
+            workspace.logPane.setUndoNodes(children);
+            return;
+        }
         const c = g.app.windowList[g.app.gui.frameIndex].c;
         const undoer = c.undoer;
 
