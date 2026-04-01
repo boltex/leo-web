@@ -19,6 +19,7 @@ import {
     Focus,
     LeoDocument,
     LeoGotoNavKey,
+    LeoGotoNode,
     LeoGuiFindTabManagerSettings,
     LeoPackageStates,
     LeoSearchSettings,
@@ -830,8 +831,7 @@ export class LeoUI extends NullGui {
     }
 
     public refreshGotoPane(): void {
-        // TODO : implement goto pane refresh
-        // console.log('TODO ! in leo-ui: refreshGotoPane called to refresh goto pane');
+        workspace.logPane.refreshGotoPane();
     }
 
     public refreshButtonsPane(): void {
@@ -1840,8 +1840,7 @@ export class LeoUI extends NullGui {
      * * Goto the next, previous, first or last nav entry via arrow keys in
      */
     public navigateNavEntry(p_nav: LeoGotoNavKey): void {
-        // TODO : Finish nav entry navigation implementation!
-        // void this.leoGotoProvider.navigateNavEntry(p_nav);
+        workspace.controller.navigateNavEntry(p_nav);
     }
 
     /**
@@ -1890,10 +1889,241 @@ export class LeoUI extends NullGui {
         const scon: QuickSearchController = c.quicksearchController;
 
         scon.clear();
-
-        // TODO: Implement proper goto provider refresh!
         // this.leoGotoProvider.refreshTreeRoot();
+        workspace.controller.buildGotoElements();
+
     }
+
+
+    /**
+     * Opens the Nav tab and focus on nav text input
+     */
+    public findQuick(p_string?: string, p_forceEnter?: boolean): Thenable<unknown> {
+        this.triggerBodySave();
+        console.log('TODO: Implement proper goto provider refresh!');
+        workspace.logPane.showTab('nav');
+        setTimeout(() => {
+            workspace.logPane.focusNavInput();
+        }, 0);
+        // let w_panelID = '';
+        // let w_panel: vscode.WebviewView | undefined;
+        // if (this._lastTreeView === this._leoTreeExView) {
+        //     w_panelID = Constants.FIND_EXPLORER_ID;
+        //     w_panel = this._findPanelWebviewExplorerView;
+        // } else {
+        //     w_panelID = Constants.FIND_ID;
+        //     w_panel = this._findPanelWebviewView;
+        // }
+        // return vscode.commands.executeCommand(w_panelID + '.focus').then((p_result) => {
+        //     if (w_panel && w_panel.show && !w_panel.visible) {
+        //         w_panel.show(false);
+        //     }
+        //     const w_message: { [key: string]: string | boolean } = { type: 'selectNav' };
+        //     if (p_string && p_string.trim()) {
+        //         w_message["text"] = p_string.trim();
+        //     }
+        //     if (p_forceEnter) {
+        //         w_message["forceEnter"] = true;
+        //     }
+        //     if (w_panel) {
+        //         void w_panel.webview.postMessage(w_message);
+        //     } else {
+        //         setTimeout(() => {
+        //             let w_panel: vscode.WebviewView | undefined;
+        //             if (this._lastTreeView === this._leoTreeExView) {
+        //                 w_panel = this._findPanelWebviewExplorerView;
+        //             } else {
+        //                 w_panel = this._findPanelWebviewView;
+        //             }
+        //             void w_panel?.webview.postMessage(w_message);
+        //         }, 290);
+        //     }
+        // });
+        return Promise.resolve();
+    }
+
+    /**
+     * Opens the Nav tab with the selected text as the search string
+     */
+    public findQuickSelected(): Thenable<unknown> {
+        // if (vscode.window.activeTextEditor) {
+        //     const editor = vscode.window.activeTextEditor;
+        //     const selection = editor.selection;
+        //     if (!selection.isEmpty) {
+        //         const text = editor.document.getText(selection).replace(/\r\n/g, "\n");
+        //         return this.findQuick(text, true);
+        //     }
+        // }
+        return this.findQuick("", true);
+    }
+
+    /**
+        * Lists all nodes in reversed gnx order, newest to oldest
+        */
+    public findQuickTimeline(): Thenable<unknown> {
+        // const c = g.app.windowList[this.frameIndex].c;
+        // const scon: QuickSearchController = c.quicksearchController;
+        // scon.qsc_sort_by_gnx();
+        // this.leoGotoProvider.refreshTreeRoot();
+        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        workspace.logPane.showTab('nav');
+        return Promise.resolve();
+    }
+
+    /**
+        * Lists all nodes that are changed (aka "dirty") since last save.
+        */
+    public findQuickChanged(): Thenable<unknown> {
+        // const c = g.app.windowList[this.frameIndex].c;
+        // const scon: QuickSearchController = c.quicksearchController;
+        // scon.qsc_find_changed();
+        // this.leoGotoProvider.refreshTreeRoot();
+        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        workspace.logPane.showTab('nav');
+        return Promise.resolve();
+    }
+
+    /**
+        * Lists nodes from c.nodeHistory.
+        */
+    public findQuickHistory(): Thenable<unknown> {
+        // const c = g.app.windowList[this.frameIndex].c;
+        // const scon: QuickSearchController = c.quicksearchController;
+        // scon.qsc_get_history();
+        // this.leoGotoProvider.refreshTreeRoot();
+        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        workspace.logPane.showTab('nav');
+        return Promise.resolve();
+    }
+
+    /**
+        * List all marked nodes.
+        */
+    public findQuickMarked(p_preserveFocus?: boolean): Thenable<unknown> {
+        // const c = g.app.windowList[this.frameIndex].c;
+        // const scon: QuickSearchController = c.quicksearchController;
+        // scon.qsc_show_marked();
+        // this.leoGotoProvider.refreshTreeRoot();
+        // if (
+        //     p_preserveFocus && (
+        //         (this._findPanelWebviewView && this._findPanelWebviewView.visible) ||
+        //         (this._findPanelWebviewExplorerView && this._findPanelWebviewExplorerView.visible)
+        //     )
+        // ) {
+        //     return Promise.resolve();
+        // }
+        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        workspace.logPane.showTab('nav');
+        return Promise.resolve();
+    }
+
+
+    /**
+        * * Handles a click (selection) of a nav panel node: Sends 'goto' command to server.
+        */
+    public async gotoNavEntry(p_node: LeoGotoNode): Promise<unknown> {
+        if (!p_node) {
+            console.log('ERROR NO NODE TO SHOW IN GOTO PANE!');
+            return;
+        }
+
+        await this.triggerBodySave(true);
+        workspace.controller.resetSelectedNode(p_node); // Inform controller of last index chosen
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+
+        // if (p_node.entryType === 'tag') {
+        //     // * For when the nav input IS CLEARED : GOTO PANE LISTS ALL TAGS!
+        //     // The node clicked was one of the tags, pre-fill the nac search with this tag and open find pane
+        //     let w_string: string = p_node.label as string;
+
+        //     let w_panelID = '';
+        //     let w_panel: vscode.WebviewView | undefined;
+        //     if (this._lastTreeView === this._leoTreeExView) {
+        //         w_panelID = Constants.FIND_EXPLORER_ID;
+        //         w_panel = this._findPanelWebviewExplorerView;
+        //     } else {
+        //         w_panelID = Constants.FIND_ID;
+        //         w_panel = this._findPanelWebviewView;
+        //     }
+        //     await vscode.commands.executeCommand(w_panelID + '.focus');
+
+        //     if (this._findPanelWebviewView && this._findPanelWebviewView.visible) {
+        //         w_panel = this._findPanelWebviewView;
+        //     } else if (this._findPanelWebviewExplorerView && this._findPanelWebviewExplorerView.visible) {
+        //         w_panel = this._findPanelWebviewExplorerView;
+        //     }
+
+        //     if (w_panel && w_panel.show && !w_panel.visible) {
+        //         w_panel.show(false);
+        //     }
+        //     const w_message: { [key: string]: string; } = { type: 'selectNav' };
+        //     if (w_string && w_string.trim()) {
+        //         w_message["text"] = w_string.trim();
+        //     }
+        //     await w_panel!.webview.postMessage(w_message);
+        //     // Do search
+
+        //     setTimeout(() => {
+        //         const inp = scon.navText;
+        //         if (scon.isTag) {
+        //             scon.qsc_find_tags(inp);
+        //         } else {
+        //             scon.qsc_search(inp);
+        //         }
+        //         this.leoGotoProvider.refreshTreeRoot();
+        //         void this.showGotoPane({ preserveFocus: true }); // show but dont change focus
+        //     }, 10);
+
+        // } else if (p_node.entryType !== 'generic' && p_node.entryType !== 'parent') {
+        //     // Other and not a tag so just locate the entry in either body or outline
+        //     // const p_navEntryResult = await this.sendAction(
+        //     //     Constants.LEOBRIDGE.GOTO_NAV_ENTRY,
+        //     //     { key: p_node.key }
+        //     // );
+
+        //     const it = p_node.key;
+        //     scon.onSelectItem(it);
+
+        //     let w_focus = this._get_focus();
+
+        //     if (!w_focus) {
+        //         return vscode.window.showInformationMessage('Not found');
+        //     } else {
+        //         let w_revealTarget = Focus.Body;
+        //         w_focus = w_focus.toLowerCase();
+
+        //         if (w_focus.includes('tree') || w_focus.includes('head')) {
+        //             // tree
+        //             w_revealTarget = Focus.Outline;
+        //             this.showOutlineIfClosed = true;
+        //         } else {
+        //             this.showBodyIfClosed = true;
+        //         }
+
+        //         this.setupRefresh(
+        //             // ! KEEP FOCUS ON GOTO PANE !
+        //             Focus.Goto,
+        //             {
+        //                 tree: true,
+        //                 body: true,
+        //                 scroll: w_revealTarget === Focus.Body,
+        //                 // documents: false,
+        //                 // buttons: false,
+        //                 states: true,
+        //             }
+        //         );
+        //         return this.launchRefresh();
+        //     }
+        // }
+
+    }
+
+    public showNavResults(): void {
+        workspace.controller.buildGotoElements();
+        workspace.logPane.showTab('nav');
+    }
+
     //@+node:felix.20260322235817.1: *3* Search and Replace
     /**
      * * Opens the find panel and selects all & focuses on the find field.
@@ -2297,11 +2527,10 @@ export class LeoUI extends NullGui {
                 void this.navTextClear();
                 break;
             }
-            // TODO.
-            // case 'leoNavMarkedList': {
-            //     void this.findQuickMarked(true);
-            //     break;
-            // }
+            case 'leoNavMarkedList': {
+                void this.findQuickMarked(true);
+                break;
+            }
             case 'leoFindNext': {
                 this.find(false);
                 break;
@@ -2322,11 +2551,11 @@ export class LeoUI extends NullGui {
                 void this.replace(true);
                 break;
             }
-            // TODO.
-            // case 'navigateNavEntry': {
-            //     void this.navigateNavEntry(message.value);
-            //     break;
-            // }
+
+            case 'navigateNavEntry': {
+                void this.navigateNavEntry(message.value);
+                break;
+            }
             case 'refreshSearchConfig': {
                 void this.triggerBodySave();
                 // Leave a cycle before getting settings

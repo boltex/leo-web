@@ -6,7 +6,7 @@ import { Constants } from "./constants";
 import { Position } from "./core/leoNodes";
 import { Controller } from "./controller";
 import { LeoUI } from "./leo-ui";
-import { Focus, ReqRefresh } from "./types";
+import { Focus, LeoGotoNavKey, LeoGotoNode, ReqRefresh } from "./types";
 import { Uri } from "./workspace";
 
 //@-<< imports >>
@@ -271,20 +271,20 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
 
         [CMD.NEXT_NODE, () => leoUI.command(LEOCMD.GOTO_NEXT_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
-        // [CMD.FIND_QUICK, () => p_leoUI.findQuick()],
-        // [CMD.FIND_QUICK_SELECTED, () => p_leoUI.findQuickSelected()],
-        // [CMD.FIND_QUICK_TIMELINE, () => p_leoUI.findQuickTimeline()],
-        // [CMD.FIND_QUICK_CHANGED, () => p_leoUI.findQuickChanged()],
-        // [CMD.FIND_QUICK_HISTORY, () => p_leoUI.findQuickHistory()],
-        // [CMD.FIND_QUICK_MARKED, () => p_leoUI.findQuickMarked()],
+        [CMD.FIND_QUICK, () => leoUI.findQuick()],
+        [CMD.FIND_QUICK_SELECTED, () => leoUI.findQuickSelected()],
+        [CMD.FIND_QUICK_TIMELINE, () => leoUI.findQuickTimeline()],
+        [CMD.FIND_QUICK_CHANGED, () => leoUI.findQuickChanged()],
+        [CMD.FIND_QUICK_HISTORY, () => leoUI.findQuickHistory()],
+        [CMD.FIND_QUICK_MARKED, () => leoUI.findQuickMarked()],
         [CMD.FIND_QUICK_GO_ANYWHERE, () => leoUI.goAnywhere()],
 
-        // [CMD.GOTO_NAV_PREV, () => p_leoUI.navigateNavEntry(LeoGotoNavKey.prev)],
-        // [CMD.GOTO_NAV_NEXT, () => p_leoUI.navigateNavEntry(LeoGotoNavKey.next)],
-        // [CMD.GOTO_NAV_FIRST, () => p_leoUI.navigateNavEntry(LeoGotoNavKey.first)],
-        // [CMD.GOTO_NAV_LAST, () => p_leoUI.navigateNavEntry(LeoGotoNavKey.last)],
+        [CMD.GOTO_NAV_PREV, () => leoUI.navigateNavEntry(LeoGotoNavKey.prev)],
+        [CMD.GOTO_NAV_NEXT, () => leoUI.navigateNavEntry(LeoGotoNavKey.next)],
+        [CMD.GOTO_NAV_FIRST, () => leoUI.navigateNavEntry(LeoGotoNavKey.first)],
+        [CMD.GOTO_NAV_LAST, () => leoUI.navigateNavEntry(LeoGotoNavKey.last)],
 
-        // [CMD.GOTO_NAV_ENTRY, (p_node: LeoGotoNode) => p_leoUI.gotoNavEntry(p_node)],
+        [CMD.GOTO_NAV_ENTRY, (p_node: LeoGotoNode) => leoUI.gotoNavEntry(p_node)],
 
         [CMD.START_SEARCH, () => leoUI.command(LEOCMD.START_SEARCH, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.SEARCH_BACKWARD, () => leoUI.command(LEOCMD.SEARCH_BACKWARD, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],

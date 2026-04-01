@@ -157,13 +157,7 @@ export class LogPaneManager {
 
         this.HTML_ELEMENT = document.documentElement;
 
-
         // * Find & Replace controls change detection
-        this.SEARCH_OPTIONS.addEventListener('change', () => {
-            this.searchSettings.searchOptions = Number(this.SEARCH_OPTIONS.value);
-            this.processChange();
-        });
-
         const findReplaceInputs = [this.FIND_INPUT, this.REPLACE_INPUT];
         const checkboxes = [this.OPT_HEADLINE, this.OPT_BODY, this.OPT_WHOLE, this.OPT_IGNORECASE, this.OPT_REGEXP, this.OPT_MARK_FINDS, this.OPT_MARK_CHANGES];
         const radios = [this.SCOPE_ENTIRE, this.SCOPE_SUBOUTLINE, this.SCOPE_NODE, this.SCOPE_FILE];
@@ -219,6 +213,47 @@ export class LogPaneManager {
             });
         }
 
+        // Setup nav pane controls:
+        this.SEARCH_OPTIONS.addEventListener('change', () => {
+            this.searchSettings.searchOptions = Number(this.SEARCH_OPTIONS.value);
+            this.processChange();
+        });
+
+        this.NAV_TEXT.addEventListener('keydown', (p_event) => {
+            const keyCode = p_event.code || p_event.key;
+            if (keyCode === 'Enter') {
+                p_event.preventDefault();
+                this.navEnter();
+            }
+        });
+
+        this.NAV_TEXT.addEventListener('input', (p_event) => {
+            this.searchSettings.navText = this.NAV_TEXT.value;
+            this.navTextDirty = true;
+            this.navTextChange(); // DEBOUNCE THIS! Don't process change too fast!
+        });
+
+        this.SHOW_PARENT.addEventListener('change', (p_event) => {
+            this.searchSettings.showParents = this.SHOW_PARENT.checked;
+            this.processChange();
+        });
+
+        this.IS_TAG.addEventListener('change', (p_event) => {
+            let w_checked = this.IS_TAG.checked;
+            let w_wasSet = false;
+            if (this.searchSettings.isTag !== w_checked) {
+                this.setFrozen(false); // Switched tagging so reset freeze
+                if (w_checked) {
+                    w_wasSet = true;
+                }
+            }
+            this.searchSettings.isTag = w_checked;
+            // Set placeholder text
+            this.processChange();
+            this.handleIsTagSwitch(w_wasSet);
+        });
+
+
         // Setup tab/shift-tab to manage focus between controls and/or the body/outline panes.
         // * Deal with pressing tab in the log content area to place focus on body-pane itself.
         this.LOG_CONTENT.addEventListener('keydown', (e) => {
@@ -257,6 +292,32 @@ export class LogPaneManager {
                 this.PREVIOUS_NEXT_HISTORY.focus();
             }
         });
+    }
+
+    private navEnter() {
+        if (this.searchSettings.navText.length === 0 && this.searchSettings.isTag) {
+            this.setFrozen(false);
+            this.resetTagNav();
+        } else {
+            if (this.searchSettings.navText.length >= 3 || this.searchSettings.isTag) {
+                this.setFrozen(true);
+                if (this.navTextDirty) {
+                    this.navTextDirty = false;
+                    if (this.timer) {
+                        clearTimeout(this.timer);
+                    }
+                    if (this.navSearchTimer) {
+                        clearTimeout(this.navSearchTimer);
+                    }
+                    this.sendSearchConfig();
+                }
+                this._postMessageCallback?.({ type: 'leoNavEnter' });
+
+            }
+            if (this.searchSettings.navText.length === 0) {
+                this._postMessageCallback?.({ type: 'leoNavClear' });
+            }
+        }
     }
 
     //@+others
@@ -461,6 +522,9 @@ export class LogPaneManager {
         if (tabName === 'undo') {
             this.refreshUndoPane();
         }
+        if (tabName === 'nav') {
+            this.refreshGotoPane();
+        }
     }
     //@+node:felix.20260323005755.1: *3* addToLogPane
     public addToLogPane(message: string, replace = false) {
@@ -474,6 +538,10 @@ export class LogPaneManager {
     //@+node:felix.20260323005812.1: *3* focusFindInput
     public focusFindInput() {
         this.FIND_INPUT.select();
+    }
+    //@+node:felix.20260401000319.1: *3* focusNavInput
+    public focusNavInput() {
+        this.NAV_TEXT.select();
     }
     //@+node:felix.20260327222254.1: *3* refreshUndoPane
     public refreshUndoPane(): void {

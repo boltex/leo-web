@@ -1189,7 +1189,7 @@ body.dragging-secondary .node {
 #nav-tab {
   background: var(--nav-tab-bg-color);
   /* Hidden while being developped */
-  display: none; /* Temporary */
+  /* display: none; /* Temporary */
 }
 
 #nav-controls {
@@ -1201,6 +1201,16 @@ body.dragging-secondary .node {
   overflow-y: hidden;
   min-height: 0;
   flex-grow: 1;
+}
+
+#gotoPane {
+  /* padding: 0.5rem 0.5rem 0 0.5rem; */
+
+  flex-direction: column;
+  flex-wrap: nowrap;
+  min-height: 0;
+  flex-grow: 1;
+  white-space: pre;
 }
 
 #undo-tab {
