@@ -1193,12 +1193,14 @@ body.dragging-secondary .node {
 }
 
 #nav-controls {
-  padding: 0.5rem 0 0 0.5rem;
+  padding: 0.5rem 0.5rem 0 0.5rem;
   display: var(--nav-display);
   flex-direction: column;
   flex-wrap: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;
+  min-height: 0;
+  flex-grow: 1;
 }
 
 #undo-tab {
