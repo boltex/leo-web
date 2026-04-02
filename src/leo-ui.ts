@@ -2022,7 +2022,6 @@ export class LeoUI extends NullGui {
      * * Handles a click (selection) of a nav panel node: Sends 'goto' command to server.
      */
     public async gotoNavEntry(p_node: LeoGotoNode): Promise<unknown> {
-        console.log(' - - - - - - - - - gotoNavEntry IN LEO UI!');
         if (!p_node) {
             console.log('ERROR NO NODE TO SHOW IN GOTO PANE!');
             return;
@@ -2536,7 +2535,6 @@ export class LeoUI extends NullGui {
             }
 
             case 'navigateNavEntry': {
-                console.log('_resolveFindPaneMessage navigateNavEntry: ', message.value);
                 void this.navigateNavEntry(message.value);
                 break;
             }
@@ -2549,8 +2547,6 @@ export class LeoUI extends NullGui {
                 break;
             }
             case 'gotoCommand': {
-                console.log('_resolveFindPaneMessage gotoCommand: ', message.value);
-
                 try {
                     const w_index = Number(message.value);
                     if (!isNaN(w_index) && workspace.controller.nodeList[w_index]) {

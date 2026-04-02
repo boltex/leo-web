@@ -667,7 +667,6 @@ export class LogPaneManager {
                 if (!e.target) {
                     return;
                 }
-                console.log('Clicked goto item with key', gotoItem.key);
                 // remove selected class first
                 if (this.lastSelectedGotoItem) {
                     this.lastSelectedGotoItem.classList.remove('selected');

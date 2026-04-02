@@ -1203,14 +1203,39 @@ body.dragging-secondary .node {
   flex-grow: 1;
 }
 
-#gotoPane {
+#gotoPane.bottom-scroll {
   /* padding: 0.5rem 0.5rem 0 0.5rem; */
-
+  gap: 0;
   flex-direction: column;
   flex-wrap: nowrap;
   min-height: 0;
   flex-grow: 1;
   white-space: pre;
+}
+
+.goto-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.2rem 0.4rem 0.2rem 0.4rem;
+  cursor: default;
+  user-select: none;
+}
+.goto-item:hover {
+  background: var(--hover-bg);
+}
+.goto-item.parent {
+  font-style: italic;
+}
+.goto-item.headline {
+  font-weight: bold;
+  padding-left: 1.4rem;
+}
+.goto-item.body {
+  padding-left: 2.4rem;
 }
 
 #undo-tab {
