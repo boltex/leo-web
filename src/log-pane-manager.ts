@@ -107,7 +107,7 @@ export class LogPaneManager {
     private _undoNodes: LeoUndoNode[] = []; // Keep track of the current list of undo nodes, so that we can refresh the undo pane when it changes.
 
     private _gotoContent: LeoGotoNode[] = []; // Keep track of the current list of goto nodes, so that we can refresh the goto pane when it changes.
-    private lastSelectedGotoItem: HTMLDivElement | undefined; // Keep track of the currently selected goto item in the DOM, so that we can maintain selection when refreshing the goto pane.
+    private lastSelectedGotoItem: HTMLElement | undefined; // Keep track of the currently selected goto item in the DOM, so that we can maintain selection when refreshing the goto pane.
 
     constructor() {
 
@@ -491,6 +491,35 @@ export class LogPaneManager {
         }, 400); // almost half second
 
     }
+    //@+node:felix.20260401203545.1: *3* revealGotoNavEntry
+    public revealGotoNavEntry(p_index: number, p_preserveFocus?: boolean): void {
+
+        if (!p_preserveFocus) {
+            this.showTab('nav');
+        }
+        if (this.lastSelectedGotoItem) {
+            this.lastSelectedGotoItem.classList.remove('selected');
+            this.lastSelectedGotoItem = undefined;
+        }
+        setTimeout(() => {
+            const gotoPaneContainer = this.GOTO_PANE;
+
+            if (!gotoPaneContainer) {
+                return;
+            }
+            const children = gotoPaneContainer.children;
+            if (children && children.length && children.length > p_index) {
+                this.lastSelectedGotoItem = children[p_index] as HTMLElement;
+                this.lastSelectedGotoItem.classList.add('selected');
+                // Will have effect only if visible
+                this.lastSelectedGotoItem.scrollIntoView({ behavior: "instant", block: "nearest" });
+                if (this.lastSelectedGotoItem && this.lastSelectedGotoItem.focus && !p_preserveFocus) {
+                    this.lastSelectedGotoItem.focus();
+                }
+            }
+        }, 0);
+
+    }
     //@+node:felix.20260323005837.1: *3* setFrozen
     public setFrozen(focus: boolean) {
         this.frozen = focus;
@@ -634,7 +663,21 @@ export class LogPaneManager {
             }
             smallerDiv.addEventListener('mousedown', (e) => {
                 e.preventDefault();
+                if (!e.target) {
+                    return;
+                }
                 console.log('Clicked goto item with key', gotoItem.key);
+                // remove selected class first
+                if (this.lastSelectedGotoItem) {
+                    this.lastSelectedGotoItem.classList.remove('selected');
+                }
+                (e.target as HTMLElement).classList.add('selected');
+                this.lastSelectedGotoItem = e.target as HTMLElement;
+
+                // CALL GOTO COMMAND!
+                this._postMessageCallback?.({ type: 'gotoCommand', value: (e.target as HTMLElement).dataset.order });
+
+                // vscode.postMessage({ type: 'gotoCommand', value: event.target.dataset.order });
             });
             gotoPaneContainer.appendChild(smallerDiv);
             i = i + 1;

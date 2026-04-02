@@ -1369,9 +1369,8 @@ export class Controller {
         }
         const node = this.nodeList[this.selectedNodeIndex];
 
-        // TODO : implement actual navigation then uncomment this ! 
-        // await this._leoUI.gotoNavEntry(node);
-        // this._leoUI.revealGotoNavEntry(this.selectedNodeIndex);
+        await g.app.gui.gotoNavEntry(node);
+        workspace.logPane.revealGotoNavEntry(this.selectedNodeIndex);
 
     }
 

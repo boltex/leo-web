@@ -361,6 +361,9 @@ export class LeoGui {
     public startSearch(): void {
         this.oops();
     }
+    public gotoNavEntry(node: any): void {
+        this.oops();
+    }
     //@+node:felix.20251213133753.231: *4* LeoGui.runMainLoop
     public runMainLoop(): void {
         this.oops();

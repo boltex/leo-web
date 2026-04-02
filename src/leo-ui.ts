@@ -1958,8 +1958,8 @@ export class LeoUI extends NullGui {
     }
 
     /**
-        * Lists all nodes in reversed gnx order, newest to oldest
-        */
+     * Lists all nodes in reversed gnx order, newest to oldest
+     */
     public findQuickTimeline(): Thenable<unknown> {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
@@ -1971,8 +1971,8 @@ export class LeoUI extends NullGui {
     }
 
     /**
-        * Lists all nodes that are changed (aka "dirty") since last save.
-        */
+     * Lists all nodes that are changed (aka "dirty") since last save.
+     */
     public findQuickChanged(): Thenable<unknown> {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
@@ -1984,8 +1984,8 @@ export class LeoUI extends NullGui {
     }
 
     /**
-        * Lists nodes from c.nodeHistory.
-        */
+     * Lists nodes from c.nodeHistory.
+     */
     public findQuickHistory(): Thenable<unknown> {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
@@ -1997,8 +1997,8 @@ export class LeoUI extends NullGui {
     }
 
     /**
-        * List all marked nodes.
-        */
+     * List all marked nodes.
+     */
     public findQuickMarked(p_preserveFocus?: boolean): Thenable<unknown> {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
@@ -2019,9 +2019,10 @@ export class LeoUI extends NullGui {
 
 
     /**
-        * * Handles a click (selection) of a nav panel node: Sends 'goto' command to server.
-        */
+     * * Handles a click (selection) of a nav panel node: Sends 'goto' command to server.
+     */
     public async gotoNavEntry(p_node: LeoGotoNode): Promise<unknown> {
+        console.log(' - - - - - - - - - gotoNavEntry IN LEO UI!');
         if (!p_node) {
             console.log('ERROR NO NODE TO SHOW IN GOTO PANE!');
             return;
@@ -2553,6 +2554,7 @@ export class LeoUI extends NullGui {
             }
 
             case 'navigateNavEntry': {
+                console.log('_resolveFindPaneMessage navigateNavEntry: ', message.value);
                 void this.navigateNavEntry(message.value);
                 break;
             }
@@ -2564,18 +2566,19 @@ export class LeoUI extends NullGui {
                 }, 0);
                 break;
             }
-            // TODO.
-            // case 'gotoCommand': {
-            //     try {
-            //         const w_index = Number(message.value);
-            //         if (!isNaN(w_index) && this.leoGotoProvider.nodeList[w_index]) {
-            //         }
-            //         void this.gotoNavEntry(this.leoGotoProvider.nodeList[w_index]);
-            //     } catch (e) {
-            //         console.log('goto nav entry failed for index: ', message.value);
-            //     }
-            //     break;
-            // }
+            case 'gotoCommand': {
+                console.log('_resolveFindPaneMessage gotoCommand: ', message.value);
+
+                try {
+                    const w_index = Number(message.value);
+                    if (!isNaN(w_index) && workspace.controller.nodeList[w_index]) {
+                        void this.gotoNavEntry(workspace.controller.nodeList[w_index]);
+                    }
+                } catch (e) {
+                    console.log('goto nav entry failed for index: ', message.value);
+                }
+                break;
+            }
         }
     }
     //@+node:felix.20260322234219.1: *3* tabCycle
