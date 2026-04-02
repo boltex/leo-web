@@ -2033,90 +2033,72 @@ export class LeoUI extends NullGui {
         const c = g.app.windowList[this.frameIndex].c;
         const scon: QuickSearchController = c.quicksearchController;
 
-        // if (p_node.entryType === 'tag') {
-        //     // * For when the nav input IS CLEARED : GOTO PANE LISTS ALL TAGS!
-        //     // The node clicked was one of the tags, pre-fill the nac search with this tag and open find pane
-        //     let w_string: string = p_node.label as string;
+        if (p_node.entryType === 'tag') {
+            // * For when the nav input IS CLEARED : GOTO PANE LISTS ALL TAGS!
+            // The node clicked was one of the tags, pre-fill the nac search with this tag and open find pane
+            let w_string: string = p_node.label || "";
 
-        //     let w_panelID = '';
-        //     let w_panel: vscode.WebviewView | undefined;
-        //     if (this._lastTreeView === this._leoTreeExView) {
-        //         w_panelID = Constants.FIND_EXPLORER_ID;
-        //         w_panel = this._findPanelWebviewExplorerView;
-        //     } else {
-        //         w_panelID = Constants.FIND_ID;
-        //         w_panel = this._findPanelWebviewView;
-        //     }
-        //     await vscode.commands.executeCommand(w_panelID + '.focus');
+            workspace.logPane.showTab('nav');
 
-        //     if (this._findPanelWebviewView && this._findPanelWebviewView.visible) {
-        //         w_panel = this._findPanelWebviewView;
-        //     } else if (this._findPanelWebviewExplorerView && this._findPanelWebviewExplorerView.visible) {
-        //         w_panel = this._findPanelWebviewExplorerView;
-        //     }
+            const w_message: { [key: string]: string; } = { type: 'selectNav' };
+            if (w_string && w_string.trim()) {
+                w_message["text"] = w_string.trim();
+            }
 
-        //     if (w_panel && w_panel.show && !w_panel.visible) {
-        //         w_panel.show(false);
-        //     }
-        //     const w_message: { [key: string]: string; } = { type: 'selectNav' };
-        //     if (w_string && w_string.trim()) {
-        //         w_message["text"] = w_string.trim();
-        //     }
-        //     await w_panel!.webview.postMessage(w_message);
-        //     // Do search
+            // TODO ************************************* call selectNav with w_string.trim() !!!!!!!!!!!!!!
+            // await w_panel!.webview.postMessage(w_message);
+            workspace.logPane.selectNav(w_string.trim());
+            // Do search
 
-        //     setTimeout(() => {
-        //         const inp = scon.navText;
-        //         if (scon.isTag) {
-        //             scon.qsc_find_tags(inp);
-        //         } else {
-        //             scon.qsc_search(inp);
-        //         }
-        //         this.leoGotoProvider.refreshTreeRoot();
-        //         void this.showGotoPane({ preserveFocus: true }); // show but dont change focus
-        //     }, 10);
+            setTimeout(() => {
+                const inp = scon.navText;
+                if (scon.isTag) {
+                    scon.qsc_find_tags(inp);
+                } else {
+                    scon.qsc_search(inp);
+                }
+                workspace.controller.buildGotoElements();
+                // void this.showGotoPane({ preserveFocus: true }); // show but dont change focus
+            }, 10);
 
-        // } else if (p_node.entryType !== 'generic' && p_node.entryType !== 'parent') {
-        //     // Other and not a tag so just locate the entry in either body or outline
-        //     // const p_navEntryResult = await this.sendAction(
-        //     //     Constants.LEOBRIDGE.GOTO_NAV_ENTRY,
-        //     //     { key: p_node.key }
-        //     // );
+        } else if (p_node.entryType !== 'generic' && p_node.entryType !== 'parent') {
+            // Other and not a tag so just locate the entry in either body or outline
+            // const p_navEntryResult = await this.sendAction(
+            //     Constants.LEOBRIDGE.GOTO_NAV_ENTRY,
+            //     { key: p_node.key }
+            // );
 
-        //     const it = p_node.key;
-        //     scon.onSelectItem(it);
+            const it = p_node.key;
+            scon.onSelectItem(it);
 
-        //     let w_focus = this._get_focus();
+            const w = g.app.gui.get_focus(c);
+            let focus = g.app.gui.widget_name(w);
 
-        //     if (!w_focus) {
-        //         return vscode.window.showInformationMessage('Not found');
-        //     } else {
-        //         let w_revealTarget = Focus.Body;
-        //         w_focus = w_focus.toLowerCase();
+            if (!focus) {
+                return workspace.dialog.showInformationMessage('Not found');
+            } else {
+                let w_revealTarget = Focus.Body;
+                focus = focus.toLowerCase();
 
-        //         if (w_focus.includes('tree') || w_focus.includes('head')) {
-        //             // tree
-        //             w_revealTarget = Focus.Outline;
-        //             this.showOutlineIfClosed = true;
-        //         } else {
-        //             this.showBodyIfClosed = true;
-        //         }
-
-        //         this.setupRefresh(
-        //             // ! KEEP FOCUS ON GOTO PANE !
-        //             Focus.Goto,
-        //             {
-        //                 tree: true,
-        //                 body: true,
-        //                 scroll: w_revealTarget === Focus.Body,
-        //                 // documents: false,
-        //                 // buttons: false,
-        //                 states: true,
-        //             }
-        //         );
-        //         return this.launchRefresh();
-        //     }
-        // }
+                if (focus.includes('tree') || focus.includes('head')) {
+                    // tree
+                    w_revealTarget = Focus.Outline;
+                }
+                this.setupRefresh(
+                    // ! KEEP FOCUS ON GOTO PANE !
+                    Focus.Goto,
+                    {
+                        tree: true,
+                        body: true,
+                        scroll: w_revealTarget === Focus.Body,
+                        // documents: false,
+                        // buttons: false,
+                        states: true,
+                    }
+                );
+                return this.launchRefresh();
+            }
+        }
 
     }
 

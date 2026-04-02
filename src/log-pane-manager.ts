@@ -2,6 +2,7 @@
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
+import { set } from "lodash";
 import { LeoGoto, LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
 import { workspace } from './workspace';
 
@@ -688,6 +689,28 @@ export class LogPaneManager {
         }
     }
 
+    //@+node:felix.20260401230630.1: *3* selectNav
+    public selectNav(value: string, forceEnter?: boolean): void {
+        this.showTab('nav');
+        if (value) {
+
+            this.NAV_TEXT.value = value;
+            this.searchSettings["navText"] = value;
+            if (this.timer) {
+                clearTimeout(this.timer);
+            }
+            this.sendSearchConfig();
+            if (forceEnter) {
+                this.navEnter();
+            }
+        }
+        // let timeout to ensure that the nav pane is rendered before trying to select the item:
+        setTimeout(() => {
+            this.NAV_TEXT.focus();
+        }, 10);
+
+    }
+
     //@+node:felix.20260330213042.1: *3* setGotoSelection
     public setGotoSelection(selection: LeoGotoNode) {
         // todo
@@ -696,6 +719,7 @@ export class LogPaneManager {
     //@+node:felix.20260330213117.1: *3* setGotoNodes
     public setGotoNodes(gotoNodes: LeoGotoNode[]): void {
         this._gotoContent = gotoNodes;
+        this.refreshGotoPane();
     }
 
     //@-others
