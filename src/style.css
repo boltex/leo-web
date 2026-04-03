@@ -1237,9 +1237,14 @@ body.dragging-secondary .node {
 }
 .goto-item.headline {
   font-weight: bold;
+}
+.show-parents .goto-item.headline {
   padding-left: 1.4rem;
 }
 .goto-item.body {
+  padding-left: 1.4rem;
+}
+.show-parents .goto-item.body {
   padding-left: 2.4rem;
 }
 .goto-item.selected {
