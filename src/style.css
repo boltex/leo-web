@@ -684,6 +684,10 @@ body.dragging-cross {
   outline: 3px solid var(--focus-outline);
   outline-offset: -3px;
 }
+#body-pane.no-focus-outline {
+  outline: none !important;
+  transition: none !important; /* Prevent any fade-in effects during the jump */
+}
 
 /*@+node:felix.20260321142128.1: ** Outline Pane*/
 #outline-pane {
@@ -1088,6 +1092,7 @@ body.dragging-secondary .node {
   transition: var(--find-pane-transition);
   container-type: inline-size;
   container-name: log-pane;
+  user-select: none;
 }
 
 #find-controls,
@@ -1223,6 +1228,7 @@ body.dragging-secondary .node {
   padding: 0.2rem 0.4rem 0.2rem 0.4rem;
   cursor: default;
   user-select: none;
+  -webkit-user-select: none; /* Safari support */
 }
 .goto-item:hover {
   background: var(--hover-bg);
@@ -1236,6 +1242,10 @@ body.dragging-secondary .node {
 }
 .goto-item.body {
   padding-left: 2.4rem;
+}
+.goto-item.selected {
+  background: var(--selected-bg);
+  color: var(--text-color);
 }
 
 #undo-tab {
@@ -1610,6 +1620,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   z-index: 1000;
+  user-select: none;
 }
 
 .context-menu ul {
@@ -1647,6 +1658,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   font-family: sans-serif;
   font-size: 13px;
   white-space: pre;
+  user-select: none;
 }
 
 #toast.show {

@@ -657,16 +657,17 @@ export class LogPaneManager {
             smallerDiv.dataset.order = i.toString();
             smallerDiv.className = 'goto-item ' + gotoItem.entryType;
             smallerDiv.textContent = gotoItem.label;
-            // smallerDiv.title = gotoItem.tooltip; // TOOLTIPS CANNOT BE STYLED!
-            smallerDiv.setAttribute('tabindex', '0');
+            // smallerDiv.title = gotoItem.tooltip; 
+            smallerDiv.setAttribute('tabindex', '-1'); // Make div focusable but only programmatically.
             if (gotoItem.entryType === 'parent') {
                 hasParent = true;
             }
-            smallerDiv.addEventListener('mousedown', (e) => {
-                e.preventDefault();
+            smallerDiv.addEventListener('click', (e) => {
+                // e.preventDefault(); // Commented off to let focus get on it.
                 if (!e.target) {
                     return;
                 }
+
                 // remove selected class first
                 if (this.lastSelectedGotoItem) {
                     this.lastSelectedGotoItem.classList.remove('selected');
@@ -676,8 +677,6 @@ export class LogPaneManager {
 
                 // CALL GOTO COMMAND!
                 this._postMessageCallback?.({ type: 'gotoCommand', value: (e.target as HTMLElement).dataset.order });
-
-                // vscode.postMessage({ type: 'gotoCommand', value: event.target.dataset.order });
             });
             gotoPaneContainer.appendChild(smallerDiv);
             i = i + 1;

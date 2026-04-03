@@ -621,7 +621,10 @@ export class LeoUI extends NullGui {
         workspace.layout.OUTLINE_PANE.focus();
     }
     //@+node:felix.20260323002416.1: *3* showBody
-    public showBody(): void {
+    public showBody(preventFocus?: boolean): void {
+
+        // If preventFocus is true, make sure to save focused element and restore it after setting selection.
+        const focusedElement = document.activeElement as HTMLElement;
         const c = g.app.windowList[this.frameIndex].c;
         const p = c.p;
 
@@ -670,8 +673,23 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
+        // Add no-focus-outline class to body pane to avoid unwanted focus outline when preventFocus is true
+        if (preventFocus) {
+            workspace.layout.BODY_PANE.classList.add('no-focus-outline');
+        }
+
         workspace.body.setBodySelection(w_selection, this._refreshType.scroll); // Note, in some browser, this has a side-effect of setting focus in body.
         this._refreshType.scroll = false;
+
+        if (preventFocus) {
+            // Wait for the Scroll and Selection-Focus to "settle" in the browser's eyes
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    focusedElement?.focus({ preventScroll: true });
+                    workspace.layout.BODY_PANE.classList.remove('no-focus-outline');
+                });
+            });
+        }
 
     }
     //@+node:felix.20260323002150.1: *3* Refresh & helpers
@@ -933,7 +951,7 @@ export class LeoUI extends NullGui {
         //     g.doHook("headclick2", { c: c, p: node, v: node });
         //     return this._launchRefresh();
         // }
-
+        this.finalFocus = Focus.Outline; // Force focus in outline after selection, since user just clicked in it.
         this._refreshType.states = true;
         this.getStates();
 
@@ -967,9 +985,13 @@ export class LeoUI extends NullGui {
         const scroll = p.v.scrollBarSpot;
         workspace.body.setBodyScroll(scroll);
 
-        if (!showBodyNoFocus) {
-            // Set focus to body pane
-            this.showBody();
+        // If the desired final focus is the goto-items of the nav pane, then we call showBody (which sets selection and optional focus)
+        // but with showBodyNoFocus true to preserve focus in the nav pane.
+
+        // * note that other 'finalFocus', e.g. on Outline, will not have the selection range set *
+        const isGotoFocus = this.finalFocus === Focus.Goto;
+        if (!showBodyNoFocus || isGotoFocus) {
+            this.showBody(isGotoFocus);
         }
 
     }
@@ -2044,11 +2066,8 @@ export class LeoUI extends NullGui {
                 w_message["text"] = w_string.trim();
             }
 
-            // TODO ************************************* call selectNav with w_string.trim() !!!!!!!!!!!!!!
-            // await w_panel!.webview.postMessage(w_message);
             workspace.logPane.selectNav(w_string.trim());
             // Do search
-
             setTimeout(() => {
                 const inp = scon.navText;
                 if (scon.isTag) {
