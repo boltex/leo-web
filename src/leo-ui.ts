@@ -835,6 +835,7 @@ export class LeoUI extends NullGui {
 
     public refreshDocumentsPane(): void {
         workspace.controller.setupDocumentTabsAndHandlers();
+        workspace.layout.updateCollapseAllPosition();
     }
 
     public refreshUndoPane(): void {
@@ -2006,7 +2007,7 @@ export class LeoUI extends NullGui {
             return;
         }
 
-        await this.triggerBodySave(true);
+        this.triggerBodySave(true);
         workspace.controller.resetSelectedNode(p_node); // Inform controller of last index chosen
         const c = g.app.windowList[this.frameIndex].c;
         const scon: QuickSearchController = c.quicksearchController;
@@ -2632,7 +2633,7 @@ export class LeoUI extends NullGui {
             // Is there a file opened?
             if (g.app.windowList.length && g.app.windowList[this.frameIndex]) {
                 const c = g.app.windowList[this.frameIndex].c;
-                await this.triggerBodySave(true);
+                this.triggerBodySave(true);
                 if (g.doHook("recentfiles1", { c: c, p: c.p, v: c.p.v, fileName: filename })) {
                     return Promise.resolve(undefined);
                 }

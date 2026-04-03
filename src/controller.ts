@@ -1369,8 +1369,8 @@ export class Controller {
         }
         const node = this.nodeList[this.selectedNodeIndex];
 
-        await g.app.gui.gotoNavEntry(node);
-        workspace.logPane.revealGotoNavEntry(this.selectedNodeIndex);
+        workspace.logPane.revealGotoNavEntry(this.selectedNodeIndex, true);
+        g.app.gui.gotoNavEntry(node);
 
     }
 

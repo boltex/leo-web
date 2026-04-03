@@ -2,8 +2,7 @@
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
-import { set } from "lodash";
-import { LeoGoto, LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
+import { LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
 import { workspace } from './workspace';
 
 type searchSettingNames = 'entireOutline' |
@@ -506,25 +505,24 @@ export class LogPaneManager {
             this.lastSelectedGotoItem.classList.remove('selected');
             this.lastSelectedGotoItem = undefined;
         }
-        setTimeout(() => {
-            if (!this.GOTO_PANE) {
-                return;
-            }
-            const children = this.GOTO_PANE.children;
-            if (children && children.length && children.length > p_index) {
-                this.lastSelectedGotoItem = children[p_index] as HTMLElement;
-                this.lastSelectedGotoItem.classList.add('selected');
-                // Will have effect only if visible
-                this.lastSelectedGotoItem.scrollIntoView({ behavior: "instant", block: "nearest" });
-                if (this.lastSelectedGotoItem && this.lastSelectedGotoItem.focus && !p_preserveFocus) {
-                    this.lastSelectedGotoItem.focus({
-                        preventScroll: false,
-                        focusVisible: false
-                    });
-                }
-            }
-        }, 0);
 
+        if (!this.GOTO_PANE) {
+            return;
+        }
+        const children = this.GOTO_PANE.children;
+        if (children && children.length && children.length > p_index) {
+            this.lastSelectedGotoItem = children[p_index] as HTMLElement;
+            this.lastSelectedGotoItem.classList.add('selected');
+            // Will have effect only if visible
+            this.lastSelectedGotoItem.scrollIntoView({ behavior: "instant", block: "nearest" });
+            if (this.lastSelectedGotoItem && this.lastSelectedGotoItem.focus && !p_preserveFocus) {
+                this.lastSelectedGotoItem.focus({
+                    preventScroll: false,
+                    // New in 2026 - but not supported in all browsers yet, so commented out for now.
+                    // focusVisible: false
+                });
+            }
+        }
     }
     //@+node:felix.20260323005837.1: *3* setFrozen
     public setFrozen(focus: boolean) {
@@ -553,6 +551,10 @@ export class LogPaneManager {
     }
     //@+node:felix.20260323005820.1: *3* showTab
     public showTab(tabName: string) {
+        const oldTab = this.HTML_ELEMENT.getAttribute('data-active-tab');
+        if (oldTab === tabName) {
+            return;
+        }
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
         if (tabName === 'undo') {
             this.refreshUndoPane();

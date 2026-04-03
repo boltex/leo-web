@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
-        // "moduleResolution": "Bundler",
-        "moduleResolution": "node",
+        "moduleResolution": "node10",
         "resolveJsonModule": true,
         "jsx": "react-jsx",
         "experimentalDecorators": true,

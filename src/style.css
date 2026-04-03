@@ -1228,7 +1228,6 @@ body.dragging-secondary .node {
   padding: 0.2rem 0.4rem 0.2rem 0.4rem;
   cursor: default;
   user-select: none;
-  -webkit-user-select: none; /* Safari support */
 }
 .goto-item:hover {
   background: var(--hover-bg);
@@ -1246,6 +1245,10 @@ body.dragging-secondary .node {
 .goto-item.selected {
   background: var(--selected-bg);
   color: var(--text-color);
+}
+/* Prevent browser styling of focus-visible */
+#log-pane :focus-visible {
+  outline: none;
 }
 
 #undo-tab {
