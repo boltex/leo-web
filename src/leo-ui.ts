@@ -1927,6 +1927,9 @@ export class LeoUI extends NullGui {
         setTimeout(() => {
             workspace.logPane.focusNavInput();
         }, 0);
+
+        // TODO : Use workspace.logPane.selectNav instead of the old webview focus and postMessage, and remove all the old webview code related to this.
+
         // let w_panelID = '';
         // let w_panel: vscode.WebviewView | undefined;
         // if (this._lastTreeView === this._leoTreeExView) {
