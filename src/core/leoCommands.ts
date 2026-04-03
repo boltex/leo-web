@@ -4721,6 +4721,7 @@ export class Commands {
         const table = [
             g.app.gui,
             g.app.pluginsController,
+            g.app.externalFilesController,
             // c.k.autoCompleter,
             c.frame,
             c.frame.body,
