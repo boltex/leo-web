@@ -215,6 +215,10 @@ export class LogPaneManager {
         }
 
         // Setup nav pane controls:
+        this.GOTO_PANE.addEventListener('keydown', (e) => {
+            this.navKeyHandler(e);
+        });
+
         this.SEARCH_OPTIONS.addEventListener('change', () => {
             this.searchSettings.searchOptions = Number(this.SEARCH_OPTIONS.value);
             this.processChange();
@@ -503,19 +507,20 @@ export class LogPaneManager {
             this.lastSelectedGotoItem = undefined;
         }
         setTimeout(() => {
-            const gotoPaneContainer = this.GOTO_PANE;
-
-            if (!gotoPaneContainer) {
+            if (!this.GOTO_PANE) {
                 return;
             }
-            const children = gotoPaneContainer.children;
+            const children = this.GOTO_PANE.children;
             if (children && children.length && children.length > p_index) {
                 this.lastSelectedGotoItem = children[p_index] as HTMLElement;
                 this.lastSelectedGotoItem.classList.add('selected');
                 // Will have effect only if visible
                 this.lastSelectedGotoItem.scrollIntoView({ behavior: "instant", block: "nearest" });
                 if (this.lastSelectedGotoItem && this.lastSelectedGotoItem.focus && !p_preserveFocus) {
-                    this.lastSelectedGotoItem.focus();
+                    this.lastSelectedGotoItem.focus({
+                        preventScroll: false,
+                        focusVisible: false
+                    });
                 }
             }
         }, 0);
@@ -688,7 +693,7 @@ export class LogPaneManager {
     }
 
     //@+node:felix.20260401230630.1: *3* selectNav
-    public selectNav(value: string, forceEnter?: boolean): void {
+    public selectNav(value?: string, forceEnter?: boolean): void {
         this.showTab('nav');
         if (value) {
 
@@ -709,6 +714,64 @@ export class LogPaneManager {
 
     }
 
+    //@+node:felix.20260403152952.1: *3* navKeyHandler
+    public navKeyHandler(p_event: KeyboardEvent): void {
+        // Handles up/down home/end pgUp/pgDown
+        // for GOTO PANE navigation under the nav input
+
+        const keyCode = p_event.code;
+
+        let code = -1;
+        switch (keyCode) {
+            case 'ArrowUp':
+                code = 0;
+                break;
+            case 'ArrowDown':
+                code = 1;
+                break;
+            case 'PageUp':
+                code = 2;
+                break;
+            case 'PageDown':
+                code = 3;
+                break;
+            case 'Home':
+                code = 2;
+                break;
+            case 'End':
+                code = 3;
+                break;
+            case 'Enter':
+                const actEl = document.activeElement as HTMLElement;
+                if (actEl && actEl.classList.contains('goto-item')) {
+                    p_event.preventDefault();
+                    p_event.stopPropagation();
+                    p_event.stopImmediatePropagation();
+                    if (!this.GOTO_PANE) {
+                        return;
+                    }
+                    // remove selected class first
+                    if (this.lastSelectedGotoItem) {
+                        this.lastSelectedGotoItem.classList.remove('selected');
+                    }
+                    actEl.classList.add('selected');
+                    this.lastSelectedGotoItem = actEl;
+                    // CALL GOTO COMMAND!
+                    this._postMessageCallback?.({ type: 'gotoCommand', value: actEl.dataset.order });
+                    return;
+                }
+                break;
+
+            default:
+                break;
+        }
+        if (code >= 0) {
+            p_event.preventDefault();
+            p_event.stopPropagation();
+            p_event.stopImmediatePropagation();
+            this._postMessageCallback?.({ type: 'navigateNavEntry', value: code });
+        }
+    }
     //@+node:felix.20260330213042.1: *3* setGotoSelection
     public setGotoSelection(selection: LeoGotoNode) {
         // todo

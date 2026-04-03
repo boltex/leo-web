@@ -1920,57 +1920,15 @@ export class LeoUI extends NullGui {
     /**
      * Opens the Nav tab and focus on nav text input
      */
-    public findQuick(p_string?: string, p_forceEnter?: boolean): Thenable<unknown> {
+    public findQuick(text?: string, p_forceEnter?: boolean): void {
         this.triggerBodySave();
-        console.log('TODO: Implement proper goto provider refresh!');
-        workspace.logPane.showTab('nav');
-        setTimeout(() => {
-            workspace.logPane.focusNavInput();
-        }, 0);
-
-        // TODO : Use workspace.logPane.selectNav instead of the old webview focus and postMessage, and remove all the old webview code related to this.
-
-        // let w_panelID = '';
-        // let w_panel: vscode.WebviewView | undefined;
-        // if (this._lastTreeView === this._leoTreeExView) {
-        //     w_panelID = Constants.FIND_EXPLORER_ID;
-        //     w_panel = this._findPanelWebviewExplorerView;
-        // } else {
-        //     w_panelID = Constants.FIND_ID;
-        //     w_panel = this._findPanelWebviewView;
-        // }
-        // return vscode.commands.executeCommand(w_panelID + '.focus').then((p_result) => {
-        //     if (w_panel && w_panel.show && !w_panel.visible) {
-        //         w_panel.show(false);
-        //     }
-        //     const w_message: { [key: string]: string | boolean } = { type: 'selectNav' };
-        //     if (p_string && p_string.trim()) {
-        //         w_message["text"] = p_string.trim();
-        //     }
-        //     if (p_forceEnter) {
-        //         w_message["forceEnter"] = true;
-        //     }
-        //     if (w_panel) {
-        //         void w_panel.webview.postMessage(w_message);
-        //     } else {
-        //         setTimeout(() => {
-        //             let w_panel: vscode.WebviewView | undefined;
-        //             if (this._lastTreeView === this._leoTreeExView) {
-        //                 w_panel = this._findPanelWebviewExplorerView;
-        //             } else {
-        //                 w_panel = this._findPanelWebviewView;
-        //             }
-        //             void w_panel?.webview.postMessage(w_message);
-        //         }, 290);
-        //     }
-        // });
-        return Promise.resolve();
+        workspace.logPane.selectNav(text, p_forceEnter);
     }
 
     /**
      * Opens the Nav tab with the selected text as the search string
      */
-    public findQuickSelected(): Thenable<unknown> {
+    public findQuickSelected(): void {
         // if (vscode.window.activeTextEditor) {
         //     const editor = vscode.window.activeTextEditor;
         //     const selection = editor.selection;
@@ -1985,46 +1943,43 @@ export class LeoUI extends NullGui {
     /**
      * Lists all nodes in reversed gnx order, newest to oldest
      */
-    public findQuickTimeline(): Thenable<unknown> {
+    public findQuickTimeline(): void {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
         // scon.qsc_sort_by_gnx();
         // this.leoGotoProvider.refreshTreeRoot();
         // return this.showGotoPane(); // Finish by opening and focussing nav pane
         workspace.logPane.showTab('nav');
-        return Promise.resolve();
     }
 
     /**
      * Lists all nodes that are changed (aka "dirty") since last save.
      */
-    public findQuickChanged(): Thenable<unknown> {
+    public findQuickChanged(): void {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
         // scon.qsc_find_changed();
         // this.leoGotoProvider.refreshTreeRoot();
         // return this.showGotoPane(); // Finish by opening and focussing nav pane
         workspace.logPane.showTab('nav');
-        return Promise.resolve();
     }
 
     /**
      * Lists nodes from c.nodeHistory.
      */
-    public findQuickHistory(): Thenable<unknown> {
+    public findQuickHistory(): void {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
         // scon.qsc_get_history();
         // this.leoGotoProvider.refreshTreeRoot();
         // return this.showGotoPane(); // Finish by opening and focussing nav pane
         workspace.logPane.showTab('nav');
-        return Promise.resolve();
     }
 
     /**
      * List all marked nodes.
      */
-    public findQuickMarked(p_preserveFocus?: boolean): Thenable<unknown> {
+    public findQuickMarked(p_preserveFocus?: boolean): void {
         // const c = g.app.windowList[this.frameIndex].c;
         // const scon: QuickSearchController = c.quicksearchController;
         // scon.qsc_show_marked();
@@ -2039,7 +1994,6 @@ export class LeoUI extends NullGui {
         // }
         // return this.showGotoPane(); // Finish by opening and focussing nav pane
         workspace.logPane.showTab('nav');
-        return Promise.resolve();
     }
 
 
