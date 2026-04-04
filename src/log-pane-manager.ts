@@ -790,12 +790,23 @@ export class LogPaneManager {
     }
     //@+node:felix.20260330213042.1: *3* focusGotoPane
     public focusGotoPane() {
+        this.showTab('nav');
         if (this._gotoContent.length === 0) {
             this.focusNavInput();
             return;
         }
         // Select the first item, if any, otherwise focus the nav input:
         this._postMessageCallback?.({ type: 'navigateNavEntry', value: 2 });
+
+        // focus on first child of goto pane
+        setTimeout(() => {
+            if (this.GOTO_PANE && this.GOTO_PANE.firstChild) {
+                (this.GOTO_PANE.firstChild as HTMLElement).focus();
+            } else {
+                this.focusNavInput();
+            }
+        }, 10);
+
 
     }
 
