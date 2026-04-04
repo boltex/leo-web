@@ -113,7 +113,6 @@ export class QuickSearchController {
         this.qsc_find_changed();
         g.workspace.controller.buildGotoElements();
         g.workspace.logPane.showTab('nav');
-
     }
 
     //@+node:felix.20260404005125.1: *4* show_marked
