@@ -1933,15 +1933,12 @@ export class LeoUI extends NullGui {
         const frame = g.app.windowList[this.frameIndex];
         const body = frame.body;
 
-        let head: string;
-        let s: string;
-        let tail: string;
-        [head, s, tail] = body.getSelectionLines();
+        let [, s] = body.getSelectionLines();
         if (s) {
             s = s.replace(/\r\n/g, "\n");
-            return this.findQuick(s, true);
         }
-        return this.findQuick("", true);
+
+        return this.findQuick(s || "", true);
     }
 
     /**

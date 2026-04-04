@@ -722,6 +722,8 @@ export class LogPaneManager {
         // let timeout to ensure that the nav pane is rendered before trying to select the item:
         setTimeout(() => {
             this.NAV_TEXT.focus();
+            // select all text in the nav input for easy replacement:
+            this.NAV_TEXT.select();
         }, 10);
 
     }
@@ -730,7 +732,9 @@ export class LogPaneManager {
     public navKeyHandler(p_event: KeyboardEvent): void {
         // Handles up/down home/end pgUp/pgDown
         // for GOTO PANE navigation under the nav input
-
+        if (this._gotoContent.length === 0) {
+            return;
+        }
         const keyCode = p_event.code;
 
         let code = -1;
@@ -784,9 +788,15 @@ export class LogPaneManager {
             this._postMessageCallback?.({ type: 'navigateNavEntry', value: code });
         }
     }
-    //@+node:felix.20260330213042.1: *3* setGotoSelection
-    public setGotoSelection(selection: LeoGotoNode) {
-        // todo
+    //@+node:felix.20260330213042.1: *3* focusGotoPane
+    public focusGotoPane() {
+        if (this._gotoContent.length === 0) {
+            this.focusNavInput();
+            return;
+        }
+        // Select the first item, if any, otherwise focus the nav input:
+        this._postMessageCallback?.({ type: 'navigateNavEntry', value: 2 });
+
     }
 
     //@+node:felix.20260330213117.1: *3* setGotoNodes
