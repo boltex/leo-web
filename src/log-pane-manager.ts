@@ -763,17 +763,11 @@ export class LogPaneManager {
                     p_event.preventDefault();
                     p_event.stopPropagation();
                     p_event.stopImmediatePropagation();
-                    if (!this.GOTO_PANE) {
+                    if (!this.GOTO_PANE || !this.lastSelectedGotoItem) {
                         return;
                     }
-                    // remove selected class first
-                    if (this.lastSelectedGotoItem) {
-                        this.lastSelectedGotoItem.classList.remove('selected');
-                    }
-                    actEl.classList.add('selected');
-                    this.lastSelectedGotoItem = actEl;
                     // CALL GOTO COMMAND!
-                    this._postMessageCallback?.({ type: 'gotoCommand', value: actEl.dataset.order });
+                    this._postMessageCallback?.({ type: 'gotoCommand', value: this.lastSelectedGotoItem.dataset.order });
                     return;
                 }
                 break;
