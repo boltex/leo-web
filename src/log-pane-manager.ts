@@ -229,6 +229,16 @@ export class LogPaneManager {
                 p_event.preventDefault();
                 this.navEnter();
             }
+            // If up/down arrows, check if there are goto-item results shown, and if so,
+            // Do as if already focused in the goto container: down to first, up to last.
+            if ((keyCode === 'ArrowDown' || keyCode === 'ArrowUp') && this.GOTO_PANE.children.length > 0) {
+                p_event.preventDefault();
+                let code = 3; // default for up: last item
+                if (keyCode === 'ArrowDown') {
+                    code = 2; // down: first item
+                }
+                this._postMessageCallback?.({ type: 'navigateNavEntry', value: code });
+            }
         });
 
         this.NAV_TEXT.addEventListener('input', (p_event) => {
