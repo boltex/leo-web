@@ -2601,8 +2601,8 @@ export class Position {
         const v: VNode = this.v;
         v.expandedPositions = v.expandedPositions.filter((z) => !z.__eq__(p));
         // Only push p in g.app.gui.positionsToAnimate if not already contracted
-        if (v.isExpanded()) {
-            g.app.gui.positionsToAnimate.push(p);
+        if (v.isExpanded() && v.children.length) {
+            g.app.gui.positionsToAnimate.push(p.copy());
         }
         v.contract();
     }
@@ -2622,8 +2622,8 @@ export class Position {
             v.expandedPositions.push(p.copy());
         }
         // Only push p in g.app.gui.positionsToAnimate if not already expanded
-        if (!v.isExpanded()) {
-            g.app.gui.positionsToAnimate.push(p);
+        if (!v.isExpanded() && v.children.length) {
+            g.app.gui.positionsToAnimate.push(p.copy());
         }
         v.expand();
     }

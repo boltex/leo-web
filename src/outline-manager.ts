@@ -39,6 +39,9 @@ export class OutlineManager {
         this.renderTree();
     }
 
+    private clearToggledTimer: ReturnType<typeof setTimeout> | undefined; // for debouncing the call to clearToggled.
+    private firstRenderDone = false; // Flag to track if the first render has been completed, used to control toggled state clearing after initial render.
+
     public ROW_HEIGHT = 26;
     private LEFT_OFFSET = 16; // Padding from left edge
 
@@ -206,6 +209,13 @@ export class OutlineManager {
             };
         });
     }
+    //@+node:felix.20260404155820.1: *3* clearToggled
+    public clearToggled(): void {
+        for (const row of this._flatRowsLeo || []) {
+            row.toggled = false;
+        }
+    }
+
     //@+node:felix.20260323011044.1: *3* renderTree
     public renderTree = () => {
         const OUTLINE_PANE: HTMLElement = workspace.layout.OUTLINE_PANE;
@@ -217,12 +227,12 @@ export class OutlineManager {
         // Render visible rows only
         const scrollTop = OUTLINE_PANE.scrollTop;
         const viewportHeight = OUTLINE_PANE.clientHeight;
-        const viewportWidth = OUTLINE_PANE.clientWidth;
 
         const startIndex = Math.floor(scrollTop / this.ROW_HEIGHT);
         const visibleCount = Math.ceil(viewportHeight / this.ROW_HEIGHT) + 1;
         const endIndex = Math.min(flatRows.length, startIndex + visibleCount);
         let leftOffset = this.LEFT_OFFSET;
+        let hadToggled = false;
 
         // If all nodes have no children, remove the left offset
         if (flatRows.every(row => !row.hasChildren)) {
@@ -231,6 +241,9 @@ export class OutlineManager {
 
         this.SPACER.innerHTML = "";
         this.SPACER.style.height = flatRows.length * this.ROW_HEIGHT + "px";
+        // since scrollbars can appear and reduce the viewport width, we need to get it dynamically here after setting the height of its contained spacer.
+        const viewportWidth = OUTLINE_PANE.clientWidth;
+
         for (let i = startIndex; i < endIndex; i++) {
             const row = flatRows[i]!;
             const div = document.createElement("div");
@@ -259,9 +272,10 @@ export class OutlineManager {
             div.style.width = (viewportWidth - leftPosition) + "px";
 
             const caret = document.createElement("span");
-            if (row.toggled) {
+            if (row.toggled && this.firstRenderDone) {
                 caret.className = "caret toggled";
-                row.toggled = false; // remove that flag when done!
+                // row.toggled = false; // ! CANNOT DO THIS WAY: scroll may do a double render!
+                hadToggled = true; // Use this debounced clearing technique instead.
             } else {
                 caret.className = "caret";
             }
@@ -292,6 +306,18 @@ export class OutlineManager {
                 this.HEADLINE_INPUT.style.width = (viewportWidth - inputLeft) - 19 + "px";
             }
         }
+        if (hadToggled) {
+            // Had toggled rows, but we might re-render in the very next moments, so we don't want to clear toggled state yet,
+            // but we want to make sure it will be cleared before the next real render to avoid keeping toggled state.
+            if (this.clearToggledTimer) {
+                clearTimeout(this.clearToggledTimer);
+            }
+            this.clearToggledTimer = setTimeout(() => {
+                this.clearToggled();
+            }, 5);
+        }
+        this.firstRenderDone = true;
+
     }
     //@+node:felix.20260323011031.1: *3* scrollNodeIntoView
     public scrollNodeIntoView(node: Position) {

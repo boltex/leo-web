@@ -3512,6 +3512,8 @@ export class Commands {
             if (!p.v.isExpanded()) {
                 p.v.expand();
                 p.expand();
+                // Only push p in g.app.gui.positionsToAnimate if not already expanded
+                g.app.gui.positionsToAnimate.push(p); // Already copies from p_p.parents.
                 redraw_flag = true;
             } else if (p.isExpanded()) {
                 p.v.expand();
@@ -3682,6 +3684,12 @@ export class Commands {
     public contractAllHeadlines(redrawFlag: boolean = true): void {
         const c: Commands = this;
         let p: Position;
+        for (const p of c.all_root_children()) {
+            // put all root children in g.app.gui.positionsToAnimate, so they will be animated.
+            if (p.isExpanded() && p.v.children.length) { // Only animate if the node has children.
+                g.app.gui.positionsToAnimate.push(p); // (already copies)
+            }
+        }
         for (let v of c.all_nodes()) {
             v.contract();
             v.expandedPositions = []; // #2571

@@ -838,8 +838,6 @@ export class LeoUI extends NullGui {
         // In case the new document has a scrollbar or not,
         // which changes the available width for the collapse all button.
         workspace.layout.updateCollapseAllPosition();
-        // Fixes width of selected area if the new document has scrollbar or not.
-        workspace.outline.renderTree();
     }
 
     public refreshUndoPane(): void {
