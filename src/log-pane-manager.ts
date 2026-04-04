@@ -231,7 +231,7 @@ export class LogPaneManager {
             }
             // If up/down arrows, check if there are goto-item results shown, and if so,
             // Do as if already focused in the goto container: down to first, up to last.
-            if ((keyCode === 'ArrowDown' || keyCode === 'ArrowUp') && this.GOTO_PANE.children.length > 0) {
+            if ((keyCode === 'ArrowDown' || keyCode === 'ArrowUp') && this._gotoContent.length > 0) {
                 p_event.preventDefault();
                 let code = 3; // default for up: last item
                 if (keyCode === 'ArrowDown') {
