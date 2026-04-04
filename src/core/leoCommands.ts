@@ -50,8 +50,7 @@ import * as typescript from 'typescript';
 import * as difflib from 'difflib';
 import * as csv from 'csvtojson';
 import KSUID from 'ksuid';
-// import KSUID = require('ksuid');
-import { Uri, workspace } from '../workspace';
+import { Uri } from '../workspace';
 import { OutlineViewerHtml } from '../outline-viewer-html';
 
 //@-<< imports >>
@@ -201,7 +200,7 @@ export class Commands {
     public import_error_nodes: string[] = []; // List of nodes for c.raise_error_dialogs. (headers)
     public last_dir: string | undefined = undefined; // The last used directory.
     public mFileName: string = ''; // ? Maybe Deprecated ? Do _not_ use os_path_norm: it converts an empty path to '.' (!!)
-    public uri: Uri | undefined; // For vscode workspace.fs file operations
+    public uri: Uri | undefined; // For workspace.fs file operations
     public mRelativeFileName: string = '';
 
     public orphan_at_file_nodes: string[] = []; // List of orphaned nodes for c.raise_error_dialogs. (headers)
@@ -874,7 +873,7 @@ export class Commands {
 
         const w_uri = g.makeUri(outputFileName);
         const writeData = Buffer.from(s, 'utf8');
-        await workspace.fs.writeFile(w_uri, writeData);
+        await g.workspace.fs.writeFile(w_uri, writeData);
 
         g.es('HTML document generated at ' + outputFileName);
 
@@ -1178,7 +1177,6 @@ export class Commands {
         number
     ] {
         const c: Commands = this;
-
         const body = c.frame.body;
         const w = body.wrapper;
         const oldYview = w.getYScrollPosition();
@@ -2614,7 +2612,7 @@ export class Commands {
                 const filename = g.os_path_normpath(g.os_path_expanduser(`~/.leo/BAD-${c.shortFileName()}.txt`));
                 try {
                     const w_uri = g.makeUri(filename);
-                    void workspace.fs.writeFile(w_uri, g.toEncodedString(translated_contents, 'utf-8', true));
+                    void g.workspace.fs.writeFile(w_uri, g.toEncodedString(translated_contents, 'utf-8', true));
                     g.es_print('');
                     g.es_print(`Wrote ${filename}`);
                     g.es_print('');
@@ -3171,7 +3169,7 @@ export class Commands {
     public async looksLikeDerivedFile(fn: string): Promise<boolean> {
         try {
             const w_uri = g.makeUri(fn);
-            const readData = await workspace.fs.readFile(w_uri);
+            const readData = await g.workspace.fs.readFile(w_uri);
             const s = Buffer.from(readData).toString('utf8');
             return s.indexOf('@+leo-ver=') > -1;
         } catch (exception) {

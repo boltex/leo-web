@@ -13,7 +13,6 @@ import { Commands } from './leoCommands';
 import { Position } from './leoNodes';
 import { Bead } from './leoUndo';
 import { Block } from '../importers/base_importer';
-import { workspace } from '../workspace';
 //@-<< leoImport imports >>
 //@+others
 //@+node:felix.20251214160339.1307: ** class FreeMindImporter
@@ -534,7 +533,7 @@ export class LeoImportCommands {
                 s += head + nl;
             }
             const writeData = Buffer.from(s, 'utf8');
-            await workspace.fs.writeFile(w_uri, writeData);
+            await g.workspace.fs.writeFile(w_uri, writeData);
         } catch (IOError) {
             g.warning('can not open', fileName);
         }
@@ -573,7 +572,7 @@ export class LeoImportCommands {
 
             const writeData = g.toEncodedString(theFile, this.encoding, true);
 
-            await workspace.fs.writeFile(w_uri, writeData);
+            await g.workspace.fs.writeFile(w_uri, writeData);
         } catch (IOError) {
             g.warning('can not open', fileName);
             return;
@@ -607,7 +606,7 @@ export class LeoImportCommands {
             }
 
             const writeData = g.toEncodedString(theFile);
-            await workspace.fs.writeFile(w_uri, writeData);
+            await g.workspace.fs.writeFile(w_uri, writeData);
         } catch (IOError) {
             g.warning('can not open', fileName);
             return;
@@ -689,7 +688,7 @@ export class LeoImportCommands {
             try {
                 const w_uri = g.makeUri(newFileName);
                 const writeData = Buffer.from(s, 'utf8');
-                await workspace.fs.writeFile(w_uri, writeData);
+                await g.workspace.fs.writeFile(w_uri, writeData);
 
                 if (!g.unitTesting) {
                     g.es('created:', newFileName);
@@ -786,7 +785,7 @@ export class LeoImportCommands {
             }
 
             const writeData = g.toEncodedString(f);
-            await workspace.fs.writeFile(w_uri, writeData);
+            await g.workspace.fs.writeFile(w_uri, writeData);
         } catch (exception) {
             g.es('exception opening:', filename);
             g.print_exception(exception);
@@ -1847,7 +1846,7 @@ export class MindMapImporter {
         try {
             //f = open(p_path)
             const w_uri = g.makeUri(p_path);
-            const readData = await workspace.fs.readFile(w_uri);
+            const readData = await g.workspace.fs.readFile(w_uri);
             const s = Buffer.from(readData).toString('utf8');
 
             await this.scan(s, p); // ! leo-web: Use string from file content instead
@@ -2839,7 +2838,7 @@ export class TabImporter {
                     g.setGlobalOpenDir(fn);
                     // s = open(fn).read();
                     const w_uri = g.makeUri(fn);
-                    const readData = await workspace.fs.readFile(w_uri);
+                    const readData = await g.workspace.fs.readFile(w_uri);
                     s = Buffer.from(readData).toString('utf8');
                     s = s.replace(/\r/g, '');
                 } catch (exception) {
@@ -3055,7 +3054,7 @@ export class ToDoImporter {
         }
         try {
             const w_uri = g.makeUri(p_path);
-            const readData = await workspace.fs.readFile(w_uri);
+            const readData = await g.workspace.fs.readFile(w_uri);
             const contents = Buffer.from(readData).toString('utf8');
 
             // with open(p_path, 'r') as f:
@@ -3087,7 +3086,7 @@ export class ToDoImporter {
                 //     contents = f.read()
 
                 const w_uri = g.makeUri(w_path);
-                const readData = await workspace.fs.readFile(w_uri);
+                const readData = await g.workspace.fs.readFile(w_uri);
                 const contents = Buffer.from(readData).toString('utf8');
                 const tasks = this.parse_file_contents(contents);
                 d[w_path] = tasks;
@@ -3363,7 +3362,7 @@ export class ZimImportController {
 
         //index = open(pathToIndex).read()
         const w_uri = g.makeUri(pathToIndex);
-        const readData = await workspace.fs.readFile(w_uri);
+        const readData = await g.workspace.fs.readFile(w_uri);
         const index = Buffer.from(readData).toString('utf8');
 
         // parse = re.findall(r'(\t*)-\s`(.+)\s<(.+)>`_', index)
@@ -3598,7 +3597,7 @@ export class LegacyExternalFileImporter {
         //     s = f.read()
 
         const w_uri = g.makeUri(p_path);
-        const readData = await workspace.fs.readFile(w_uri);
+        const readData = await g.workspace.fs.readFile(w_uri);
         let s = Buffer.from(readData).toString('utf8');
 
         // Do nothing if the file is a newer external file.

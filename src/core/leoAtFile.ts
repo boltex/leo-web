@@ -5,7 +5,6 @@
  */
 //@+<< imports >>
 //@+node:felix.20251214160339.154: ** << imports >>
-import { workspace } from '../workspace';
 import * as utils from '../utils';
 import * as g from './leoGlobals';
 import { new_cmd_decorator } from './decorators';
@@ -1296,7 +1295,7 @@ export class AtFile {
             const w_uri = g.makeUri(fileName);
             const w_exists = await g.os_path_exists(fileName);
             if (w_exists) {
-                s = await workspace.fs.readFile(w_uri);
+                s = await g.workspace.fs.readFile(w_uri);
             } else {
                 at.error(`can not open ${fileName}`);
                 return undefined;
@@ -4097,7 +4096,7 @@ export class AtFile {
         try {
             // os.remove(fileName);
             const w_uri = g.makeUri(fileName);
-            await workspace.fs.delete(w_uri, { recursive: true });
+            await g.workspace.fs.delete(w_uri, { recursive: true });
             return true;
         } catch (exception) {
             if (!g.unitTesting) {
@@ -4118,7 +4117,7 @@ export class AtFile {
         let mode;
         try {
             const w_uri = g.makeUri(fileName);
-            const stat = await workspace.fs.stat(w_uri);
+            const stat = await g.workspace.fs.stat(w_uri);
             mode = stat.permissions; // 0777
         } catch (exception) {
             mode = undefined;
@@ -4308,7 +4307,7 @@ export class AtFile {
         let read_only;
         try {
             const w_uri = g.makeUri(fn);
-            const w_stats = await workspace.fs.stat(w_uri);
+            const w_stats = await g.workspace.fs.stat(w_uri);
             read_only = w_stats.permissions && FilePermission.Readonly;
         } catch (attributeError) {
             read_only = false;

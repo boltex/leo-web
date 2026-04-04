@@ -12,7 +12,6 @@ import { BaseEditCommandsClass } from './baseCommands';
 import { Constants } from '../constants';
 import { Position } from '../core/leoNodes';
 import { QuickPickItem } from '../types';
-import { workspace } from '../workspace';
 //@-<< helpCommands imports & annotations >>
 
 //@+others
@@ -127,7 +126,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
         w_choices.push(...w_withDetails);
 
-        const w_picked = await workspace.dialog.showQuickPick(w_choices, {
+        const w_picked = await g.workspace.dialog.showQuickPick(w_choices, {
             placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
         });
 

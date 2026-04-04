@@ -8,12 +8,12 @@ import * as g from '../core/leoGlobals';
 import { commander_command } from '../core/decorators';
 import { Position } from '../core/leoNodes';
 import { Commands } from '../core/leoCommands';
-import { Bead, Undoer } from '../core/leoUndo';
+import { Undoer } from '../core/leoUndo';
 import { PreviousSettings } from '../core/leoApp';
 import { NullGui } from '../core/leoGui';
 import { LeoImportCommands, MORE_Importer } from '../core/leoImport';
 import { ScriptingController } from '../core/mod_scripting';
-import { Uri, workspace } from '../workspace';
+import { Uri } from '../workspace';
 
 //@+others
 //@+node:felix.20251214160853.69: ** Class CommanderFileCommands
@@ -1172,7 +1172,7 @@ export class CommanderFileCommands {
                 }
                 const w_uri = g.makeUri(fileName);
                 const writeData = Buffer.from(s, 'utf8');
-                await workspace.fs.writeFile(w_uri, writeData);
+                await g.workspace.fs.writeFile(w_uri, writeData);
                 return g.blue('wrote:', fileName);
             } catch (iOError) {
                 g.error(`can not write ${fileName}`);
@@ -1225,7 +1225,7 @@ export class CommanderFileCommands {
                 // f.flush()
                 const w_uri = g.makeUri(fileName);
                 const writeData = Buffer.from(s, 'utf8');
-                await workspace.fs.writeFile(w_uri, writeData);
+                await g.workspace.fs.writeFile(w_uri, writeData);
                 g.blue('wrote:', fileName);
             } catch (IOError) {
                 g.error(`can not write ${fileName}`);

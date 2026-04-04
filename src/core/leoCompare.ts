@@ -11,7 +11,6 @@ import * as g from './leoGlobals';
 import { command } from './decorators';
 import { Commands } from './leoCommands';
 import { VNode, Position } from './leoNodes';
-import { workspace } from '../workspace';
 
 //@-<< leoCompare imports & annotations >>
 //@+others
@@ -141,7 +140,7 @@ export class BaseLeoCompare {
         }
         try {
             const w_uri = g.makeUri(dir1);
-            const w_dirInfo = await workspace.fs.readDirectory(w_uri);
+            const w_dirInfo = await g.workspace.fs.readDirectory(w_uri);
             list1 = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
         } catch (exception) {
             this.show('invalid directory:' + dir1);
@@ -149,7 +148,7 @@ export class BaseLeoCompare {
         }
         try {
             const w_uri = g.makeUri(dir2);
-            const w_dirInfo = await workspace.fs.readDirectory(w_uri);
+            const w_dirInfo = await g.workspace.fs.readDirectory(w_uri);
             list2 = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
         } catch (exception) {
             this.show('invalid directory:' + dir2);
@@ -238,7 +237,7 @@ export class BaseLeoCompare {
             // WRITE WHAT ACCUMULATED IN this.outputFile !
             const w_uri = g.makeUri(this.outputFileName);
             const writeData = Buffer.from(this.outputFile, 'utf8');
-            await workspace.fs.writeFile(w_uri, writeData);
+            await g.workspace.fs.writeFile(w_uri, writeData);
 
             // this.outputFile.close()
             this.outputFile = undefined;
@@ -514,7 +513,7 @@ export class BaseLeoCompare {
     public async doOpen(name: string): Promise<string[] | undefined> {
         try {
             const w_uri = g.makeUri(name);
-            const content = await workspace.fs.readFile(w_uri);
+            const content = await g.workspace.fs.readFile(w_uri);
             const s = g.toUnicode(content);
 
             // .split(/\r?\n/);
@@ -637,7 +636,7 @@ export class BaseLeoCompare {
                 this.show('appending to ' + this.outputFileName);
                 // this.outputFile = open(this.outputFileName, "ab");
                 const w_uri = g.makeUri(this.outputFileName);
-                const content = await workspace.fs.readFile(w_uri);
+                const content = await g.workspace.fs.readFile(w_uri);
                 this.outputFile = g.toUnicode(content);
             } else {
                 this.show('writing to ' + this.outputFileName);
@@ -965,7 +964,7 @@ export class CompareLeoOutlines {
         // with open(p_path, 'rb') as f
         //     s = f.read()
         const w_uri = g.makeUri(p_path);
-        const s = await workspace.fs.readFile(w_uri);
+        const s = await g.workspace.fs.readFile(w_uri);
 
         return g.toUnicode(s).replace(/\r/g, '');
     }

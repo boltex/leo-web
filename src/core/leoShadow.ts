@@ -33,7 +33,6 @@ import * as path from 'path';
 
 import { Position, VNode } from './leoNodes';
 import { Commands } from './leoCommands';
-import { workspace } from '../workspace';
 
 type DispatchKeys = 'delete' | 'equal' | 'insert' | 'replace';
 
@@ -199,7 +198,7 @@ export class ShadowController {
             const w_writeUri = g.makeUri(fileName);
             const writeData = g.toEncodedString(s, encoding);
 
-            await workspace.fs.writeFile(w_writeUri, writeData);
+            await g.workspace.fs.writeFile(w_writeUri, writeData);
 
             await c.setFileTimeStamp(fileName); // Fix #1053.  This is an *ancient* bug.
             if (!g.unitTesting) {
