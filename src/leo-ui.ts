@@ -1907,14 +1907,10 @@ export class LeoUI extends NullGui {
      * * Clears the nav search results of the goto pane
      */
     public navTextClear(): void {
-
         const c = g.app.windowList[this.frameIndex].c;
         const scon: QuickSearchController = c.quicksearchController;
-
         scon.clear();
-        // this.leoGotoProvider.refreshTreeRoot();
         workspace.controller.buildGotoElements();
-
     }
 
 
@@ -1930,14 +1926,21 @@ export class LeoUI extends NullGui {
      * Opens the Nav tab with the selected text as the search string
      */
     public findQuickSelected(): void {
-        // if (vscode.window.activeTextEditor) {
-        //     const editor = vscode.window.activeTextEditor;
-        //     const selection = editor.selection;
-        //     if (!selection.isEmpty) {
-        //         const text = editor.document.getText(selection).replace(/\r\n/g, "\n");
-        //         return this.findQuick(text, true);
-        //     }
-        // }
+        this.triggerBodySave();
+        if (g.app.windowList.length === 0) {
+            return;
+        }
+        const frame = g.app.windowList[this.frameIndex];
+        const body = frame.body;
+
+        let head: string;
+        let s: string;
+        let tail: string;
+        [head, s, tail] = body.getSelectionLines();
+        if (s) {
+            s = s.replace(/\r\n/g, "\n");
+            return this.findQuick(s, true);
+        }
         return this.findQuick("", true);
     }
 
@@ -1945,11 +1948,10 @@ export class LeoUI extends NullGui {
      * Lists all nodes in reversed gnx order, newest to oldest
      */
     public findQuickTimeline(): void {
-        // const c = g.app.windowList[this.frameIndex].c;
-        // const scon: QuickSearchController = c.quicksearchController;
-        // scon.qsc_sort_by_gnx();
-        // this.leoGotoProvider.refreshTreeRoot();
-        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_sort_by_gnx();
+        workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav');
     }
 
@@ -1957,11 +1959,10 @@ export class LeoUI extends NullGui {
      * Lists all nodes that are changed (aka "dirty") since last save.
      */
     public findQuickChanged(): void {
-        // const c = g.app.windowList[this.frameIndex].c;
-        // const scon: QuickSearchController = c.quicksearchController;
-        // scon.qsc_find_changed();
-        // this.leoGotoProvider.refreshTreeRoot();
-        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_find_changed();
+        workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav');
     }
 
@@ -1969,11 +1970,10 @@ export class LeoUI extends NullGui {
      * Lists nodes from c.nodeHistory.
      */
     public findQuickHistory(): void {
-        // const c = g.app.windowList[this.frameIndex].c;
-        // const scon: QuickSearchController = c.quicksearchController;
-        // scon.qsc_get_history();
-        // this.leoGotoProvider.refreshTreeRoot();
-        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_get_history();
+        workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav');
     }
 
@@ -1981,19 +1981,13 @@ export class LeoUI extends NullGui {
      * List all marked nodes.
      */
     public findQuickMarked(p_preserveFocus?: boolean): void {
-        // const c = g.app.windowList[this.frameIndex].c;
-        // const scon: QuickSearchController = c.quicksearchController;
-        // scon.qsc_show_marked();
-        // this.leoGotoProvider.refreshTreeRoot();
-        // if (
-        //     p_preserveFocus && (
-        //         (this._findPanelWebviewView && this._findPanelWebviewView.visible) ||
-        //         (this._findPanelWebviewExplorerView && this._findPanelWebviewExplorerView.visible)
-        //     )
-        // ) {
-        //     return Promise.resolve();
-        // }
-        // return this.showGotoPane(); // Finish by opening and focussing nav pane
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_show_marked();
+        workspace.controller.buildGotoElements();
+        if (p_preserveFocus && workspace.logPane.HTML_ELEMENT.getAttribute('data-active-tab') === 'nav') {
+            return
+        }
         workspace.logPane.showTab('nav');
     }
 
