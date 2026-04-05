@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.8
+
+- ...
+
 ## 1.0.7
 
 - Added Nav Pane and quickSearch plugin features originally by Ville M. Vainio <vivainio@gmail.com> 
