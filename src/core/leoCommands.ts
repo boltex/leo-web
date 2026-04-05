@@ -3804,9 +3804,8 @@ export class Commands {
      * Indicate that the focus is in an invalid location, or is unknown.
      */
     public invalidateFocus(): void {
-        // c = self
-        // c.requestedFocusWidget = None
-        // pass
+        const c = this;
+        c.requestedFocusWidget = undefined;
     }
     //@+node:felix.20251214160339.605: *5* c.traceFocus (not used)
     public traceFocus(w: StringTextWrapper): void {

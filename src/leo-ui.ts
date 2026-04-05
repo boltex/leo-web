@@ -1426,7 +1426,6 @@ export class LeoUI extends NullGui {
                 }
             );
             // not awaited
-            console.log('TODO: FIX EASTER EGG GOTO LINE:', lastInput);
             c.editCommands.gotoGlobalLine(Number(lastInput)).then((p_gotoResult) => {
                 if (p_gotoResult[0]) {
                     void this.launchRefresh();
@@ -1434,6 +1433,7 @@ export class LeoUI extends NullGui {
             }, () => {
                 // pass
             });
+            return Promise.resolve();
         }
 
         // First, check for undo-history list being requested
