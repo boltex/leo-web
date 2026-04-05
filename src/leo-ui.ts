@@ -19,6 +19,7 @@ import {
     Focus,
     LeoDocument,
     LeoGotoNavKey,
+    LeoGotoNode,
     LeoGuiFindTabManagerSettings,
     LeoPackageStates,
     LeoSearchSettings,
@@ -620,7 +621,10 @@ export class LeoUI extends NullGui {
         workspace.layout.OUTLINE_PANE.focus();
     }
     //@+node:felix.20260323002416.1: *3* showBody
-    public showBody(): void {
+    public showBody(preventFocus?: boolean): void {
+
+        // If preventFocus is true, make sure to save focused element and restore it after setting selection.
+        const focusedElement = document.activeElement as HTMLElement;
         const c = g.app.windowList[this.frameIndex].c;
         const p = c.p;
 
@@ -669,8 +673,23 @@ export class LeoUI extends NullGui {
             w_activeCol
         );
 
+        // Add no-focus-outline class to body pane to avoid unwanted focus outline when preventFocus is true
+        if (preventFocus) {
+            workspace.layout.BODY_PANE.classList.add('no-focus-outline');
+        }
+
         workspace.body.setBodySelection(w_selection, this._refreshType.scroll); // Note, in some browser, this has a side-effect of setting focus in body.
         this._refreshType.scroll = false;
+
+        if (preventFocus) {
+            // Wait for the Scroll and Selection-Focus to "settle" in the browser's eyes
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    focusedElement?.focus({ preventScroll: true });
+                    workspace.layout.BODY_PANE.classList.remove('no-focus-outline');
+                });
+            });
+        }
 
     }
     //@+node:felix.20260323002150.1: *3* Refresh & helpers
@@ -816,6 +835,9 @@ export class LeoUI extends NullGui {
 
     public refreshDocumentsPane(): void {
         workspace.controller.setupDocumentTabsAndHandlers();
+        // In case the new document has a scrollbar or not,
+        // which changes the available width for the collapse all button.
+        workspace.layout.updateCollapseAllPosition();
     }
 
     public refreshUndoPane(): void {
@@ -830,8 +852,7 @@ export class LeoUI extends NullGui {
     }
 
     public refreshGotoPane(): void {
-        // TODO : implement goto pane refresh
-        // console.log('TODO ! in leo-ui: refreshGotoPane called to refresh goto pane');
+        workspace.logPane.refreshGotoPane();
     }
 
     public refreshButtonsPane(): void {
@@ -933,7 +954,7 @@ export class LeoUI extends NullGui {
         //     g.doHook("headclick2", { c: c, p: node, v: node });
         //     return this._launchRefresh();
         // }
-
+        this.finalFocus = Focus.Outline; // Force focus in outline after selection, since user just clicked in it.
         this._refreshType.states = true;
         this.getStates();
 
@@ -967,9 +988,13 @@ export class LeoUI extends NullGui {
         const scroll = p.v.scrollBarSpot;
         workspace.body.setBodyScroll(scroll);
 
-        if (!showBodyNoFocus) {
-            // Set focus to body pane
-            this.showBody();
+        // If the desired final focus is the goto-items of the nav pane, then we call showBody (which sets selection and optional focus)
+        // but with showBodyNoFocus true to preserve focus in the nav pane.
+
+        // * note that other 'finalFocus', e.g. on Outline, will not have the selection range set *
+        const isGotoFocus = this.finalFocus === Focus.Goto;
+        if (!showBodyNoFocus || isGotoFocus) {
+            this.showBody(isGotoFocus);
         }
 
     }
@@ -1401,7 +1426,6 @@ export class LeoUI extends NullGui {
                 }
             );
             // not awaited
-            console.log('TODO: FIX EASTER EGG GOTO LINE:', lastInput);
             c.editCommands.gotoGlobalLine(Number(lastInput)).then((p_gotoResult) => {
                 if (p_gotoResult[0]) {
                     void this.launchRefresh();
@@ -1409,6 +1433,7 @@ export class LeoUI extends NullGui {
             }, () => {
                 // pass
             });
+            return Promise.resolve();
         }
 
         // First, check for undo-history list being requested
@@ -1840,8 +1865,7 @@ export class LeoUI extends NullGui {
      * * Goto the next, previous, first or last nav entry via arrow keys in
      */
     public navigateNavEntry(p_nav: LeoGotoNavKey): void {
-        // TODO : Finish nav entry navigation implementation!
-        // void this.leoGotoProvider.navigateNavEntry(p_nav);
+        workspace.controller.navigateNavEntry(p_nav);
     }
 
     /**
@@ -1885,25 +1909,180 @@ export class LeoUI extends NullGui {
      * * Clears the nav search results of the goto pane
      */
     public navTextClear(): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.clear();
+        workspace.controller.buildGotoElements();
+    }
 
+
+    /**
+     * Opens the Nav tab and focus on nav text input
+     */
+    public findQuick(text?: string, p_forceEnter?: boolean): void {
+        this.triggerBodySave();
+        workspace.logPane.selectNav(text, p_forceEnter);
+    }
+
+    /**
+     * Opens the Nav tab with the selected text as the search string
+     */
+    public findQuickSelected(): void {
+        this.triggerBodySave();
+        if (g.app.windowList.length === 0) {
+            return;
+        }
+        const frame = g.app.windowList[this.frameIndex];
+        const w = frame.body.wrapper;
+        let [i, j] = w.getSelectionRange();
+        if (i === j) {
+            const ins = w.getInsertPoint();
+            [i, j] = g.getLine(w.getAllText(), ins);
+        }
+        let s = w.get(i, j);
+        if (s) {
+            s = s.replace(/\r\n/g, "\n");
+        }
+        workspace.logPane.selectNav(s || "", true);
+    }
+
+    /**
+     * Lists all nodes in reversed gnx order, newest to oldest
+     */
+    public findQuickTimeline(): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_sort_by_gnx();
+        workspace.controller.buildGotoElements();
+        workspace.logPane.showTab('nav', true);
+    }
+
+    /**
+     * Lists all nodes that are changed (aka "dirty") since last save.
+     */
+    public findQuickChanged(): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_find_changed();
+        workspace.controller.buildGotoElements();
+        workspace.logPane.showTab('nav', true);
+    }
+
+    /**
+     * Lists nodes from c.nodeHistory.
+     */
+    public findQuickHistory(): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_get_history();
+        workspace.controller.buildGotoElements();
+        workspace.logPane.showTab('nav', true);
+    }
+
+    /**
+     * List all marked nodes.
+     */
+    public findQuickMarked(p_preserveFocus?: boolean): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const scon: QuickSearchController = c.quicksearchController;
+        scon.qsc_show_marked();
+        workspace.controller.buildGotoElements();
+        workspace.logPane.showTab('nav', p_preserveFocus);
+    }
+
+
+    /**
+     * * Handles a click (selection) of a nav panel node: Sends 'goto' command to server.
+     */
+    public async gotoNavEntry(p_node: LeoGotoNode): Promise<unknown> {
+        if (!p_node) {
+            console.log('ERROR NO NODE TO SHOW IN GOTO PANE!');
+            return;
+        }
+
+        this.triggerBodySave(true);
+        workspace.controller.resetSelectedNode(p_node); // Inform controller of last index chosen
         const c = g.app.windowList[this.frameIndex].c;
         const scon: QuickSearchController = c.quicksearchController;
 
-        scon.clear();
+        if (p_node.entryType === 'tag') {
+            // * For when the nav input IS CLEARED : GOTO PANE LISTS ALL TAGS!
+            // The node clicked was one of the tags, pre-fill the nac search with this tag and open find pane
+            let w_string: string = p_node.label || "";
 
-        // TODO: Implement proper goto provider refresh!
-        // this.leoGotoProvider.refreshTreeRoot();
+            workspace.logPane.showTab('nav');
+
+            const w_message: { [key: string]: string; } = { type: 'selectNav' };
+            if (w_string && w_string.trim()) {
+                w_message["text"] = w_string.trim();
+            }
+
+            workspace.logPane.selectNav(w_string.trim());
+            // Do search
+            setTimeout(() => {
+                const inp = scon.navText;
+                if (scon.isTag) {
+                    scon.qsc_find_tags(inp);
+                } else {
+                    scon.qsc_search(inp);
+                }
+                workspace.controller.buildGotoElements();
+                // void this.showGotoPane({ preserveFocus: true }); // show but dont change focus
+            }, 10);
+
+        } else if (p_node.entryType !== 'generic' && p_node.entryType !== 'parent') {
+            // Other and not a tag so just locate the entry in either body or outline
+            // const p_navEntryResult = await this.sendAction(
+            //     Constants.LEOBRIDGE.GOTO_NAV_ENTRY,
+            //     { key: p_node.key }
+            // );
+
+            const it = p_node.key;
+            scon.onSelectItem(it);
+
+            const w = g.app.gui.get_focus(c);
+            let focus = g.app.gui.widget_name(w);
+
+            if (!focus) {
+                return workspace.dialog.showInformationMessage('Not found');
+            } else {
+                let w_revealTarget = Focus.Body;
+                focus = focus.toLowerCase();
+
+                if (focus.includes('tree') || focus.includes('head')) {
+                    // tree
+                    w_revealTarget = Focus.Outline;
+                }
+                this.setupRefresh(
+                    // ! KEEP FOCUS ON GOTO PANE !
+                    Focus.Goto,
+                    {
+                        tree: true,
+                        body: true,
+                        scroll: w_revealTarget === Focus.Body,
+                        // documents: false,
+                        // buttons: false,
+                        states: true,
+                    }
+                );
+                return this.launchRefresh();
+            }
+        }
+
     }
+
+    public showNavResults(): void {
+        workspace.controller.buildGotoElements();
+        workspace.logPane.showTab('nav');
+    }
+
     //@+node:felix.20260322235817.1: *3* Search and Replace
     /**
      * * Opens the find panel and selects all & focuses on the find field.
      */
     public startSearch(): void {
         this.triggerBodySave();
-        workspace.logPane.showTab('find');
-        setTimeout(() => {
-            workspace.logPane.focusFindInput();
-        }, 0);
+        workspace.logPane.showTab('find', true);
     }
 
     /**
@@ -2297,11 +2476,10 @@ export class LeoUI extends NullGui {
                 void this.navTextClear();
                 break;
             }
-            // TODO.
-            // case 'leoNavMarkedList': {
-            //     void this.findQuickMarked(true);
-            //     break;
-            // }
+            case 'leoNavMarkedList': {
+                void this.findQuickMarked(true);
+                break;
+            }
             case 'leoFindNext': {
                 this.find(false);
                 break;
@@ -2322,11 +2500,11 @@ export class LeoUI extends NullGui {
                 void this.replace(true);
                 break;
             }
-            // TODO.
-            // case 'navigateNavEntry': {
-            //     void this.navigateNavEntry(message.value);
-            //     break;
-            // }
+
+            case 'navigateNavEntry': {
+                void this.navigateNavEntry(message.value);
+                break;
+            }
             case 'refreshSearchConfig': {
                 void this.triggerBodySave();
                 // Leave a cycle before getting settings
@@ -2335,18 +2513,17 @@ export class LeoUI extends NullGui {
                 }, 0);
                 break;
             }
-            // TODO.
-            // case 'gotoCommand': {
-            //     try {
-            //         const w_index = Number(message.value);
-            //         if (!isNaN(w_index) && this.leoGotoProvider.nodeList[w_index]) {
-            //         }
-            //         void this.gotoNavEntry(this.leoGotoProvider.nodeList[w_index]);
-            //     } catch (e) {
-            //         console.log('goto nav entry failed for index: ', message.value);
-            //     }
-            //     break;
-            // }
+            case 'gotoCommand': {
+                try {
+                    const w_index = Number(message.value);
+                    if (!isNaN(w_index) && workspace.controller.nodeList[w_index]) {
+                        void this.gotoNavEntry(workspace.controller.nodeList[w_index]);
+                    }
+                } catch (e) {
+                    console.log('goto nav entry failed for index: ', message.value);
+                }
+                break;
+            }
         }
     }
     //@+node:felix.20260322234219.1: *3* tabCycle
@@ -2446,7 +2623,7 @@ export class LeoUI extends NullGui {
             // Is there a file opened?
             if (g.app.windowList.length && g.app.windowList[this.frameIndex]) {
                 const c = g.app.windowList[this.frameIndex].c;
-                await this.triggerBodySave(true);
+                this.triggerBodySave(true);
                 if (g.doHook("recentfiles1", { c: c, p: c.p, v: c.p.v, fileName: filename })) {
                     return Promise.resolve(undefined);
                 }

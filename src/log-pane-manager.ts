@@ -2,7 +2,7 @@
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
-import { LeoGoto, LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
+import { LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
 import { workspace } from './workspace';
 
 type searchSettingNames = 'entireOutline' |
@@ -107,7 +107,7 @@ export class LogPaneManager {
     private _undoNodes: LeoUndoNode[] = []; // Keep track of the current list of undo nodes, so that we can refresh the undo pane when it changes.
 
     private _gotoContent: LeoGotoNode[] = []; // Keep track of the current list of goto nodes, so that we can refresh the goto pane when it changes.
-    private lastSelectedGotoItem: HTMLDivElement | undefined; // Keep track of the currently selected goto item in the DOM, so that we can maintain selection when refreshing the goto pane.
+    private lastSelectedGotoItem: HTMLElement | undefined; // Keep track of the currently selected goto item in the DOM, so that we can maintain selection when refreshing the goto pane.
 
     constructor() {
 
@@ -157,13 +157,7 @@ export class LogPaneManager {
 
         this.HTML_ELEMENT = document.documentElement;
 
-
         // * Find & Replace controls change detection
-        this.SEARCH_OPTIONS.addEventListener('change', () => {
-            this.searchSettings.searchOptions = Number(this.SEARCH_OPTIONS.value);
-            this.processChange();
-        });
-
         const findReplaceInputs = [this.FIND_INPUT, this.REPLACE_INPUT];
         const checkboxes = [this.OPT_HEADLINE, this.OPT_BODY, this.OPT_WHOLE, this.OPT_IGNORECASE, this.OPT_REGEXP, this.OPT_MARK_FINDS, this.OPT_MARK_CHANGES];
         const radios = [this.SCOPE_ENTIRE, this.SCOPE_SUBOUTLINE, this.SCOPE_NODE, this.SCOPE_FILE];
@@ -219,6 +213,67 @@ export class LogPaneManager {
             });
         }
 
+        // Setup nav pane controls:
+        this.GOTO_PANE.addEventListener('keydown', (e) => {
+            this.navKeyHandler(e);
+        });
+
+        this.SEARCH_OPTIONS.addEventListener('change', () => {
+            this.searchSettings.searchOptions = Number(this.SEARCH_OPTIONS.value);
+            this.processChange();
+        });
+
+        this.NAV_TEXT.addEventListener('keydown', (p_event) => {
+            const keyCode = p_event.code || p_event.key;
+            if (keyCode === 'Enter') {
+                p_event.preventDefault();
+                this.navEnter();
+            }
+            // If up/down arrows, check if there are goto-item results shown, and if so,
+            // Do as if already focused in the goto container: down to first, up to last.
+            if ((keyCode === 'ArrowDown' || keyCode === 'ArrowUp') && this._gotoContent.length > 0) {
+                p_event.preventDefault();
+                p_event.stopPropagation();
+                let code = 3; // default for up: last item
+                if (keyCode === 'ArrowDown') {
+                    code = 2; // down: first item
+                }
+                if (code === 2 && this.GOTO_PANE && this.GOTO_PANE.firstChild) {
+                    (this.GOTO_PANE.firstChild as HTMLElement).focus();
+                } else if (code === 3 && this.GOTO_PANE && this.GOTO_PANE.lastChild) {
+                    (this.GOTO_PANE.lastChild as HTMLElement).focus();
+                }
+                this._postMessageCallback?.({ type: 'navigateNavEntry', value: code });
+            }
+        });
+
+        this.NAV_TEXT.addEventListener('input', (p_event) => {
+            this.searchSettings.navText = this.NAV_TEXT.value;
+            this.navTextDirty = true;
+            this.navTextChange(); // DEBOUNCE THIS! Don't process change too fast!
+        });
+
+        this.SHOW_PARENT.addEventListener('change', (p_event) => {
+            this.searchSettings.showParents = this.SHOW_PARENT.checked;
+            this.processChange();
+        });
+
+        this.IS_TAG.addEventListener('change', (p_event) => {
+            let w_checked = this.IS_TAG.checked;
+            let w_wasSet = false;
+            if (this.searchSettings.isTag !== w_checked) {
+                this.setFrozen(false); // Switched tagging so reset freeze
+                if (w_checked) {
+                    w_wasSet = true;
+                }
+            }
+            this.searchSettings.isTag = w_checked;
+            // Set placeholder text
+            this.processChange();
+            this.handleIsTagSwitch(w_wasSet);
+        });
+
+
         // Setup tab/shift-tab to manage focus between controls and/or the body/outline panes.
         // * Deal with pressing tab in the log content area to place focus on body-pane itself.
         this.LOG_CONTENT.addEventListener('keydown', (e) => {
@@ -257,6 +312,32 @@ export class LogPaneManager {
                 this.PREVIOUS_NEXT_HISTORY.focus();
             }
         });
+    }
+
+    private navEnter() {
+        if (this.searchSettings.navText.length === 0 && this.searchSettings.isTag) {
+            this.setFrozen(false);
+            this.resetTagNav();
+        } else {
+            if (this.searchSettings.navText.length >= 3 || this.searchSettings.isTag) {
+                this.setFrozen(true);
+                if (this.navTextDirty) {
+                    this.navTextDirty = false;
+                    if (this.timer) {
+                        clearTimeout(this.timer);
+                    }
+                    if (this.navSearchTimer) {
+                        clearTimeout(this.navSearchTimer);
+                    }
+                    this.sendSearchConfig();
+                }
+                this._postMessageCallback?.({ type: 'leoNavEnter' });
+
+            }
+            if (this.searchSettings.navText.length === 0) {
+                this._postMessageCallback?.({ type: 'leoNavClear' });
+            }
+        }
     }
 
     //@+others
@@ -430,6 +511,35 @@ export class LogPaneManager {
         }, 400); // almost half second
 
     }
+    //@+node:felix.20260401203545.1: *3* revealGotoNavEntry
+    public revealGotoNavEntry(p_index: number, p_preserveFocus?: boolean): void {
+
+        if (!p_preserveFocus) {
+            this.showTab('nav');
+        }
+        if (this.lastSelectedGotoItem) {
+            this.lastSelectedGotoItem.classList.remove('selected');
+            this.lastSelectedGotoItem = undefined;
+        }
+
+        if (!this.GOTO_PANE) {
+            return;
+        }
+        const children = this.GOTO_PANE.children;
+        if (children && children.length && children.length > p_index) {
+            this.lastSelectedGotoItem = children[p_index] as HTMLElement;
+            this.lastSelectedGotoItem.classList.add('selected');
+            // Will have effect only if visible
+            this.lastSelectedGotoItem.scrollIntoView({ behavior: "instant", block: "nearest" });
+            if (this.lastSelectedGotoItem && this.lastSelectedGotoItem.focus && !p_preserveFocus) {
+                this.lastSelectedGotoItem.focus({
+                    preventScroll: false,
+                    // New in 2026 - but not supported in all browsers yet, so commented out for now.
+                    // focusVisible: false
+                });
+            }
+        }
+    }
     //@+node:felix.20260323005837.1: *3* setFrozen
     public setFrozen(focus: boolean) {
         this.frozen = focus;
@@ -456,10 +566,29 @@ export class LogPaneManager {
         }, 250); // quarter second
     }
     //@+node:felix.20260323005820.1: *3* showTab
-    public showTab(tabName: string) {
+    public showTab(tabName: string, focusInFirstInput = false) {
+        const oldTab = this.HTML_ELEMENT.getAttribute('data-active-tab');
+        if (focusInFirstInput) {
+            requestAnimationFrame(() => {
+                switch (tabName) {
+                    case 'find':
+                        this.focusFindInput();
+                        break;
+                    case 'nav':
+                        this.focusNavInput();
+                        break;
+                }
+            });
+        }
+        if (oldTab === tabName) {
+            return;
+        }
         this.HTML_ELEMENT.setAttribute('data-active-tab', tabName);
         if (tabName === 'undo') {
             this.refreshUndoPane();
+        }
+        if (tabName === 'nav') {
+            this.refreshGotoPane();
         }
     }
     //@+node:felix.20260323005755.1: *3* addToLogPane
@@ -473,7 +602,13 @@ export class LogPaneManager {
     }
     //@+node:felix.20260323005812.1: *3* focusFindInput
     public focusFindInput() {
+        this.FIND_INPUT.focus();
         this.FIND_INPUT.select();
+    }
+    //@+node:felix.20260401000319.1: *3* focusNavInput
+    public focusNavInput() {
+        this.NAV_TEXT.focus();
+        this.NAV_TEXT.select();
     }
     //@+node:felix.20260327222254.1: *3* refreshUndoPane
     public refreshUndoPane(): void {
@@ -559,14 +694,26 @@ export class LogPaneManager {
             smallerDiv.dataset.order = i.toString();
             smallerDiv.className = 'goto-item ' + gotoItem.entryType;
             smallerDiv.textContent = gotoItem.label;
-            // smallerDiv.title = gotoItem.tooltip; // TOOLTIPS CANNOT BE STYLED!
-            smallerDiv.setAttribute('tabindex', '0');
+            // smallerDiv.title = gotoItem.tooltip; 
+            smallerDiv.setAttribute('tabindex', '-1'); // Make div focusable but only programmatically.
             if (gotoItem.entryType === 'parent') {
                 hasParent = true;
             }
-            smallerDiv.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                console.log('Clicked goto item with key', gotoItem.key);
+            smallerDiv.addEventListener('click', (e) => {
+                // e.preventDefault(); // Commented off to let focus get on it.
+                if (!e.target) {
+                    return;
+                }
+
+                // remove selected class first
+                if (this.lastSelectedGotoItem) {
+                    this.lastSelectedGotoItem.classList.remove('selected');
+                }
+                (e.target as HTMLElement).classList.add('selected');
+                this.lastSelectedGotoItem = e.target as HTMLElement;
+
+                // CALL GOTO COMMAND!
+                this._postMessageCallback?.({ type: 'gotoCommand', value: (e.target as HTMLElement).dataset.order });
             });
             gotoPaneContainer.appendChild(smallerDiv);
             i = i + 1;
@@ -577,14 +724,105 @@ export class LogPaneManager {
         }
     }
 
-    //@+node:felix.20260330213042.1: *3* setGotoSelection
-    public setGotoSelection(selection: LeoGotoNode) {
-        // todo
+    //@+node:felix.20260401230630.1: *3* selectNav
+    public selectNav(value?: string, forceEnter?: boolean): void {
+        this.showTab('nav');
+        if (value) {
+
+            this.NAV_TEXT.value = value;
+            this.searchSettings["navText"] = value;
+            if (this.timer) {
+                clearTimeout(this.timer);
+            }
+            this.sendSearchConfig();
+            if (forceEnter) {
+                this.navEnter();
+            }
+        }
+        //  ensure that the nav pane is rendered before trying to select the item:
+        requestAnimationFrame(() => {
+            this.focusNavInput();
+        });
+
+    }
+
+    //@+node:felix.20260403152952.1: *3* navKeyHandler
+    public navKeyHandler(p_event: KeyboardEvent): void {
+        // Handles up/down home/end pgUp/pgDown
+        // for GOTO PANE navigation under the nav input
+        if (this._gotoContent.length === 0) {
+            return;
+        }
+        const keyCode = p_event.code;
+
+        let code = -1;
+        switch (keyCode) {
+            case 'ArrowUp':
+                code = 0;
+                break;
+            case 'ArrowDown':
+                code = 1;
+                break;
+            case 'PageUp':
+                code = 2;
+                break;
+            case 'PageDown':
+                code = 3;
+                break;
+            case 'Home':
+                code = 2;
+                break;
+            case 'End':
+                code = 3;
+                break;
+            case 'Enter':
+                const actEl = document.activeElement as HTMLElement;
+                if (actEl && actEl.classList.contains('goto-item')) {
+                    p_event.preventDefault();
+                    p_event.stopPropagation();
+                    p_event.stopImmediatePropagation();
+                    if (!this.GOTO_PANE || !this.lastSelectedGotoItem) {
+                        return;
+                    }
+                    // CALL GOTO COMMAND!
+                    this._postMessageCallback?.({ type: 'gotoCommand', value: this.lastSelectedGotoItem.dataset.order });
+                    return;
+                }
+                break;
+
+            default:
+                break;
+        }
+        if (code >= 0) {
+            p_event.preventDefault();
+            p_event.stopPropagation();
+            p_event.stopImmediatePropagation();
+            this._postMessageCallback?.({ type: 'navigateNavEntry', value: code });
+        }
+    }
+    //@+node:felix.20260330213042.1: *3* focusGotoPane
+    public focusGotoPane() {
+        this.showTab('nav', this._gotoContent.length === 0);
+        if (this._gotoContent.length === 0) {
+            return;
+        }
+        // Select the first item, if any, otherwise focus the nav input:
+        this._postMessageCallback?.({ type: 'navigateNavEntry', value: 2 });
+
+        // focus on first child of goto pane
+        setTimeout(() => {
+            if (this.GOTO_PANE && this.GOTO_PANE.firstChild) {
+                (this.GOTO_PANE.firstChild as HTMLElement).focus();
+            } else {
+                this.focusNavInput();
+            }
+        }, 10);
     }
 
     //@+node:felix.20260330213117.1: *3* setGotoNodes
     public setGotoNodes(gotoNodes: LeoGotoNode[]): void {
         this._gotoContent = gotoNodes;
+        this.refreshGotoPane();
     }
 
     //@-others

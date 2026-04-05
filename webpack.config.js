@@ -47,14 +47,12 @@ module.exports = (env, argv) => {
                 // for the list of Node.js core module polyfills.
                 assert: require.resolve("assert"),
                 buffer: require.resolve('buffer'),
-                // console: require.resolve('console-browserify'),
                 crypto: require.resolve('crypto-browserify'), // Needed for ksuid which was written for node.
                 os: require.resolve('os-browserify/browser'),
                 path: require.resolve('path-browserify'),
                 process: require.resolve('process/browser'),
                 url: require.resolve('url'),
                 fs: false, // Explicitly disable fs in browser builds
-                // opn: false, // false: so compilation passes: WILL NOT BE USED IN WEB VERSION
                 vm: false, // These code paths will never execute in the browser anyway.
                 perf_hooks: false, // These code paths will never execute in the browser anyway.
             },

@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.7
+
+- Added Nav Pane and quickSearch plugin features originally by Ville M. Vainio <vivainio@gmail.com> 
+- Fixed minibuffer's 'goto-global-line' easter egg command.
+
 ## 1.0.6
 
 - Fixed 'enter' to insert a newline while respecting the indentation of the current line. Fixes [#9](https://github.com/boltex/leo-web/issues/9)

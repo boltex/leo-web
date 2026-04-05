@@ -44,7 +44,6 @@ import * as g from './leoGlobals';
 //@+node:felix.20251214160339.1763: ** << leoRst annotations >>
 import { Commands } from './leoCommands';
 import { Position, VNode } from './leoNodes';
-import { workspace } from '../workspace';
 //@-<< leoRst annotations >>
 
 //@+others
@@ -534,7 +533,7 @@ export class RstCommands {
         } else {
             // TODO : FIX THIS !
             g.es("Leo-Web : docutils not available, only the intermediate file was written.");
-            void workspace.dialog.showInformationMessage("Leo-Web: docutils not available, only the intermediate file was written.");
+            void g.workspace.dialog.showInformationMessage("Leo-Web: docutils not available, only the intermediate file was written.");
             return;
         }
 

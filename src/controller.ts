@@ -178,8 +178,8 @@ export class Controller {
         menu.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         menu.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab('log') });
-        logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab('find') });
-        logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav') });
+        logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab('find', true) });
+        logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav', true) });
         logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') });
         logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab('settings') });
         logPane.HELP_TAB.addEventListener('click', () => { logPane.showTab('help') });
@@ -1369,9 +1369,8 @@ export class Controller {
         }
         const node = this.nodeList[this.selectedNodeIndex];
 
-        // TODO : implement actual navigation then uncomment this ! 
-        // await this._leoUI.gotoNavEntry(node);
-        // this._leoUI.revealGotoNavEntry(this.selectedNodeIndex);
+        workspace.logPane.revealGotoNavEntry(this.selectedNodeIndex, true);
+        g.app.gui.gotoNavEntry(node);
 
     }
 

@@ -453,15 +453,14 @@ export const keybindings: Keybinding[] = [
         find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
-    // TODO : UNDOMMENT WHEN NAV PANEL IS READY
-    // {
-    //     command: CMD.FIND_QUICK_SELECTED,
-    //     key: "ctrl+shift+f",
-    //     mac: "meta+shift+f",
-    //     outline: true,
-    //     body: true,
-    //     find: true
-    // }
+    {
+        command: CMD.FIND_QUICK_SELECTED,
+        key: "ctrl+shift+f",
+        mac: "meta+shift+f",
+        outline: true,
+        body: true,
+        find: true
+    },
     {
         command: CMD.FIND_NEXT,
         key: "f3",

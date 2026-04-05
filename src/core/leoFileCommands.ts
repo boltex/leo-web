@@ -3,13 +3,12 @@
 //@+<< imports >>
 //@+node:felix.20251214160339.871: ** << imports >>
 import * as g from './leoGlobals';
-import { VNode, Position, StatusFlags } from './leoNodes';
+import { VNode, Position } from './leoNodes';
 import { Commands } from './leoCommands';
 import { new_cmd_decorator } from './decorators';
 import 'date-format-lite';
 import * as et from 'elementtree';
 import * as difflib from 'difflib';
-import { workspace } from '../workspace';
 var binascii = require('binascii');
 var pickle = require('./jpicklejs');
 
@@ -104,7 +103,7 @@ export class FastRead {
         let s;
         if (theFile == null) {
             const w_uri = g.makeUri(p_path);
-            const readData = await workspace.fs.readFile(w_uri);
+            const readData = await g.workspace.fs.readFile(w_uri);
             s = Buffer.from(readData).toString('utf8');
         } else {
             s = theFile;
@@ -138,7 +137,7 @@ export class FastRead {
         let s;
         if (theFile == null) {
             const w_uri = g.makeUri(p_path);
-            const readData = await workspace.fs.readFile(w_uri);
+            const readData = await g.workspace.fs.readFile(w_uri);
             s = Buffer.from(readData).toString('utf8');
         } else {
             s = theFile;
@@ -1027,13 +1026,13 @@ export class FileCommands {
 
             let s: string;
             const w_readUri = g.makeUri(fileName);
-            const readData = await workspace.fs.readFile(w_readUri);
+            const readData = await g.workspace.fs.readFile(w_readUri);
             // s = Buffer.from(readData).toString('utf8'); // * No need to convert if already Uint8Array
 
             try {
                 const w_writeUri = g.makeUri(backupName);
                 // const writeData = Buffer.from(s, 'utf8'); // * No need to convert if already Uint8Array
-                await workspace.fs.writeFile(w_writeUri, readData);
+                await g.workspace.fs.writeFile(w_writeUri, readData);
                 ok = true;
             } catch (exception) {
                 g.error('exception creating backup file');
@@ -1054,7 +1053,7 @@ export class FileCommands {
     public async deleteBackupFile(fileName: string): Promise<void> {
         try {
             const w_uri = g.makeUri(fileName);
-            await workspace.fs.delete(w_uri);
+            await g.workspace.fs.delete(w_uri);
         } catch (exception) {
             if (this.read_only) {
                 g.error('read only');
@@ -1091,7 +1090,7 @@ export class FileCommands {
             try {
                 const w_srcUri = g.makeUri(src);
                 const w_dstUri = g.makeUri(dst);
-                await workspace.fs.rename(w_srcUri, w_dstUri, {
+                await g.workspace.fs.rename(w_srcUri, w_dstUri, {
                     overwrite: true,
                 });
             } catch (exception) {
@@ -1108,7 +1107,7 @@ export class FileCommands {
         const w_exists = await g.os_path_exists(fileName);
         if (w_exists) {
             const w_uri = g.makeUri(fileName);
-            const fileStat = await workspace.fs.stat(w_uri);
+            const fileStat = await g.workspace.fs.stat(w_uri);
             if (fileStat.permissions && fileStat.permissions & 1) {
                 g.error('can not write: read only:', fileName);
                 return true;
@@ -1120,7 +1119,7 @@ export class FileCommands {
     public async warnOnReadOnlyFiles(fileName: string): Promise<boolean> {
         try {
             const w_uri = g.makeUri(fileName);
-            const fileStat = await workspace.fs.stat(w_uri);
+            const fileStat = await g.workspace.fs.stat(w_uri);
             if (fileStat.permissions && fileStat.permissions & 1) {
                 g.error('can not write: read only:', fileName);
                 this.read_only = true;
@@ -2005,7 +2004,7 @@ export class FileCommands {
             const json_s = JSON.stringify(d, null, 2); // json.dumps(d, indent = 2);
 
             const w_uri = g.makeUri(fileName);
-            await workspace.fs.writeFile(
+            await g.workspace.fs.writeFile(
                 w_uri,
                 Buffer.from(json_s, this.leo_file_encoding)
             );
@@ -2261,7 +2260,7 @@ export class FileCommands {
             );
 
             const w_uri = g.makeUri(fileName);
-            await workspace.fs.writeFile(w_uri, s);
+            await g.workspace.fs.writeFile(w_uri, s);
 
             await c.setFileTimeStamp(fileName);
             // Delete backup file.

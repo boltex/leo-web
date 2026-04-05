@@ -9,7 +9,6 @@ import * as g from './leoGlobals';
 import { LeoFrame } from './leoFrame';
 import { Position, VNode } from './leoNodes';
 import { Commands } from './leoCommands';
-import { workspace } from '../workspace';
 import { FileStat } from '../types';
 //@-<< imports >>
 //@+others
@@ -555,7 +554,7 @@ export class ExternalFilesController {
             const w_exists = await g.os_path_exists(td);
             if (!w_exists) {
                 const w_uri = g.makeUri(td);
-                await workspace.fs.createDirectory(w_uri);
+                await g.workspace.fs.createDirectory(w_uri);
                 // os.mkdir(td);
             }
         }
@@ -588,7 +587,7 @@ export class ExternalFilesController {
         const w_exists = await g.os_path_exists(td);
         if (!w_exists) {
             const w_uri = g.makeUri(td);
-            await workspace.fs.createDirectory(w_uri);
+            await g.workspace.fs.createDirectory(w_uri);
             //os.mkdir(td);
         }
 
@@ -623,7 +622,7 @@ export class ExternalFilesController {
 
                 const w_uri = g.makeUri(w_path);
                 // s is already Uint8Array buffer
-                await workspace.fs.writeFile(w_uri, s);
+                await g.workspace.fs.writeFile(w_uri, s);
             } catch (IOError) {
                 g.error(`exception creating temp file: ${w_path}`);
                 g.es_exception(IOError);
@@ -727,6 +726,14 @@ export class ExternalFilesController {
         }
     }
 
+    //@+node:felix.20260401212949.3: *4* efc.reloadSettings
+    /**
+     * Clear the enabled_d dict
+     */
+    public reloadSettings(): void {
+        this.enabled_d.clear();
+    }
+
     //@+node:felix.20251214160339.858: *4* efc.shut_down
     /**
      * Destroy all temporary open-with files.
@@ -786,12 +793,12 @@ export class ExternalFilesController {
             //     if (!checkConfig.includes('none')) {
             //         let w_message = 'Changes to external files were detected.';
             //         if (checkConfig.includes('yes')) {
-            //             void workspace.dialog.showInformationMessage(
+            //             void g.workspace.dialog.showInformationMessage(
             //                 w_message + ' Nodes refreshed.'
             //             );
             //             return 'yes-all';
             //         } else {
-            //             void workspace.dialog.showInformationMessage(
+            //             void g.workspace.dialog.showInformationMessage(
             //                 w_message + ' They were ignored.'
             //             );
             //             return 'no-all';
@@ -849,7 +856,7 @@ export class ExternalFilesController {
         //     s = f.read()
 
         const w_uri = g.makeUri(p_path);
-        const s = await workspace.fs.readFile(w_uri);
+        const s = await g.workspace.fs.readFile(w_uri);
 
         // return hashlib.md5(s).hexdigest()
         return md5(s);
@@ -864,7 +871,7 @@ export class ExternalFilesController {
         if (ef.path && w_exists) {
             try {
                 const w_uri = g.makeUri(ef.path);
-                await workspace.fs.delete(w_uri, { recursive: true });
+                await g.workspace.fs.delete(w_uri, { recursive: true });
                 // os.remove(ef.path)
             } catch (exception) {
                 // pass
@@ -1020,7 +1027,7 @@ export class ExternalFilesController {
                 'Proceed with refresh-from-disk only if this is intended.\n';
         }
 
-        void workspace.dialog.showInformationMessage(message);
+        void g.workspace.dialog.showInformationMessage(message);
     }
 
     //@-others

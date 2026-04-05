@@ -6,7 +6,7 @@
  */
 //@+<< imports >>
 //@+node:felix.20251207215313.2: ** << imports >>
-import { workspace } from '../workspace';
+import { workspace as workspaceInstance } from '../workspace';
 import * as utils from '../utils';
 import * as os from 'os';
 import * as path from 'path';
@@ -41,6 +41,8 @@ export const isWindows: boolean = name.includes('windows');
 export const isLinux: boolean = name.includes('linux');
 export const isIOS: boolean = name.includes('ios');
 export const isAndroid: boolean = name.includes('android');
+
+export const workspace = workspaceInstance; // To expose the workspace to the rest of Leo.
 
 /** For accessing files in the current workspace */
 export let workspaceUri: Uri;
@@ -1479,12 +1481,12 @@ export async function chdir(p_path: string): Promise<void> {
 //@+node:felix.20251207215313.73: *3* g.mkdir
 export async function mkdir(folderName: string): Promise<void> {
     const w_uri = makeUri(folderName);
-    await workspace.fs.createDirectory(w_uri);
+    await workspaceInstance.fs.createDirectory(w_uri);
 }
 //@+node:felix.20251207215313.74: *3* g.rmdir
 export async function rmdir(folderName: string): Promise<void> {
     const w_uri = makeUri(folderName);
-    await workspace.fs.delete(w_uri, { recursive: true });
+    await workspaceInstance.fs.delete(w_uri, { recursive: true });
 }
 //@+node:felix.20251207215313.75: *3* g.computeWindowTitle
 /**
@@ -1562,14 +1564,14 @@ export async function filecmp_cmp(
     let w_uri: Uri;
     w_uri = makeUri(path1); // first uri, no matter if shallow or not.
     if (shallow) {
-        const stats1 = await workspace.fs.stat(w_uri);
+        const stats1 = await workspaceInstance.fs.stat(w_uri);
         w_uri = makeUri(path2);
-        const stats2 = await workspace.fs.stat(w_uri);
+        const stats2 = await workspaceInstance.fs.stat(w_uri);
         w_same = stats1.size === stats2.size && stats1.mtime === stats2.mtime;
     } else {
-        const file1 = await workspace.fs.readFile(w_uri);
+        const file1 = await workspaceInstance.fs.readFile(w_uri);
         w_uri = makeUri(path2);
-        const file2 = await workspace.fs.readFile(w_uri);
+        const file2 = await workspaceInstance.fs.readFile(w_uri);
         w_same = Buffer.compare(file1, file2) === 0;
     }
     return w_same;
@@ -1622,7 +1624,7 @@ export async function is_binary_external_file(
         // with open(fileName, 'rb') as f:
         //     s = f.read(1024)  // bytes, in Python 3.
         const w_readUri = makeUri(fileName);
-        const readData = await workspace.fs.readFile(w_readUri);
+        const readData = await workspaceInstance.fs.readFile(w_readUri);
         const s = readData.slice(0, 1024);
         return is_binary_string(s);
         // except IOError:
@@ -1670,7 +1672,7 @@ export async function makeAllNonExistentDirectories(
     // #1450: Create the directory with os.makedirs.
     try {
         const w_uri = makeUri(theDir);
-        await workspace.fs.createDirectory(w_uri);
+        await workspaceInstance.fs.createDirectory(w_uri);
         return theDir;
     } catch (exception) {
         return undefined;
@@ -1737,7 +1739,7 @@ export async function readFileIntoString(
 
     try {
         const w_uri = makeUri(fileName);
-        let readData = await workspace.fs.readFile(w_uri);
+        let readData = await workspaceInstance.fs.readFile(w_uri);
         if (!readData) {
             return ['', undefined];
         }
@@ -1779,7 +1781,7 @@ export async function readFileIntoUnicodeString(
 ): Promise<string | undefined> {
     try {
         const w_uri = makeUri(fn);
-        let s = await workspace.fs.readFile(w_uri);
+        let s = await workspaceInstance.fs.readFile(w_uri);
         return toUnicode(s, encoding);
     } catch (e) {
         if (!silent) {
@@ -1822,7 +1824,7 @@ export function readlineForceUnixNewline(
 //@+node:felix.20251207215313.88: *3* g.os_remove
 export async function os_remove(fileName: string): Promise<void> {
     const w_uri = makeUri(fileName);
-    await workspace.fs.delete(w_uri);
+    await workspaceInstance.fs.delete(w_uri);
 }
 //@+node:felix.20251207215313.89: *3* g.sanitize_filename
 /**
@@ -1928,7 +1930,7 @@ export async function writeFile(
         //     f.write(contents)  // type:ignore
 
         const w_uri = makeUri(fileName);
-        await workspace.fs.writeFile(w_uri, contents);
+        await workspaceInstance.fs.writeFile(w_uri, contents);
 
         return true;
     } catch (e) {
@@ -1955,7 +1957,7 @@ export async function write_file_if_changed(
             // with open(fn, 'rb') as f
             //     contents = f.read()
             const w_uri = makeUri(fn);
-            const contents = await workspace.fs.readFile(w_uri);
+            const contents = await workspaceInstance.fs.readFile(w_uri);
             if (Buffer.compare(contents, encoded_s) === 0) {
                 return false;
             }
@@ -1963,7 +1965,7 @@ export async function write_file_if_changed(
         // with open(fn, 'wb') as f
         //     f.write(encoded_s);
         const w_uri = makeUri(fn);
-        await workspace.fs.writeFile(w_uri, encoded_s);
+        await workspaceInstance.fs.writeFile(w_uri, encoded_s);
         return true;
     } catch (exception) {
         es_print(`Exception writing ${fn}`);
@@ -3953,7 +3955,7 @@ export function es_print_unique_message(message: string, color?: string): boolea
 //@+node:felix.20251207215313.202: ** g.Miscellaneous
 //@+node:felix.20251207215313.203: *3* g.IDDialog
 export function IDDialog(): Thenable<string> {
-    return workspace.dialog.showInputDialog({
+    return workspaceInstance.dialog.showInputDialog({
         title: "Enter Leo id",
         prompt: "Please enter an id that identifies you uniquely.\n(Letters and numbers only, and at least 3 characters in length)",
     }).then((id) => {
@@ -4274,7 +4276,7 @@ export async function os_listdir(p_path: string): Promise<string[]> {
     let result: string[] = [];
     try {
         const w_uri = makeUri(p_path);
-        const w_dirInfo = await workspace.fs.readDirectory(w_uri);
+        const w_dirInfo = await workspaceInstance.fs.readDirectory(w_uri);
         result = w_dirInfo.map((p_dirInfo) => p_dirInfo[0]);
     } catch (e) {
         es(`Error listing directory ${p_path}`);
@@ -4283,7 +4285,7 @@ export async function os_listdir(p_path: string): Promise<string[]> {
 }
 //@+node:felix.20251207215313.223: *3* g.setStatusLabel
 export function setStatusLabel(s: string): void {
-    workspace.dialog.showToast(s);
+    workspaceInstance.dialog.showToast(s);
 }
 //@+node:felix.20251207215313.224: *3* g.truncate
 export function truncate(s: string, n: number): string {
@@ -4489,7 +4491,7 @@ export async function os_path_exists(
     }
     const w_uri = makeUri(p_path);
     try {
-        const stat = await workspace.fs.stat(w_uri);
+        const stat = await workspaceInstance.fs.stat(w_uri);
         return stat;
     } catch {
         return false;
@@ -4570,7 +4572,7 @@ export async function os_path_getmtime(p_path: string): Promise<number> {
     try {
         // return os.path.getmtime(p_path);
         const w_uri = makeUri(p_path);
-        const w_stats = await workspace.fs.stat(w_uri);
+        const w_stats = await workspaceInstance.fs.stat(w_uri);
         if (!w_stats.mtime) {
             return 0;
         }
@@ -4587,7 +4589,7 @@ export async function os_path_getsize(p_path: string): Promise<number> {
     if (p_path) {
         const w_uri = makeUri(p_path);
         try {
-            const fileStat: FileStat = await workspace.fs.stat(
+            const fileStat: FileStat = await workspaceInstance.fs.stat(
                 w_uri
             );
             // OK exists
@@ -4620,7 +4622,7 @@ export async function os_path_isdir(p_path: string): Promise<boolean> {
     if (p_path) {
         try {
             const w_uri = makeUri(p_path);
-            const fileStat: FileStat = await workspace.fs.stat(
+            const fileStat: FileStat = await workspaceInstance.fs.stat(
                 w_uri
             );
             // OK exists
@@ -4642,7 +4644,7 @@ export async function os_path_isfile(p_path?: string): Promise<boolean> {
     if (p_path) {
         try {
             const w_uri = makeUri(p_path);
-            const fileStat: FileStat = await workspace.fs.stat(
+            const fileStat: FileStat = await workspaceInstance.fs.stat(
                 w_uri
             );
             // OK exists
@@ -4826,8 +4828,8 @@ export async function os_path_samefile(
 
     // IF REAL NODE FS ONLY !
     try {
-        const w_stat1: FileStat = await workspace.fs.stat(w_uri1);
-        const w_stat2: FileStat = await workspace.fs.stat(w_uri2);
+        const w_stat1: FileStat = await workspaceInstance.fs.stat(w_uri1);
+        const w_stat2: FileStat = await workspaceInstance.fs.stat(w_uri2);
         if (
             (w_stat1 as any)['ino'] &&
             (w_stat1 as any)['dev'] &&

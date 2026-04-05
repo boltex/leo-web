@@ -476,6 +476,7 @@ export class GoToCommands {
         // Put the cursor on the last line of body text.
         w.setInsertPoint(root.b.length);
         c.bodyWantsFocus();
+        c.bodyWantsFocusNow();
         w.seeInsertPoint();
     }
     //@+node:felix.20251214160853.503: *4* goto.find_gnx & find_gnx2
@@ -709,6 +710,7 @@ export class GoToCommands {
         c.frame.putStatusLine(`goto-global-line found: ${n2}`);
         w.setInsertPoint(ins);
         c.bodyWantsFocus();
+        c.bodyWantsFocusNow();
         w.seeInsertPoint();
     }
     //@-others

@@ -8,9 +8,17 @@
 import * as g from './leoGlobals';
 import { Position } from './leoNodes';
 import { Commands } from './leoCommands';
+import { new_cmd_decorator } from './decorators';
 //@-<< quicksearch imports >>
 //@+others
-//@+node:felix.20251214160339.2059: ** class QuickSearchController (leoserver.py)
+//@+node:felix.20260403231649.2: ** quicksearch cmd
+/**
+ * Command decorator for the QuickSearchController class.
+ */
+function cmd(p_name: string, p_doc: string) {
+    return new_cmd_decorator(p_name, p_doc, ['c', 'quicksearchController']);
+}
+//@+node:felix.20251214160339.2059: ** class QuickSearchController
 export class QuickSearchController {
     public c: Commands;
     public lw: string[];
@@ -67,6 +75,68 @@ export class QuickSearchController {
             'Node',
         ];
     }
+    //@+node:felix.20260404000959.1: *3* QuickSearch Commands
+    //@+node:felix.20260404001033.1: *4* find_selected
+    @cmd('find-quick-selected', 'Nav search with current selection')
+    public find_selected(): void {
+        const body = this.c.frame.body;
+        const w = body.wrapper;
+        let [i, j] = w.getSelectionRange();
+        if (i === j) {
+            const ins = w.getInsertPoint();
+            [i, j] = g.getLine(w.getAllText(), ins);
+        }
+        let s = w.get(i, j);
+        if (s) {
+            s = s.replace(/\r\n/g, "\n");
+        }
+        g.workspace.logPane.selectNav(s || "", true);
+    }
+
+    //@+node:felix.20260404001129.1: *4* focus_quicksearch_entry
+    @cmd('find-quick', 'Nav search')
+    public focus_quicksearch_entry(): void {
+        g.workspace.logPane.selectNav();
+    }
+
+    //@+node:felix.20260404001133.1: *4* focus_to_nav
+    @cmd('focus-to-nav', 'Focus on Nav tab')
+    public focus_to_nav(): void {
+        g.workspace.logPane.focusGotoPane();
+    }
+
+    //@+node:felix.20260404001139.1: *4* timeline
+    @cmd('find-quick-timeline', 'List nodes in reverse gnx order')
+    public timeline(): void {
+        this.qsc_sort_by_gnx();
+        g.workspace.controller.buildGotoElements();
+        g.workspace.logPane.showTab('nav');
+    }
+
+    //@+node:felix.20260404001144.1: *4* show_dirty
+    @cmd('find-quick-changed', 'List all changed/dirty nodes')
+    public show_dirty(): void {
+        this.qsc_find_changed();
+        g.workspace.controller.buildGotoElements();
+        g.workspace.logPane.showTab('nav');
+    }
+
+    //@+node:felix.20260404005125.1: *4* show_marked
+    @cmd('find-quick-marked', 'List all marked nodes')
+    public show_marked(): void {
+        this.qsc_show_marked();
+        g.workspace.controller.buildGotoElements();
+        g.workspace.logPane.showTab('nav');
+    }
+
+    //@+node:felix.20260404001150.1: *4* nodehistory
+    @cmd('find-quick-history', 'List visited nodes from history')
+    public nodehistory(): void {
+        this.qsc_get_history();
+        g.workspace.controller.buildGotoElements();
+        g.workspace.logPane.showTab('nav');
+    }
+
     //@+node:felix.20251214160339.2061: *3* translate & helper
     //based on fnmatch.py
     public escape(s: string): string {

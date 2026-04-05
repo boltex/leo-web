@@ -3,7 +3,6 @@
 //@+<< imports >>
 //@+node:felix.20251214160339.16: ** << imports >>
 import pkg from '../../package.json'; // note the .json extension
-import { workspace } from '../workspace';
 import * as Bowser from 'bowser';
 import * as os from 'os';
 import * as path from 'path';
@@ -1201,7 +1200,7 @@ export class LeoApp {
             id_ = '';
             if (!this.LeoIDWarningShown) {
                 this.LeoIDWarningShown = true;
-                void workspace.dialog.showInformationMessage(
+                void g.workspace.dialog.showInformationMessage(
                     `Invalid Leo ID: ${tag}`,
                     {
                         detail:
@@ -1220,7 +1219,7 @@ export class LeoApp {
     public setIDFromConfigSetting(verbose: boolean): Promise<void> {
         let w_userName = '';
         // 1 - set leoID from configuration settings
-        if (!this.leoID && workspace) {
+        if (!this.leoID && g.workspace) {
             // this.gui does not exist at this point, so we cannot use it to get the config setting.
             // Instead, we will get the config setting with localStorage, which is where the config setting is stored in leo-web.
             // Even if this duplcates the code from config.ts, it is better than adding a dependency on the GUI before it is initialized.
@@ -2161,7 +2160,7 @@ export class LoadManager {
         directories = [
             //  { kind: 'repository', theDir: g.app.homeDir },
             { kind: 'leo-editor', theDir: location.toString() },
-            { kind: 'workspace', theDir: workspace.workspaceDirHandle ? workspace.workspaceDirHandle.name : undefined },
+            { kind: 'workspace', theDir: g.workspace.workspaceDirHandle ? g.workspace.workspaceDirHandle.name : undefined },
         ];
 
         for (const { kind, theDir } of directories) {
@@ -2569,7 +2568,7 @@ export class LoadManager {
 
             if (fn === 'leoSettings.leo') {
                 // const w_leoSettingsUri = lm.computeLeoSettingsUri();
-                // let readData = await workspace.fs.readFile(w_leoSettingsUri);
+                // let readData = await g.workspace.fs.readFile(w_leoSettingsUri);
                 let readData = JSON.stringify(leoSettings);
                 [ok, g_element] = w_fastRead.readWithJsonTree(
                     fn,
@@ -3890,7 +3889,7 @@ export class RecentFilesManager {
                 try {
                     const w_uri = g.makeUri(fn);
                     const writeData = Buffer.from('', 'utf8');
-                    await workspace.fs.writeFile(w_uri, writeData);
+                    await g.workspace.fs.writeFile(w_uri, writeData);
                     g.es('created', fn);
                     return;
                 } catch (err) {

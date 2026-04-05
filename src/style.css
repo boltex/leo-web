@@ -684,6 +684,10 @@ body.dragging-cross {
   outline: 3px solid var(--focus-outline);
   outline-offset: -3px;
 }
+#body-pane.no-focus-outline {
+  outline: none !important;
+  transition: none !important; /* Prevent any fade-in effects during the jump */
+}
 
 /*@+node:felix.20260321142128.1: ** Outline Pane*/
 #outline-pane {
@@ -1088,6 +1092,7 @@ body.dragging-secondary .node {
   transition: var(--find-pane-transition);
   container-type: inline-size;
   container-name: log-pane;
+  /* user-select: none; */ /* Allow text selection for copying of log content */
 }
 
 #find-controls,
@@ -1189,16 +1194,66 @@ body.dragging-secondary .node {
 #nav-tab {
   background: var(--nav-tab-bg-color);
   /* Hidden while being developped */
-  display: none; /* Temporary */
+  /* display: none; /* Temporary */
 }
 
 #nav-controls {
-  padding: 0.5rem 0 0 0.5rem;
+  padding: 0.5rem 0.5rem 0 0.5rem;
   display: var(--nav-display);
   flex-direction: column;
   flex-wrap: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;
+  min-height: 0;
+  flex-grow: 1;
+}
+
+#gotoPane.bottom-scroll {
+  /* padding: 0.5rem 0.5rem 0 0.5rem; */
+  gap: 0;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  min-height: 0;
+  flex-grow: 1;
+  white-space: pre;
+}
+
+.goto-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.2rem 0.4rem 0.2rem 0.4rem;
+  cursor: default;
+  user-select: none;
+}
+.goto-item:hover {
+  background: var(--hover-bg);
+}
+.goto-item.parent {
+  font-style: italic;
+}
+.goto-item.headline {
+  font-weight: bold;
+}
+.show-parents .goto-item.headline {
+  padding-left: 1.4rem;
+}
+.goto-item.body {
+  padding-left: 1.4rem;
+}
+.show-parents .goto-item.body {
+  padding-left: 2.4rem;
+}
+.goto-item.selected {
+  background: var(--selected-bg);
+  color: var(--text-color);
+}
+/* Prevent browser styling of focus-visible */
+#log-pane :focus-visible {
+  outline: none;
 }
 
 #undo-tab {
@@ -1573,6 +1628,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   z-index: 1000;
+  user-select: none;
 }
 
 .context-menu ul {
@@ -1610,6 +1666,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   font-family: sans-serif;
   font-size: 13px;
   white-space: pre;
+  user-select: none;
 }
 
 #toast.show {
