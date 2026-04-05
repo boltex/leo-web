@@ -1933,14 +1933,17 @@ export class LeoUI extends NullGui {
             return;
         }
         const frame = g.app.windowList[this.frameIndex];
-        const body = frame.body;
-
-        let [, s] = body.getSelectionLines();
+        const w = frame.body.wrapper;
+        let [i, j] = w.getSelectionRange();
+        if (i === j) {
+            const ins = w.getInsertPoint();
+            [i, j] = g.getLine(w.getAllText(), ins);
+        }
+        let s = w.get(i, j);
         if (s) {
             s = s.replace(/\r\n/g, "\n");
         }
-
-        return this.findQuick(s || "", true);
+        workspace.logPane.selectNav(s || "", true);
     }
 
     /**
@@ -1951,7 +1954,7 @@ export class LeoUI extends NullGui {
         const scon: QuickSearchController = c.quicksearchController;
         scon.qsc_sort_by_gnx();
         workspace.controller.buildGotoElements();
-        workspace.logPane.showTab('nav');
+        workspace.logPane.showTab('nav', true);
     }
 
     /**
@@ -1962,7 +1965,7 @@ export class LeoUI extends NullGui {
         const scon: QuickSearchController = c.quicksearchController;
         scon.qsc_find_changed();
         workspace.controller.buildGotoElements();
-        workspace.logPane.showTab('nav');
+        workspace.logPane.showTab('nav', true);
     }
 
     /**
@@ -1973,7 +1976,7 @@ export class LeoUI extends NullGui {
         const scon: QuickSearchController = c.quicksearchController;
         scon.qsc_get_history();
         workspace.controller.buildGotoElements();
-        workspace.logPane.showTab('nav');
+        workspace.logPane.showTab('nav', true);
     }
 
     /**
@@ -1984,10 +1987,7 @@ export class LeoUI extends NullGui {
         const scon: QuickSearchController = c.quicksearchController;
         scon.qsc_show_marked();
         workspace.controller.buildGotoElements();
-        if (p_preserveFocus && workspace.logPane.HTML_ELEMENT.getAttribute('data-active-tab') === 'nav') {
-            return
-        }
-        workspace.logPane.showTab('nav');
+        workspace.logPane.showTab('nav', p_preserveFocus);
     }
 
 
@@ -2082,10 +2082,7 @@ export class LeoUI extends NullGui {
      */
     public startSearch(): void {
         this.triggerBodySave();
-        workspace.logPane.showTab('find');
-        setTimeout(() => {
-            workspace.logPane.focusFindInput();
-        }, 0);
+        workspace.logPane.showTab('find', true);
     }
 
     /**

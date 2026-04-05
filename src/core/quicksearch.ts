@@ -16,7 +16,7 @@ import { new_cmd_decorator } from './decorators';
  * Command decorator for the QuickSearchController class.
  */
 function cmd(p_name: string, p_doc: string) {
-    return new_cmd_decorator(p_name, p_doc, ['c', 'QuickSearchController']);
+    return new_cmd_decorator(p_name, p_doc, ['c', 'quicksearchController']);
 }
 //@+node:felix.20251214160339.2059: ** class QuickSearchController
 export class QuickSearchController {
@@ -80,11 +80,17 @@ export class QuickSearchController {
     @cmd('find-quick-selected', 'Nav search with current selection')
     public find_selected(): void {
         const body = this.c.frame.body;
-        let [, s] = body.getSelectionLines();
+        const w = body.wrapper;
+        let [i, j] = w.getSelectionRange();
+        if (i === j) {
+            const ins = w.getInsertPoint();
+            [i, j] = g.getLine(w.getAllText(), ins);
+        }
+        let s = w.get(i, j);
         if (s) {
             s = s.replace(/\r\n/g, "\n");
         }
-        g.workspace.logPane.selectNav(s, true);
+        g.workspace.logPane.selectNav(s || "", true);
     }
 
     //@+node:felix.20260404001129.1: *4* focus_quicksearch_entry

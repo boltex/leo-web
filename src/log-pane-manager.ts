@@ -233,9 +233,15 @@ export class LogPaneManager {
             // Do as if already focused in the goto container: down to first, up to last.
             if ((keyCode === 'ArrowDown' || keyCode === 'ArrowUp') && this._gotoContent.length > 0) {
                 p_event.preventDefault();
+                p_event.stopPropagation();
                 let code = 3; // default for up: last item
                 if (keyCode === 'ArrowDown') {
                     code = 2; // down: first item
+                }
+                if (code === 2 && this.GOTO_PANE && this.GOTO_PANE.firstChild) {
+                    (this.GOTO_PANE.firstChild as HTMLElement).focus();
+                } else if (code === 3 && this.GOTO_PANE && this.GOTO_PANE.lastChild) {
+                    (this.GOTO_PANE.lastChild as HTMLElement).focus();
                 }
                 this._postMessageCallback?.({ type: 'navigateNavEntry', value: code });
             }
@@ -560,8 +566,20 @@ export class LogPaneManager {
         }, 250); // quarter second
     }
     //@+node:felix.20260323005820.1: *3* showTab
-    public showTab(tabName: string) {
+    public showTab(tabName: string, focusInFirstInput = false) {
         const oldTab = this.HTML_ELEMENT.getAttribute('data-active-tab');
+        if (focusInFirstInput) {
+            requestAnimationFrame(() => {
+                switch (tabName) {
+                    case 'find':
+                        this.focusFindInput();
+                        break;
+                    case 'nav':
+                        this.focusNavInput();
+                        break;
+                }
+            });
+        }
         if (oldTab === tabName) {
             return;
         }
@@ -584,10 +602,12 @@ export class LogPaneManager {
     }
     //@+node:felix.20260323005812.1: *3* focusFindInput
     public focusFindInput() {
+        this.FIND_INPUT.focus();
         this.FIND_INPUT.select();
     }
     //@+node:felix.20260401000319.1: *3* focusNavInput
     public focusNavInput() {
+        this.NAV_TEXT.focus();
         this.NAV_TEXT.select();
     }
     //@+node:felix.20260327222254.1: *3* refreshUndoPane
@@ -719,12 +739,10 @@ export class LogPaneManager {
                 this.navEnter();
             }
         }
-        // let timeout to ensure that the nav pane is rendered before trying to select the item:
-        setTimeout(() => {
-            this.NAV_TEXT.focus();
-            // select all text in the nav input for easy replacement:
-            this.NAV_TEXT.select();
-        }, 10);
+        //  ensure that the nav pane is rendered before trying to select the item:
+        requestAnimationFrame(() => {
+            this.focusNavInput();
+        });
 
     }
 
@@ -784,9 +802,8 @@ export class LogPaneManager {
     }
     //@+node:felix.20260330213042.1: *3* focusGotoPane
     public focusGotoPane() {
-        this.showTab('nav');
+        this.showTab('nav', this._gotoContent.length === 0);
         if (this._gotoContent.length === 0) {
-            this.focusNavInput();
             return;
         }
         // Select the first item, if any, otherwise focus the nav input:
@@ -800,8 +817,6 @@ export class LogPaneManager {
                 this.focusNavInput();
             }
         }, 10);
-
-
     }
 
     //@+node:felix.20260330213117.1: *3* setGotoNodes

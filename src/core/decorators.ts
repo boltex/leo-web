@@ -71,6 +71,8 @@ export function new_cmd_decorator(
         propertyKey: string,
         descriptor: PropertyDescriptor
     ) {
+        // the ivars parameter is a list of strings, 'c', and 'quicksearchController' in the case of the QuickSearchController instance in c called 'quicksearchController'.
+        // (it resolves by putting each string and adding a dot in between, so 'c' and 'quicksearchController' becomes 'c.quicksearchController' and then eval is used to get the actual instance).
         // Like commander_command but the ivars array (base object and sub object/subcommander)
         // are also added to the func itself.
         // So this original 'new_cmd_decorator' is implemented at run time with c.commandsDict.

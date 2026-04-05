@@ -1092,7 +1092,7 @@ body.dragging-secondary .node {
   transition: var(--find-pane-transition);
   container-type: inline-size;
   container-name: log-pane;
-  user-select: none;
+  /* user-select: none; */ /* Allow text selection for copying of log content */
 }
 
 #find-controls,
