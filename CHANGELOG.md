@@ -2,11 +2,11 @@
 
 ## 1.0.8
 
-- ...
+- Added Leo's 'at-button' features.
 
 ## 1.0.7
 
-- Added Nav Pane and quickSearch plugin features originally by Ville M. Vainio <vivainio@gmail.com> 
+- Added Nav Pane and quickSearch plugin features originally by Ville M. Vainio <vivainio@gmail.com>
 - Fixed minibuffer's 'goto-global-line' easter egg command.
 - Fixed expand/contract caret animations.
 
