@@ -1161,6 +1161,7 @@ export class LeoUI extends NullGui {
         workspace.body.setBody('', false);
         // Make body pane not editable.
         workspace.body.setBodyEditable(false);
+        workspace.logPane.showTab('log');
     }
 
     /**
@@ -1195,7 +1196,6 @@ export class LeoUI extends NullGui {
         );
 
         this.loadSearchSettings();
-
     }
     //@+node:felix.20260323001205.1: *3* Leo Command
     /**

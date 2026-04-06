@@ -1626,6 +1626,10 @@ input[type="checkbox"]:focus-visible:checked::after {
   content: "\f137";
 }
 
+/* Leave only the log and settings pane tabs visible */
+[data-no-opened-documents="true"] .doc-dependent {
+  display: none;
+}
 /*@+node:felix.20260321142220.1: ** Overlays & Popups*/
 .context-menu {
   position: absolute;
