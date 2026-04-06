@@ -315,6 +315,20 @@ body {
     inset 1px 1px 0 rgba(255, 255, 255, 0.4),
     /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.3); /* bottom-right shadow */
 }
+.raised-effect:hover {
+  /* enhances it more on hover */
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.6),
+    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.5); /* bottom-right shadow */
+  background: var(--hover-bg);
+}
+.raised-effect:active {
+  /* inverts the effect on click */
+  box-shadow:
+    inset -1px -1px 0 rgba(255, 255, 255, 0.4),
+    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+  background: var(--hover-bg);
+}
 
 /* Document Tabs */
 #document-tabs {
@@ -445,6 +459,10 @@ body {
 
 .menu-item.active {
   background: var(--hover-bg);
+  /* depression effect on click */
+  box-shadow:
+    inset -1px -1px 0 rgba(255, 255, 255, 0.4),
+    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
 }
 
 .menu-item.sub-active {
@@ -493,6 +511,35 @@ body {
 .menu-item.disabled .menu-label,
 .menu-item.disabled .menu-shortcut {
   color: var(--find-placeholder-color);
+}
+
+#at-buttons {
+  max-height: 26px;
+  min-height: 0;
+  display: flex;
+}
+#at-buttons:has(> *) {
+  border-top: 1px solid var(--menu-border-color);
+}
+
+.at-button {
+  color: var(--menu-color);
+  font-size: 0.875rem;
+  padding: 5px 12px 5px 28px;
+  border-right: 1px solid var(--menu-border-color);
+  background: var(--menu-bg-color);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+.at-button::before {
+  content: "★"; /* todo use better icon! */
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /*@+node:felix.20260321142107.1: ** Node Icons*/
