@@ -862,7 +862,7 @@ export class LeoUI extends NullGui {
     }
 
     public refreshButtonsPane(): void {
-        workspace.controller.setupAtButtonsAndHandlers();
+        workspace.controller.refreshAtButtons();
     }
     //@+node:felix.20260323002101.1: *3* selectTreeNode
     /**

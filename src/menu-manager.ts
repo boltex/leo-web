@@ -23,6 +23,7 @@ export class MenuManager {
     public OUTLINE_MENU: HTMLElement;
     public BODY_MENU: HTMLElement;
     public UNDO_MENU: HTMLElement;
+    public AT_BUTTON_MENU: HTMLElement;
 
     // * Top Menu
     public TOP_MENU: HTMLElement;
@@ -49,6 +50,8 @@ export class MenuManager {
 
     // * at-buttons
     public AT_BUTTONS_CONTAINER: HTMLElement;
+    public REMOVE_BUTTON: HTMLElement;
+    public GOTO_SCRIPT: HTMLElement;
 
     // * Settings Menu
     // public CHECK_EXTERNAL_FILES: HTMLSelectElement;
@@ -81,6 +84,7 @@ export class MenuManager {
         this.OUTLINE_MENU = document.getElementById('outline-menu')!;
         this.BODY_MENU = document.getElementById('body-menu')!;
         this.UNDO_MENU = document.getElementById('undo-menu')!;
+        this.AT_BUTTON_MENU = document.getElementById('at-button-menu')!;
         this.TOP_MENU = document.getElementById("top-menu")!;
         this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
         this.TOP_BAR_TOGGLE = document.getElementById("top-bar-toggle")!;
@@ -103,6 +107,9 @@ export class MenuManager {
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
 
         this.AT_BUTTONS_CONTAINER = document.getElementById('at-buttons')!;
+
+        this.REMOVE_BUTTON = document.getElementById('remove-button')!;
+        this.GOTO_SCRIPT = document.getElementById('goto-script')!;
 
         // this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
         // this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
@@ -518,6 +525,7 @@ export class MenuManager {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
         this.UNDO_MENU.style.display = "none";
+        this.AT_BUTTON_MENU.style.display = "none";
         document.querySelectorAll(".submenu.visible").forEach(sub =>
             sub.classList.remove("visible")
         );
@@ -553,6 +561,7 @@ export class MenuManager {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
         this.UNDO_MENU.style.display = "none";
+        this.AT_BUTTON_MENU.style.display = "none";
         const target = e.target as Element;
         if (!target.closest('.menu')) {
             this.closeAllSubmenus();
@@ -565,6 +574,7 @@ export class MenuManager {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
         this.UNDO_MENU.style.display = "none";
+        this.AT_BUTTON_MENU.style.display = "none";
         this.HTML_ELEMENT.setAttribute('data-show-menu', this.isMenuShown ? 'true' : 'false');
 
         if (this.isMenuShown) {
@@ -687,21 +697,16 @@ export class MenuManager {
     //@+node:felix.20260406002848.1: *3* At-Buttons
     public clearAtButtons(): void {
         this.AT_BUTTONS_CONTAINER.innerHTML = '';
-        console.log("Cleared at-buttons container");
     }
 
-    public createAtButton(label: string, tooltip: string, icon: number, contextValue: string): HTMLDivElement {
-        //
+    public createAtButton(label: string, tooltip: string, icon: number): HTMLDivElement {
         const button = document.createElement("div");
         button.classList.add("at-button");
         button.textContent = label;
         button.title = tooltip;
         button.classList.add(`icon-${icon}`);
-        button.setAttribute('data-context', contextValue);
         this.AT_BUTTONS_CONTAINER.appendChild(button);
-
         return button;
-
     }
 
     //@-others

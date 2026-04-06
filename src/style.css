@@ -505,7 +505,7 @@ body {
 .at-button {
   color: var(--menu-color);
   font-size: 0.875rem;
-  padding: 5px 12px 5px 28px;
+  padding: 5px 10px 5px 10px;
   border-right: 1px solid var(--menu-border-color);
   background: var(--menu-bg-color);
   max-width: 150px;
@@ -518,12 +518,26 @@ body {
     /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.3); /* bottom-right shadow */
 }
 .at-button::before {
-  content: "★"; /* todo use better icon! */
   position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
 }
+.at-button.icon-1 {
+  padding: 5px 10px 5px 22px;
+}
+.at-button.icon-1::before {
+  top: 2px;
+  left: 6px;
+  content: "⏷";
+}
+.at-button.icon-2 {
+  padding: 5px 10px 5px 22px;
+}
+.at-button.icon-2::before {
+  top: 4px;
+  left: 7px;
+  font-size: 1rem;
+  content: "+";
+}
+
 .at-button:hover {
   /* enhances it more on hover */
   box-shadow:

@@ -727,7 +727,7 @@ export class Commands {
         const curDir = g.os_path_abspath(process.cwd());
         if (w_path && w_path !== curDir) {
             try {
-                console.warn(`chdir (not implemented) to ${w_path}`);
+                // Leo web is a browser app and does not run os executables anyways.
                 //process.chdir?.(w_path);
             }
             catch (e) {
