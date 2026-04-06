@@ -586,6 +586,10 @@ export class NullGui extends LeoGui {
         this.oops();
         return Promise.resolve();
     }
+    public clickAtButton(button: any): Promise<unknown> {
+        this.oops();
+        return Promise.resolve();
+    }
 
     public override widget_name(widget: any): string {
         if (g.unitTesting) {

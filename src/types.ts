@@ -518,11 +518,11 @@ export interface ChooseDocumentItem {
 /**
  * * Used to select a button's rclick by index
  */
-export interface ChooseRClickItem {
+export interface ChooseRClickItem extends QuickPickItem {
     index: number;
     rclick?: RClick;
-    label: string;
-    description?: string;
+    // label: string;
+    // description?: string;
 }
 
 //@+node:felix.20251211000618.29: ** MinibufferCommand

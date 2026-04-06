@@ -310,26 +310,6 @@ body {
   width: 100%;
 }
 
-.raised-effect {
-  box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.4),
-    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.3); /* bottom-right shadow */
-}
-.raised-effect:hover {
-  /* enhances it more on hover */
-  box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.6),
-    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.5); /* bottom-right shadow */
-  background: var(--hover-bg);
-}
-.raised-effect:active {
-  /* inverts the effect on click */
-  box-shadow:
-    inset -1px -1px 0 rgba(255, 255, 255, 0.4),
-    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
-  background: var(--hover-bg);
-}
-
 /* Document Tabs */
 #document-tabs {
   flex-shrink: 0;
@@ -533,6 +513,9 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   position: relative;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.4),
+    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.3); /* bottom-right shadow */
 }
 .at-button::before {
   content: "★"; /* todo use better icon! */
@@ -540,6 +523,20 @@ body {
   left: 8px;
   top: 50%;
   transform: translateY(-50%);
+}
+.at-button:hover {
+  /* enhances it more on hover */
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.6),
+    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.5); /* bottom-right shadow */
+  background: var(--hover-bg);
+}
+.at-button:active {
+  /* inverts the effect on click */
+  box-shadow:
+    inset -1px -1px 0 rgba(255, 255, 255, 0.4),
+    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+  background: var(--hover-bg);
 }
 
 /*@+node:felix.20260321142107.1: ** Node Icons*/

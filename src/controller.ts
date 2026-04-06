@@ -4,7 +4,7 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -12,6 +12,8 @@ import { Constants } from "./constants";
 import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
 import { keybindings } from "./keybindings";
 import { QuickSearchController } from "./core/quicksearch";
+import { nullButtonWidget } from "./core/leoFrame";
+import { RClick } from "./core/mod_scripting";
 
 //@-<< imports >>
 //@+others
@@ -442,6 +444,77 @@ export class Controller {
             });
         }
     }
+    //@+node:felix.20260406002306.1: *4* setupAtButtonsAndHandlers
+    public setupAtButtonsAndHandlers(): void {
+
+        const hasOpenedDocuments = g.app.windowList.length > 0;
+
+        // First call the view method to clear existing at-buttons
+        workspace.menu.clearAtButtons();
+        // const w_children: any[] = [];
+        if (!hasOpenedDocuments) {
+            return;
+        }
+
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+
+        let d: nullButtonWidget[];
+        if (c && c.theScriptingController) {
+            d = c.theScriptingController.buttonsArray || [];
+        } else {
+            d = [];
+        }
+
+        const buttons = [];
+
+        let i_but = 0;
+        for (const but of d) {
+            let rclickList: RClick[] = [];
+
+            if (but.rclicks) {
+                rclickList = but.rclicks;
+            }
+
+            const entry: LeoButton = {
+                name: but.text,
+                index: i_but,
+                rclicks: rclickList,
+            };
+
+            buttons.push(entry);
+            i_but += 1;
+        }
+
+
+        buttons.forEach(p_button => {
+
+            // w_children.push(new LeoButtonNode(p_button, this._icons));
+            const label = p_button.name || `Button ${p_button.index}`;
+            const tooltip = label;
+            const isAdd = p_button.name === Constants.BUTTON_STRINGS.SCRIPT_BUTTON
+            const icon = isAdd ? 2 : p_button.rclicks!.length ? 1 : 0
+            const contextValue = isAdd ? Constants.BUTTON_STRINGS.ADD_BUTTON : Constants.BUTTON_STRINGS.NORMAL_BUTTON;
+
+            const buttonEl = workspace.menu.createAtButton(label, tooltip, icon, contextValue);
+            // now setup handlers for the button to call g.app.gui.clickAtButton(index)
+            buttonEl.addEventListener("click", () => {
+                g.app.gui.clickAtButton(p_button);
+                workspace.layout.restoreLastFocusedElement();
+            });
+            // Also setup handler for right-click to show context menu
+            buttonEl.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                // Show context menu for the button
+                // workspace.menu.showContextMenu(e, rclicks);
+                console.log('Right-clicked button:', p_button);
+                // todo : show at-button context menu with the 'goto script' and 'Remove button'.
+            });
+
+        });
+        workspace.layout.updateCollapseAllPosition();
+
+    }
+
     //@-others
     //@+node:felix.20260322222433.1: *3* Event Handlers
     //@+others

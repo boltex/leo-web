@@ -55,6 +55,16 @@ export class Constants {
         "xml",
     ];
 
+    //@+node:felix.20260406005056.1: *3* buttons strings
+    /**
+     * * Strings used in 'at-button' panel display in LeoButtonNode
+     */
+    public static BUTTON_STRINGS = {
+        NULL_WIDGET: "nullButtonWidget",
+        SCRIPT_BUTTON: "script-button",
+        ADD_BUTTON: "leojsButtonAdd",
+        NORMAL_BUTTON: "leojsButtonNode"
+    };
     //@+node:felix.20260102223425.1: *3* config defaults
     public static CONFIG_DEFAULTS = {
         CHECK_FOR_CHANGE_EXTERNAL_FILES: "none",

@@ -255,7 +255,7 @@ export class LayoutManager {
     }
     //@+node:felix.20260322230821.1: *3* updateCollapseAllPosition
     public updateCollapseAllPosition() {
-        workspace.menu.COLLAPSE_ALL_BTN.style.inset = `${this.OUTLINE_PANE.offsetTop}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
+        workspace.menu.COLLAPSE_ALL_BTN.style.inset = `${this.OUTLINE_PANE.offsetTop + 2}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
     //@+node:felix.20260322230817.1: *3* toggleTheme
     public toggleTheme() {

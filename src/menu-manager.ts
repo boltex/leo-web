@@ -47,6 +47,9 @@ export class MenuManager {
     public TOGGLE_MARK_BTN: HTMLButtonElement;
     public PREV_MARKED_BTN: HTMLButtonElement;
 
+    // * at-buttons
+    public AT_BUTTONS_CONTAINER: HTMLElement;
+
     // * Settings Menu
     // public CHECK_EXTERNAL_FILES: HTMLSelectElement;
     // public RELOAD_IGNORE_CHANGES: HTMLSelectElement;
@@ -98,6 +101,8 @@ export class MenuManager {
         this.NEXT_MARKED_BTN = document.getElementById('next-marked-btn')! as HTMLButtonElement;
         this.TOGGLE_MARK_BTN = document.getElementById('toggle-mark-btn')! as HTMLButtonElement;
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
+
+        this.AT_BUTTONS_CONTAINER = document.getElementById('at-buttons')!;
 
         // this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
         // this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
@@ -679,6 +684,26 @@ export class MenuManager {
             this.BUTTON_CONTAINER.classList.add('hidden');
         }, 1500);
     }
+    //@+node:felix.20260406002848.1: *3* At-Buttons
+    public clearAtButtons(): void {
+        this.AT_BUTTONS_CONTAINER.innerHTML = '';
+        console.log("Cleared at-buttons container");
+    }
+
+    public createAtButton(label: string, tooltip: string, icon: number, contextValue: string): HTMLDivElement {
+        //
+        const button = document.createElement("div");
+        button.classList.add("at-button");
+        button.textContent = label;
+        button.title = tooltip;
+        button.classList.add(`icon-${icon}`);
+        button.setAttribute('data-context', contextValue);
+        this.AT_BUTTONS_CONTAINER.appendChild(button);
+
+        return button;
+
+    }
+
     //@-others
 
 }
