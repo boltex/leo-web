@@ -91,11 +91,11 @@ export class LayoutManager {
     public positionCrossDragger() {
         if (this.currentLayout === 'vertical') {
             const outlineWidth = this.OUTLINE_FIND_CONTAINER.offsetWidth;
-            const paneHeight = this.OUTLINE_PANE.offsetHeight + workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            const paneHeight = this.OUTLINE_PANE.offsetHeight + workspace.menu.TOP_BAR_TOGGLE.offsetHeight;
             this.CROSS_RESIZER.style.top = (paneHeight) + 'px';
             this.CROSS_RESIZER.style.left = (outlineWidth) + 'px';
         } else {
-            const outlineHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight + workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            const outlineHeight = this.OUTLINE_FIND_CONTAINER.offsetHeight + workspace.menu.TOP_BAR_TOGGLE.offsetHeight;
             const paneWidth = this.OUTLINE_PANE.offsetWidth;
             this.CROSS_RESIZER.style.left = (paneWidth) + 'px';
             this.CROSS_RESIZER.style.top = (outlineHeight) + 'px';
@@ -255,7 +255,7 @@ export class LayoutManager {
     }
     //@+node:felix.20260322230821.1: *3* updateCollapseAllPosition
     public updateCollapseAllPosition() {
-        workspace.menu.COLLAPSE_ALL_BTN.style.inset = `${workspace.menu.isMenuShown ? 58 : 5}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
+        workspace.menu.COLLAPSE_ALL_BTN.style.inset = `${this.OUTLINE_PANE.offsetTop}px auto auto ${this.OUTLINE_PANE.clientWidth - 18}px`;
     }
     //@+node:felix.20260322230817.1: *3* toggleTheme
     public toggleTheme() {

@@ -65,10 +65,9 @@
   /* quickpick-dialog */
   --quickpick-dialog-display: none;
   /* document tabs visibility */
-  --top-bar-height: 52px;
+  /* --top-bar-height: 78px; original 52 */
   --doc-tabs-display: flex;
   --collapse-all-btn-display: inline-flex;
-  --menu-toggle-line-height: 54px;
 
   /* Headline edit */
   --headline-input-display: none;
@@ -243,10 +242,9 @@
 }
 
 [data-no-opened-documents="true"] {
-  --top-bar-height: 26px;
+  /* --top-bar-height: 52px; original 26 */
   --doc-tabs-display: none;
   --collapse-all-btn-display: none;
-  --menu-toggle-line-height: 27px;
 }
 
 /*@+node:felix.20260321142058.1: ** Base / Reset*/
@@ -295,7 +293,7 @@ body {
   background: var(--menu-bg-color);
   border-bottom: 1px solid var(--menu-border-color);
   padding: 0;
-  height: var(--top-bar-height);
+  /* height: var(--top-bar-height); */
   font-family: var(--menu-font-family);
   font-size: 0.875rem;
   user-select: none;
@@ -304,11 +302,18 @@ body {
 
 /* Top container for document tabs and menu */
 #top-container {
-  /* flex-shrink: 0; */
+  flex-shrink: 1;
+  overflow: hidden;
   padding: 0;
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+.raised-effect {
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.4),
+    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.3); /* bottom-right shadow */
 }
 
 /* Document Tabs */
@@ -376,17 +381,20 @@ body {
   overflow: hidden;
 }
 
-#top-menu-toggle {
+#top-bar-toggle {
   margin-left: auto;
   color: var(--menu-color);
   font-size: 24px;
-  padding: 0px 16px;
   height: 100%;
-  line-height: var(--menu-toggle-line-height);
+  width: 46px;
   border-left: 1px solid var(--menu-border-color);
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
 }
 
-#top-menu-toggle:hover {
+#top-bar-toggle:hover {
   background: var(--ancestor-bg);
 }
 

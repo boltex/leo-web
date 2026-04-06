@@ -176,7 +176,7 @@ export class Controller {
         menu.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
         menu.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
         menu.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        menu.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        menu.TOP_BAR_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab('log') });
         logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab('find', true) });
         logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav', true) });
@@ -192,7 +192,7 @@ export class Controller {
                 e.preventDefault();
             });
         });
-        workspace.menu.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
+        workspace.menu.TOP_BAR_TOGGLE.addEventListener('mousedown', (e) => {
             e.preventDefault();
         });
     }
@@ -756,7 +756,7 @@ export class Controller {
             if (e.touches) {
                 clientY = e.touches[0].clientY;
             }
-            const newHeight = clientY - workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            const newHeight = clientY - workspace.menu.TOP_BAR_TOGGLE.offsetHeight;
             if (newHeight >= layout.minWidth) {
                 layout.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
             } else {
@@ -881,7 +881,7 @@ export class Controller {
             // Handle cross drag when in horizontal layout
 
             // do main first as per handleDrag
-            const newHeight = clientY - workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            const newHeight = clientY - workspace.menu.TOP_BAR_TOGGLE.offsetHeight;
             if (newHeight >= layout.minWidth) {
                 layout.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
             } else {

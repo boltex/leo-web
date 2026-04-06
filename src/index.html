@@ -54,12 +54,12 @@
     <!--@+node:felix.20260321125100.1: *3* Top Bar-->
     <div id="top-bar">
         <div id="top-container">
-            <div id="document-tabs">
-            </div>
+            <div id="document-tabs"></div>
             <div id="top-menu"></div>
+            <div id="at-buttons"></div>
         </div>
-        <!-- Top menu toggle is at the right: -->
-        <div id="top-menu-toggle" aria-label="Hide menu" title="Hide menu (Shift+F11)">&#8801;</div>
+        <!-- Top bar toggle is at the right: -->
+        <div id="top-bar-toggle" aria-label="Hide menu" title="Hide menu (Shift+F11)">&#8801;</div>
     </div>
 
     <!--@+node:felix.20260321125106.1: *3* Main Container-->
@@ -378,7 +378,15 @@
     <div id="outline-menu" class="context-menu"></div>
     <div id="body-menu" class="context-menu"></div>
     <div id="undo-menu" class="context-menu">
-        <li class="menu-item"><span class="menu-label">Revert to Undo State</span></li>
+        <ul>
+            <li class="menu-item"><span class="menu-label">Revert to Undo State</span></li>
+        </ul>
+    </div>
+    <div id="at-button-menu" class="context-menu">
+        <ul>
+            <li class="menu-item"><span class="menu-label">Remove Button</span></li>
+            <li class="menu-item"><span class="menu-label">Goto Script</span></li>
+        </ul>
     </div>
 
     <!--@+node:felix.20260321125350.1: *3* Toast & Dialogs-->
