@@ -1145,12 +1145,8 @@ export class LeoUI extends NullGui {
     private _setupNoOpenedLeoDocument(): void {
         this.leoStates.fileOpenedReady = false;
         this._refreshOutline(RevealType.NoReveal);
-        const states = this.leoStates;
         const menu = workspace.menu;
-        menu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
-        menu.updateMarkedButtonStates(states.leoHasMarked);
-        menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
-        menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        menu.updateButtonVisibility(false, false, true);
         menu.refreshMenu(menuData);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);

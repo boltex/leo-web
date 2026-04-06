@@ -4,6 +4,8 @@
 //@+node:felix.20260323010551.1: ** << imports >>
 import { workspace } from './workspace';
 import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
+import * as g from './core/leoGlobals';
+
 //@-<< imports >>
 //@+others
 //@+node:felix.20260323010625.1: ** MenuManager
@@ -591,14 +593,14 @@ export class MenuManager {
         return tab;
     }
     //@+node:felix.20260323010715.1: *3* Buttons State and Visibility
-    public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean) => {
-        this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked);
-        this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked);
-        this.toggleButtonVisibility(this.NEXT_BTN, this.PREV_BTN, this.SHOW_PREV_NEXT_HISTORY.checked && hasHistory);
-        this.toggleButtonVisibility(this.HOIST_BTN, this.DEHOIST_BTN, this.SHOW_HOIST_DEHOIST.checked);
-        this.toggleButtonVisibility(this.LAYOUT_TOGGLE, null, this.SHOW_LAYOUT_ORIENTATION.checked);
-        this.toggleButtonVisibility(this.THEME_TOGGLE, null, this.SHOW_THEME_TOGGLE.checked);
-        this.toggleButtonVisibility(this.COLLAPSE_ALL_BTN, null, this.SHOW_COLLAPSE_ALL.checked);
+    public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean, noOpenedDocuments = false) => {
+        this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.NEXT_BTN, this.PREV_BTN, this.SHOW_PREV_NEXT_HISTORY.checked && hasHistory && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.HOIST_BTN, this.DEHOIST_BTN, this.SHOW_HOIST_DEHOIST.checked && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.LAYOUT_TOGGLE, null, this.SHOW_LAYOUT_ORIENTATION.checked);  // show even when no documents opened.
+        this.toggleButtonVisibility(this.THEME_TOGGLE, null, this.SHOW_THEME_TOGGLE.checked); // show even when no documents opened.
+        this.toggleButtonVisibility(this.COLLAPSE_ALL_BTN, null, this.SHOW_COLLAPSE_ALL.checked && !noOpenedDocuments);
         let visibleButtonCount = 0; // Count visible buttons to adjust trigger area width
         if (this.SHOW_PREV_NEXT_MARK.checked && hasMarked) {
             visibleButtonCount += 2;
