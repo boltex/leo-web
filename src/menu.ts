@@ -38,7 +38,7 @@ export const outlinePaneContextMenuData: ContextMenuEntry[] = [
     { label: "De-Hoist", action: CMD.DEHOIST, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_DEHOIST] },
     { label: "Mark", action: CMD.MARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], enabledFlagsClear: [FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
     { label: "Unmark", action: CMD.UNMARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
-    // { label: "Tag-Node", action: CMD.TAG_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] }, // Todo: implement tagging UI & nav panel and then re-enable this.
+    { label: "Tag-Node", action: CMD.TAG_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
     { label: "", kind: QuickPickItemKind.Separator },
     { label: "Cut-Node", action: CMD.CUT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+X" },
     { label: "Copy-Node", action: CMD.COPY_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+C" },

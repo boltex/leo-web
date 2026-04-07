@@ -14,9 +14,11 @@ import { Commands } from "./core/leoCommands";
 import {
     BodySelectionInfo,
     ChooseDocumentItem,
+    ChooseRClickItem,
     CommandOptions,
     ConfigSetting,
     Focus,
+    LeoButton,
     LeoDocument,
     LeoGotoNavKey,
     LeoGotoNode,
@@ -41,6 +43,7 @@ import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
 import { QuickSearchController } from "./core/quicksearch";
 import { HeadlineFinishedResult } from "./outline-manager";
+import { RClick } from "./core/mod_scripting";
 //@-<< imports >>
 //@+others
 //@+node:felix.20260322232711.1: ** Leo UI
@@ -100,6 +103,9 @@ export class LeoUI extends NullGui {
     private _scrollDirty: boolean = false; // Flag set when cursor selection is changed
     private _scrollGnx: string = '';
     private _scroll: number | undefined;
+
+    // * '@button' pane
+    private _rclickSelected: number[] = [];
 
     // * Body pane
     private _editorTouched: boolean = false; // Signifies that the body editor DOM element has been modified by the user since last save
@@ -286,14 +292,31 @@ export class LeoUI extends NullGui {
     }
     //@+node:felix.20260323003423.1: *4* chooseNewWorkspace
     public async chooseNewWorkspace(): Promise<boolean> {
+
+        // First, warn user and ask for confirmation before closing all opened documents and clearing the workspace, since this action is destructive and cannot be undone.
+        const confirmed = await workspace.dialog.showMessageDialog(
+            "Are you sure you want to choose a new workspace?",
+            {
+                detail: "All opened documents will be closed. The recent documents list, sessions and cache will be cleared. This action cannot be undone.",
+                modal: true,
+            },
+            "Yes",
+            "No"
+        );
+
+        if (confirmed !== "Yes") {
+            return Promise.resolve(false);
+        }
+
         // Perform the 'quit' command to force asking to save unsaved changes
         // Then clear the workspace from db and force-refresh the page to restart leoWeb
         // This will have the effect of closing all opened documents and then asking for a new workspace
         for (const c of g.app.commanders()) {
+            console.log('closing commander: ', c.fileName());
             const closed = await g.app.closeLeoWindow(c.frame)
-            const allow = c.exists && closed;
+            const allow = !c.exists && closed; // was successfully closed and the exist flag is now false, meaning the commander is really closed.
             if (!allow) {
-                return Promise.resolve(false);
+                return Promise.resolve(false); // If any commander was not closed, exit without clearing workspace or reloading page, to avoid data loss.
             }
         }
 
@@ -856,8 +879,7 @@ export class LeoUI extends NullGui {
     }
 
     public refreshButtonsPane(): void {
-        // TODO : implement buttons pane refresh
-        // console.log('TODO ! in leo-ui: refreshButtonsPane called to refresh buttons pane');
+        workspace.controller.refreshAtButtons();
     }
     //@+node:felix.20260323002101.1: *3* selectTreeNode
     /**
@@ -1145,12 +1167,8 @@ export class LeoUI extends NullGui {
     private _setupNoOpenedLeoDocument(): void {
         this.leoStates.fileOpenedReady = false;
         this._refreshOutline(RevealType.NoReveal);
-        const states = this.leoStates;
         const menu = workspace.menu;
-        menu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
-        menu.updateMarkedButtonStates(states.leoHasMarked);
-        menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
-        menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        menu.updateButtonVisibility(false, false, true);
         menu.refreshMenu(menuData);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
@@ -1161,6 +1179,7 @@ export class LeoUI extends NullGui {
         workspace.body.setBody('', false);
         // Make body pane not editable.
         workspace.body.setBodyEditable(false);
+        workspace.logPane.showTab('log');
     }
 
     /**
@@ -1631,6 +1650,208 @@ export class LeoUI extends NullGui {
         }
 
     }
+    //@+node:felix.20260406012500.1: *3* At Buttons
+    //@+node:felix.20260406012500.2: *4* clickAtButton
+    /**
+     * * Invoke an '@button' click directly by index string. Used by '@buttons' treeview.
+     * @param p_node the node of the at-buttons panel that was clicked
+     * @returns Promises that resolves when done
+     */
+    public async clickAtButton(p_node: LeoButton): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const d = c.theScriptingController.buttonsArray;
+        const button = d[p_node.index];
+        let result: any;
+        if (p_node.rclicks?.length) {
+            // Has rclicks so show menu to choose
+            this._rclickSelected = [];
+            let w_rclick: number[] | undefined;
+            const p_picked = await this._handleRClicks(p_node.rclicks, p_node.name);
+
+            if (
+                p_picked
+            ) {
+                // Check if only one in this._rclickSelected and is zero: normal press
+                if (this._rclickSelected.length === 1 && this._rclickSelected[0] === 0) {
+                    // Normal 'top' button, not one of it's child rclicks.
+                } else {
+                    // One of its child 'rclick', so decrement first one, and send this._rclickSelected as array of choices
+                    this._rclickSelected[0] = this._rclickSelected[0] - 1;
+                    w_rclick = this._rclickSelected;
+                }
+
+                try {
+                    let w_rclickChosen: RClick | undefined;
+
+                    if (w_rclick && button.rclicks) {
+                        // Had w_rclick setup so it's a child rclick, not the recular 'top' button.
+                        let toChooseFrom: RClick[] = button.rclicks;
+                        for (const i_rc of w_rclick) {
+                            w_rclickChosen = toChooseFrom[i_rc];
+                            toChooseFrom = w_rclickChosen.children;
+                        }
+                        if (w_rclickChosen) {
+                            result = c.theScriptingController.executeScriptFromButton(button, '', w_rclickChosen.position, '');
+                        }
+                    } else {
+                        // Normal 'top' button.
+                        result = await Promise.resolve(button.command());
+                    }
+
+                } catch (e: any) {
+                    void workspace.dialog.showInformationMessage("LEOJS: LeoUI clickAtButton Error: " + e.toString());
+                }
+
+            } else {
+                // Escaped so  just return, no 'setupRefresh' nor 'launchRefresh'!
+                return Promise.resolve();
+            }
+
+        } else {
+            // no rclicks nor menus, so just call the button's command.
+            result = await Promise.resolve(button.command());
+        }
+
+        this.setupRefresh(Focus.NoChange, {
+            tree: true,
+            body: true,
+            documents: true,
+            buttons: true,
+            states: true
+        });
+
+        void this.launchRefresh();
+        return result;
+
+    }
+
+    //@+node:felix.20260406012500.3: *4* _handleRClicks
+    /**
+     * * Show input window to select
+     */
+    private async _handleRClicks(p_rclicks: RClick[], topLevelName?: string): Promise<ChooseRClickItem | undefined> {
+        const w_choices: ChooseRClickItem[] = [];
+        let w_index = 0;
+        if (topLevelName) {
+            w_choices.push(
+                { label: topLevelName, index: w_index++ } // picked: true, alwaysShow: true,
+            );
+        }
+        w_choices.push(
+            ...p_rclicks.map((p_rclick): ChooseRClickItem => { return { label: p_rclick.position.h, index: w_index++, rclick: p_rclick }; })
+        );
+        const w_options: QuickPickOptions = {
+            placeHolder: Constants.USER_MESSAGES.CHOOSE_BUTTON
+        };
+        const w_picked = await workspace.dialog.showQuickPick(w_choices, w_options);
+        if (w_picked) {
+            this._rclickSelected.push(w_picked.index);
+            if (topLevelName && w_picked.index === 0) {
+                return Promise.resolve(w_picked);
+            }
+            if (w_picked.rclick && w_picked.rclick.children && w_picked.rclick.children.length) {
+                return this._handleRClicks(w_picked.rclick.children);
+            } else {
+                return Promise.resolve(w_picked);
+            }
+        }
+        return Promise.resolve(undefined);
+    }
+
+    //@+node:felix.20260406012500.4: *4* gotoScript
+    /**
+     * * Finds and goes to the script of an at-button. Used by '@buttons' treeview.
+     * @param p_node the node of the at-buttons panel that was right-clicked
+     * @returns the launchRefresh promise started after it's done finding the node
+     */
+    public async gotoScript(p_node: LeoButton): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const tag = 'goto_script';
+        const index = p_node.index;
+        const old_c = g.app.windowList[g.app.gui.frameIndex].c;
+        const d = old_c.theScriptingController.buttonsArray;
+        const butWidget = d[index];
+
+        if (butWidget) {
+
+            try {
+                const gnx: string = butWidget.command.gnx;
+                let new_c = old_c;
+                const w_result = await old_c.theScriptingController.open_gnx(old_c, gnx);
+                let p: Position | undefined; // Replace YourPType with actual type
+
+                if (w_result[0] && w_result[1]) {
+                    p = w_result[1];
+                    new_c = w_result[0];
+                } else {
+                    new_c = old_c;
+                }
+
+                g.app.gui.frameIndex = 0;
+                for (const w_f of g.app.windowList) {
+                    if (w_f.c === new_c) {
+                        break;
+                    }
+                    g.app.gui.frameIndex++;
+                }
+                // g.app.gui.frameIndex now points to the selected Commander.
+
+                if (p) {
+                    new_c.selectPosition(p);
+                    this.setupRefresh(
+                        Focus.NoChange,
+                        {
+                            tree: true,
+                            body: true,
+                            documents: true,
+                            states: true,
+                        }
+                    );
+                    return this.launchRefresh();
+                } else {
+                    throw new Error(`${tag}: not found ${gnx}`);
+                }
+
+            } catch (e) {
+                g.es_exception(e);
+            }
+
+        }
+        return Promise.resolve(false);
+
+    }
+
+    //@+node:felix.20260406012500.5: *4* removeAtButton
+    /**
+     * * Removes an '@button' from Leo's button dict, directly by index string. Used by '@buttons' treeview.
+     * @param p_node the node of the at-buttons panel that was chosen to remove
+     * @returns Thenable that resolves when done
+     */
+    public async removeAtButton(p_node: LeoButton): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const tag: string = 'remove_button';
+        const index = p_node.index;
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const d = c.theScriptingController.buttonsArray;
+        const butWidget = d[index];
+        if (butWidget) {
+            try {
+                d.splice(index, 1);
+            } catch (e) {
+                g.es_exception(e);
+            }
+        } else {
+            console.log(`LEOJS : ERROR ${tag}: button ${String(index)} does not exist`);
+        }
+        this.setupRefresh(Focus.NoChange, { buttons: true });
+        return this.launchRefresh();
+
+    }
+
     //@+node:felix.20260323000247.1: *3* editHeadline & helper
     /**
      * * Asks for a new headline label, and replaces the current label with this new one one the specified, or currently selected node

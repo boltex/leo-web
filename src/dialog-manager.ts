@@ -209,7 +209,7 @@ export class DialogManager {
         });
     }
     //@+node:felix.20260322225819.1: *3* showQuickPick
-    public async showQuickPick(items: QuickPickItem[], options?: QuickPickOptions): Promise<QuickPickItem | undefined> {
+    public async showQuickPick<T extends QuickPickItem>(items: T[], options?: QuickPickOptions): Promise<T | undefined> {
         if (!items || items.length === 0) {
             return Promise.resolve(undefined);
         }

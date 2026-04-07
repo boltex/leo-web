@@ -55,24 +55,20 @@ export class Constants {
         "xml",
     ];
 
+    //@+node:felix.20260406005056.1: *3* buttons strings
+    /**
+     * * Strings used in 'at-button' panel display in LeoButtonNode
+     */
+    public static BUTTON_STRINGS = {
+        NULL_WIDGET: "nullButtonWidget",
+        SCRIPT_BUTTON: "script-button",
+        ADD_BUTTON: "leojsButtonAdd",
+        NORMAL_BUTTON: "leojsButtonNode"
+    };
     //@+node:felix.20260102223425.1: *3* config defaults
     public static CONFIG_DEFAULTS = {
-        CHECK_FOR_CHANGE_EXTERNAL_FILES: "none",
-        DEFAULT_RELOAD_IGNORE: "none",
         LEO_ID: ""
     };
-
-    public static CHECK_FOR_CHANGE_EXTERNAL_FILES_OPTIONS = {
-        "none": "Default from Leo's config",
-        "force-check": "Check for changes",
-        "force-ignore": "Ignore all changes"
-    }
-
-    public static DEFAULT_RELOAD_IGNORE_OPTIONS = {
-        "none": "Choose each time",
-        "yes-all": "Reload All",
-        "no-all": "Ignore All"
-    }
 
     //@+node:felix.20251210234420.6: *3* user messages
     public static USER_MESSAGES = {

@@ -4,6 +4,8 @@
 //@+node:felix.20260323010551.1: ** << imports >>
 import { workspace } from './workspace';
 import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
+import * as g from './core/leoGlobals';
+
 //@-<< imports >>
 //@+others
 //@+node:felix.20260323010625.1: ** MenuManager
@@ -21,11 +23,13 @@ export class MenuManager {
     public OUTLINE_MENU: HTMLElement;
     public BODY_MENU: HTMLElement;
     public UNDO_MENU: HTMLElement;
+    public AT_BUTTON_MENU: HTMLElement;
 
     // * Top Menu
+    public TOP_BAR: HTMLElement;
     public TOP_MENU: HTMLElement;
     public MENU_TOGGLE: HTMLElement;
-    public TOP_MENU_TOGGLE: HTMLElement;
+    public TOP_BAR_TOGGLE: HTMLElement;
     public DOCUMENT_TABS: HTMLElement;
 
     // * Button Menu
@@ -45,10 +49,10 @@ export class MenuManager {
     public TOGGLE_MARK_BTN: HTMLButtonElement;
     public PREV_MARKED_BTN: HTMLButtonElement;
 
-    // * Settings Menu
-    // public CHECK_EXTERNAL_FILES: HTMLSelectElement;
-    // public RELOAD_IGNORE_CHANGES: HTMLSelectElement;
+    // * at-buttons
+    public AT_BUTTONS_CONTAINER: HTMLElement;
 
+    // * Settings Menu
     public SHOW_PREV_NEXT_MARK: HTMLInputElement;
     public SHOW_TOGGLE_MARK: HTMLInputElement;
     public SHOW_PREV_NEXT_HISTORY: HTMLInputElement;
@@ -76,9 +80,12 @@ export class MenuManager {
         this.OUTLINE_MENU = document.getElementById('outline-menu')!;
         this.BODY_MENU = document.getElementById('body-menu')!;
         this.UNDO_MENU = document.getElementById('undo-menu')!;
+        this.AT_BUTTON_MENU = document.getElementById('at-button-menu')!;
+
+        this.TOP_BAR = document.getElementById("top-bar")!;
         this.TOP_MENU = document.getElementById("top-menu")!;
         this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
-        this.TOP_MENU_TOGGLE = document.getElementById("top-menu-toggle")!;
+        this.TOP_BAR_TOGGLE = document.getElementById("top-bar-toggle")!;
         this.DOCUMENT_TABS = document.getElementById("document-tabs")!;
 
         this.BUTTON_CONTAINER = document.getElementById('button-container')!;
@@ -97,8 +104,7 @@ export class MenuManager {
         this.TOGGLE_MARK_BTN = document.getElementById('toggle-mark-btn')! as HTMLButtonElement;
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
 
-        // this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
-        // this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
+        this.AT_BUTTONS_CONTAINER = document.getElementById('at-buttons')!;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
         this.SHOW_TOGGLE_MARK = document.getElementById('show-toggle-mark')! as HTMLInputElement;
@@ -511,6 +517,7 @@ export class MenuManager {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
         this.UNDO_MENU.style.display = "none";
+        this.AT_BUTTON_MENU.style.display = "none";
         document.querySelectorAll(".submenu.visible").forEach(sub =>
             sub.classList.remove("visible")
         );
@@ -546,6 +553,7 @@ export class MenuManager {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
         this.UNDO_MENU.style.display = "none";
+        this.AT_BUTTON_MENU.style.display = "none";
         const target = e.target as Element;
         if (!target.closest('.menu')) {
             this.closeAllSubmenus();
@@ -558,6 +566,7 @@ export class MenuManager {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
         this.UNDO_MENU.style.display = "none";
+        this.AT_BUTTON_MENU.style.display = "none";
         this.HTML_ELEMENT.setAttribute('data-show-menu', this.isMenuShown ? 'true' : 'false');
 
         if (this.isMenuShown) {
@@ -591,14 +600,14 @@ export class MenuManager {
         return tab;
     }
     //@+node:felix.20260323010715.1: *3* Buttons State and Visibility
-    public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean) => {
-        this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked);
-        this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked);
-        this.toggleButtonVisibility(this.NEXT_BTN, this.PREV_BTN, this.SHOW_PREV_NEXT_HISTORY.checked && hasHistory);
-        this.toggleButtonVisibility(this.HOIST_BTN, this.DEHOIST_BTN, this.SHOW_HOIST_DEHOIST.checked);
-        this.toggleButtonVisibility(this.LAYOUT_TOGGLE, null, this.SHOW_LAYOUT_ORIENTATION.checked);
-        this.toggleButtonVisibility(this.THEME_TOGGLE, null, this.SHOW_THEME_TOGGLE.checked);
-        this.toggleButtonVisibility(this.COLLAPSE_ALL_BTN, null, this.SHOW_COLLAPSE_ALL.checked);
+    public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean, noOpenedDocuments = false) => {
+        this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.NEXT_BTN, this.PREV_BTN, this.SHOW_PREV_NEXT_HISTORY.checked && hasHistory && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.HOIST_BTN, this.DEHOIST_BTN, this.SHOW_HOIST_DEHOIST.checked && !noOpenedDocuments);
+        this.toggleButtonVisibility(this.LAYOUT_TOGGLE, null, this.SHOW_LAYOUT_ORIENTATION.checked);  // show even when no documents opened.
+        this.toggleButtonVisibility(this.THEME_TOGGLE, null, this.SHOW_THEME_TOGGLE.checked); // show even when no documents opened.
+        this.toggleButtonVisibility(this.COLLAPSE_ALL_BTN, null, this.SHOW_COLLAPSE_ALL.checked && !noOpenedDocuments);
         let visibleButtonCount = 0; // Count visible buttons to adjust trigger area width
         if (this.SHOW_PREV_NEXT_MARK.checked && hasMarked) {
             visibleButtonCount += 2;
@@ -677,6 +686,21 @@ export class MenuManager {
             this.BUTTON_CONTAINER.classList.add('hidden');
         }, 1500);
     }
+    //@+node:felix.20260406002848.1: *3* At-Buttons
+    public clearAtButtons(): void {
+        this.AT_BUTTONS_CONTAINER.innerHTML = '';
+    }
+
+    public createAtButton(label: string, tooltip: string, icon: number): HTMLDivElement {
+        const button = document.createElement("div");
+        button.classList.add("at-button");
+        button.textContent = label;
+        button.title = tooltip;
+        button.classList.add(`icon-${icon}`);
+        this.AT_BUTTONS_CONTAINER.appendChild(button);
+        return button;
+    }
+
     //@-others
 
 }

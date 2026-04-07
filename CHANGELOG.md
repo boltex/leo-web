@@ -1,9 +1,16 @@
 # Change Log
 
+## 1.0.8
+
+- Added Leo's 'at-button' features.
+- Fixed 'choose new workspace' feature.
+- Polished UI behavior and styling.
+
 ## 1.0.7
 
-- Added Nav Pane and quickSearch plugin features originally by Ville M. Vainio <vivainio@gmail.com> 
+- Added Nav Pane and quickSearch plugin features originally by Ville M. Vainio <vivainio@gmail.com>
 - Fixed minibuffer's 'goto-global-line' easter egg command.
+- Fixed expand/contract caret animations.
 
 ## 1.0.6
 

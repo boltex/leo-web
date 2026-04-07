@@ -4,7 +4,7 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -12,6 +12,8 @@ import { Constants } from "./constants";
 import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
 import { keybindings } from "./keybindings";
 import { QuickSearchController } from "./core/quicksearch";
+import { nullButtonWidget } from "./core/leoFrame";
+import { RClick } from "./core/mod_scripting";
 
 //@-<< imports >>
 //@+others
@@ -24,6 +26,7 @@ export class Controller {
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
 
     private _lastUndoBeadIndex: number | null = null; // To track the last right-clicked undo bead index for showing context menu options
+    private _lastAtButton: LeoButton | null = null; // To track the last right-clicked at-button for context menu actions
 
     // Goto Nodes Variables
     public nodeList: LeoGotoNode[] = [];
@@ -69,6 +72,7 @@ export class Controller {
         this.setupOutlinePaneHandlers();
         this.setupBodyPaneHandlers();
         this.setupLogPaneHandlers();
+        this.setupAtButtonHandlers();
         this.setupResizerHandlers();
         this.setupWindowHandlers();
         this.setupButtonHandlers();
@@ -121,6 +125,7 @@ export class Controller {
             }
         });
         // Setup handler for the "Revert to Undo State" option in the undo context menu
+        /*
         workspace.menu.UNDO_MENU.querySelector('.menu-item')?.addEventListener('click', () => {
             if (this._lastUndoBeadIndex !== null) {
                 workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
@@ -129,8 +134,76 @@ export class Controller {
             // close the undo context menu after clicking the option
             workspace.menu.UNDO_MENU.style.display = 'none';
         });
+        */
+        // instead of commented above code , build this in UNDO_MENU:
+        /*
+         <ul>
+             <li class="menu-item"><span class="menu-label">Revert to Undo State</span></li>
+         </ul>
+        */
+        const undoMenu = workspace.menu.UNDO_MENU;
+        const ul_element = document.createElement('ul');
+        const menuItemElement = document.createElement('li');
+        menuItemElement.classList.add('menu-item');
+        const labelElement = document.createElement('span');
+        labelElement.classList.add('menu-label');
+        labelElement.textContent = 'Revert to Undo State';
+        menuItemElement.appendChild(labelElement);
+        menuItemElement.addEventListener('click', () => {
+            if (this._lastUndoBeadIndex !== null) {
+                workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
+                this._lastUndoBeadIndex = null; // Reset after handling
+            }
+            // close the undo context menu after clicking the option
+            workspace.menu.UNDO_MENU.style.display = 'none';
+        });
+        ul_element.appendChild(menuItemElement);
+        undoMenu.appendChild(ul_element);
 
     }
+
+    //@+node:felix.20260406170001.1: *4* setupAtButtonHandlers
+    private setupAtButtonHandlers() {
+        // Those will use the this._lastAtButton to know which button was right-clicked 
+        // and call either remove or goto script command with the correct LeoButton.
+        const atButtonMenu = workspace.menu.AT_BUTTON_MENU;
+        const ul_element = document.createElement('ul');
+        const REMOVE_BUTTON = document.createElement('li');
+        const GOTO_SCRIPT = document.createElement('li');
+        REMOVE_BUTTON.classList.add('menu-item');
+        GOTO_SCRIPT.classList.add('menu-item');
+        const removeLabel = document.createElement('span');
+        const gotoLabel = document.createElement('span');
+        removeLabel.classList.add('menu-label');
+        gotoLabel.classList.add('menu-label');
+        removeLabel.textContent = 'Remove Button';
+        gotoLabel.textContent = 'Goto Script';
+        REMOVE_BUTTON.appendChild(removeLabel);
+        GOTO_SCRIPT.appendChild(gotoLabel);
+        ul_element.appendChild(REMOVE_BUTTON);
+        ul_element.appendChild(GOTO_SCRIPT);
+        atButtonMenu.appendChild(ul_element);
+
+        REMOVE_BUTTON.addEventListener('click', () => {
+            workspace.menu.AT_BUTTON_MENU.style.display = 'none';
+            workspace.layout.restoreLastFocusedElement();
+            if (this._lastAtButton) {
+                workspace.controller.doCommand(Constants.COMMANDS.REMOVE_BUTTON, this._lastAtButton);
+                this._lastAtButton = null; // Reset after handling
+            }
+        });
+
+        GOTO_SCRIPT.addEventListener('click', () => {
+            workspace.menu.AT_BUTTON_MENU.style.display = 'none';
+            workspace.layout.restoreLastFocusedElement();
+            if (this._lastAtButton) {
+                workspace.controller.doCommand(Constants.COMMANDS.GOTO_SCRIPT, this._lastAtButton);
+                this._lastAtButton = null; // Reset after handling
+            }
+        });
+
+    }
+
     //@+node:felix.20260322221954.1: *4* setupResizerHandlers
     private setupResizerHandlers() {
         const layout = workspace.layout;
@@ -176,23 +249,28 @@ export class Controller {
         menu.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
         menu.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
         menu.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        menu.TOP_MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
+        menu.TOP_BAR_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab('log') });
         logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab('find', true) });
         logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav', true) });
         logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') });
         logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab('settings') });
-        logPane.HELP_TAB.addEventListener('click', () => { logPane.showTab('help') });
     }
     //@+node:felix.20260322221915.1: *4* setupButtonFocusPrevention
     private setupButtonFocusPrevention() {
+
+        workspace.menu.TOP_BAR.addEventListener('mousedown', (e) => {
+
+            e.preventDefault();
+        });
+
         const actionButtons = document.querySelectorAll('.action-button');
         actionButtons.forEach(button => {
             button.addEventListener('mousedown', (e) => {
                 e.preventDefault();
             });
         });
-        workspace.menu.TOP_MENU_TOGGLE.addEventListener('mousedown', (e) => {
+        workspace.menu.TOP_BAR_TOGGLE.addEventListener('mousedown', (e) => {
             e.preventDefault();
         });
     }
@@ -442,6 +520,78 @@ export class Controller {
             });
         }
     }
+    //@+node:felix.20260406002306.1: *4* refreshAtButtons
+    public refreshAtButtons(): void {
+
+        const hasOpenedDocuments = g.app.windowList.length > 0;
+
+        // First call the view method to clear existing at-buttons
+        workspace.menu.clearAtButtons();
+        // const w_children: any[] = [];
+        if (!hasOpenedDocuments) {
+            return;
+        }
+
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+
+        let d: nullButtonWidget[];
+        if (c && c.theScriptingController) {
+            d = c.theScriptingController.buttonsArray || [];
+        } else {
+            d = [];
+        }
+
+        const buttons = [];
+
+        let i_but = 0;
+        for (const but of d) {
+            let rclickList: RClick[] = [];
+
+            if (but.rclicks) {
+                rclickList = but.rclicks;
+            }
+
+            const entry: LeoButton = {
+                name: but.text,
+                index: i_but,
+                rclicks: rclickList,
+            };
+
+            buttons.push(entry);
+            i_but += 1;
+        }
+
+        const AT_BUTTON_MENU = workspace.menu.AT_BUTTON_MENU;
+        buttons.forEach(button => {
+
+            const label = button.name || `Button ${button.index}`;
+            const isAdd = button.name === Constants.BUTTON_STRINGS.SCRIPT_BUTTON
+            const tooltip = isAdd ? Constants.USER_MESSAGES.SCRIPT_BUTTON_TOOLTIP : label;
+            const icon = isAdd ? 2 : button.rclicks!.length ? 1 : 0
+
+            const buttonEl = workspace.menu.createAtButton(label, tooltip, icon);
+            // now setup handlers for the button to call g.app.gui.clickAtButton(index)
+            buttonEl.addEventListener("click", () => {
+                g.app.gui.clickAtButton(button);
+                workspace.layout.restoreLastFocusedElement();
+            });
+            // Also setup handler for right-click to show context menu if not the default "Add Script" button
+            if (!isAdd) {
+                buttonEl.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    this._lastAtButton = button; // Store the last right-clicked button for context menu actions
+                    setTimeout(() => {
+                        AT_BUTTON_MENU.style.top = `${e.clientY}px`;
+                        AT_BUTTON_MENU.style.left = `${e.clientX}px`;
+                        AT_BUTTON_MENU.style.display = 'block';
+                    }, 0);
+                });
+            }
+        });
+        workspace.layout.updateCollapseAllPosition();
+
+    }
+
     //@-others
     //@+node:felix.20260322222433.1: *3* Event Handlers
     //@+others
@@ -756,7 +906,7 @@ export class Controller {
             if (e.touches) {
                 clientY = e.touches[0].clientY;
             }
-            const newHeight = clientY - workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            const newHeight = clientY - workspace.menu.TOP_BAR_TOGGLE.offsetHeight;
             if (newHeight >= layout.minWidth) {
                 layout.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
             } else {
@@ -881,7 +1031,7 @@ export class Controller {
             // Handle cross drag when in horizontal layout
 
             // do main first as per handleDrag
-            const newHeight = clientY - workspace.menu.TOP_MENU_TOGGLE.offsetHeight;
+            const newHeight = clientY - workspace.menu.TOP_BAR_TOGGLE.offsetHeight;
             if (newHeight >= layout.minWidth) {
                 layout.OUTLINE_FIND_CONTAINER.style.height = (newHeight - 3) + 'px';
             } else {
@@ -1168,7 +1318,7 @@ export class Controller {
             let i: number = 0;
             let defaultIcon = 1;
 
-            undoer.beads.forEach(p_bead => {
+            undoer.beads.forEach(bead => {
                 let description: string = "";
                 let undoFlag: boolean = false;
                 let icon = defaultIcon;
@@ -1187,7 +1337,7 @@ export class Controller {
                     }
                 }
                 const node: LeoUndoNode = {
-                    label: p_bead.undoType || "unknown",
+                    label: bead.undoType || "unknown",
                     description: description,
                     contextValue: Constants.CONTEXT_FLAGS.UNDO_BEAD,
                     beadIndex: i - undoer.bead,
@@ -1250,33 +1400,30 @@ export class Controller {
 
             const navList: LeoGoto[] = result.navList;
             if (navList && navList.length) {
-                navList.forEach((p_goto: LeoGoto) => {
+                navList.forEach((goto: LeoGoto) => {
                     // (from leojs) new LeoGotoNode(this._leoUI, p_goto, result.navOptions!)
                     let leoPaneLabel = "";
                     let leoPaneDescription = "";
-                    let leoPaneTooltip = p_goto.h.trim();
+                    let leoPaneTooltip = goto.h.trim();
                     let leoPaneIcon: number | undefined = undefined;
-                    if (p_goto.t !== 'generic') {
-                        leoPaneTooltip = p_goto.t.charAt(0).toUpperCase() + p_goto.t.slice(1)
+                    if (goto.t !== 'generic') {
+                        leoPaneTooltip = goto.t.charAt(0).toUpperCase() + goto.t.slice(1)
                     }
-                    // if (["tag", "headline"].includes(p_goto.t)) {
-                    //     leoPaneLabel = p_goto.h;
-                    // }
                     let w_spacing = "";
                     if (scon.showParents && !scon.isTag) {
                         w_spacing = "    ";
                     }
                     let w_label = "";
-                    if (["tag", "headline"].includes(p_goto.t)) {
-                        w_label = w_spacing + p_goto.h;
+                    if (["tag", "headline"].includes(goto.t)) {
+                        w_label = w_spacing + goto.h;
                     }
                     leoPaneLabel = "";
-                    if (["tag", "headline"].includes(p_goto.t)) {
-                        leoPaneLabel = p_goto.h;
+                    if (["tag", "headline"].includes(goto.t)) {
+                        leoPaneLabel = goto.h;
                     }
-                    const headline = p_goto.h.trim();
+                    const headline = goto.h.trim();
 
-                    if (p_goto.t === 'body') {
+                    if (goto.t === 'body') {
                         leoPaneIcon = 2;
                         if (scon.showParents) {
                             leoPaneDescription = "    " + headline;
@@ -1284,15 +1431,15 @@ export class Controller {
                             leoPaneDescription = "  " + headline;
                         }
                         leoPaneLabel = headline;
-                    } else if (p_goto.t === 'parent') {
+                    } else if (goto.t === 'parent') {
                         leoPaneIcon = 0;
                         leoPaneDescription = headline.trim();
                         leoPaneLabel = leoPaneDescription;
-                    } else if (p_goto.t === 'generic') {
+                    } else if (goto.t === 'generic') {
                         leoPaneIcon = 4;
                         leoPaneDescription = headline;
                         leoPaneLabel = leoPaneDescription;
-                    } else if (p_goto.t === 'headline') {
+                    } else if (goto.t === 'headline') {
                         leoPaneIcon = 1;
                     } else {
                         leoPaneIcon = 3; // tag
@@ -1304,8 +1451,8 @@ export class Controller {
                             label: leoPaneLabel,
                             description: leoPaneDescription,
                             tooltip: leoPaneTooltip,
-                            entryType: p_goto.t,
-                            key: p_goto.key,
+                            entryType: goto.t,
+                            key: goto.key,
                             icon: leoPaneIcon
                         }
                     );
@@ -1317,11 +1464,11 @@ export class Controller {
     }
 
     //@+node:felix.20260330235648.1: *3* resetSelectedNode
-    public resetSelectedNode(p_node?: LeoGotoNode): void {
+    public resetSelectedNode(node?: LeoGotoNode): void {
         this.selectedNodeIndex = 0;
         this.isSelected = false;
-        if (p_node) {
-            const w_found = this.nodeList.indexOf(p_node);
+        if (node) {
+            const w_found = this.nodeList.indexOf(node);
             if (w_found >= 0) {
                 this.selectedNodeIndex = w_found;
                 this.isSelected = true;
@@ -1330,13 +1477,13 @@ export class Controller {
         }
     }
     //@+node:felix.20260330235927.1: *3* navigateNavEntry
-    public async navigateNavEntry(p_nav: LeoGotoNavKey): Promise<void> {
+    public async navigateNavEntry(nav: LeoGotoNavKey): Promise<void> {
         if (!this.nodeList.length) {
             this.selectedNodeIndex = 0;
             this.isSelected = false;
             return;
         }
-        switch (p_nav.valueOf()) {
+        switch (nav.valueOf()) {
             case LeoGotoNavKey.first:
                 this.selectedNodeIndex = 0;
                 this.isSelected = true;

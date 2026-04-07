@@ -6,7 +6,7 @@ import { Constants } from "./constants";
 import { Position } from "./core/leoNodes";
 import { Controller } from "./controller";
 import { LeoUI } from "./leo-ui";
-import { Focus, LeoGotoNavKey, LeoGotoNode, ReqRefresh } from "./types";
+import { Focus, LeoButton, LeoGotoNavKey, LeoGotoNode, ReqRefresh } from "./types";
 import { Uri } from "./workspace";
 
 //@-<< imports >>
@@ -79,12 +79,11 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.SHOW_BODY, () => leoUI.showBody()], // Also focuses on body
         [CMD.EXECUTE, () => leoUI.command(LEOCMD.EXECUTE_SCRIPT, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
 
-        // [CMD.SHORT_GNX_UNL_TO_CLIPBOARD, () => p_leoUI.unlToClipboard("shortGnx")], // Not referenced in package.json
-        // [CMD.FULL_GNX_UNL_TO_CLIPBOARD, () => p_leoUI.unlToClipboard("fullGnx")], // Not referenced in package.json
-        // [CMD.SHORT_LEGACY_UNL_TO_CLIPBOARD, () => p_leoUI.unlToClipboard("shortLegacy")], // Not referenced in package.json
-        // [CMD.FULL_LEGACY_UNL_TO_CLIPBOARD, () => p_leoUI.unlToClipboard("fullLegacy")], // Not referenced in package.json
+        [CMD.SHORT_GNX_UNL_TO_CLIPBOARD, () => leoUI.unlToClipboard("shortGnx")], // Not referenced in package.json
+        [CMD.FULL_GNX_UNL_TO_CLIPBOARD, () => leoUI.unlToClipboard("fullGnx")], // Not referenced in package.json
+        [CMD.SHORT_LEGACY_UNL_TO_CLIPBOARD, () => leoUI.unlToClipboard("shortLegacy")], // Not referenced in package.json
+        [CMD.FULL_LEGACY_UNL_TO_CLIPBOARD, () => leoUI.unlToClipboard("fullLegacy")], // Not referenced in package.json
 
-        // [CMD.STATUS_BAR, () => p_leoUI.statusBar()], // Not referenced in package.json
         [CMD.MINIBUFFER, () => leoUI.minibuffer()], // Is referenced in package.json
         [CMD.SET_LEO_ID, () => leoUI.setLeoIDCommand()],
         [CMD.OPEN_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
@@ -93,12 +92,9 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
 
         [CMD.HANDLE_UNL, (p_arg: { unl: string }) => leoUI.handleUnl(p_arg)],
 
-        // [CMD.GOTO_LINE_IN_LEO_OUTLINE, (p_arg: any) => p_leoUI.gotoLineInLeoOutline(p_arg)],
-        // [CMD.IMPORT_INTO_LEO_OUTLINE, (p_arg: any) => p_leoUI.importIntoLeoOutline(p_arg)],
-
-        // [CMD.CLICK_BUTTON, (p_node: LeoButtonNode) => p_leoUI.clickAtButton(p_node)], // Not referenced in package.json
-        // [CMD.GOTO_SCRIPT, (p_node: LeoButtonNode) => p_leoUI.gotoScript(p_node)],
-        // [CMD.REMOVE_BUTTON, (p_node: LeoButtonNode) => p_leoUI.removeAtButton(p_node)],
+        [CMD.CLICK_BUTTON, (p_node: LeoButton) => leoUI.clickAtButton(p_node)], // Not referenced in package.json
+        [CMD.GOTO_SCRIPT, (p_node: LeoButton) => leoUI.gotoScript(p_node)],
+        [CMD.REMOVE_BUTTON, (p_node: LeoButton) => leoUI.removeAtButton(p_node)],
 
         [CMD.CLOSE_FILE, () => leoUI.closeLeoFile()],
         [CMD.NEW_FILE, () => leoUI.newLeoFile()],
