@@ -51,13 +51,8 @@ export class MenuManager {
 
     // * at-buttons
     public AT_BUTTONS_CONTAINER: HTMLElement;
-    public REMOVE_BUTTON: HTMLElement;
-    public GOTO_SCRIPT: HTMLElement;
 
     // * Settings Menu
-    // public CHECK_EXTERNAL_FILES: HTMLSelectElement;
-    // public RELOAD_IGNORE_CHANGES: HTMLSelectElement;
-
     public SHOW_PREV_NEXT_MARK: HTMLInputElement;
     public SHOW_TOGGLE_MARK: HTMLInputElement;
     public SHOW_PREV_NEXT_HISTORY: HTMLInputElement;
@@ -110,12 +105,6 @@ export class MenuManager {
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
 
         this.AT_BUTTONS_CONTAINER = document.getElementById('at-buttons')!;
-
-        this.REMOVE_BUTTON = document.getElementById('remove-button')!;
-        this.GOTO_SCRIPT = document.getElementById('goto-script')!;
-
-        // this.CHECK_EXTERNAL_FILES = document.getElementById('checkForChangeExternalFiles')! as HTMLSelectElement;
-        // this.RELOAD_IGNORE_CHANGES = document.getElementById('defaultReloadIgnore')! as HTMLSelectElement;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
         this.SHOW_TOGGLE_MARK = document.getElementById('show-toggle-mark')! as HTMLInputElement;

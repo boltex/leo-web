@@ -125,6 +125,7 @@ export class Controller {
             }
         });
         // Setup handler for the "Revert to Undo State" option in the undo context menu
+        /*
         workspace.menu.UNDO_MENU.querySelector('.menu-item')?.addEventListener('click', () => {
             if (this._lastUndoBeadIndex !== null) {
                 workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
@@ -133,6 +134,31 @@ export class Controller {
             // close the undo context menu after clicking the option
             workspace.menu.UNDO_MENU.style.display = 'none';
         });
+        */
+        // instead of commented above code , build this in UNDO_MENU:
+        /*
+         <ul>
+             <li class="menu-item"><span class="menu-label">Revert to Undo State</span></li>
+         </ul>
+        */
+        const undoMenu = workspace.menu.UNDO_MENU;
+        const ul_element = document.createElement('ul');
+        const menuItemElement = document.createElement('li');
+        menuItemElement.classList.add('menu-item');
+        const labelElement = document.createElement('span');
+        labelElement.classList.add('menu-label');
+        labelElement.textContent = 'Revert to Undo State';
+        menuItemElement.appendChild(labelElement);
+        menuItemElement.addEventListener('click', () => {
+            if (this._lastUndoBeadIndex !== null) {
+                workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
+                this._lastUndoBeadIndex = null; // Reset after handling
+            }
+            // close the undo context menu after clicking the option
+            workspace.menu.UNDO_MENU.style.display = 'none';
+        });
+        ul_element.appendChild(menuItemElement);
+        undoMenu.appendChild(ul_element);
 
     }
 
@@ -140,24 +166,40 @@ export class Controller {
     private setupAtButtonHandlers() {
         // Those will use the this._lastAtButton to know which button was right-clicked 
         // and call either remove or goto script command with the correct LeoButton.
-        const REMOVE_BUTTON = workspace.menu.REMOVE_BUTTON;
-        const GOTO_SCRIPT = workspace.menu.GOTO_SCRIPT;
+        const atButtonMenu = workspace.menu.AT_BUTTON_MENU;
+        const ul_element = document.createElement('ul');
+        const REMOVE_BUTTON = document.createElement('li');
+        const GOTO_SCRIPT = document.createElement('li');
+        REMOVE_BUTTON.classList.add('menu-item');
+        GOTO_SCRIPT.classList.add('menu-item');
+        const removeLabel = document.createElement('span');
+        const gotoLabel = document.createElement('span');
+        removeLabel.classList.add('menu-label');
+        gotoLabel.classList.add('menu-label');
+        removeLabel.textContent = 'Remove Button';
+        gotoLabel.textContent = 'Goto Script';
+        REMOVE_BUTTON.appendChild(removeLabel);
+        GOTO_SCRIPT.appendChild(gotoLabel);
+        ul_element.appendChild(REMOVE_BUTTON);
+        ul_element.appendChild(GOTO_SCRIPT);
+        atButtonMenu.appendChild(ul_element);
+
         REMOVE_BUTTON.addEventListener('click', () => {
+            workspace.menu.AT_BUTTON_MENU.style.display = 'none';
+            workspace.layout.restoreLastFocusedElement();
             if (this._lastAtButton) {
                 workspace.controller.doCommand(Constants.COMMANDS.REMOVE_BUTTON, this._lastAtButton);
                 this._lastAtButton = null; // Reset after handling
             }
-            workspace.menu.AT_BUTTON_MENU.style.display = 'none';
-            workspace.layout.restoreLastFocusedElement();
         });
 
         GOTO_SCRIPT.addEventListener('click', () => {
+            workspace.menu.AT_BUTTON_MENU.style.display = 'none';
+            workspace.layout.restoreLastFocusedElement();
             if (this._lastAtButton) {
                 workspace.controller.doCommand(Constants.COMMANDS.GOTO_SCRIPT, this._lastAtButton);
                 this._lastAtButton = null; // Reset after handling
             }
-            workspace.menu.AT_BUTTON_MENU.style.display = 'none';
-            workspace.layout.restoreLastFocusedElement();
         });
 
     }

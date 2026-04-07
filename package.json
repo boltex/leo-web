@@ -77,5 +77,8 @@
     "showdown": "^2.1.0",
     "stream": "^0.0.2",
     "typescript": "^5.9.3"
-  }
+  },
+  "gitCommit": "056a825",
+  "gitBranch": "devel",
+  "gitDate": "2026-04-06 22:03:32 -0400"
 }
