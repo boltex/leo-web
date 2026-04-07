@@ -392,6 +392,13 @@ body {
   background: var(--ancestor-bg);
 }
 
+#top-bar-toggle:active {
+  box-shadow:
+    inset -1px -1px 0 rgba(255, 255, 255, 0.4),
+    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+  background: var(--hover-bg);
+}
+
 .menu {
   background: var(--menu-bg-color);
   color: var(--menu-color);
@@ -497,18 +504,20 @@ body {
   max-height: 26px;
   min-height: 0;
   display: flex;
+  overflow: hidden;
 }
 #at-buttons:has(> *) {
   border-top: 1px solid var(--menu-border-color);
 }
 
 .at-button {
+  flex-shrink: 0; /* prevent shrinking when text is long */
   color: var(--menu-color);
   font-size: 0.875rem;
   padding: 5px 10px 5px 10px;
   border-right: 1px solid var(--menu-border-color);
   background: var(--menu-bg-color);
-  max-width: 150px;
+  max-width: 150px; /* limit max width of buttons, their text will be cropped with ellipsis if too long */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1735,7 +1744,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   text-align: center;
   font-family: sans-serif;
   font-size: 13px;
-  white-space: pre;
+  white-space: pre-wrap;
   user-select: none;
 }
 
@@ -1843,7 +1852,7 @@ input[type="checkbox"]:focus-visible:checked::after {
 
 #modal-dialog-description,
 #input-dialog-description {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 /* QuickPick dialog */

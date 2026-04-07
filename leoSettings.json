@@ -782,10 +782,6 @@
                 {
                   "gnx": "felix.20230927161926.9",
                   "vh": "@bool scripting-create-script-button-button = True"
-                },
-                {
-                  "gnx": "felix.20230927161926.10",
-                  "vh": "@int scripting-max-button-size = 18"
                 }
               ]
             }
@@ -1149,7 +1145,6 @@
     "felix.20230927161926.7": "True: create Debug Script button.\n",
     "felix.20230927161926.8": "True: create Run Script button.\n\nNote: The plugin creates the press-run-script-button command regardless of this setting.",
     "felix.20230927161926.9": "True: create Script Button button in icon area.\n\nNote: The plugin creates the press-script-button-button regardless of this setting.",
-    "felix.20230927161926.10": "The maximum length of button names.\n",
     "ekr.20060930085532": "True: (Recommended) The find commands collapse all nodes that are not ancestors of the node containing the match.\nFalse: The find command expands nodes needed to show the match, but does not collapse any nodes.",
     "ekr.20080315083057.7": "True: (Recommended) The spell commands collapse all nodes that are not ancestors of the node containing the match.\nFalse: The spell commands do not collapse any nodes.",
     "felix.20220506230435.1": "True: (Legacy) The goto-first-visible-node and goto-first-visible-node commands collapse all nodes that are not ancestors of the target node that is selected.\n\nFalse: (Recommended) The commands act as simple navigation commands, and do not change the outline state.",

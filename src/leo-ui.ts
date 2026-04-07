@@ -292,14 +292,31 @@ export class LeoUI extends NullGui {
     }
     //@+node:felix.20260323003423.1: *4* chooseNewWorkspace
     public async chooseNewWorkspace(): Promise<boolean> {
+
+        // First, warn user and ask for confirmation before closing all opened documents and clearing the workspace, since this action is destructive and cannot be undone.
+        const confirmed = await workspace.dialog.showMessageDialog(
+            "Are you sure you want to choose a new workspace?",
+            {
+                detail: "All opened documents will be closed. The recent documents list, sessions and cache will be cleared. This action cannot be undone.",
+                modal: true,
+            },
+            "Yes",
+            "No"
+        );
+
+        if (confirmed !== "Yes") {
+            return Promise.resolve(false);
+        }
+
         // Perform the 'quit' command to force asking to save unsaved changes
         // Then clear the workspace from db and force-refresh the page to restart leoWeb
         // This will have the effect of closing all opened documents and then asking for a new workspace
         for (const c of g.app.commanders()) {
+            console.log('closing commander: ', c.fileName());
             const closed = await g.app.closeLeoWindow(c.frame)
-            const allow = c.exists && closed;
+            const allow = !c.exists && closed; // was successfully closed and the exist flag is now false, meaning the commander is really closed.
             if (!allow) {
-                return Promise.resolve(false);
+                return Promise.resolve(false); // If any commander was not closed, exit without clearing workspace or reloading page, to avoid data loss.
             }
         }
 
@@ -1785,13 +1802,12 @@ export class LeoUI extends NullGui {
                 if (p) {
                     new_c.selectPosition(p);
                     this.setupRefresh(
-                        Focus.Outline,
+                        Focus.NoChange,
                         {
                             tree: true,
                             body: true,
                             documents: true,
                             states: true,
-                            buttons: true,
                         }
                     );
                     return this.launchRefresh();

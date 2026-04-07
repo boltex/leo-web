@@ -72,6 +72,13 @@ export type Keybinding = {
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
 };
 
+//@+node:felix.20260406210016.1: ** ButtonEntry
+export interface ButtonEntry {
+    icon: string;
+    action: string; // Command to execute when the entry is selected
+    enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled
+    enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
+}
 //@+node:felix.20251211213200.1: ** FileStat
 export interface FileStat {
     type: 'file' | 'directory';

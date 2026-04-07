@@ -26,6 +26,7 @@ export class MenuManager {
     public AT_BUTTON_MENU: HTMLElement;
 
     // * Top Menu
+    public TOP_BAR: HTMLElement;
     public TOP_MENU: HTMLElement;
     public MENU_TOGGLE: HTMLElement;
     public TOP_BAR_TOGGLE: HTMLElement;
@@ -85,6 +86,8 @@ export class MenuManager {
         this.BODY_MENU = document.getElementById('body-menu')!;
         this.UNDO_MENU = document.getElementById('undo-menu')!;
         this.AT_BUTTON_MENU = document.getElementById('at-button-menu')!;
+
+        this.TOP_BAR = document.getElementById("top-bar")!;
         this.TOP_MENU = document.getElementById("top-menu")!;
         this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
         this.TOP_BAR_TOGGLE = document.getElementById("top-bar-toggle")!;

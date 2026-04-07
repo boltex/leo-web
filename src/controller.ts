@@ -148,6 +148,7 @@ export class Controller {
                 this._lastAtButton = null; // Reset after handling
             }
             workspace.menu.AT_BUTTON_MENU.style.display = 'none';
+            workspace.layout.restoreLastFocusedElement();
         });
 
         GOTO_SCRIPT.addEventListener('click', () => {
@@ -156,6 +157,7 @@ export class Controller {
                 this._lastAtButton = null; // Reset after handling
             }
             workspace.menu.AT_BUTTON_MENU.style.display = 'none';
+            workspace.layout.restoreLastFocusedElement();
         });
 
     }
@@ -215,6 +217,12 @@ export class Controller {
     }
     //@+node:felix.20260322221915.1: *4* setupButtonFocusPrevention
     private setupButtonFocusPrevention() {
+
+        workspace.menu.TOP_BAR.addEventListener('mousedown', (e) => {
+
+            e.preventDefault();
+        });
+
         const actionButtons = document.querySelectorAll('.action-button');
         actionButtons.forEach(button => {
             button.addEventListener('mousedown', (e) => {

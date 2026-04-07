@@ -474,7 +474,9 @@ export class ScriptingController {
         // True: create Script Button button.
         this.createScriptButtonButton = getBool('scripting-create-script-button-button');
         // Maximum length of button names.
-        this.maxButtonSize = c.config.getInt('scripting-max-button-size') || 18;
+        // this.maxButtonSize = c.config.getInt('scripting-max-button-size') || 256;
+        // in Leo-web, the css will limit with ellipsis, so we can set a much higher maxButtonSize.
+        this.maxButtonSize = 128;
 
         if (!iconBar) {
             this.iconBar = c.frame.iconBar; // c.frame.getIconBar();
