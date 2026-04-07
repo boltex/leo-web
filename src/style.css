@@ -315,10 +315,9 @@ body {
 }
 
 .document-tab:active {
-  /* depression effect on click */
   box-shadow:
     inset -1px -1px 0 rgba(255, 255, 255, 0.4),
-    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+    inset 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
 .close-btn {
@@ -338,8 +337,6 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 12px;
-  /* color: var(--menu-color);
-  cursor: pointer; */
 }
 
 .close-btn:hover {
@@ -377,7 +374,7 @@ body {
 #top-bar-toggle:active {
   box-shadow:
     inset -1px -1px 0 rgba(255, 255, 255, 0.4),
-    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+    inset 1px 1px 0 rgba(0, 0, 0, 0.3);
   background: var(--hover-bg);
 }
 
@@ -429,10 +426,9 @@ body {
 .menu-item.active,
 .menu-item:active {
   background: var(--hover-bg);
-  /* depression effect on click */
   box-shadow:
     inset -1px -1px 0 rgba(255, 255, 255, 0.4),
-    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+    inset 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
 .menu-item.sub-active {
@@ -494,20 +490,20 @@ body {
 }
 
 .at-button {
-  flex-shrink: 0; /* prevent shrinking when text is long */
+  flex-shrink: 0;
   color: var(--menu-color);
   font-size: 0.875rem;
   padding: 5px 10px 5px 10px;
   border-right: 1px solid var(--menu-border-color);
   background: var(--menu-bg-color);
-  max-width: 150px; /* limit max width of buttons, their text will be cropped with ellipsis if too long */
+  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   position: relative;
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.4),
-    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.3); /* bottom-right shadow */
+    inset -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 .at-button::before {
   position: absolute;
@@ -531,17 +527,15 @@ body {
 }
 
 .at-button:hover {
-  /* enhances it more on hover */
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.6),
-    /* top-left highlight */ inset -1px -1px 0 rgba(0, 0, 0, 0.5); /* bottom-right shadow */
+    inset -1px -1px 0 rgba(0, 0, 0, 0.5);
   background: var(--hover-bg);
 }
 .at-button:active {
-  /* inverts the effect on click */
   box-shadow:
     inset -1px -1px 0 rgba(255, 255, 255, 0.4),
-    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+    inset 1px 1px 0 rgba(0, 0, 0, 0.3);
   background: var(--hover-bg);
 }
 
@@ -886,8 +880,7 @@ body.dragging-secondary .node {
 /* Special handling for node icons */
 [data-show-icons="false"] .node-text {
   background-image: none !important;
-  padding-left: 4px !important;
-  /* Reduce padding when icons are hidden */
+  padding-left: 4px !important; /* Reduce padding when icons are hidden */
 }
 
 .caret::after {
@@ -1161,12 +1154,6 @@ body.dragging-secondary .node {
   flex-wrap: wrap;
 }
 
-/* @container log-pane (min-width: 450px) {
-  #config-controls {
-    justify-content: center;
-  }
-} */
-
 #log-pane-tabs {
   display: flex;
   gap: 2px;
@@ -1251,8 +1238,6 @@ body.dragging-secondary .node {
 
 #nav-tab {
   background: var(--nav-tab-bg-color);
-  /* Hidden while being developped */
-  /* display: none; /* Temporary */
 }
 
 #nav-controls {
@@ -1267,7 +1252,6 @@ body.dragging-secondary .node {
 }
 
 #gotoPane.bottom-scroll {
-  /* padding: 0.5rem 0.5rem 0 0.5rem; */
   gap: 0;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -1436,7 +1420,7 @@ select.setting-select {
 
 #log-pane .nav-col {
   display: flex;
-  flex-direction: row; /* TEST IF NEEDED ! horizontal layout for navigation buttons */
+  flex-direction: row;
   gap: 0.5rem;
 }
 
@@ -1622,7 +1606,6 @@ input[type="checkbox"]:focus-visible:checked::after {
   white-space: nowrap;
 }
 
-/* Optional icon lane driven by class names from TS (undo-icon-*) */
 .undo-node::before {
   content: "";
   position: relative;
