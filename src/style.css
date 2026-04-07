@@ -84,8 +84,6 @@
   --undo-tab-bg-color: var(--menu-bg-color);
   --settings-display: none;
   --settings-tab-bg-color: var(--menu-bg-color);
-  --help-display: none;
-  --help-tab-bg-color: var(--menu-bg-color);
 }
 
 [data-active-tab="find"] {
@@ -99,8 +97,6 @@
   --undo-tab-bg-color: var(--menu-bg-color);
   --settings-display: none;
   --settings-tab-bg-color: var(--menu-bg-color);
-  --help-display: none;
-  --help-tab-bg-color: var(--menu-bg-color);
 }
 
 [data-active-tab="nav"] {
@@ -114,8 +110,6 @@
   --undo-tab-bg-color: var(--menu-bg-color);
   --settings-display: none;
   --settings-tab-bg-color: var(--menu-bg-color);
-  --help-display: none;
-  --help-tab-bg-color: var(--menu-bg-color);
 }
 
 [data-active-tab="undo"] {
@@ -129,8 +123,6 @@
   --undo-tab-bg-color: var(--selected-bg);
   --settings-display: none;
   --settings-tab-bg-color: var(--menu-bg-color);
-  --help-display: none;
-  --help-tab-bg-color: var(--menu-bg-color);
 }
 
 [data-active-tab="settings"] {
@@ -144,23 +136,6 @@
   --undo-tab-bg-color: var(--menu-bg-color);
   --settings-display: flex;
   --settings-tab-bg-color: var(--selected-bg);
-  --help-display: none;
-  --help-tab-bg-color: var(--menu-bg-color);
-}
-
-[data-active-tab="help"] {
-  --log-display: none;
-  --log-tab-bg-color: var(--menu-bg-color);
-  --find-display: none;
-  --find-tab-bg-color: var(--menu-bg-color);
-  --nav-display: none;
-  --nav-tab-bg-color: var(--menu-bg-color);
-  --undo-display: none;
-  --undo-tab-bg-color: var(--menu-bg-color);
-  --settings-display: none;
-  --settings-tab-bg-color: var(--menu-bg-color);
-  --help-display: flex;
-  --help-tab-bg-color: var(--selected-bg);
 }
 
 [data-show-menu="true"] {
@@ -339,6 +314,13 @@ body {
   background: var(--hover-bg);
 }
 
+.document-tab:active {
+  /* depression effect on click */
+  box-shadow:
+    inset -1px -1px 0 rgba(255, 255, 255, 0.4),
+    /* top-left shadow */ inset 1px 1px 0 rgba(0, 0, 0, 0.3); /* bottom-right highlight */
+}
+
 .close-btn {
   width: 12px;
   height: 12px;
@@ -444,7 +426,8 @@ body {
   background: var(--selected-bg);
 }
 
-.menu-item.active {
+.menu-item.active,
+.menu-item:active {
   background: var(--hover-bg);
   /* depression effect on click */
   box-shadow:
@@ -1346,19 +1329,6 @@ body.dragging-secondary .node {
   background: var(--settings-tab-bg-color);
 }
 
-#help-tab {
-  background: var(--help-tab-bg-color);
-  /* Hidden while being developped */
-  display: none; /* Temporary */
-}
-
-#help-controls {
-  padding: 0;
-  display: var(--help-display);
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
 #config-controls {
   padding-top: 0.5rem;
   padding-bottom: 0.1rem;
@@ -1434,21 +1404,6 @@ select.setting-select {
   border: 1px solid var(--find-border-color);
   border-radius: 3px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-}
-
-.kbd-spacer {
-  display: inline-block;
-  width: 130px;
-  text-align: right;
-}
-
-#help-content {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.help-column {
-  flex-shrink: 0;
 }
 
 #log-pane .find-col,

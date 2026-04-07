@@ -31,7 +31,6 @@ export class LogPaneManager {
     public NAV_TAB: HTMLDivElement;
     public UNDO_TAB: HTMLDivElement;
     public SETTINGS_TAB: HTMLDivElement;
-    public HELP_TAB: HTMLDivElement;
 
     // Log text content
     public LOG_CONTENT: HTMLElement;
@@ -117,7 +116,6 @@ export class LogPaneManager {
         this.NAV_TAB = document.getElementById('nav-tab')! as HTMLDivElement;
         this.UNDO_TAB = document.getElementById('undo-tab')! as HTMLDivElement;
         this.SETTINGS_TAB = document.getElementById('settings-tab')! as HTMLDivElement;
-        this.HELP_TAB = document.getElementById('help-tab')! as HTMLDivElement;
 
         // Log text content
         this.LOG_CONTENT = document.getElementById('log-controls')!;

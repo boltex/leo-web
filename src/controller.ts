@@ -213,7 +213,6 @@ export class Controller {
         logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav', true) });
         logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') });
         logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab('settings') });
-        logPane.HELP_TAB.addEventListener('click', () => { logPane.showTab('help') });
     }
     //@+node:felix.20260322221915.1: *4* setupButtonFocusPrevention
     private setupButtonFocusPrevention() {
