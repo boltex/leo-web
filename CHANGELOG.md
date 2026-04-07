@@ -3,6 +3,8 @@
 ## 1.0.8
 
 - Added Leo's 'at-button' features.
+- Fixed 'choose new workspace' feature.
+- Polished UI behavior and styling.
 
 ## 1.0.7
 
