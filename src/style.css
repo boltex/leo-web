@@ -482,8 +482,21 @@ body {
   max-height: 26px;
   min-height: 0;
   display: flex;
-  overflow: hidden;
+  overflow-x: auto; /* Enables horizontal scrollbar */
+  overflow-y: hidden; /* Prevents vertical scrollbar */
+  white-space: nowrap;
+  justify-content: space-between;
   border-top: 1px solid var(--menu-border-color);
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+#toolbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
 #at-buttons,
@@ -513,6 +526,14 @@ body {
 
 .icon-button {
   max-width: 26px;
+}
+.icon-button.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+.icon-button.disabled span,
+.icon-button.disabled::before {
+  opacity: 0.4;
 }
 
 .at-button::before {

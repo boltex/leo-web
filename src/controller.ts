@@ -80,6 +80,7 @@ export class Controller {
         this.setupButtonHandlers();
         this.setupConfigCheckboxes();
         this.setupTopMenuHandlers();
+        this.setupToolbarHandlers();
     }
     //@+node:felix.20260322222009.1: *4* setupOutlinePaneHandlers
     private setupOutlinePaneHandlers() {
@@ -448,6 +449,18 @@ export class Controller {
         });
 
     }
+    //@+node:felix.20260408001315.1: *4* setupToolbarHandlers
+    private setupToolbarHandlers() {
+        // setup horizontal mouse wheel scrolling for toolbar
+        const TOOLBAR = workspace.menu.TOOLBAR;
+        TOOLBAR.addEventListener('wheel', (e) => {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+            }
+            TOOLBAR.scrollLeft += e.deltaY * 1.5; // scroll horizontally, adjust multiplier as needed for speed
+        }, { passive: false });
+    }
+
     //@+node:felix.20260322221701.1: *4* setupDocumentTabsAndHandlers
     public setupDocumentTabsAndHandlers() {
         // The opened documents are in g.app.windowList.

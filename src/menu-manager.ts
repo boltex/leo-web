@@ -49,8 +49,10 @@ export class MenuManager {
     public TOGGLE_MARK_BTN: HTMLButtonElement;
     public PREV_MARKED_BTN: HTMLButtonElement;
 
-    // * at-buttons
+
+    public TOOLBAR: HTMLElement;
     public AT_BUTTONS_CONTAINER: HTMLElement;
+    public ICON_BUTTONS_CONTAINER: HTMLElement;
 
     // * Settings Menu
     public SHOW_PREV_NEXT_MARK: HTMLInputElement;
@@ -104,7 +106,9 @@ export class MenuManager {
         this.TOGGLE_MARK_BTN = document.getElementById('toggle-mark-btn')! as HTMLButtonElement;
         this.PREV_MARKED_BTN = document.getElementById('prev-marked-btn')! as HTMLButtonElement;
 
+        this.TOOLBAR = document.getElementById('toolbar')!;
         this.AT_BUTTONS_CONTAINER = document.getElementById('at-buttons')!;
+        this.ICON_BUTTONS_CONTAINER = document.getElementById('icon-buttons')!;
 
         this.SHOW_PREV_NEXT_MARK = document.getElementById('show-prev-next-mark')! as HTMLInputElement;
         this.SHOW_TOGGLE_MARK = document.getElementById('show-toggle-mark')! as HTMLInputElement;
@@ -584,11 +588,87 @@ export class MenuManager {
     }
     //@+node:felix.20260407223125.1: *3* Icon Buttons
     public buildIconButtons(entries: ButtonEntry[]): void {
-        // todo
+        // Build div with class "icon-button" for each entry and add to ICON_BUTTONS_CONTAINER
+        this.ICON_BUTTONS_CONTAINER.innerHTML = '';
+        for (const entry of entries) {
+            const button = document.createElement('div');
+            button.className = entry.icon ? 'icon-button glicon ' + entry.icon : 'icon-button';
+            if (entry.tooltip) {
+                button.title = entry.tooltip;
+            }
+            if (entry.action) {
+                // First check for enabledFlagsSet and enabledFlagsClear to determine if the item should be enabled
+                let enabled = true;
+                if (entry.enabledFlagsSet) {
+                    for (const flag of entry.enabledFlagsSet) {
+                        if (!workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (enabled && entry.enabledFlagsClear) {
+                    for (const flag of entry.enabledFlagsClear) {
+                        if (workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (!enabled) {
+                    button.classList.add("disabled");
+                }
+                if (entry.label) {
+                    const labelSpan = document.createElement("span");
+                    labelSpan.className = "button-label";
+                    labelSpan.textContent = entry.label;
+                    button.appendChild(labelSpan);
+                }
+
+                button.addEventListener("click", () => {
+                    this.closeAllSubmenus();
+                    workspace.layout.restoreLastFocusedElement();
+                    this.activeTopMenu = null;
+                    workspace.controller.doCommand(entry.action as string);
+                });
+
+                if (entry.enabledFlagsSet || entry.enabledFlagsClear) {
+                    // Has a condition so save the DOM element reference for later updates
+                    entry.domElementRef = button;
+                }
+            }
+
+            this.ICON_BUTTONS_CONTAINER.appendChild(button);
+        }
     }
 
     public refreshIconButtons(entries: ButtonEntry[]): void {
-        // todo
+        for (const entry of entries) {
+            if (entry.domElementRef) {
+                let enabled = true;
+                if (entry.enabledFlagsSet) {
+                    for (const flag of entry.enabledFlagsSet) {
+                        if (!workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (enabled && entry.enabledFlagsClear) {
+                    for (const flag of entry.enabledFlagsClear) {
+                        if (workspace.getContext(flag)) {
+                            enabled = false;
+                            break;
+                        }
+                    }
+                }
+                if (enabled) {
+                    entry.domElementRef.classList.remove("disabled");
+                } else {
+                    entry.domElementRef.classList.add("disabled");
+                }
+            }
+        }
     }
 
     //@+node:felix.20260323010746.1: *3* Document Tabs
