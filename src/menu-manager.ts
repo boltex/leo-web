@@ -3,7 +3,7 @@
 //@+<< imports >>
 //@+node:felix.20260323010551.1: ** << imports >>
 import { workspace } from './workspace';
-import { ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
+import { ButtonEntry, ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
 import * as g from './core/leoGlobals';
 
 //@-<< imports >>
@@ -582,6 +582,15 @@ export class MenuManager {
         workspace.layout.updateOutlineContainerSize();
         workspace.layout.positionCrossDragger();
     }
+    //@+node:felix.20260407223125.1: *3* Icon Buttons
+    public buildIconButtons(entries: ButtonEntry[]): void {
+        // todo
+    }
+
+    public refreshIconButtons(entries: ButtonEntry[]): void {
+        // todo
+    }
+
     //@+node:felix.20260323010746.1: *3* Document Tabs
     public clearDocumentTabs() {
         this.DOCUMENT_TABS.innerHTML = "";

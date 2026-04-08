@@ -10,6 +10,7 @@ import * as utils from './utils';
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
 import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
+import { toolbarButtons } from "./toolbar-buttons";
 import { keybindings } from "./keybindings";
 import { QuickSearchController } from "./core/quicksearch";
 import { nullButtonWidget } from "./core/leoFrame";
@@ -35,6 +36,7 @@ export class Controller {
 
     constructor() {
         workspace.menu.buildMenu(menuData);
+        workspace.menu.buildIconButtons(toolbarButtons);
         workspace.menu.buildBodyContextMenu(bodyPaneContextMenuData);
         workspace.menu.buildOutlineContextMenu(outlinePaneContextMenuData);
         workspace.layout.setWindowTitle(Constants.DEFAULT_WINDOW_TITLE);
