@@ -44,6 +44,7 @@ import { LeoFind } from "./core/leoFind";
 import { QuickSearchController } from "./core/quicksearch";
 import { HeadlineFinishedResult } from "./outline-manager";
 import { RClick } from "./core/mod_scripting";
+import { toolbarButtons } from "./toolbar-buttons";
 //@-<< imports >>
 //@+others
 //@+node:felix.20260322232711.1: ** Leo UI
@@ -1143,6 +1144,7 @@ export class LeoUI extends NullGui {
         menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
         menu.refreshMenu(menuData);
+        menu.refreshIconButtons(toolbarButtons);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
 
@@ -1170,6 +1172,7 @@ export class LeoUI extends NullGui {
         const menu = workspace.menu;
         menu.updateButtonVisibility(false, false, true);
         menu.refreshMenu(menuData);
+        menu.refreshIconButtons(toolbarButtons);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
         this.refreshDocumentsPane();

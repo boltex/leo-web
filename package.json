@@ -1,6 +1,6 @@
 {
   "name": "leo-web",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Leo Web - A TypeScript implementation of the Leo Editor",
   "main": "dist/bundle.js",
   "scripts": {

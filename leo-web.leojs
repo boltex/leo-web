@@ -100,6 +100,10 @@
           "vh": "@file src/menu.ts"
         },
         {
+          "gnx": "felix.20260407013645.1",
+          "vh": "@file src/toolbar-buttons.ts"
+        },
+        {
           "gnx": "felix.20260321200500.1",
           "vh": "@file src/outline-manager.ts"
         },

@@ -54,210 +54,210 @@
  *  Icons
  *-------------------*/
 
-.leojs-arrow-down:before {
+.leo-arrow-down:before {
   content: "\f101";
 }
-.leojs-arrow-left:before {
+.leo-arrow-left:before {
   content: "\f102";
 }
-.leojs-arrow-right:before {
+.leo-arrow-right:before {
   content: "\f103";
 }
-.leojs-arrow-small-down:before {
+.leo-arrow-small-down:before {
   content: "\f104";
 }
-.leojs-arrow-small-left:before {
+.leo-arrow-small-left:before {
   content: "\f105";
 }
-.leojs-arrow-small-right:before {
+.leo-arrow-small-right:before {
   content: "\f106";
 }
-.leojs-arrow-small-up:before {
+.leo-arrow-small-up:before {
   content: "\f107";
 }
-.leojs-arrow-up:before {
+.leo-arrow-up:before {
   content: "\f108";
 }
-.leojs-chapter-back:before {
+.leo-chapter-back:before {
   content: "\f109";
 }
-.leojs-chapter-main:before {
+.leo-chapter-main:before {
   content: "\f10a";
 }
-.leojs-chapter-next:before {
+.leo-chapter-next:before {
   content: "\f10b";
 }
-.leojs-chapter-select:before {
+.leo-chapter-select:before {
   content: "\f10c";
 }
-.leojs-clear-files:before {
+.leo-clear-files:before {
   content: "\f10d";
 }
-.leojs-clipboard:before {
+.leo-clipboard:before {
   content: "\f10e";
 }
-.leojs-close:before {
+.leo-close:before {
   content: "\f10f";
 }
-.leojs-close-server:before {
+.leo-close-server:before {
   content: "\f110";
 }
-.leojs-collapse:before {
+.leo-collapse:before {
   content: "\f111";
 }
-.leojs-connect:before {
+.leo-connect:before {
   content: "\f112";
 }
-.leojs-cut:before {
+.leo-cut:before {
   content: "\f113";
 }
-.leojs-dehoist:before {
+.leo-dehoist:before {
   content: "\f114";
 }
-.leojs-delete:before {
+.leo-delete:before {
   content: "\f115";
 }
-.leojs-demote:before {
+.leo-demote:before {
   content: "\f116";
 }
-.leojs-edit:before {
+.leo-edit:before {
   content: "\f117";
 }
-.leojs-extract:before {
+.leo-extract:before {
   content: "\f118";
 }
-.leojs-extract-name:before {
+.leo-extract-name:before {
   content: "\f119";
 }
-.leojs-find-next:before {
+.leo-find-next:before {
   content: "\f11a";
 }
-.leojs-find-previous:before {
+.leo-find-previous:before {
   content: "\f11b";
 }
-.leojs-find-quick:before {
+.leo-find-quick:before {
   content: "\f11c";
 }
-.leojs-find-quick-changed:before {
+.leo-find-quick-changed:before {
   content: "\f11d";
 }
-.leojs-find-quick-history:before {
+.leo-find-quick-history:before {
   content: "\f11e";
 }
-.leojs-find-quick-marked:before {
+.leo-find-quick-marked:before {
   content: "\f11f";
 }
-.leojs-find-quick-selected:before {
+.leo-find-quick-selected:before {
   content: "\f120";
 }
-.leojs-find-quick-timeline:before {
+.leo-find-quick-timeline:before {
   content: "\f121";
 }
-.leojs-folder:before {
+.leo-folder:before {
   content: "\f122";
 }
-.leojs-gear:before {
+.leo-gear:before {
   content: "\f123";
 }
-.leojs-hoist:before {
+.leo-hoist:before {
   content: "\f124";
 }
-.leojs-icon-leo-fill:before {
+.leo-icon-leo-fill:before {
   content: "\f125";
 }
-.leojs-icon-leo-outline:before {
+.leo-icon-leo-outline:before {
   content: "\f126";
 }
-.leojs-import:before {
+.leo-import:before {
   content: "\f127";
 }
-.leojs-insert:before {
+.leo-insert:before {
   content: "\f128";
 }
-.leojs-insert-child:before {
+.leo-insert-child:before {
   content: "\f129";
 }
-.leojs-link:before {
+.leo-link:before {
   content: "\f12a";
 }
-.leojs-mark:before {
+.leo-mark:before {
   content: "\f12b";
 }
-.leojs-new-file:before {
+.leo-new-file:before {
   content: "\f12c";
 }
-.leojs-next:before {
+.leo-next:before {
   content: "\f12d";
 }
-.leojs-node:before {
+.leo-node:before {
   content: "\f12e";
 }
-.leojs-open-recent:before {
+.leo-open-recent:before {
   content: "\f12f";
 }
-.leojs-parent:before {
+.leo-parent:before {
   content: "\f130";
 }
-.leojs-paste:before {
+.leo-paste:before {
   content: "\f131";
 }
-.leojs-paste-clone:before {
+.leo-paste-clone:before {
   content: "\f132";
 }
-.leojs-plus:before {
+.leo-plus:before {
   content: "\f133";
 }
-.leojs-plus-small:before {
+.leo-plus-small:before {
   content: "\f134";
 }
-.leojs-prev:before {
+.leo-prev:before {
   content: "\f135";
 }
-.leojs-promote:before {
+.leo-promote:before {
   content: "\f136";
 }
-.leojs-redo:before {
+.leo-redo:before {
   content: "\f137";
 }
-.leojs-refresh:before {
+.leo-refresh:before {
   content: "\f138";
 }
-.leojs-save:before {
+.leo-save:before {
   content: "\f139";
 }
-.leojs-save-as:before {
+.leo-save-as:before {
   content: "\f13a";
 }
-.leojs-save-as-leojs:before {
+.leo-save-as-leojs:before {
   content: "\f13b";
 }
-.leojs-show-log:before {
+.leo-show-log:before {
   content: "\f13c";
 }
-.leojs-sort-children:before {
+.leo-sort-children:before {
   content: "\f13d";
 }
-.leojs-sort-siblings:before {
+.leo-sort-siblings:before {
   content: "\f13e";
 }
-.leojs-start-server:before {
+.leo-start-server:before {
   content: "\f13f";
 }
-.leojs-switch:before {
+.leo-switch:before {
   content: "\f140";
 }
-.leojs-tag:before {
+.leo-tag:before {
   content: "\f141";
 }
-.leojs-undo:before {
+.leo-undo:before {
   content: "\f142";
 }
-.leojs-unmark:before {
+.leo-unmark:before {
   content: "\f143";
 }
-.leojs-write-at-file-nodes:before {
+.leo-write-at-file-nodes:before {
   content: "\f144";
 }
-.leojs-write-dirty-at-file-nodes:before {
+.leo-write-dirty-at-file-nodes:before {
   content: "\f145";
 }

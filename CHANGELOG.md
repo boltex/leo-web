@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.9
+
+- Made button-toolbar mouse-scrollable horizontally.
+- Added icon buttons for most common commands in toolbar.
+
 ## 1.0.8
 
 - Added Leo's 'at-button' features.
