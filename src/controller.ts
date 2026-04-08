@@ -457,7 +457,7 @@ export class Controller {
             if (e.deltaY !== 0) {
                 e.preventDefault();
             }
-            TOOLBAR.scrollLeft += e.deltaY * 1.5; // scroll horizontally, adjust multiplier as needed for speed
+            TOOLBAR.scrollLeft += e.deltaY * 1.5; // scroll horizontally, adjust multiplier as needed.
         }, { passive: false });
     }
 
