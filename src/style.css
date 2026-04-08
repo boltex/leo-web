@@ -381,7 +381,6 @@ body {
 .menu {
   background: var(--menu-bg-color);
   color: var(--menu-color);
-  /* border-bottom: 1px solid var(--menu-border-color); */
   position: relative;
   z-index: 10;
   user-select: none;
@@ -479,46 +478,58 @@ body {
   color: var(--find-placeholder-color);
 }
 
-#at-buttons {
+#toolbar {
   max-height: 26px;
   min-height: 0;
   display: flex;
   overflow: hidden;
-}
-#at-buttons:has(> *) {
   border-top: 1px solid var(--menu-border-color);
 }
 
-.at-button {
+#at-buttons,
+#icon-buttons {
+  display: flex;
+}
+
+.at-button,
+.icon-button {
   flex-shrink: 0;
   color: var(--menu-color);
   font-size: 0.875rem;
-  padding: 5px 10px 5px 10px;
-  border-right: 1px solid var(--menu-border-color);
+  padding: 5px 10px;
   background: var(--menu-bg-color);
-  max-width: 150px;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
   position: relative;
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.4),
     inset -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
+
+.at-button {
+  max-width: 150px;
+  text-overflow: ellipsis;
+}
+
+.icon-button {
+  max-width: 26px;
+}
+
 .at-button::before {
   position: absolute;
 }
-.at-button.icon-1 {
+
+.at-button.icon-1,
+.at-button.icon-2 {
   padding: 5px 10px 5px 22px;
 }
+
 .at-button.icon-1::before {
   top: 2px;
   left: 6px;
   content: "⏷";
 }
-.at-button.icon-2 {
-  padding: 5px 10px 5px 22px;
-}
+
 .at-button.icon-2::before {
   top: 4px;
   left: 7px;
@@ -526,13 +537,16 @@ body {
   content: "+";
 }
 
-.at-button:hover {
+.at-button:hover,
+.icon-button:hover {
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.6),
     inset -1px -1px 0 rgba(0, 0, 0, 0.5);
   background: var(--hover-bg);
 }
-.at-button:active {
+
+.at-button:active,
+.icon-button:active {
   box-shadow:
     inset -1px -1px 0 rgba(255, 255, 255, 0.4),
     inset 1px 1px 0 rgba(0, 0, 0, 0.3);
