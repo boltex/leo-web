@@ -24,6 +24,10 @@ export class DialogManager {
 
     public HTML_ELEMENT: HTMLElement;
 
+    private MODAL_DIALOG: HTMLElement;
+    private INPUT_DIALOG: HTMLElement;
+    private QUICKPICK_DIALOG: HTMLElement;
+
     private TOAST: HTMLElement;
     private MODAL_DIALOG_TITLE: HTMLElement;
     private MODAL_DIALOG_DESCRIPTION: HTMLElement;
@@ -36,7 +40,6 @@ export class DialogManager {
 
     private QUICKPICK_DIALOG_INPUT: HTMLInputElement;
     private QUICKPICK_DIALOG_LIST: HTMLElement;
-
 
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
     private __quickPickScrollTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -68,6 +71,10 @@ export class DialogManager {
         this.HTML_ELEMENT = document.documentElement;
 
         this.TOAST = document.getElementById('toast')!;
+
+        this.MODAL_DIALOG = document.getElementById('message-dialog')!;
+        this.INPUT_DIALOG = document.getElementById('input-dialog')!;
+        this.QUICKPICK_DIALOG = document.getElementById('quickpick-dialog')!;
 
         this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;
@@ -343,6 +350,19 @@ export class DialogManager {
     //@+node:felix.20260322225524.1: *3* _showMessageDialogInternal
     private _showMessageDialogInternal(dialog: any): void {
         this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'true');
+        this.MODAL_DIALOG.onkeydown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this._cleanupFocusTrap();
+                this.HTML_ELEMENT.setAttribute('data-show-message-dialog', 'false');
+                this.MODAL_DIALOG.onkeydown = null; // Remove its own keydown.
+                this.isDialogOpen = false;
+                this._restorePreDialogFocus();
+                dialog.resolve(undefined);
+                setTimeout(() => this._processDialogQueue(), 100);
+            }
+        };
 
         this.MODAL_DIALOG_TITLE.textContent = dialog.message;
         this.MODAL_DIALOG_DESCRIPTION.textContent = dialog.options?.detail ?? '';
@@ -393,6 +413,22 @@ export class DialogManager {
         this.INPUT_DIALOG_INPUT.value = options.value || '';
         this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
 
+        this.INPUT_DIALOG.onkeydown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.INPUT_DIALOG.onkeydown = null; // Remove its own keydown.
+                this._cleanupFocusTrap();
+                this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+                this.INPUT_DIALOG_INPUT.onkeydown = null;
+                this.INPUT_DIALOG_BTN.onclick = null;
+                this.isDialogOpen = false;
+                this._restorePreDialogFocus();
+                dialog.resolve(undefined);
+                setTimeout(() => this._processDialogQueue(), 100);
+            }
+        };
+
         const inputCallback = () => {
             const inputValue = this.INPUT_DIALOG_INPUT.value;
             this._cleanupFocusTrap();
@@ -438,6 +474,21 @@ export class DialogManager {
         this.INPUT_DIALOG_INPUT.value = options.value || '';
         this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
 
+        this.INPUT_DIALOG.onkeydown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.INPUT_DIALOG.onkeydown = null; // Remove its own keydown.
+                this._cleanupFocusTrap();
+                this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+                this.INPUT_DIALOG_INPUT.oninput = null;
+                this.isDialogOpen = false;
+                this._restorePreDialogFocus();
+                dialog.resolve(undefined);
+                setTimeout(() => this._processDialogQueue(), 100);
+            }
+        };
+
         // add 'hidden-button' class to OK button since we don't need it for single char input
         this.INPUT_DIALOG_BTN.classList.add('hidden-button');
 
@@ -478,6 +529,14 @@ export class DialogManager {
         const options = dialog.quickPickOptions;
 
         this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'true');
+
+        this.QUICKPICK_DIALOG.onkeydown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                closeDialog(null);
+            }
+        };
 
         this.QUICKPICK_DIALOG_INPUT.placeholder = options?.placeHolder || '';
         this.QUICKPICK_DIALOG_INPUT.value = '';
@@ -645,13 +704,14 @@ export class DialogManager {
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
             this.isDialogOpen = false;
+            this.QUICKPICK_DIALOG.onkeydown = null;
             this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
             this.QUICKPICK_DIALOG_INPUT.oninput = null;
             this._restorePreDialogFocus();
             if (this.__quickPickScrollTimeout) {
                 clearTimeout(this.__quickPickScrollTimeout);
             }
-            dialog.resolve(returnValue);
+            dialog.resolve(returnValue || undefined); // will return undefined if null.
             setTimeout(() => this._processDialogQueue(), 100);
         };
 
@@ -956,7 +1016,6 @@ export class DialogManager {
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key !== 'Tab') return;
-            console.log('Focus trap keydown:', e.key, 'Shift:', e.shiftKey);
             const focusableElements = getFocusableElements();
             if (focusableElements.length === 0) return;
 

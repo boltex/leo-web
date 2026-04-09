@@ -340,7 +340,7 @@
     <!--@+node:felix.20260321125350.1: *3* Toast & Dialogs-->
     <div id="toast" role="status" aria-live="polite" hidden></div>
 
-    <div id="message-dialog" class="modal">
+    <div id="message-dialog" class="modal" tabindex="-1">
         <div class="modal-content">
             <h2 id="modal-dialog-title"></h2>
             <p id="modal-dialog-description"></p>
@@ -348,7 +348,7 @@
         </div>
     </div>
 
-    <div id="input-dialog" class="modal">
+    <div id="input-dialog" class="modal" tabindex="-1">
         <div class="modal-content">
             <h2 id="input-dialog-title"></h2>
             <p id="input-dialog-description"></p>
@@ -359,7 +359,7 @@
         </div>
     </div>
 
-    <div id="quickpick-dialog" class="modal">
+    <div id="quickpick-dialog" class="modal" tabindex="-1">
         <div class="modal-content">
             <input id="quickpick-dialog-input" type="text" autocomplete="off" />
             <ul id="quickpick-dialog-list" class="quick-pick-list"></ul>
