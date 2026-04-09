@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.11
+
+- ...
+
 ## 1.0.10
 
 - Fixed showQuickPick dialog and added escape keypress detection to all modal dialogs.
