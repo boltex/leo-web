@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.10
+
+- Fixed showQuickPick dialog and added escape keypress detection to all modal dialogs.
+- Fixed minibuffer icons
+
 ## 1.0.9
 
 - Made button-toolbar mouse-scrollable horizontally.
