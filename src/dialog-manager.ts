@@ -37,7 +37,9 @@ export class DialogManager {
     private QUICKPICK_DIALOG_INPUT: HTMLInputElement;
     private QUICKPICK_DIALOG_LIST: HTMLElement;
 
+
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
+    private __quickPickScrollTimeout: ReturnType<typeof setTimeout> | null = null;
     private __toastResolvers: Array<(value: PromiseLike<undefined> | undefined) => void> = [];
 
     private __dialogQueue: Array<{
@@ -391,16 +393,12 @@ export class DialogManager {
         this.INPUT_DIALOG_INPUT.value = options.value || '';
         this.INPUT_DIALOG_INPUT.placeholder = options.placeholder || '';
 
-        if (options.value) {
-            setTimeout(() => {
-                this.INPUT_DIALOG_INPUT.select();
-            }, 0);
-        }
-
         const inputCallback = () => {
             const inputValue = this.INPUT_DIALOG_INPUT.value;
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+            this.INPUT_DIALOG_INPUT.onkeydown = null;
+            this.INPUT_DIALOG_BTN.onclick = null;
             this.isDialogOpen = false;
             this._restorePreDialogFocus();
             dialog.resolve(inputValue);
@@ -426,6 +424,9 @@ export class DialogManager {
 
         setTimeout(() => {
             this.INPUT_DIALOG_INPUT.focus();
+            if (options.value) {
+                this.INPUT_DIALOG_INPUT.select();
+            }
         }, 0);
     }
     //@+node:felix.20260322225350.1: *3* _showSingleCharInputDialogInternal
@@ -444,6 +445,7 @@ export class DialogManager {
             const inputValue = this.INPUT_DIALOG_INPUT.value;
             this._cleanupFocusTrap();
             this.HTML_ELEMENT.setAttribute('data-show-input-dialog', 'false');
+            this.INPUT_DIALOG_INPUT.oninput = null;
             this.isDialogOpen = false;
             // Remove the 'hidden-button' class from OK button for future dialogs
             this.INPUT_DIALOG_BTN.classList.remove('hidden-button');
@@ -547,20 +549,26 @@ export class DialogManager {
 
                 if (index === selectedIndex) {
                     li.classList.add('selected');
-                    setTimeout(() => {
-                        li.scrollIntoView({ block: 'nearest', behavior: this.QUICKPICK_DIALOG_INPUT.value ? 'smooth' : 'instant' });
+                    if (this.__quickPickScrollTimeout) {
+                        clearTimeout(this.__quickPickScrollTimeout);
+                    }
+
+                    this.__quickPickScrollTimeout = setTimeout(() => {
+                        const selected = this.QUICKPICK_DIALOG_LIST.querySelector('.selected');
+                        if (selected) {
+                            selected.scrollIntoView({
+                                block: 'nearest',
+                                behavior: this.QUICKPICK_DIALOG_INPUT.value ? 'smooth' : 'instant'
+                            });
+                        }
                     }, 0);
                 }
 
                 li.onclick = () => {
-                    this.HTML_ELEMENT.setAttribute('data-show-quickpick-dialog', 'false');
-                    this.isDialogOpen = false;
                     if (options?.onDidSelectItem) {
                         options.onDidSelectItem(item);
                     }
-                    this._restorePreDialogFocus();
-                    dialog.resolve(item);
-                    setTimeout(() => this._processDialogQueue(), 100);
+                    closeDialog(item);
                 };
 
                 this.QUICKPICK_DIALOG_LIST.appendChild(li);
@@ -581,6 +589,7 @@ export class DialogManager {
                         return false;
                     }
                     if (item.alwaysShow) {
+                        (item as QuickPickInternalItem).renderedLabel = undefined;
                         return true;
                     }
                     const labelMatch = item.label.toLowerCase().includes(filterText);
@@ -639,6 +648,9 @@ export class DialogManager {
             this.QUICKPICK_DIALOG_INPUT.onkeydown = null;
             this.QUICKPICK_DIALOG_INPUT.oninput = null;
             this._restorePreDialogFocus();
+            if (this.__quickPickScrollTimeout) {
+                clearTimeout(this.__quickPickScrollTimeout);
+            }
             dialog.resolve(returnValue);
             setTimeout(() => this._processDialogQueue(), 100);
         };
@@ -664,24 +676,39 @@ export class DialogManager {
                 }
             } else if (e.key === 'ArrowDown') {
                 e.preventDefault();
+                const oldIndex = selectedIndex;
                 for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
                     if (filteredItems[i]!.kind !== -1) {
                         selectedIndex = i;
                         break;
+                    }
+                }
+                if (options?.onDidSelectItem && oldIndex !== selectedIndex) {
+                    const selectedItem = filteredItems[selectedIndex];
+                    if (selectedItem && selectedItem.kind !== -1) {
+                        options.onDidSelectItem(selectedItem);
                     }
                 }
                 renderList();
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
+                const oldIndex = selectedIndex;
                 for (let i = selectedIndex - 1; i >= 0; i--) {
                     if (filteredItems[i]!.kind !== -1) {
                         selectedIndex = i;
                         break;
                     }
                 }
+                if (options?.onDidSelectItem && oldIndex !== selectedIndex) {
+                    const selectedItem = filteredItems[selectedIndex];
+                    if (selectedItem && selectedItem.kind !== -1) {
+                        options.onDidSelectItem(selectedItem);
+                    }
+                }
                 renderList();
             } else if (e.key === 'PageDown') {
                 e.preventDefault();
+                const oldIndex = selectedIndex;
                 let count = 0;
                 for (let i = selectedIndex + 1; i < filteredItems.length; i++) {
                     if (filteredItems[i]!.kind !== -1) {
@@ -690,9 +717,16 @@ export class DialogManager {
                         if (count >= 5) break;
                     }
                 }
+                if (options?.onDidSelectItem && oldIndex !== selectedIndex) {
+                    const selectedItem = filteredItems[selectedIndex];
+                    if (selectedItem && selectedItem.kind !== -1) {
+                        options.onDidSelectItem(selectedItem);
+                    }
+                }
                 renderList();
             } else if (e.key === 'PageUp') {
                 e.preventDefault();
+                const oldIndex = selectedIndex;
                 let count = 0;
                 for (let i = selectedIndex - 1; i >= 0; i--) {
                     if (filteredItems[i]!.kind !== -1) {
@@ -701,8 +735,47 @@ export class DialogManager {
                         if (count >= 5) break;
                     }
                 }
+                if (options?.onDidSelectItem && oldIndex !== selectedIndex) {
+                    const selectedItem = filteredItems[selectedIndex];
+                    if (selectedItem && selectedItem.kind !== -1) {
+                        options.onDidSelectItem(selectedItem);
+                    }
+                }
                 renderList();
-            } else if (e.key === 'Tab') {
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                const oldIndex = selectedIndex;
+                for (let i = 0; i < filteredItems.length; i++) {
+                    if (filteredItems[i]!.kind !== -1) {
+                        selectedIndex = i;
+                        break;
+                    }
+                }
+                if (options?.onDidSelectItem && oldIndex !== selectedIndex) {
+                    const selectedItem = filteredItems[selectedIndex];
+                    if (selectedItem && selectedItem.kind !== -1) {
+                        options.onDidSelectItem(selectedItem);
+                    }
+                }
+                renderList();
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                const oldIndex = selectedIndex;
+                for (let i = filteredItems.length - 1; i >= 0; i--) {
+                    if (filteredItems[i]!.kind !== -1) {
+                        selectedIndex = i;
+                        break;
+                    }
+                }
+                if (options?.onDidSelectItem && oldIndex !== selectedIndex) {
+                    const selectedItem = filteredItems[selectedIndex];
+                    if (selectedItem && selectedItem.kind !== -1) {
+                        options.onDidSelectItem(selectedItem);
+                    }
+                }
+                renderList();
+            }
+            else if (e.key === 'Tab') {
                 e.preventDefault();
             }
         };

@@ -2,7 +2,7 @@
 
 ## 1.0.10
 
-- ...
+- Fixed showQuickPick dialog.
 
 ## 1.0.9
 
