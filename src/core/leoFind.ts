@@ -2057,8 +2057,7 @@ export class LeoFind {
 
     @cmd(
         'find-all',
-        'Create a summary node containing descriptions of all matches of the' +
-        'search string.'
+        'Create a summary node containing descriptions of all matches of the search string.'
     )
     public interactive_find_all(): Thenable<unknown> {
 
