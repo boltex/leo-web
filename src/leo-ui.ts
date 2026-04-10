@@ -383,6 +383,19 @@ export class LeoUI extends NullGui {
         }
     }
     //@+node:felix.20260323002920.1: *3* Log Pane
+    //@+node:felix.20260409231833.1: *4* showLogPane
+    public showLogPane(p_focus?: boolean): void {
+        workspace.logPane.showTab('log');
+    }
+    //@+node:felix.20260409231826.1: *4* addLogPaneEntry
+    public override addLogPaneEntry(p_message: string): void {
+        if (this._leoLogPane) {
+            workspace.logPane.addToLogPane(p_message);
+        } else {
+            g.logBuffer.push(p_message);
+        }
+    }
+    //@+node:felix.20260409231812.1: *4* createLogPane
     /**
      * * Bind the log output to the log pane of the web UI
      */
@@ -399,18 +412,6 @@ export class LeoUI extends NullGui {
                 }
             }
         }
-    }
-
-    public override addLogPaneEntry(p_message: string): void {
-        if (this._leoLogPane) {
-            workspace.logPane.addToLogPane(p_message);
-        } else {
-            g.logBuffer.push(p_message);
-        }
-    }
-
-    public showLogPane(p_focus?: boolean): void {
-        workspace.logPane.showTab('log');
     }
     //@+node:felix.20260323002847.1: *3* Body States Change Handlers
     /**
@@ -1074,7 +1075,8 @@ export class LeoUI extends NullGui {
 
         return [w_language, w_wrap];
     }
-    //@+node:felix.20260323001345.1: *3* Trigger GetStates
+    //@+node:felix.20260409232446.1: *3* Document States
+    //@+node:felix.20260323001345.1: *4* _triggerGetStates
     /**
      * * 'getStates' action for use in debounced method call
      */
@@ -1162,7 +1164,7 @@ export class LeoUI extends NullGui {
             this.refreshButtonsPane();
         }
     }
-    //@+node:felix.20260323001309.1: *3* Setup open and no-open document
+    //@+node:felix.20260409232510.1: *4* _setupNoOpenedLeoDocument
     /**
      * * Setup UI for having no opened Leo documents
      */
@@ -1184,7 +1186,7 @@ export class LeoUI extends NullGui {
         workspace.body.setBodyEditable(false);
         workspace.logPane.showTab('log');
     }
-
+    //@+node:felix.20260409232515.1: *4* _setupOpenedLeoDocument
     /**
      * * A Leo file was opened: setup UI accordingly.
      */
@@ -1219,6 +1221,7 @@ export class LeoUI extends NullGui {
         this.loadSearchSettings();
 
     }
+    //@+node:felix.20260409232602.1: *3* Commands
     //@+node:felix.20260323001205.1: *3* Leo Command
     /**
      * Leo Command. This is used in "command bindings" from the UI to execute commands.
@@ -1580,78 +1583,6 @@ export class LeoUI extends NullGui {
         }
         // Add to top of minibuffer history
         c.commandHistory.unshift(p_command.label);
-    }
-    //@+node:felix.20260323001118.1: *3* saveLeoFile
-    /**
-     * * Invokes the commander.save() command
-     * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
-     * @returns Promise that resolves when the save command is done
-     */
-    public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
-
-        this.triggerBodySave();
-
-        const c = g.app.windowList[this.frameIndex].c;
-
-        await c.save();
-
-        setTimeout(() => {
-            this.setupRefresh(
-                p_fromOutline ? Focus.Outline : Focus.Body,
-                {
-                    tree: true,
-                    states: true,
-                    documents: true
-                }
-            );
-            void this.launchRefresh();
-        });
-
-        return Promise.resolve();
-    }
-    //@+node:felix.20260323001112.1: *3* selectOpenedLeoDocument
-    /**
-     * * Switches Leo document directly by index number.
-     */
-    public async selectOpenedLeoDocument(index: number): Promise<unknown> {
-
-        if (this.frameIndex === index) {
-            // already selected
-            return Promise.resolve();
-        }
-
-        let finalFocus = Focus.NoChange;
-        // Get the current focus (body outline, or other will be noChange)
-        if (workspace.layout.isOutlineFocused()) {
-            finalFocus = Focus.Outline;
-        } else if (workspace.layout.isBodyFocused()) {
-            finalFocus = Focus.Body;
-        }
-
-        this.triggerBodySave();
-        this.frameIndex = index;
-        // Like we just opened or made a new file
-        if (g.app.windowList.length) {
-            this.setupRefresh(
-                finalFocus,
-                {
-                    tree: true,
-                    body: true,
-                    documents: true,
-                    buttons: true,
-                    states: true,
-                    goto: true
-                }
-            );
-            const result = this.launchRefresh();
-            this.loadSearchSettings();
-            return result;
-        } else {
-            void this.launchRefresh(); // dont wait for it
-            console.error('Select Opened Leo File Error');
-            return Promise.reject('Select Opened Leo File Error');
-        }
-
     }
     //@+node:felix.20260406012500.1: *3* At Buttons
     //@+node:felix.20260406012500.2: *4* clickAtButton
@@ -2750,28 +2681,27 @@ export class LeoUI extends NullGui {
             }
         }
     }
-    //@+node:felix.20260322234219.1: *3* tabCycle
+    //@+node:felix.20260322233602.1: *3* show_find_success
     /**
-     * * Cycle opened documents
+     * Handle a successful find match.
      */
-    public async tabCycle(): Promise<unknown> {
-        this.triggerBodySave();
+    public show_find_success(c: Commands, in_headline: boolean, insert: number, p: Position): void {
+        if (in_headline) {
+            try {
+                g.app.gui.set_focus(c, c.frame.tree.edit_widget(p));
+            }
+            catch (e) {
+                console.log('oops!', e);
 
-        let w_chosenIndex;
-        const w_files = g.app.windowList;
-
-        if (w_files && w_files.length && w_files.length > 1) {
-            if (this.frameIndex === w_files.length - 1) {
-                w_chosenIndex = 0;
-            } else {
-                w_chosenIndex = this.frameIndex + 1;
             }
         } else {
-            // "Only one, or no opened documents"
-            return undefined;
+            try {
+                g.app.gui.set_focus(c, c.frame.body.widget);
+            }
+            catch (e) {
+                console.log('oops!', e);
+            }
         }
-
-        return this.selectOpenedLeoDocument(w_chosenIndex);
     }
     //@+node:felix.20260329222451.1: *3* revertToUndo
     /**
@@ -2812,7 +2742,29 @@ export class LeoUI extends NullGui {
     }
 
     //@+node:felix.20260322233732.1: *3* File Commands
-    //@+others
+    //@+node:felix.20260322234219.1: *4* tabCycle
+    /**
+     * * Cycle opened documents
+     */
+    public async tabCycle(): Promise<unknown> {
+        this.triggerBodySave();
+
+        let w_chosenIndex;
+        const w_files = g.app.windowList;
+
+        if (w_files && w_files.length && w_files.length > 1) {
+            if (this.frameIndex === w_files.length - 1) {
+                w_chosenIndex = 0;
+            } else {
+                w_chosenIndex = this.frameIndex + 1;
+            }
+        } else {
+            // "Only one, or no opened documents"
+            return undefined;
+        }
+
+        return this.selectOpenedLeoDocument(w_chosenIndex);
+    }
     //@+node:felix.20260322234040.1: *4* showRecentLeoFiles
     /**
      * * Shows the recent Leo files list, choosing one will open it
@@ -3117,8 +3069,35 @@ export class LeoUI extends NullGui {
         void this.launchRefresh();
         return;
     }
-    //@-others
-    //@+node:felix.20260322233644.1: *3* switchLeoFile
+    //@+node:felix.20260409233011.1: *4* saveLeoFile
+    /**
+     * * Invokes the commander.save() command
+     * @param p_fromOutline Signifies that the focus was, and should be brought back to, the outline
+     * @returns Promise that resolves when the save command is done
+     */
+    public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
+
+        this.triggerBodySave();
+
+        const c = g.app.windowList[this.frameIndex].c;
+
+        await c.save();
+
+        setTimeout(() => {
+            this.setupRefresh(
+                p_fromOutline ? Focus.Outline : Focus.Body,
+                {
+                    tree: true,
+                    states: true,
+                    documents: true
+                }
+            );
+            void this.launchRefresh();
+        });
+
+        return Promise.resolve();
+    }
+    //@+node:felix.20260322233644.1: *4* switchLeoFile
     /**
      * * Show switch document 'QuickPick' dialog and switch file if selection is made, or just return if no files are opened.
      * @returns A promise that resolves with a textEditor of the selected node's body from the newly selected document
@@ -3167,52 +3146,52 @@ export class LeoUI extends NullGui {
             return Promise.resolve(undefined);
         }
     }
-    //@+node:felix.20260322233602.1: *3* show_find_success
+    //@+node:felix.20260409233146.1: *4* selectOpenedLeoDocument
     /**
-     * Handle a successful find match.
+     * * Switches Leo document directly by index number.
      */
-    public show_find_success(c: Commands, in_headline: boolean, insert: number, p: Position): void {
-        // TODO : see focus_to_body !
-        // TODO : USE ONLY 'WRAPPER' OR 'WIDGET' like in show_find_success!
-        if (in_headline) {
-            // edit_widget(p)
-            // c.frame.edit_widget(p);
-            // console.log('try to set');
-            try {
-                g.app.gui.set_focus(c, c.frame.tree.edit_widget(p));
-            }
-            catch (e) {
-                console.log('oops!', e);
+    public async selectOpenedLeoDocument(index: number): Promise<unknown> {
 
-            }
-            // g.app.gui.set_focus(c, { _name: 'tree' });
-        } else {
-            try {
-                g.app.gui.set_focus(c, c.frame.body.widget);
-            }
-            catch (e) {
-                console.log('oops!', e);
-            }
+        if (this.frameIndex === index) {
+            // already selected
+            return Promise.resolve();
         }
 
-        // edit_widget
-        // ? needed ?
+        let finalFocus = Focus.NoChange;
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.layout.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.layout.isBodyFocused()) {
+            finalFocus = Focus.Body;
+        }
 
-        // trace = False and not g.unitTesting
-        // if in_headline:
-        //     if trace:
-        //         g.trace('HEADLINE', p.h)
-        //     c.frame.tree.widget.select_leo_node(p)
-        //     self.focus_to_head(c, p)  # Does not return.
-        // else:
-        //     w = c.frame.body.widget
-        //     row, col = g.convertPythonIndexToRowCol(p.b, insert)
-        //     if trace:
-        //         g.trace('BODY ROW', row, p.h)
-        //     w.cursor_line = row
-        //     self.focus_to_body(c)  # Does not return.
+        this.triggerBodySave();
+        this.frameIndex = index;
+        // Like we just opened or made a new file
+        if (g.app.windowList.length) {
+            this.setupRefresh(
+                finalFocus,
+                {
+                    tree: true,
+                    body: true,
+                    documents: true,
+                    buttons: true,
+                    states: true,
+                    goto: true
+                }
+            );
+            const result = this.launchRefresh();
+            this.loadSearchSettings();
+            return result;
+        } else {
+            void this.launchRefresh(); // dont wait for it
+            console.error('Select Opened Leo File Error');
+            return Promise.reject('Select Opened Leo File Error');
+        }
+
     }
-    //@+node:felix.20260322233307.1: *3* Leo ID
+    //@+node:felix.20260409232242.1: *3* GUI Wrappers & Helpers
+    //@+node:felix.20260322233307.1: *4* Leo ID
     /**
         * Show info window about requiring leoID to start
         * and a button to perform the 'set leoID' command.
@@ -3300,7 +3279,7 @@ export class LeoUI extends NullGui {
         }
         return Promise.resolve();
     }
-    //@+node:felix.20260322233253.1: *3* widget_name
+    //@+node:felix.20260322233253.1: *4* widget_name
     public widget_name(w: any): string {
         let name: string;
         if (!w) {
@@ -3318,7 +3297,7 @@ export class LeoUI extends NullGui {
         }
         return name;
     }
-    //@+node:felix.20260322233248.1: *3* Get & Set Focus
+    //@+node:felix.20260322233248.1: *4* Get & Set Focus
     public set_focus(commander: Commands, widget: any): void {
         this.focusWidget = widget;
         const w_widgetName = this.widget_name(widget);
@@ -3340,7 +3319,7 @@ export class LeoUI extends NullGui {
     public get_focus(c?: Commands): StringTextWrapper {
         return this.focusWidget!;
     }
-    //@+node:felix.20260322233148.1: *3* get1Arg
+    //@+node:felix.20260322233148.1: *4* get1Arg
     public get1Arg(
         options: {
             title: string;
@@ -3368,7 +3347,7 @@ export class LeoUI extends NullGui {
             return workspace.dialog.showInputDialog(options);
         }
     }
-    //@+node:felix.20260322233136.1: *3* get1Char
+    //@+node:felix.20260322233136.1: *4* get1Char
     /**
      * * Gets a single character input from the user, automatically accepting as soon as a character is entered
      * @param options Options for the input box
@@ -3390,7 +3369,7 @@ export class LeoUI extends NullGui {
         }
         return workspace.dialog.showSingleCharInputDialog(options);
     }
-    //@+node:felix.20260322233127.1: *3* About Leo Dialog
+    //@+node:felix.20260322233127.1: *4* About Leo Dialog
     public runAboutLeoDialog(
         c: Commands | undefined,
         version: string,
@@ -3405,7 +3384,7 @@ export class LeoUI extends NullGui {
                 detail: theCopyright
             });
     }
-    //@+node:felix.20260322232941.1: *3* Ask Dialogs
+    //@+node:felix.20260322232941.1: *4* Ask Dialogs
     public runAskOkDialog(
         c: Commands | undefined,
         title: string,
@@ -3507,7 +3486,7 @@ export class LeoUI extends NullGui {
                 }
             });
     }
-    //@+node:felix.20260322232836.1: *3* File Dialogs
+    //@+node:felix.20260322232836.1: *4* File Dialogs
     public runOpenFileDialog(
         c: Commands | undefined,
         title: string,
