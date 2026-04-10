@@ -312,6 +312,8 @@ export class LogPaneManager {
         });
     }
 
+    //@+others
+    //@+node:felix.20260410003436.1: *3* navEnter
     private navEnter() {
         if (this.searchSettings.navText.length === 0 && this.searchSettings.isTag) {
             this.setFrozen(false);
@@ -337,8 +339,6 @@ export class LogPaneManager {
             }
         }
     }
-
-    //@+others
     //@+node:felix.20260323005956.1: *3* processChange
     private processChange() {
         clearTimeout(this.timer);
