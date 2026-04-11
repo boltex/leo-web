@@ -928,7 +928,9 @@ export class NullTree {
      */
     public endEditLabel(): void {
         // Important: this will redraw if necessary.
-        g.app.gui.endEditHeadline();
+        if (g.app.gui) {
+            g.app.gui.endEditHeadline(); // MAY BE CALLED FROM OUTSIDE THE GUI AT STARTUP, so check for existence.
+        }
         this.onHeadChanged(this.c.p);
         // ! LEO-WEB: Mimic qt_tree
         const d = this.editWidgetsDict;
