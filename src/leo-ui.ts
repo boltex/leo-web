@@ -3191,9 +3191,9 @@ export class LeoUI extends NullGui {
     //@+node:felix.20260409232242.1: *3* GUI Wrappers & Helpers
     //@+node:felix.20260322233307.1: *4* Leo ID
     /**
-        * Show info window about requiring leoID to start
-        * and a button to perform the 'set leoID' command.
-        */
+     * Show info window about requiring leoID to start
+     * and a button to perform the 'set leoID' command.
+     */
     public showLeoIDMessage(): void {
         void workspace.dialog.showInformationMessage(
             Constants.USER_MESSAGES.SET_LEO_ID_MESSAGE,
@@ -3207,11 +3207,16 @@ export class LeoUI extends NullGui {
     }
 
     /**
-        * * Command to get the LeoID from dialog, save it to user settings.
-        * Start Leo-Web if the ID is valid, and not already started.
-        */
+     * * Command to get the LeoID from dialog, save it to user settings.
+     * Start Leo-Web if the ID is valid, and not already started.
+     */
     public setLeoIDCommand(): Thenable<unknown> {
         return g.IDDialog().then((p_id) => {
+            if (!p_id && g.app.leoID) {
+                // Already one so just cancel without warning
+                workspace.dialog.showToast('Canceled');
+                return Promise.resolve();
+            }
             p_id = p_id.trim();
             p_id = g.app.cleanLeoID(p_id, '');
             if (p_id && p_id.length >= 3 && utils.isAlphaNumeric(p_id)) {
@@ -3226,8 +3231,8 @@ export class LeoUI extends NullGui {
 
 
     /**
-        * * Returns the leoID from the Leo-Web settings
-        */
+     * * Returns the leoID from the Leo-Web settings
+     */
     public getIdFromSetting(): string {
         return this.config.leoID;
     }
