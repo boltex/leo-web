@@ -6,7 +6,7 @@
 
 ## 1.0.12
 
-- Fixed bug that occured whtn reading \@buttons from config at startup (submitted by lewis https://groups.google.com/g/leo-editor/c/ykQY2nw1L8k/m/FrGyCpj4AAAJ)
+- Fixed bug that occured when reading \@buttons from config at startup (submitted by lewis https://groups.google.com/g/leo-editor/c/ykQY2nw1L8k/m/FrGyCpj4AAAJ)
 
 ## 1.0.11
 
