@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.13
+
+- ...
+
 ## 1.0.12
 
 - Fixed bug that occured whtn reading \@buttons from config at startup (submitted by lewis https://groups.google.com/g/leo-editor/c/ykQY2nw1L8k/m/FrGyCpj4AAAJ)
