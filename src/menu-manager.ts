@@ -273,7 +273,7 @@ export class MenuManager {
                 }
 
                 if (level === 0) {
-                    item.addEventListener("click", (e) => {
+                    item.addEventListener("pointerdown", (e) => {
                         e.stopPropagation();
                         if (this.activeTopMenu === item) {
                             this.closeAllSubmenus();
@@ -324,7 +324,7 @@ export class MenuManager {
                     item.classList.add("disabled");
                 }
 
-                item.addEventListener("click", () => {
+                item.addEventListener("pointerup", () => {
                     this.closeAllSubmenus();
                     workspace.layout.restoreLastFocusedElement();
                     this.activeTopMenu = null;

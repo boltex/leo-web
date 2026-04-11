@@ -2,7 +2,7 @@
 
 ## 1.0.11
 
-- ...
+- Fixed behavior of top menu by having the mouse suport "press-drag-release" to navigate (insted of only clicking).
 
 ## 1.0.10
 
