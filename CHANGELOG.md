@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.12
+
+- ...
+
 ## 1.0.11
 
 - Fixed behavior of top menu and tab switching by having the mouse pointer-down/up events to navigate.
