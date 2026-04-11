@@ -253,11 +253,11 @@ export class Controller {
         menu.LAYOUT_TOGGLE.addEventListener('click', this.handleLayoutToggleClick);
         menu.MENU_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
         menu.TOP_BAR_TOGGLE.addEventListener('click', this.handleMenuToggleClick);
-        logPane.LOG_TAB.addEventListener('click', () => { logPane.showTab('log') });
-        logPane.FIND_TAB.addEventListener('click', () => { logPane.showTab('find', true) });
-        logPane.NAV_TAB.addEventListener('click', () => { logPane.showTab('nav', true) });
-        logPane.UNDO_TAB.addEventListener('click', () => { logPane.showTab('undo') });
-        logPane.SETTINGS_TAB.addEventListener('click', () => { logPane.showTab('settings') });
+        logPane.LOG_TAB.addEventListener('pointerdown', () => { logPane.showTab('log') });
+        logPane.FIND_TAB.addEventListener('pointerdown', () => { logPane.showTab('find', true) });
+        logPane.NAV_TAB.addEventListener('pointerdown', () => { logPane.showTab('nav', true) });
+        logPane.UNDO_TAB.addEventListener('pointerdown', () => { logPane.showTab('undo') });
+        logPane.SETTINGS_TAB.addEventListener('pointerdown', () => { logPane.showTab('settings') });
     }
     //@+node:felix.20260322221915.1: *4* setupButtonFocusPrevention
     private setupButtonFocusPrevention() {

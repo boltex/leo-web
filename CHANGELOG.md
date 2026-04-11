@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.11
+
+- Fixed behavior of top menu and tab switching by having the mouse pointer-down/up events to navigate.
+
 ## 1.0.10
 
 - Fixed showQuickPick dialog and added escape keypress detection to all modal dialogs.

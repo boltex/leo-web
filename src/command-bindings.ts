@@ -60,8 +60,8 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.HELP_FOR_FIND_COMMANDS, () => leoUI.command(LEOCMD.HELP_FOR_FIND_COMMANDS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.HELP_FOR_MINIBUFFER, () => leoUI.command(LEOCMD.HELP_FOR_MINIBUFFER, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
 
-        [CMD.LIGHT_THEME, () => leoUI.lightTheme()],
-        [CMD.DARK_THEME, () => leoUI.darkTheme()],
+        [CMD.LIGHT_THEME, () => leoUI.setTheme('light')],
+        [CMD.DARK_THEME, () => leoUI.setTheme('dark')],
         [CMD.HORIZONTAL_LAYOUT, () => leoUI.applyLayout('horizontal')],
         [CMD.VERTICAL_LAYOUT, () => leoUI.applyLayout('vertical')],
         [CMD.EQUAL_SIZED_PANES, () => leoUI.equalSizedPanes()],

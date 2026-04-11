@@ -261,19 +261,77 @@ export class LeoUI extends NullGui {
     public makeAllBindings(): void {
         makeAllBindings(this, workspace.controller);
     }
+    //@+node:felix.20260323003057.1: *3* handleUnl
+    /**
+     * Handles the calls from the DocumentLinkProvider for clicks on UNLs.
+     */
+    public async handleUnl(p_arg: { unl: string }): Promise<void> {
+        if (!g.app.windowList.length) {
+            // No file opened: exit
+            g.es('Handle Unl: No Commanders opened');
+            return;
+        }
+        const c = g.app.windowList[this.frameIndex].c;
+        this.triggerBodySave();
+        try {
+
+            this.setupRefresh(
+                Focus.Body, // Finish in body pane given explicitly because last focus was in input box.
+                {
+                    tree: true,
+                    body: true,
+                    goto: true,
+                    states: true,
+                    documents: true,
+                    buttons: true
+                }
+            );
+            await g.openUrlOnClick(c, p_arg.unl);
+            void this.launchRefresh();
+            this.loadSearchSettings();
+
+        }
+        catch (e) {
+            console.log('FAILED HANDLE URL! ', p_arg);
+        }
+    }
+    //@+node:felix.20260323002027.1: *3* Row Col Convertion Utilities
+    /**
+     * Utility to convert a string index into a line, col dict
+     */
+    private _row_col_pv_dict(i: number, s: string): { line: number, col: number, index: number } {
+        if (!i) {
+            i = 0; // prevent none type
+        }
+        // BUG: this uses current selection wrapper only, use
+        // g.convertPythonIndexToRowCol instead !
+        let line: number;
+        let col: number;
+        [line, col] = g.convertPythonIndexToRowCol(s, i);
+        return { "line": line, "col": col, "index": i };
+    };
+
+    /**
+     * Converts from wrapper text index to line /col
+     */
+    private _row_col_wrapper_dict(i: number, wrapper: StringTextWrapper): { "line": number, "col": number, "index": number } {
+        if (!i) {
+            i = 0; // prevent none type
+        }
+        let line, col;
+        [line, col] = wrapper.toPythonIndexRowCol(i);
+        return { "line": line, "col": col, "index": i };
+    }
     //@+node:felix.20260323004032.1: *3* GUI Commands
-    //@+others
-    //@+node:felix.20260323003609.1: *4* Themes
-    public lightTheme(): void {
-        workspace.layout.applyTheme('light');
+    //@+node:felix.20260323003609.1: *4* setTheme
+    public setTheme(theme: string): void {
+        workspace.layout.applyTheme(theme);
     }
-    public darkTheme(): void {
-        workspace.layout.applyTheme('dark');
-    }
-    //@+node:felix.20260323003605.1: *4* Layout
+    //@+node:felix.20260410232626.1: *4* applyLayout
     public applyLayout(orientation: string): void {
         workspace.layout.applyLayout(orientation);
     }
+    //@+node:felix.20260410232622.1: *4* equalSizedPanes
     public equalSizedPanes(): void {
         workspace.layout.equalSizedPanes();
     }
@@ -313,7 +371,6 @@ export class LeoUI extends NullGui {
         // Then clear the workspace from db and force-refresh the page to restart leoWeb
         // This will have the effect of closing all opened documents and then asking for a new workspace
         for (const c of g.app.commanders()) {
-            console.log('closing commander: ', c.fileName());
             const closed = await g.app.closeLeoWindow(c.frame)
             const allow = !c.exists && closed; // was successfully closed and the exist flag is now false, meaning the commander is really closed.
             if (!allow) {
@@ -347,42 +404,20 @@ export class LeoUI extends NullGui {
         s = workspace.showdownConverter.makeHtml(s);
         utils.showHtmlInNewTab(s, short_title);
     }
-    //@-others
-    //@+node:felix.20260323003057.1: *3* handleUnl
-    /**
-     * Handles the calls from the DocumentLinkProvider for clicks on UNLs.
-     */
-    public async handleUnl(p_arg: { unl: string }): Promise<void> {
-        if (!g.app.windowList.length) {
-            // No file opened: exit
-            g.es('Handle Unl: No Commanders opened');
-            return;
-        }
-        const c = g.app.windowList[this.frameIndex].c;
-        this.triggerBodySave();
-        try {
-
-            this.setupRefresh(
-                Focus.Body, // Finish in body pane given explicitly because last focus was in input box.
-                {
-                    tree: true,
-                    body: true,
-                    goto: true,
-                    states: true,
-                    documents: true,
-                    buttons: true
-                }
-            );
-            await g.openUrlOnClick(c, p_arg.unl);
-            void this.launchRefresh();
-            this.loadSearchSettings();
-
-        }
-        catch (e) {
-            console.log('FAILED HANDLE URL! ', p_arg);
+    //@+node:felix.20260323002920.1: *3* Log Pane
+    //@+node:felix.20260409231833.1: *4* showLogPane
+    public showLogPane(p_focus?: boolean): void {
+        workspace.logPane.showTab('log');
+    }
+    //@+node:felix.20260409231826.1: *4* addLogPaneEntry
+    public override addLogPaneEntry(p_message: string): void {
+        if (this._leoLogPane) {
+            workspace.logPane.addToLogPane(p_message);
+        } else {
+            g.logBuffer.push(p_message);
         }
     }
-    //@+node:felix.20260323002920.1: *3* Log Pane
+    //@+node:felix.20260409231812.1: *4* createLogPane
     /**
      * * Bind the log output to the log pane of the web UI
      */
@@ -400,19 +435,154 @@ export class LeoUI extends NullGui {
             }
         }
     }
+    //@+node:felix.20260410224126.1: *3* Document States
+    //@+node:felix.20260410224126.2: *4* _triggerGetStates
+    /**
+     * * 'getStates' action for use in debounced method call
+     */
+    private _triggerGetStates(): void {
 
-    public override addLogPaneEntry(p_message: string): void {
-        if (this._leoLogPane) {
-            workspace.logPane.addToLogPane(p_message);
-        } else {
-            g.logBuffer.push(p_message);
+        const frame = g.app.windowList[this.frameIndex];
+        const c = frame.c;
+        const states = this.leoStates;
+        const menu = workspace.menu;
+
+        if (this._refreshType.states) {
+            this._refreshType.states = false;
+            const p = c.p;
+            // TODO : set status bar info? (If any, and if implemented in the web UI)
+            // if (this._leoStatusBar && p && p.v) {
+            //     const unl = c.frame.computeStatusUnl(p);
+            //     this._leoStatusBar.setString(unl);
+            //     this._leoStatusBar.setTooltip(p.h);
+            // }
+            let w_canHoist = true;
+            let w_topIsChapter = false;
+            let w_hasMarked = false;
+            for (const v of c.all_unique_nodes()) {
+                if (v.isMarked()) {
+                    w_hasMarked = true;
+                    break;
+                }
+            }
+            if (c.hoistStack.length) {
+                const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
+                w_topIsChapter = w_ph.h.startsWith('@chapter ');
+                if (p.__eq__(w_ph)) {
+                    // p is already the hoisted node
+                    w_canHoist = false;
+                }
+            } else {
+                // not hoisted, was it the single top child of the real root?
+                if (c.rootPosition()!.__eq__(p) && c.hiddenRootNode.children.length === 1) {
+                    w_canHoist = false;
+                }
+            }
+            const w_states: LeoPackageStates = {
+                changed: c.changed, // Document has changed (is dirty)
+                canUndo: c.canUndo(), // Document can undo the last operation done
+                canRedo: c.canRedo(), // Document can redo the last operation 'undone'
+                canGoBack: c.nodeHistory.beadPointer > 0,
+                canGoNext: c.nodeHistory.beadPointer + 1 < c.nodeHistory.beadList.length,
+                canDemote: c.canDemote(), // Selected node can have its siblings demoted
+                canPromote: c.canPromote(), // Selected node can have its children promoted
+                canDehoist: c.canDehoist(), // Document is currently hoisted and can be de-hoisted
+                canHoist: w_canHoist,
+                topIsChapter: w_topIsChapter,
+                hasMarked: w_hasMarked,
+                // 
+            };
+            states.setLeoStateFlags(w_states);
+            this.refreshUndoPane();
+        }
+        // Set leoChanged and leoOpenedFilename
+        states.leoChanged = c.changed;
+        states.leoOpenedFileName = frame.getTitle();
+
+        this.refreshBodyStates(); // Set language and wrap states, if different.
+
+        menu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
+        menu.updateMarkedButtonStates(states.leoHasMarked);
+        menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
+        menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
+        menu.refreshMenu(menuData);
+        menu.refreshIconButtons(toolbarButtons);
+        menu.refreshBodyContextMenu(bodyPaneContextMenuData);
+        menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
+
+        // Refresh other panes if needed
+        if (this._refreshType.documents) {
+            this._refreshType.documents = false;
+            this.refreshDocumentsPane();
+        }
+        if (this._refreshType.goto) {
+            this._refreshType.goto = false;
+            this.refreshGotoPane();
+        }
+        if (this._refreshType.buttons) {
+            this._refreshType.buttons = false;
+            this.refreshButtonsPane();
         }
     }
-
-    public showLogPane(p_focus?: boolean): void {
+    //@+node:felix.20260410224126.3: *4* _setupNoOpenedLeoDocument
+    /**
+     * * Setup UI for having no opened Leo documents
+     */
+    private _setupNoOpenedLeoDocument(): void {
+        this.leoStates.fileOpenedReady = false;
+        this._refreshOutline(RevealType.NoReveal);
+        const menu = workspace.menu;
+        menu.updateButtonVisibility(false, false, true);
+        menu.refreshMenu(menuData);
+        menu.refreshIconButtons(toolbarButtons);
+        menu.refreshBodyContextMenu(bodyPaneContextMenuData);
+        menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
+        this.refreshDocumentsPane();
+        this.refreshButtonsPane();
+        this.refreshUndoPane();
+        // Empty body pane
+        workspace.body.setBody('', false);
+        // Make body pane not editable.
+        workspace.body.setBodyEditable(false);
         workspace.logPane.showTab('log');
     }
-    //@+node:felix.20260323002847.1: *3* Body States Change Handlers
+    //@+node:felix.20260410224126.4: *4* _setupOpenedLeoDocument
+    /**
+     * * A Leo file was opened: setup UI accordingly.
+     */
+    private _setupOpenedLeoDocument(): void {
+        const frame = g.app.windowList[this.frameIndex];
+        const c = frame.c;
+        this.leoStates.leoOpenedFileName = frame.getTitle();
+        this.leoStates.leoChanged = c.changed;
+
+        // * Startup flag
+        if (!this.leoStates.leoIdUnset && g.app.leoID !== 'None') {
+            this.leoStates.fileOpenedReady = true;
+        }
+
+        // In case it's the first file openind, make body pane editable again.
+        workspace.body.setBodyEditable(true);
+
+        this._revealType = RevealType.RevealSelect; // For initial outline 'visible' event
+
+        this.setupRefresh(
+            Focus.Body, // Original Leo seems to open itself with focus in body.
+            {
+                tree: true,
+                body: true,
+                states: true,
+                buttons: true,
+                documents: true,
+                goto: true
+            },
+        );
+
+        this.loadSearchSettings();
+
+    }
+    //@+node:felix.20260323002847.1: *3* UI Change Events
+    //@+node:felix.20260410223103.1: *4* _onChangeEditorSelection
     /**
      * * Handles detection of the active editor's selection change or cursor position
      * @param p_event a change event containing the active editor's selection, if any.
@@ -428,7 +598,7 @@ export class LeoUI extends NullGui {
             this._selectionGnx = c.p.gnx;
         }
     }
-
+    //@+node:felix.20260410223058.1: *4* _onChangeEditorScroll
     /**
      * * Handles detection of the active editor's scroll position changes
      * @param p_event a change event containing the active editor's visible range, if any.
@@ -441,7 +611,7 @@ export class LeoUI extends NullGui {
             this._scrollGnx = c.p.gnx;
         }
     }
-
+    //@+node:felix.20260410223043.1: *4* _onDocumentChanged
     private _onDocumentChanged(): void {
 
         const c = g.app.windowList[this.frameIndex].c;
@@ -473,34 +643,8 @@ export class LeoUI extends NullGui {
         this.debouncedRefreshBodyStates(750);
 
     }
-
-    /**
-     * * Refresh body states after a small debounced delay.
-     */
-    private debouncedRefreshBodyStates(p_delay?: number) {
-
-        if (!p_delay) {
-            p_delay = 0;
-        }
-
-        if (this._bodyStatesTimer) {
-            clearTimeout(this._bodyStatesTimer);
-        }
-        if (p_delay === 0) {
-            if (this.leoStates.fileOpenedReady) {
-                void this._bodySaveDocument();
-            }
-            this.refreshBodyStates();
-        } else {
-            this._bodyStatesTimer = setTimeout(() => {
-                if (this.leoStates.fileOpenedReady) {
-                    void this._bodySaveDocument();
-                }
-                this.refreshBodyStates();
-            }, p_delay);
-        }
-    }
-    //@+node:felix.20260323002618.1: *3* Save Body states to Leo
+    //@+node:felix.20260323002618.1: *3* Body Editing
+    //@+node:felix.20260410223151.1: *4* triggerBodySave
     /**
      * * Validate headline edit input box if active, or, Save body to the Leo app if its dirty.
      *   That is, only if a change has been made to the body 'document' so far
@@ -522,7 +666,7 @@ export class LeoUI extends NullGui {
         this._bodySaveSelection();
         return hadEditHeadline;
     }
-
+    //@+node:felix.20260410223145.1: *4* _bodySaveSelection
     /**
      * Saves the cursor position along with the text selection range and scroll position
      * of the last body, or detached body pane, that had its cursor info set in this._selection, etc.
@@ -603,7 +747,7 @@ export class LeoUI extends NullGui {
         this._scrollDirty = false;
         this._selectionDirty = false;
     }
-
+    //@+node:felix.20260410223139.1: *4* _bodySaveDocument
     /**
      * * Sets new body text on leo's side.
      * @returns a promise that resolves when the complete saving process is finished
@@ -640,11 +784,212 @@ export class LeoUI extends NullGui {
         this.getStates();
 
     }
-    //@+node:felix.20260323002420.1: *3* showOutline
+    //@+node:felix.20260323002150.1: *3* Refresh UI
+    //@+node:felix.20260323002420.1: *4* showOutline
     public showOutline(): void {
         workspace.layout.OUTLINE_PANE.focus();
     }
-    //@+node:felix.20260323002416.1: *3* showBody
+    //@+node:felix.20260410223330.1: *4* setupRefresh
+    /**
+     * * Setup global refresh options
+     * @param p_finalFocus kind of pane for focus to be placed after refresh, if any. If not specified, focus will be preserved.
+     * @param p_refreshType Refresh flags for each UI part
+    */
+    public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh, p_preserveRange?: boolean): void {
+        if (p_preserveRange) {
+            this.refreshPreserveRange = true; // Will be cleared after a refresh cycle.
+        }
+        // Set final "focus-placement"
+        this.finalFocus = p_finalFocus;
+
+        if (p_refreshType) {
+            // Set all properties WITHOUT clearing others.
+            Object.assign(this._refreshType, p_refreshType);
+        }
+    }
+    //@+node:felix.20260410223325.1: *4* _launchRefresh
+    /**
+     * * Launches refresh for UI components and context states (Debounced)
+     */
+    public async _launchRefresh(): Promise<unknown> {
+        if (this.inEditHeadline) {
+            return; // editHeadline will end with a refresh!
+        }
+
+        // Check states for having at least a document opened
+        if (this.leoStates.leoReady && this.leoStates.fileOpenedReady) {
+            // Had some opened...
+            if (!g.app.windowList.length) {
+                return this._setupNoOpenedLeoDocument(); // ...But all closed now!
+            }
+        }
+
+        // Maybe this is the first refresh after opening?
+        if (this.leoStates.leoReady && !this.leoStates.fileOpenedReady) {
+            // Was all closed
+            if (g.app.windowList.length) {
+                this._setupOpenedLeoDocument();
+            } else {
+                // First time starting: not even an untitled nor workbook.leo
+                return;
+            }
+        }
+
+        // Consider last command finished since the refresh cycle is starting
+        if (this.trace && this.commandTimer !== undefined) {
+            console.log('commandTimer: ' + utils.getDurationMs(this.commandTimer));
+        }
+        this.commandTimer = undefined;
+
+        // Start reset-timer capture, if has been reset.
+        this.lastRefreshTimer = process.hrtime();
+        if (this.refreshTimer === undefined) {
+            this.refreshTimer = this.lastRefreshTimer;
+        }
+
+        let w_revealType: RevealType;
+        if (this.finalFocus.valueOf() === Focus.Outline) {
+            w_revealType = RevealType.RevealSelectFocus;
+        } else {
+            w_revealType = RevealType.RevealSelect;
+        }
+
+        const c = g.app.windowList[this.frameIndex].c;
+        this._refreshNode = c.p;
+
+        if (this._refreshType.tree) {
+            this._refreshType.tree = false;
+            this._refreshOutline(w_revealType);
+        }
+
+        if (this._refreshNode) {
+            this.leoStates.setSelectedNodeFlags(this._refreshNode);
+        }
+
+        if (this._refreshType.body) {
+            this._refreshType.body = false;
+            let w_showBodyNoFocus: boolean = this.finalFocus.valueOf() !== Focus.Body; // Will preserve focus where it is without forcing into the body pane if true
+            this._tryApplyNodeToBody(this._refreshNode, w_showBodyNoFocus);
+        }
+
+        // getStates will check if documents, buttons and states flags are set and refresh accordingly
+        return this.getStates();
+    }
+    //@+node:felix.20260410223317.1: *4* fullRefresh
+    /**
+     * * Refreshes all parts.
+     */
+    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void {
+        this.setupRefresh(
+            p_keepFocus ? Focus.NoChange : this.finalFocus,
+            {
+                tree: true,
+                body: true,
+                states: true,
+                buttons: true,
+                documents: true,
+                goto: true,
+            }
+        );
+        if (instantRefresh) {
+            // Launch the tree and body refresh immediately!
+            workspace.controller.buildRowsRenderTreeLeo();
+            if (g.app.windowList[this.frameIndex]) {
+                const c = g.app.windowList[this.frameIndex].c;
+                this._tryApplyNodeToBody(c.p, true);
+            }
+        } else {
+            void this.launchRefresh(); // Debounced, for better performance when multiple things need refreshing at once (ex: after a command execution)
+        }
+    }
+    //@+node:felix.20260410223311.1: *4* _refreshOutline
+    /**
+     * * Refreshes the outline. A reveal type can be passed along to specify the reveal type for the selected node
+     * @param p_revealType Facultative reveal type to specify type of reveal when the 'selected node' is encountered
+     */
+    private _refreshOutline(p_revealType?: RevealType): void {
+
+        if (p_revealType !== undefined && p_revealType.valueOf() >= this._revealType.valueOf()) { // To check if selected node should self-select while redrawing whole tree
+            this._revealType = p_revealType; // To be read/cleared (in arrayToLeoNodesArray instead of directly by nodes)
+        }
+        workspace.controller.buildRowsRenderTreeLeo();
+        if (this._revealType !== undefined) {
+            const focusTree = (this._revealType.valueOf() >= RevealType.RevealSelectFocus.valueOf());
+            if (focusTree) {
+                // set focus to outline pane
+                this.showOutline();
+            }
+            if (this._revealType.valueOf() >= RevealType.Reveal.valueOf()) {
+                // should reveal selected node in the tree, so scroll to it if needed
+                if (g.app.windowList.length) {
+                    const c = g.app.windowList[this.frameIndex].c;
+                    workspace.outline.scrollNodeIntoView(c.p);
+                }
+            }
+            this._revealType = RevealType.NoReveal; // Clear after use
+        }
+    }
+    //@+node:felix.20260410223303.1: *4* refreshDocumentsPane
+    public refreshDocumentsPane(): void {
+        workspace.controller.setupDocumentTabsAndHandlers();
+        // In case the new document has a scrollbar or not,
+        // which changes the available width for the collapse all button.
+        workspace.layout.updateCollapseAllPosition();
+    }
+    //@+node:felix.20260410223259.1: *4* refreshUndoPane
+    public refreshUndoPane(): void {
+        workspace.controller.buildUndoElements();
+    }
+    //@+node:felix.20260410223253.1: *4* refreshBodyStates
+    public refreshBodyStates(): void {
+        const c = g.app.windowList[this.frameIndex].c;
+        const [w_language, w_wrap] = this._getBodyLanguage(c.p);
+        workspace.body.setBodyLanguage(w_language);
+        workspace.body.setBodyWrap(w_wrap);
+    }
+    //@+node:felix.20260410223248.1: *4* refreshGotoPane
+    public refreshGotoPane(): void {
+        workspace.logPane.refreshGotoPane();
+    }
+    //@+node:felix.20260410223244.1: *4* refreshButtonsPane
+    public refreshButtonsPane(): void {
+        workspace.controller.refreshAtButtons();
+    }
+    //@+node:felix.20260410225744.1: *3* Body Pane Management
+    //@+node:felix.20260323002042.1: *4* _tryApplyNodeToBody
+    private _tryApplyNodeToBody(node: Position, showBodyNoFocus: boolean): void {
+        // In LeoJS, this required a bunch of helper methods because the body pane itself was not readily available and the body text was not directly settable,
+        // so it required to find the right "editor" object in the DOM, then set its value, then restore scroll and selection, etc.   
+        // Here in Leo-Web, the body pane is always readily available and we can directly set its content and send it the scroll and selection info,
+        // so this should be more straightforward.
+
+        const c = g.app.windowList[this.frameIndex].c;
+        const p = c.p;
+
+        if (!node.__eq__(c.p)) {
+            // Oh, should never happen
+            console.error('Trying to apply a node to body that is different from the selected one! This should not happen. Node:', node, ' Selected:', c.p);
+        }
+
+        const [w_language, w_wrap] = this._getBodyLanguage(node);
+
+        workspace.body.setBody(p.b, w_wrap, w_language);
+        // this._setBodyLanguage(w_language); // Unused?
+
+        const scroll = p.v.scrollBarSpot;
+        workspace.body.setBodyScroll(scroll);
+
+        // If the desired final focus is the goto-items of the nav pane, then we call showBody (which sets selection and optional focus)
+        // but with showBodyNoFocus true to preserve focus in the nav pane.
+
+        // * note that other 'finalFocus', e.g. on Outline, will not have the selection range set *
+        const isGotoFocus = this.finalFocus === Focus.Goto;
+        if (!showBodyNoFocus || isGotoFocus) {
+            this.showBody(isGotoFocus);
+        }
+
+    }
+    //@+node:felix.20260323002416.1: *4* showBody
     public showBody(preventFocus?: boolean): void {
 
         // If preventFocus is true, make sure to save focused element and restore it after setting selection.
@@ -716,173 +1061,61 @@ export class LeoUI extends NullGui {
         }
 
     }
-    //@+node:felix.20260323002150.1: *3* Refresh & helpers
+    //@+node:felix.20260410223029.1: *4* debouncedRefreshBodyStates
     /**
-     * * Setup global refresh options
-     * @param p_finalFocus kind of pane for focus to be placed after refresh, if any. If not specified, focus will be preserved.
-     * @param p_refreshType Refresh flags for each UI part
-    */
-    public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh, p_preserveRange?: boolean): void {
-        if (p_preserveRange) {
-            this.refreshPreserveRange = true; // Will be cleared after a refresh cycle.
-        }
-        // Set final "focus-placement"
-        this.finalFocus = p_finalFocus;
-
-        if (p_refreshType) {
-            // Set all properties WITHOUT clearing others.
-            Object.assign(this._refreshType, p_refreshType);
-        }
-    }
-
-    /**
-     * * Launches refresh for UI components and context states (Debounced)
+     * * Refresh body states after a small debounced delay.
      */
-    public async _launchRefresh(): Promise<unknown> {
-        if (this.inEditHeadline) {
-            return; // editHeadline will end with a refresh!
+    private debouncedRefreshBodyStates(p_delay?: number) {
+
+        if (!p_delay) {
+            p_delay = 0;
         }
 
-        // Check states for having at least a document opened
-        if (this.leoStates.leoReady && this.leoStates.fileOpenedReady) {
-            // Had some opened...
-            if (!g.app.windowList.length) {
-                return this._setupNoOpenedLeoDocument(); // ...But all closed now!
+        if (this._bodyStatesTimer) {
+            clearTimeout(this._bodyStatesTimer);
+        }
+        if (p_delay === 0) {
+            if (this.leoStates.fileOpenedReady) {
+                void this._bodySaveDocument();
             }
-        }
-
-        // Maybe this is the first refresh after opening?
-        if (this.leoStates.leoReady && !this.leoStates.fileOpenedReady) {
-            // Was all closed
-            if (g.app.windowList.length) {
-                this._setupOpenedLeoDocument();
-            } else {
-                // First time starting: not even an untitled nor workbook.leo
-                return;
-            }
-        }
-
-        // Consider last command finished since the refresh cycle is starting
-        if (this.trace && this.commandTimer !== undefined) {
-            console.log('commandTimer: ' + utils.getDurationMs(this.commandTimer));
-        }
-        this.commandTimer = undefined;
-
-        // Start reset-timer capture, if has been reset.
-        this.lastRefreshTimer = process.hrtime();
-        if (this.refreshTimer === undefined) {
-            this.refreshTimer = this.lastRefreshTimer;
-        }
-
-        let w_revealType: RevealType;
-        if (this.finalFocus.valueOf() === Focus.Outline) {
-            w_revealType = RevealType.RevealSelectFocus;
+            this.refreshBodyStates();
         } else {
-            w_revealType = RevealType.RevealSelect;
-        }
-
-        const c = g.app.windowList[this.frameIndex].c;
-        this._refreshNode = c.p;
-
-        if (this._refreshType.tree) {
-            this._refreshType.tree = false;
-            this._refreshOutline(w_revealType);
-        }
-
-        if (this._refreshNode) {
-            this.leoStates.setSelectedNodeFlags(this._refreshNode);
-        }
-
-        if (this._refreshType.body) {
-            this._refreshType.body = false;
-            let w_showBodyNoFocus: boolean = this.finalFocus.valueOf() !== Focus.Body; // Will preserve focus where it is without forcing into the body pane if true
-            this._tryApplyNodeToBody(this._refreshNode, w_showBodyNoFocus);
-        }
-
-        // getStates will check if documents, buttons and states flags are set and refresh accordingly
-        return this.getStates();
-    }
-
-    /**
-     * * Refreshes all parts.
-     */
-    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void {
-        this.setupRefresh(
-            p_keepFocus ? Focus.NoChange : this.finalFocus,
-            {
-                tree: true,
-                body: true,
-                states: true,
-                buttons: true,
-                documents: true,
-                goto: true,
-            }
-        );
-        if (instantRefresh) {
-            // Launch the tree and body refresh immediately!
-            workspace.controller.buildRowsRenderTreeLeo();
-            if (g.app.windowList[this.frameIndex]) {
-                const c = g.app.windowList[this.frameIndex].c;
-                this._tryApplyNodeToBody(c.p, true);
-            }
-        } else {
-            void this.launchRefresh(); // Debounced, for better performance when multiple things need refreshing at once (ex: after a command execution)
-        }
-    }
-
-    /**
-     * * Refreshes the outline. A reveal type can be passed along to specify the reveal type for the selected node
-     * @param p_revealType Facultative reveal type to specify type of reveal when the 'selected node' is encountered
-     */
-    private _refreshOutline(p_revealType?: RevealType): void {
-
-        if (p_revealType !== undefined && p_revealType.valueOf() >= this._revealType.valueOf()) { // To check if selected node should self-select while redrawing whole tree
-            this._revealType = p_revealType; // To be read/cleared (in arrayToLeoNodesArray instead of directly by nodes)
-        }
-        workspace.controller.buildRowsRenderTreeLeo();
-        if (this._revealType !== undefined) {
-            const focusTree = (this._revealType.valueOf() >= RevealType.RevealSelectFocus.valueOf());
-            if (focusTree) {
-                // set focus to outline pane
-                this.showOutline();
-            }
-            if (this._revealType.valueOf() >= RevealType.Reveal.valueOf()) {
-                // should reveal selected node in the tree, so scroll to it if needed
-                if (g.app.windowList.length) {
-                    const c = g.app.windowList[this.frameIndex].c;
-                    workspace.outline.scrollNodeIntoView(c.p);
+            this._bodyStatesTimer = setTimeout(() => {
+                if (this.leoStates.fileOpenedReady) {
+                    void this._bodySaveDocument();
                 }
-            }
-            this._revealType = RevealType.NoReveal; // Clear after use
+                this.refreshBodyStates();
+            }, p_delay);
         }
     }
+    //@+node:felix.20260323001955.1: *4* _getBodyLanguage
+    /**
+     * * Looks for given position's coloring language and wrap, taking account of '@killcolor', etc.
+     */
+    private _getBodyLanguage(p: Position): [string, boolean] {
+        const c = p.v.context;
+        let w_language = "plain";
+        const w_wrap = !!c.getWrap(p);
+        if (g.useSyntaxColoring(p)) {
 
-    public refreshDocumentsPane(): void {
-        workspace.controller.setupDocumentTabsAndHandlers();
-        // In case the new document has a scrollbar or not,
-        // which changes the available width for the collapse all button.
-        workspace.layout.updateCollapseAllPosition();
-    }
+            // DEPRECATED:  leojs old colorizer language detection
+            // const aList = g.get_directives_dict_list(p);
+            // const d = g.scanAtCommentAndAtLanguageDirectives(aList);
+            // w_language =
+            //     (d && d['language'])
+            //     || g.getLanguageFromAncestorAtFileNode(p)
+            //     || c.config.getLanguage('target-language')
+            //     || 'plain';
 
-    public refreshUndoPane(): void {
-        workspace.controller.buildUndoElements();
-    }
+            // * as per original Leo's leoColorizer.py
+            w_language = c.getLanguage(p) || c.config.getLanguage('target-language');
+            w_language = w_language.toLowerCase();
+        }
 
-    public refreshBodyStates(): void {
-        const c = g.app.windowList[this.frameIndex].c;
-        const [w_language, w_wrap] = this._getBodyLanguage(c.p);
-        workspace.body.setBodyLanguage(w_language);
-        workspace.body.setBodyWrap(w_wrap);
+        return [w_language, w_wrap];
     }
-
-    public refreshGotoPane(): void {
-        workspace.logPane.refreshGotoPane();
-    }
-
-    public refreshButtonsPane(): void {
-        workspace.controller.refreshAtButtons();
-    }
-    //@+node:felix.20260323002101.1: *3* selectTreeNode
+    //@+node:felix.20260409232602.1: *3* Commands
+    //@+node:felix.20260323002101.1: *4* selectTreeNode
     /**
      * * Called by UI when the user selects in the tree (click or 'open aside' through context menu)
      * @param node is the position node selected in the tree
@@ -988,238 +1221,7 @@ export class LeoUI extends NullGui {
         return this._tryApplyNodeToBody(node, true);
 
     }
-    //@+node:felix.20260323002042.1: *3* _tryApplyNodeToBody
-    private _tryApplyNodeToBody(node: Position, showBodyNoFocus: boolean): void {
-        // In LeoJS, this required a bunch of helper methods because the body pane itself was not readily available and the body text was not directly settable,
-        // so it required to find the right "editor" object in the DOM, then set its value, then restore scroll and selection, etc.   
-        // Here in Leo-Web, the body pane is always readily available and we can directly set its content and send it the scroll and selection info,
-        // so this should be more straightforward.
-
-        const c = g.app.windowList[this.frameIndex].c;
-        const p = c.p;
-
-        if (!node.__eq__(c.p)) {
-            // Oh, should never happen
-            console.error('Trying to apply a node to body that is different from the selected one! This should not happen. Node:', node, ' Selected:', c.p);
-        }
-
-        const [w_language, w_wrap] = this._getBodyLanguage(node);
-
-        workspace.body.setBody(p.b, w_wrap, w_language);
-        // this._setBodyLanguage(w_language); // Unused?
-
-        const scroll = p.v.scrollBarSpot;
-        workspace.body.setBodyScroll(scroll);
-
-        // If the desired final focus is the goto-items of the nav pane, then we call showBody (which sets selection and optional focus)
-        // but with showBodyNoFocus true to preserve focus in the nav pane.
-
-        // * note that other 'finalFocus', e.g. on Outline, will not have the selection range set *
-        const isGotoFocus = this.finalFocus === Focus.Goto;
-        if (!showBodyNoFocus || isGotoFocus) {
-            this.showBody(isGotoFocus);
-        }
-
-    }
-    //@+node:felix.20260323002027.1: *3* Row Col Convertion Utilities
-    /**
-     * Utility to convert a string index into a line, col dict
-     */
-    private _row_col_pv_dict(i: number, s: string): { line: number, col: number, index: number } {
-        if (!i) {
-            i = 0; // prevent none type
-        }
-        // BUG: this uses current selection wrapper only, use
-        // g.convertPythonIndexToRowCol instead !
-        let line: number;
-        let col: number;
-        [line, col] = g.convertPythonIndexToRowCol(s, i);
-        return { "line": line, "col": col, "index": i };
-    };
-
-    /**
-     * Converts from wrapper text index to line /col
-     */
-    private _row_col_wrapper_dict(i: number, wrapper: StringTextWrapper): { "line": number, "col": number, "index": number } {
-        if (!i) {
-            i = 0; // prevent none type
-        }
-        let line, col;
-        [line, col] = wrapper.toPythonIndexRowCol(i);
-        return { "line": line, "col": col, "index": i };
-    }
-    //@+node:felix.20260323001955.1: *3* _getBodyLanguage
-    /**
-     * * Looks for given position's coloring language and wrap, taking account of '@killcolor', etc.
-     */
-    private _getBodyLanguage(p: Position): [string, boolean] {
-        const c = p.v.context;
-        let w_language = "plain";
-        const w_wrap = !!c.getWrap(p);
-        if (g.useSyntaxColoring(p)) {
-
-            // DEPRECATED:  leojs old colorizer language detection
-            // const aList = g.get_directives_dict_list(p);
-            // const d = g.scanAtCommentAndAtLanguageDirectives(aList);
-            // w_language =
-            //     (d && d['language'])
-            //     || g.getLanguageFromAncestorAtFileNode(p)
-            //     || c.config.getLanguage('target-language')
-            //     || 'plain';
-
-            // * as per original Leo's leoColorizer.py
-            w_language = c.getLanguage(p) || c.config.getLanguage('target-language');
-            w_language = w_language.toLowerCase();
-        }
-
-        return [w_language, w_wrap];
-    }
-    //@+node:felix.20260323001345.1: *3* Trigger GetStates
-    /**
-     * * 'getStates' action for use in debounced method call
-     */
-    private _triggerGetStates(): void {
-
-        const frame = g.app.windowList[this.frameIndex];
-        const c = frame.c;
-        const states = this.leoStates;
-        const menu = workspace.menu;
-
-        if (this._refreshType.states) {
-            this._refreshType.states = false;
-            const p = c.p;
-            // TODO : set status bar info? (If any, and if implemented in the web UI)
-            // if (this._leoStatusBar && p && p.v) {
-            //     const unl = c.frame.computeStatusUnl(p);
-            //     this._leoStatusBar.setString(unl);
-            //     this._leoStatusBar.setTooltip(p.h);
-            // }
-            let w_canHoist = true;
-            let w_topIsChapter = false;
-            let w_hasMarked = false;
-            for (const v of c.all_unique_nodes()) {
-                if (v.isMarked()) {
-                    w_hasMarked = true;
-                    break;
-                }
-            }
-            if (c.hoistStack.length) {
-                const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
-                w_topIsChapter = w_ph.h.startsWith('@chapter ');
-                if (p.__eq__(w_ph)) {
-                    // p is already the hoisted node
-                    w_canHoist = false;
-                }
-            } else {
-                // not hoisted, was it the single top child of the real root?
-                if (c.rootPosition()!.__eq__(p) && c.hiddenRootNode.children.length === 1) {
-                    w_canHoist = false;
-                }
-            }
-            const w_states: LeoPackageStates = {
-                changed: c.changed, // Document has changed (is dirty)
-                canUndo: c.canUndo(), // Document can undo the last operation done
-                canRedo: c.canRedo(), // Document can redo the last operation 'undone'
-                canGoBack: c.nodeHistory.beadPointer > 0,
-                canGoNext: c.nodeHistory.beadPointer + 1 < c.nodeHistory.beadList.length,
-                canDemote: c.canDemote(), // Selected node can have its siblings demoted
-                canPromote: c.canPromote(), // Selected node can have its children promoted
-                canDehoist: c.canDehoist(), // Document is currently hoisted and can be de-hoisted
-                canHoist: w_canHoist,
-                topIsChapter: w_topIsChapter,
-                hasMarked: w_hasMarked,
-                // 
-            };
-            states.setLeoStateFlags(w_states);
-            this.refreshUndoPane();
-        }
-        // Set leoChanged and leoOpenedFilename
-        states.leoChanged = c.changed;
-        states.leoOpenedFileName = frame.getTitle();
-
-        this.refreshBodyStates(); // Set language and wrap states, if different.
-
-        menu.updateButtonVisibility(states.leoHasMarked, states.leoCanGoBack || states.leoCanGoNext);
-        menu.updateMarkedButtonStates(states.leoHasMarked);
-        menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
-        menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        menu.refreshMenu(menuData);
-        menu.refreshIconButtons(toolbarButtons);
-        menu.refreshBodyContextMenu(bodyPaneContextMenuData);
-        menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
-
-        // Refresh other panes if needed
-        if (this._refreshType.documents) {
-            this._refreshType.documents = false;
-            this.refreshDocumentsPane();
-        }
-        if (this._refreshType.goto) {
-            this._refreshType.goto = false;
-            this.refreshGotoPane();
-        }
-        if (this._refreshType.buttons) {
-            this._refreshType.buttons = false;
-            this.refreshButtonsPane();
-        }
-    }
-    //@+node:felix.20260323001309.1: *3* Setup open and no-open document
-    /**
-     * * Setup UI for having no opened Leo documents
-     */
-    private _setupNoOpenedLeoDocument(): void {
-        this.leoStates.fileOpenedReady = false;
-        this._refreshOutline(RevealType.NoReveal);
-        const menu = workspace.menu;
-        menu.updateButtonVisibility(false, false, true);
-        menu.refreshMenu(menuData);
-        menu.refreshIconButtons(toolbarButtons);
-        menu.refreshBodyContextMenu(bodyPaneContextMenuData);
-        menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
-        this.refreshDocumentsPane();
-        this.refreshButtonsPane();
-        this.refreshUndoPane();
-        // Empty body pane
-        workspace.body.setBody('', false);
-        // Make body pane not editable.
-        workspace.body.setBodyEditable(false);
-        workspace.logPane.showTab('log');
-    }
-
-    /**
-     * * A Leo file was opened: setup UI accordingly.
-     */
-    private _setupOpenedLeoDocument(): void {
-        const frame = g.app.windowList[this.frameIndex];
-        const c = frame.c;
-        this.leoStates.leoOpenedFileName = frame.getTitle();
-        this.leoStates.leoChanged = c.changed;
-
-        // * Startup flag
-        if (!this.leoStates.leoIdUnset && g.app.leoID !== 'None') {
-            this.leoStates.fileOpenedReady = true;
-        }
-
-        // In case it's the first file openind, make body pane editable again.
-        workspace.body.setBodyEditable(true);
-
-        this._revealType = RevealType.RevealSelect; // For initial outline 'visible' event
-
-        this.setupRefresh(
-            Focus.Body, // Original Leo seems to open itself with focus in body.
-            {
-                tree: true,
-                body: true,
-                states: true,
-                buttons: true,
-                documents: true,
-                goto: true
-            },
-        );
-
-        this.loadSearchSettings();
-
-    }
-    //@+node:felix.20260323001205.1: *3* Leo Command
+    //@+node:felix.20260323001205.1: *4* Leo Command
     /**
      * Leo Command. This is used in "command bindings" from the UI to execute commands.
      * @param p_cmd Command name string
@@ -1331,7 +1333,7 @@ export class LeoUI extends NullGui {
         }
 
     }
-    //@+node:felix.20260323001131.1: *3* Minibuffer & helpers
+    //@+node:felix.20260323001131.1: *4* Minibuffer & helpers
     /**
      * Opens quickPick minibuffer pallette to choose from all commands in this file's commander
      * @returns Promise from the command resolving - or resolve with undefined if cancelled
@@ -1581,281 +1583,7 @@ export class LeoUI extends NullGui {
         // Add to top of minibuffer history
         c.commandHistory.unshift(p_command.label);
     }
-    //@+node:felix.20260323001118.1: *3* saveLeoFile
-    /**
-     * * Invokes the commander.save() command
-     * @param p_fromOutlineSignifies that the focus was, and should be brought back to, the outline
-     * @returns Promise that resolves when the save command is done
-     */
-    public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
-
-        this.triggerBodySave();
-
-        const c = g.app.windowList[this.frameIndex].c;
-
-        await c.save();
-
-        setTimeout(() => {
-            this.setupRefresh(
-                p_fromOutline ? Focus.Outline : Focus.Body,
-                {
-                    tree: true,
-                    states: true,
-                    documents: true
-                }
-            );
-            void this.launchRefresh();
-        });
-
-        return Promise.resolve();
-    }
-    //@+node:felix.20260323001112.1: *3* selectOpenedLeoDocument
-    /**
-     * * Switches Leo document directly by index number.
-     */
-    public async selectOpenedLeoDocument(index: number): Promise<unknown> {
-
-        if (this.frameIndex === index) {
-            // already selected
-            return Promise.resolve();
-        }
-
-        let finalFocus = Focus.NoChange;
-        // Get the current focus (body outline, or other will be noChange)
-        if (workspace.layout.isOutlineFocused()) {
-            finalFocus = Focus.Outline;
-        } else if (workspace.layout.isBodyFocused()) {
-            finalFocus = Focus.Body;
-        }
-
-        this.triggerBodySave();
-        this.frameIndex = index;
-        // Like we just opened or made a new file
-        if (g.app.windowList.length) {
-            this.setupRefresh(
-                finalFocus,
-                {
-                    tree: true,
-                    body: true,
-                    documents: true,
-                    buttons: true,
-                    states: true,
-                    goto: true
-                }
-            );
-            const result = this.launchRefresh();
-            this.loadSearchSettings();
-            return result;
-        } else {
-            void this.launchRefresh(); // dont wait for it
-            console.error('Select Opened Leo File Error');
-            return Promise.reject('Select Opened Leo File Error');
-        }
-
-    }
-    //@+node:felix.20260406012500.1: *3* At Buttons
-    //@+node:felix.20260406012500.2: *4* clickAtButton
-    /**
-     * * Invoke an '@button' click directly by index string. Used by '@buttons' treeview.
-     * @param p_node the node of the at-buttons panel that was clicked
-     * @returns Promises that resolves when done
-     */
-    public async clickAtButton(p_node: LeoButton): Promise<unknown> {
-
-        await this.triggerBodySave(true);
-        const c = g.app.windowList[g.app.gui.frameIndex].c;
-        const d = c.theScriptingController.buttonsArray;
-        const button = d[p_node.index];
-        let result: any;
-        if (p_node.rclicks?.length) {
-            // Has rclicks so show menu to choose
-            this._rclickSelected = [];
-            let w_rclick: number[] | undefined;
-            const p_picked = await this._handleRClicks(p_node.rclicks, p_node.name);
-
-            if (
-                p_picked
-            ) {
-                // Check if only one in this._rclickSelected and is zero: normal press
-                if (this._rclickSelected.length === 1 && this._rclickSelected[0] === 0) {
-                    // Normal 'top' button, not one of it's child rclicks.
-                } else {
-                    // One of its child 'rclick', so decrement first one, and send this._rclickSelected as array of choices
-                    this._rclickSelected[0] = this._rclickSelected[0] - 1;
-                    w_rclick = this._rclickSelected;
-                }
-
-                try {
-                    let w_rclickChosen: RClick | undefined;
-
-                    if (w_rclick && button.rclicks) {
-                        // Had w_rclick setup so it's a child rclick, not the recular 'top' button.
-                        let toChooseFrom: RClick[] = button.rclicks;
-                        for (const i_rc of w_rclick) {
-                            w_rclickChosen = toChooseFrom[i_rc];
-                            toChooseFrom = w_rclickChosen.children;
-                        }
-                        if (w_rclickChosen) {
-                            result = c.theScriptingController.executeScriptFromButton(button, '', w_rclickChosen.position, '');
-                        }
-                    } else {
-                        // Normal 'top' button.
-                        result = await Promise.resolve(button.command());
-                    }
-
-                } catch (e: any) {
-                    void workspace.dialog.showInformationMessage("LEOJS: LeoUI clickAtButton Error: " + e.toString());
-                }
-
-            } else {
-                // Escaped so  just return, no 'setupRefresh' nor 'launchRefresh'!
-                return Promise.resolve();
-            }
-
-        } else {
-            // no rclicks nor menus, so just call the button's command.
-            result = await Promise.resolve(button.command());
-        }
-
-        this.setupRefresh(Focus.NoChange, {
-            tree: true,
-            body: true,
-            documents: true,
-            buttons: true,
-            states: true
-        });
-
-        void this.launchRefresh();
-        return result;
-
-    }
-
-    //@+node:felix.20260406012500.3: *4* _handleRClicks
-    /**
-     * * Show input window to select
-     */
-    private async _handleRClicks(p_rclicks: RClick[], topLevelName?: string): Promise<ChooseRClickItem | undefined> {
-        const w_choices: ChooseRClickItem[] = [];
-        let w_index = 0;
-        if (topLevelName) {
-            w_choices.push(
-                { label: topLevelName, index: w_index++ } // picked: true, alwaysShow: true,
-            );
-        }
-        w_choices.push(
-            ...p_rclicks.map((p_rclick): ChooseRClickItem => { return { label: p_rclick.position.h, index: w_index++, rclick: p_rclick }; })
-        );
-        const w_options: QuickPickOptions = {
-            placeHolder: Constants.USER_MESSAGES.CHOOSE_BUTTON
-        };
-        const w_picked = await workspace.dialog.showQuickPick(w_choices, w_options);
-        if (w_picked) {
-            this._rclickSelected.push(w_picked.index);
-            if (topLevelName && w_picked.index === 0) {
-                return Promise.resolve(w_picked);
-            }
-            if (w_picked.rclick && w_picked.rclick.children && w_picked.rclick.children.length) {
-                return this._handleRClicks(w_picked.rclick.children);
-            } else {
-                return Promise.resolve(w_picked);
-            }
-        }
-        return Promise.resolve(undefined);
-    }
-
-    //@+node:felix.20260406012500.4: *4* gotoScript
-    /**
-     * * Finds and goes to the script of an at-button. Used by '@buttons' treeview.
-     * @param p_node the node of the at-buttons panel that was right-clicked
-     * @returns the launchRefresh promise started after it's done finding the node
-     */
-    public async gotoScript(p_node: LeoButton): Promise<unknown> {
-
-        await this.triggerBodySave(true);
-        const tag = 'goto_script';
-        const index = p_node.index;
-        const old_c = g.app.windowList[g.app.gui.frameIndex].c;
-        const d = old_c.theScriptingController.buttonsArray;
-        const butWidget = d[index];
-
-        if (butWidget) {
-
-            try {
-                const gnx: string = butWidget.command.gnx;
-                let new_c = old_c;
-                const w_result = await old_c.theScriptingController.open_gnx(old_c, gnx);
-                let p: Position | undefined; // Replace YourPType with actual type
-
-                if (w_result[0] && w_result[1]) {
-                    p = w_result[1];
-                    new_c = w_result[0];
-                } else {
-                    new_c = old_c;
-                }
-
-                g.app.gui.frameIndex = 0;
-                for (const w_f of g.app.windowList) {
-                    if (w_f.c === new_c) {
-                        break;
-                    }
-                    g.app.gui.frameIndex++;
-                }
-                // g.app.gui.frameIndex now points to the selected Commander.
-
-                if (p) {
-                    new_c.selectPosition(p);
-                    this.setupRefresh(
-                        Focus.NoChange,
-                        {
-                            tree: true,
-                            body: true,
-                            documents: true,
-                            states: true,
-                        }
-                    );
-                    return this.launchRefresh();
-                } else {
-                    throw new Error(`${tag}: not found ${gnx}`);
-                }
-
-            } catch (e) {
-                g.es_exception(e);
-            }
-
-        }
-        return Promise.resolve(false);
-
-    }
-
-    //@+node:felix.20260406012500.5: *4* removeAtButton
-    /**
-     * * Removes an '@button' from Leo's button dict, directly by index string. Used by '@buttons' treeview.
-     * @param p_node the node of the at-buttons panel that was chosen to remove
-     * @returns Thenable that resolves when done
-     */
-    public async removeAtButton(p_node: LeoButton): Promise<unknown> {
-
-        await this.triggerBodySave(true);
-        const tag: string = 'remove_button';
-        const index = p_node.index;
-        const c = g.app.windowList[g.app.gui.frameIndex].c;
-        const d = c.theScriptingController.buttonsArray;
-        const butWidget = d[index];
-        if (butWidget) {
-            try {
-                d.splice(index, 1);
-            } catch (e) {
-                g.es_exception(e);
-            }
-        } else {
-            console.log(`LEOJS : ERROR ${tag}: button ${String(index)} does not exist`);
-        }
-        this.setupRefresh(Focus.NoChange, { buttons: true });
-        return this.launchRefresh();
-
-    }
-
-    //@+node:felix.20260323000247.1: *3* editHeadline & helper
+    //@+node:felix.20260323000247.1: *4* editHeadline & helpers
     /**
      * * Asks for a new headline label, and replaces the current label with this new one one the specified, or currently selected node
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
@@ -1960,38 +1688,46 @@ export class LeoUI extends NullGui {
             g.doHook("headkey2", { c: c, p: c.p, ch: '\n', changed: true });
         }
     }
+    //@+node:felix.20260410230104.1: *4* revertToUndo
+    /**
+     * * Reverts to a particular undo bead state
+     */
+    public revertToUndo(beadIndex: number): Promise<any> {
+
+        let action = "redo";
+        let repeat = beadIndex;
+        if (beadIndex <= 0) {
+            action = "undo";
+            repeat = (-beadIndex) + 1;
+        }
+        const c = g.app.windowList[this.frameIndex].c;
+        const u = c.undoer;
+        for (let x = 0; x < repeat; x++) {
+            if (action === "redo") {
+                if (u.canRedo()) {
+                    u.redo();
+                }
+            } else if (action === "undo") {
+                if (u.canUndo()) {
+                    u.undo();
+                }
+            }
+        }
+        this.setupRefresh(
+            Focus.Outline,
+            {
+                tree: true,
+                body: true,
+                documents: true,
+                states: true,
+                buttons: true,
+            }
+        );
+        return Promise.resolve(this.launchRefresh());
+    }
+
     //@+node:felix.20260323000155.1: *3* Clipboard
-    /**
-     * Replaces the system's clipboard with the given string
-     * @param s actual string content to go onto the clipboard
-     * @returns a promise that resolves when the string is put on the clipboard
-     */
-    public replaceClipboardWith(s: string): Thenable<string> {
-        this.clipboardContents = s; // also set immediate clipboard string
-        return navigator.clipboard.writeText(s).then(() => { return s; });
-    }
-
-    /**
-     * Asynchronous clipboards getter
-     * Get the system's clipboard contents and returns a promise
-     * Also puts it in the global clipboardContents variable
-     * @returns a promise of the clipboard string content
-     */
-    public asyncGetTextFromClipboard(): Thenable<string> {
-        return navigator.clipboard.readText().then((s) => {
-            // also set immediate clipboard string for possible future read
-            this.clipboardContents = s;
-            return this.getTextFromClipboard();
-        });
-    }
-
-    /**
-     * Returns clipboard content
-    */
-    public getTextFromClipboard(): string {
-        return this.clipboardContents;
-    }
-
+    //@+node:felix.20260410230933.1: *4* unlToClipboard
     /**
      * Put UNL of current node on the clipboard. 
      * @para optional unlType to specify type.
@@ -2023,7 +1759,39 @@ export class LeoUI extends NullGui {
         }
         return this.replaceClipboardWith(unl);
     }
-    //@+node:felix.20260322235938.1: *3* goAnywhere
+    //@+node:felix.20260410230927.1: *4* getTextFromClipboard
+    /**
+     * Returns clipboard content
+    */
+    public getTextFromClipboard(): string {
+        return this.clipboardContents;
+    }
+    //@+node:felix.20260410230922.1: *4* asyncGetTextFromClipboard
+    /**
+     * Asynchronous clipboards getter
+     * Get the system's clipboard contents and returns a promise
+     * Also puts it in the global clipboardContents variable
+     * @returns a promise of the clipboard string content
+     */
+    public asyncGetTextFromClipboard(): Thenable<string> {
+        return navigator.clipboard.readText().then((s) => {
+            // also set immediate clipboard string for possible future read
+            this.clipboardContents = s;
+            return this.getTextFromClipboard();
+        });
+    }
+    //@+node:felix.20260410230916.1: *4* replaceClipboardWith
+    /**
+     * Replaces the system's clipboard with the given string
+     * @param s actual string content to go onto the clipboard
+     * @returns a promise that resolves when the string is put on the clipboard
+     */
+    public replaceClipboardWith(s: string): Thenable<string> {
+        this.clipboardContents = s; // also set immediate clipboard string
+        return navigator.clipboard.writeText(s).then(() => { return s; });
+    }
+    //@+node:felix.20260322235907.1: *3* Nav and Goto
+    //@+node:felix.20260322235938.1: *4* goAnywhere
     /**
      * Mimic vscode and sublime-text's CTRL+P to find any position by it's headline
      */
@@ -2084,14 +1852,14 @@ export class LeoUI extends NullGui {
         return Promise.resolve(undefined); // Canceled
 
     }
-    //@+node:felix.20260322235907.1: *3* Nav and Goto
+    //@+node:felix.20260410231213.1: *4* navigateNavEntry
     /**
      * * Goto the next, previous, first or last nav entry via arrow keys in
      */
     public navigateNavEntry(p_nav: LeoGotoNavKey): void {
         workspace.controller.navigateNavEntry(p_nav);
     }
-
+    //@+node:felix.20260410231208.1: *4* navEnter
     /**
      * * Handles an enter press in the 'nav pattern' input
      */
@@ -2110,7 +1878,7 @@ export class LeoUI extends NullGui {
         return this.showNavResults();
 
     }
-
+    //@+node:felix.20260410231201.1: *4* navTextChange
     /**
      * * Handles a debounced text change in the nav pattern input box
      */
@@ -2128,7 +1896,7 @@ export class LeoUI extends NullGui {
         }
         return this.showNavResults();
     }
-
+    //@+node:felix.20260410231156.1: *4* navTextClear
     /**
      * * Clears the nav search results of the goto pane
      */
@@ -2138,8 +1906,7 @@ export class LeoUI extends NullGui {
         scon.clear();
         workspace.controller.buildGotoElements();
     }
-
-
+    //@+node:felix.20260410231152.1: *4* findQuick
     /**
      * Opens the Nav tab and focus on nav text input
      */
@@ -2147,7 +1914,7 @@ export class LeoUI extends NullGui {
         this.triggerBodySave();
         workspace.logPane.selectNav(text, p_forceEnter);
     }
-
+    //@+node:felix.20260410231146.1: *4* findQuickSelected
     /**
      * Opens the Nav tab with the selected text as the search string
      */
@@ -2169,7 +1936,7 @@ export class LeoUI extends NullGui {
         }
         workspace.logPane.selectNav(s || "", true);
     }
-
+    //@+node:felix.20260410231139.1: *4* findQuickTimeline
     /**
      * Lists all nodes in reversed gnx order, newest to oldest
      */
@@ -2180,7 +1947,7 @@ export class LeoUI extends NullGui {
         workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav', true);
     }
-
+    //@+node:felix.20260410231135.1: *4* findQuickChanged
     /**
      * Lists all nodes that are changed (aka "dirty") since last save.
      */
@@ -2191,7 +1958,7 @@ export class LeoUI extends NullGui {
         workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav', true);
     }
-
+    //@+node:felix.20260410231127.1: *4* findQuickHistory
     /**
      * Lists nodes from c.nodeHistory.
      */
@@ -2202,7 +1969,7 @@ export class LeoUI extends NullGui {
         workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav', true);
     }
-
+    //@+node:felix.20260410231121.1: *4* findQuickMarked
     /**
      * List all marked nodes.
      */
@@ -2213,8 +1980,7 @@ export class LeoUI extends NullGui {
         workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav', p_preserveFocus);
     }
-
-
+    //@+node:felix.20260410231057.1: *4* gotoNavEntry
     /**
      * * Handles a click (selection) of a nav panel node: Sends 'goto' command to server.
      */
@@ -2294,13 +2060,13 @@ export class LeoUI extends NullGui {
         }
 
     }
-
+    //@+node:felix.20260410231047.1: *4* showNavResults
     public showNavResults(): void {
         workspace.controller.buildGotoElements();
         workspace.logPane.showTab('nav');
     }
-
     //@+node:felix.20260322235817.1: *3* Search and Replace
+    //@+node:felix.20260410231431.1: *4* startSearch
     /**
      * * Opens the find panel and selects all & focuses on the find field.
      */
@@ -2308,7 +2074,7 @@ export class LeoUI extends NullGui {
         this.triggerBodySave();
         workspace.logPane.showTab('find', true);
     }
-
+    //@+node:felix.20260410231426.1: *4* find
     /**
      * * Find next / previous commands
      * @param p_reverse
@@ -2412,7 +2178,7 @@ export class LeoUI extends NullGui {
             }
         }
     }
-
+    //@+node:felix.20260410231417.1: *4* replace
     /**
      * * Replace / Replace-Then-Find commands
      * @param p_fromOutline
@@ -2518,7 +2284,7 @@ export class LeoUI extends NullGui {
             }
         }
     }
-
+    //@+node:felix.20260410231409.1: *4* loadSearchSettings
     /**
      * * Gets the search settings from Leo, and applies them to the find panel webviews
      */
@@ -2562,7 +2328,7 @@ export class LeoUI extends NullGui {
         workspace.logPane.setSettings(w_settings);
 
     }
-
+    //@+node:felix.20260410231402.1: *4* saveSearchSettings
     /**
      * * Send the settings to Leo implementation
      * @param p_settings the search settings to be set in Leo implementation to affect next results
@@ -2685,7 +2451,7 @@ export class LeoUI extends NullGui {
 
         return Promise.resolve();
     }
-
+    //@+node:felix.20260410231324.1: *4* _resolveFindPaneMessage
     private _resolveFindPaneMessage = (message: any): void => {
         switch (message.type) {
             case 'leoNavEnter': {
@@ -2750,7 +2516,30 @@ export class LeoUI extends NullGui {
             }
         }
     }
-    //@+node:felix.20260322234219.1: *3* tabCycle
+    //@+node:felix.20260322233602.1: *4* show_find_success
+    /**
+     * Handle a successful find match.
+     */
+    public show_find_success(c: Commands, in_headline: boolean, insert: number, p: Position): void {
+        if (in_headline) {
+            try {
+                g.app.gui.set_focus(c, c.frame.tree.edit_widget(p));
+            }
+            catch (e) {
+                console.log('oops!', e);
+
+            }
+        } else {
+            try {
+                g.app.gui.set_focus(c, c.frame.body.widget);
+            }
+            catch (e) {
+                console.log('oops!', e);
+            }
+        }
+    }
+    //@+node:felix.20260322233732.1: *3* File Commands
+    //@+node:felix.20260322234219.1: *4* tabCycle
     /**
      * * Cycle opened documents
      */
@@ -2773,46 +2562,6 @@ export class LeoUI extends NullGui {
 
         return this.selectOpenedLeoDocument(w_chosenIndex);
     }
-    //@+node:felix.20260329222451.1: *3* revertToUndo
-    /**
-     * * Reverts to a particular undo bead state
-     */
-    public revertToUndo(beadIndex: number): Promise<any> {
-
-        let action = "redo";
-        let repeat = beadIndex;
-        if (beadIndex <= 0) {
-            action = "undo";
-            repeat = (-beadIndex) + 1;
-        }
-        const c = g.app.windowList[this.frameIndex].c;
-        const u = c.undoer;
-        for (let x = 0; x < repeat; x++) {
-            if (action === "redo") {
-                if (u.canRedo()) {
-                    u.redo();
-                }
-            } else if (action === "undo") {
-                if (u.canUndo()) {
-                    u.undo();
-                }
-            }
-        }
-        this.setupRefresh(
-            Focus.Outline,
-            {
-                tree: true,
-                body: true,
-                documents: true,
-                states: true,
-                buttons: true,
-            }
-        );
-        return Promise.resolve(this.launchRefresh());
-    }
-
-    //@+node:felix.20260322233732.1: *3* File Commands
-    //@+others
     //@+node:felix.20260322234040.1: *4* showRecentLeoFiles
     /**
      * * Shows the recent Leo files list, choosing one will open it
@@ -2853,7 +2602,6 @@ export class LeoUI extends NullGui {
                 }
             }
 
-            console.log('Opening recent file: ', filename);
             // Either way, try to open the file
             await this.openLeoFile(new Uri(filename));
 
@@ -3117,8 +2865,35 @@ export class LeoUI extends NullGui {
         void this.launchRefresh();
         return;
     }
-    //@-others
-    //@+node:felix.20260322233644.1: *3* switchLeoFile
+    //@+node:felix.20260409233011.1: *4* saveLeoFile
+    /**
+     * * Invokes the commander.save() command
+     * @param p_fromOutline Signifies that the focus was, and should be brought back to, the outline
+     * @returns Promise that resolves when the save command is done
+     */
+    public async saveLeoFile(p_fromOutline?: boolean): Promise<unknown> {
+
+        this.triggerBodySave();
+
+        const c = g.app.windowList[this.frameIndex].c;
+
+        await c.save();
+
+        setTimeout(() => {
+            this.setupRefresh(
+                p_fromOutline ? Focus.Outline : Focus.Body,
+                {
+                    tree: true,
+                    states: true,
+                    documents: true
+                }
+            );
+            void this.launchRefresh();
+        });
+
+        return Promise.resolve();
+    }
+    //@+node:felix.20260322233644.1: *4* switchLeoFile
     /**
      * * Show switch document 'QuickPick' dialog and switch file if selection is made, or just return if no files are opened.
      * @returns A promise that resolves with a textEditor of the selected node's body from the newly selected document
@@ -3167,56 +2942,258 @@ export class LeoUI extends NullGui {
             return Promise.resolve(undefined);
         }
     }
-    //@+node:felix.20260322233602.1: *3* show_find_success
+    //@+node:felix.20260409233146.1: *4* selectOpenedLeoDocument
     /**
-     * Handle a successful find match.
+     * * Switches Leo document directly by index number.
      */
-    public show_find_success(c: Commands, in_headline: boolean, insert: number, p: Position): void {
-        // TODO : see focus_to_body !
-        // TODO : USE ONLY 'WRAPPER' OR 'WIDGET' like in show_find_success!
-        if (in_headline) {
-            // edit_widget(p)
-            // c.frame.edit_widget(p);
-            // console.log('try to set');
-            try {
-                g.app.gui.set_focus(c, c.frame.tree.edit_widget(p));
-            }
-            catch (e) {
-                console.log('oops!', e);
+    public async selectOpenedLeoDocument(index: number): Promise<unknown> {
 
-            }
-            // g.app.gui.set_focus(c, { _name: 'tree' });
-        } else {
-            try {
-                g.app.gui.set_focus(c, c.frame.body.widget);
-            }
-            catch (e) {
-                console.log('oops!', e);
-            }
+        if (this.frameIndex === index) {
+            // already selected
+            return Promise.resolve();
         }
 
-        // edit_widget
-        // ? needed ?
+        let finalFocus = Focus.NoChange;
+        // Get the current focus (body outline, or other will be noChange)
+        if (workspace.layout.isOutlineFocused()) {
+            finalFocus = Focus.Outline;
+        } else if (workspace.layout.isBodyFocused()) {
+            finalFocus = Focus.Body;
+        }
 
-        // trace = False and not g.unitTesting
-        // if in_headline:
-        //     if trace:
-        //         g.trace('HEADLINE', p.h)
-        //     c.frame.tree.widget.select_leo_node(p)
-        //     self.focus_to_head(c, p)  # Does not return.
-        // else:
-        //     w = c.frame.body.widget
-        //     row, col = g.convertPythonIndexToRowCol(p.b, insert)
-        //     if trace:
-        //         g.trace('BODY ROW', row, p.h)
-        //     w.cursor_line = row
-        //     self.focus_to_body(c)  # Does not return.
+        this.triggerBodySave();
+        this.frameIndex = index;
+        // Like we just opened or made a new file
+        if (g.app.windowList.length) {
+            this.setupRefresh(
+                finalFocus,
+                {
+                    tree: true,
+                    body: true,
+                    documents: true,
+                    buttons: true,
+                    states: true,
+                    goto: true
+                }
+            );
+            const result = this.launchRefresh();
+            this.loadSearchSettings();
+            return result;
+        } else {
+            void this.launchRefresh(); // dont wait for it
+            console.error('Select Opened Leo File Error');
+            return Promise.reject('Select Opened Leo File Error');
+        }
+
     }
-    //@+node:felix.20260322233307.1: *3* Leo ID
+    //@+node:felix.20260406012500.1: *3* At Buttons
+    //@+node:felix.20260406012500.2: *4* clickAtButton
     /**
-        * Show info window about requiring leoID to start
-        * and a button to perform the 'set leoID' command.
-        */
+     * * Invoke an '@button' click directly by index string. Used by '@buttons' treeview.
+     * @param p_node the node of the at-buttons panel that was clicked
+     * @returns Promises that resolves when done
+     */
+    public async clickAtButton(p_node: LeoButton): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const d = c.theScriptingController.buttonsArray;
+        const button = d[p_node.index];
+        let result: any;
+        if (p_node.rclicks?.length) {
+            // Has rclicks so show menu to choose
+            this._rclickSelected = [];
+            let w_rclick: number[] | undefined;
+            const p_picked = await this._handleRClicks(p_node.rclicks, p_node.name);
+
+            if (
+                p_picked
+            ) {
+                // Check if only one in this._rclickSelected and is zero: normal press
+                if (this._rclickSelected.length === 1 && this._rclickSelected[0] === 0) {
+                    // Normal 'top' button, not one of it's child rclicks.
+                } else {
+                    // One of its child 'rclick', so decrement first one, and send this._rclickSelected as array of choices
+                    this._rclickSelected[0] = this._rclickSelected[0] - 1;
+                    w_rclick = this._rclickSelected;
+                }
+
+                try {
+                    let w_rclickChosen: RClick | undefined;
+
+                    if (w_rclick && button.rclicks) {
+                        // Had w_rclick setup so it's a child rclick, not the recular 'top' button.
+                        let toChooseFrom: RClick[] = button.rclicks;
+                        for (const i_rc of w_rclick) {
+                            w_rclickChosen = toChooseFrom[i_rc];
+                            toChooseFrom = w_rclickChosen.children;
+                        }
+                        if (w_rclickChosen) {
+                            result = c.theScriptingController.executeScriptFromButton(button, '', w_rclickChosen.position, '');
+                        }
+                    } else {
+                        // Normal 'top' button.
+                        result = await Promise.resolve(button.command());
+                    }
+
+                } catch (e: any) {
+                    void workspace.dialog.showInformationMessage("LEOJS: LeoUI clickAtButton Error: " + e.toString());
+                }
+
+            } else {
+                // Escaped so  just return, no 'setupRefresh' nor 'launchRefresh'!
+                return Promise.resolve();
+            }
+
+        } else {
+            // no rclicks nor menus, so just call the button's command.
+            result = await Promise.resolve(button.command());
+        }
+
+        this.setupRefresh(Focus.NoChange, {
+            tree: true,
+            body: true,
+            documents: true,
+            buttons: true,
+            states: true
+        });
+
+        void this.launchRefresh();
+        return result;
+
+    }
+
+    //@+node:felix.20260406012500.3: *4* _handleRClicks
+    /**
+     * * Show input window to select
+     */
+    private async _handleRClicks(p_rclicks: RClick[], topLevelName?: string): Promise<ChooseRClickItem | undefined> {
+        const w_choices: ChooseRClickItem[] = [];
+        let w_index = 0;
+        if (topLevelName) {
+            w_choices.push(
+                { label: topLevelName, index: w_index++ } // picked: true, alwaysShow: true,
+            );
+        }
+        w_choices.push(
+            ...p_rclicks.map((p_rclick): ChooseRClickItem => { return { label: p_rclick.position.h, index: w_index++, rclick: p_rclick }; })
+        );
+        const w_options: QuickPickOptions = {
+            placeHolder: Constants.USER_MESSAGES.CHOOSE_BUTTON
+        };
+        const w_picked = await workspace.dialog.showQuickPick(w_choices, w_options);
+        if (w_picked) {
+            this._rclickSelected.push(w_picked.index);
+            if (topLevelName && w_picked.index === 0) {
+                return Promise.resolve(w_picked);
+            }
+            if (w_picked.rclick && w_picked.rclick.children && w_picked.rclick.children.length) {
+                return this._handleRClicks(w_picked.rclick.children);
+            } else {
+                return Promise.resolve(w_picked);
+            }
+        }
+        return Promise.resolve(undefined);
+    }
+
+    //@+node:felix.20260406012500.4: *4* gotoScript
+    /**
+     * * Finds and goes to the script of an at-button. Used by '@buttons' treeview.
+     * @param p_node the node of the at-buttons panel that was right-clicked
+     * @returns the launchRefresh promise started after it's done finding the node
+     */
+    public async gotoScript(p_node: LeoButton): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const tag = 'goto_script';
+        const index = p_node.index;
+        const old_c = g.app.windowList[g.app.gui.frameIndex].c;
+        const d = old_c.theScriptingController.buttonsArray;
+        const butWidget = d[index];
+
+        if (butWidget) {
+
+            try {
+                const gnx: string = butWidget.command.gnx;
+                let new_c = old_c;
+                const w_result = await old_c.theScriptingController.open_gnx(old_c, gnx);
+                let p: Position | undefined; // Replace YourPType with actual type
+
+                if (w_result[0] && w_result[1]) {
+                    p = w_result[1];
+                    new_c = w_result[0];
+                } else {
+                    new_c = old_c;
+                }
+
+                g.app.gui.frameIndex = 0;
+                for (const w_f of g.app.windowList) {
+                    if (w_f.c === new_c) {
+                        break;
+                    }
+                    g.app.gui.frameIndex++;
+                }
+                // g.app.gui.frameIndex now points to the selected Commander.
+
+                if (p) {
+                    new_c.selectPosition(p);
+                    this.setupRefresh(
+                        Focus.NoChange,
+                        {
+                            tree: true,
+                            body: true,
+                            documents: true,
+                            states: true,
+                        }
+                    );
+                    return this.launchRefresh();
+                } else {
+                    throw new Error(`${tag}: not found ${gnx}`);
+                }
+
+            } catch (e) {
+                g.es_exception(e);
+            }
+
+        }
+        return Promise.resolve(false);
+
+    }
+
+    //@+node:felix.20260406012500.5: *4* removeAtButton
+    /**
+     * * Removes an '@button' from Leo's button dict, directly by index string. Used by '@buttons' treeview.
+     * @param p_node the node of the at-buttons panel that was chosen to remove
+     * @returns Thenable that resolves when done
+     */
+    public async removeAtButton(p_node: LeoButton): Promise<unknown> {
+
+        await this.triggerBodySave(true);
+        const tag: string = 'remove_button';
+        const index = p_node.index;
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        const d = c.theScriptingController.buttonsArray;
+        const butWidget = d[index];
+        if (butWidget) {
+            try {
+                d.splice(index, 1);
+            } catch (e) {
+                g.es_exception(e);
+            }
+        } else {
+            console.log(`LEOJS : ERROR ${tag}: button ${String(index)} does not exist`);
+        }
+        this.setupRefresh(Focus.NoChange, { buttons: true });
+        return this.launchRefresh();
+
+    }
+
+    //@+node:felix.20260409232242.1: *3* GUI Wrappers & Helpers
+    //@+node:felix.20260322233307.1: *4* Leo ID
+    /**
+     * Show info window about requiring leoID to start
+     * and a button to perform the 'set leoID' command.
+     */
     public showLeoIDMessage(): void {
         void workspace.dialog.showInformationMessage(
             Constants.USER_MESSAGES.SET_LEO_ID_MESSAGE,
@@ -3230,11 +3207,16 @@ export class LeoUI extends NullGui {
     }
 
     /**
-        * * Command to get the LeoID from dialog, save it to user settings.
-        * Start Leo-Web if the ID is valid, and not already started.
-        */
+     * * Command to get the LeoID from dialog, save it to user settings.
+     * Start Leo-Web if the ID is valid, and not already started.
+     */
     public setLeoIDCommand(): Thenable<unknown> {
         return g.IDDialog().then((p_id) => {
+            if (!p_id && g.app.leoID) {
+                // Already one so just cancel without warning
+                workspace.dialog.showToast('Canceled');
+                return Promise.resolve();
+            }
             p_id = p_id.trim();
             p_id = g.app.cleanLeoID(p_id, '');
             if (p_id && p_id.length >= 3 && utils.isAlphaNumeric(p_id)) {
@@ -3249,8 +3231,8 @@ export class LeoUI extends NullGui {
 
 
     /**
-        * * Returns the leoID from the Leo-Web settings
-        */
+     * * Returns the leoID from the Leo-Web settings
+     */
     public getIdFromSetting(): string {
         return this.config.leoID;
     }
@@ -3300,7 +3282,7 @@ export class LeoUI extends NullGui {
         }
         return Promise.resolve();
     }
-    //@+node:felix.20260322233253.1: *3* widget_name
+    //@+node:felix.20260322233253.1: *4* widget_name
     public widget_name(w: any): string {
         let name: string;
         if (!w) {
@@ -3318,7 +3300,7 @@ export class LeoUI extends NullGui {
         }
         return name;
     }
-    //@+node:felix.20260322233248.1: *3* Get & Set Focus
+    //@+node:felix.20260322233248.1: *4* Get & Set Focus
     public set_focus(commander: Commands, widget: any): void {
         this.focusWidget = widget;
         const w_widgetName = this.widget_name(widget);
@@ -3340,7 +3322,7 @@ export class LeoUI extends NullGui {
     public get_focus(c?: Commands): StringTextWrapper {
         return this.focusWidget!;
     }
-    //@+node:felix.20260322233148.1: *3* get1Arg
+    //@+node:felix.20260322233148.1: *4* get1Arg
     public get1Arg(
         options: {
             title: string;
@@ -3368,7 +3350,7 @@ export class LeoUI extends NullGui {
             return workspace.dialog.showInputDialog(options);
         }
     }
-    //@+node:felix.20260322233136.1: *3* get1Char
+    //@+node:felix.20260322233136.1: *4* get1Char
     /**
      * * Gets a single character input from the user, automatically accepting as soon as a character is entered
      * @param options Options for the input box
@@ -3390,7 +3372,7 @@ export class LeoUI extends NullGui {
         }
         return workspace.dialog.showSingleCharInputDialog(options);
     }
-    //@+node:felix.20260322233127.1: *3* About Leo Dialog
+    //@+node:felix.20260322233127.1: *4* About Leo Dialog
     public runAboutLeoDialog(
         c: Commands | undefined,
         version: string,
@@ -3405,7 +3387,7 @@ export class LeoUI extends NullGui {
                 detail: theCopyright
             });
     }
-    //@+node:felix.20260322232941.1: *3* Ask Dialogs
+    //@+node:felix.20260322232941.1: *4* Ask Dialogs
     public runAskOkDialog(
         c: Commands | undefined,
         title: string,
@@ -3507,7 +3489,7 @@ export class LeoUI extends NullGui {
                 }
             });
     }
-    //@+node:felix.20260322232836.1: *3* File Dialogs
+    //@+node:felix.20260322232836.1: *4* File Dialogs
     public runOpenFileDialog(
         c: Commands | undefined,
         title: string,
