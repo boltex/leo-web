@@ -4,7 +4,6 @@
 //@+node:felix.20260323010551.1: ** << imports >>
 import { workspace } from './workspace';
 import { ButtonEntry, ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
-import * as g from './core/leoGlobals';
 
 //@-<< imports >>
 //@+others
@@ -137,6 +136,7 @@ export class MenuManager {
 
     //@+others
     //@+node:felix.20260323010814.1: *3* Context Menus
+    //@+node:felix.20260410220507.1: *4* buildContextMenu
     private buildContextMenu(container: HTMLElement, entries: ContextMenuEntry[]) {
         container.innerHTML = '';
         const ul = document.createElement('ul');
@@ -192,7 +192,7 @@ export class MenuManager {
         }
         container.appendChild(ul);
     }
-
+    //@+node:felix.20260410220513.1: *4* refreshContextMenu
     private refreshContextMenu(entries: ContextMenuEntry[]) {
         for (const entry of entries) {
             if (!entry.domElementRef) { continue; }
@@ -214,23 +214,24 @@ export class MenuManager {
             }
         }
     }
-
+    //@+node:felix.20260410220518.1: *4* buildBodyContextMenu
     public buildBodyContextMenu(entries: ContextMenuEntry[]) {
         this.buildContextMenu(this.BODY_MENU, entries);
     }
-
+    //@+node:felix.20260410220521.1: *4* refreshBodyContextMenu
     public refreshBodyContextMenu(entries: ContextMenuEntry[]) {
         this.refreshContextMenu(entries);
     }
-
+    //@+node:felix.20260410220527.1: *4* buildOutlineContextMenu
     public buildOutlineContextMenu(entries: ContextMenuEntry[]) {
         this.buildContextMenu(this.OUTLINE_MENU, entries);
     }
-
+    //@+node:felix.20260410220531.1: *4* refreshOutlineContextMenu
     public refreshOutlineContextMenu(entries: ContextMenuEntry[]) {
         this.refreshContextMenu(entries);
     }
     //@+node:felix.20260323010803.1: *3* Top Menu
+    //@+node:felix.20260410221205.1: *4* buildMenu
     public buildMenu(entries: MenuEntry[], level = 0) {
         const menu = level === 0 ? this.TOP_MENU : document.createElement("div");
 
@@ -348,7 +349,7 @@ export class MenuManager {
 
         return menu;
     }
-
+    //@+node:felix.20260410221156.1: *4* refreshMenu
     public refreshMenu(entries: MenuEntry[], level = 0) {
         // Go through the menu and for each entry with enabledFlagsSet or enabledFlagsClear, check the conditions and update the disabled state
         for (const entry of entries) {
@@ -386,7 +387,7 @@ export class MenuManager {
             }
         }
     }
-
+    //@+node:felix.20260410221149.1: *4* constrainToViewport
     private constrainToViewport(
         submenu: HTMLElement,
         level: number
@@ -437,7 +438,7 @@ export class MenuManager {
             }
         }
     }
-
+    //@+node:felix.20260410221143.1: *4* repositionOpenMenus
     private repositionOpenMenus(): void {
         // Find all visible submenus
         const visibleSubmenus = document.querySelectorAll('.submenu.visible');
@@ -450,7 +451,7 @@ export class MenuManager {
             }
         });
     }
-
+    //@+node:felix.20260410221137.1: *4* findParentMenuItem
     private findParentMenuItem(submenu: Element): HTMLDivElement | null {
         // For level 0 submenus attached to body, search in topLevelSubmenus map
         for (const [menuItem, sub] of this.topLevelSubmenus.entries()) {
@@ -463,7 +464,7 @@ export class MenuManager {
         const parentItem = submenu.parentElement?.closest('.menu-item');
         return parentItem as HTMLDivElement | null;
     }
-
+    //@+node:felix.20260410221131.1: *4* getMenuLevel
     private getMenuLevel(submenu: Element): number {
         // Level 0 submenus are attached to document.body
         if (submenu.parentElement === document.body) {
@@ -483,7 +484,7 @@ export class MenuManager {
 
         return level;
     }
-
+    //@+node:felix.20260410221058.1: *4* openTopMenu
     public openTopMenu(item: HTMLDivElement, sub: HTMLElement | null, level: number) {
         this.closeAllSubmenus();
         this.activeTopMenu = item;
@@ -494,7 +495,7 @@ export class MenuManager {
         item.classList.add("active");
         this.focusedMenuItem = null;
     }
-
+    //@+node:felix.20260410221050.1: *4* positionSubmenu
     public positionSubmenu(parentItem: HTMLDivElement, submenu: HTMLElement, level: number) {
         submenu.style.display = "flex";
         const rect = parentItem.getBoundingClientRect();
@@ -516,7 +517,7 @@ export class MenuManager {
         submenu.style.display = "";
         setTimeout(() => this.constrainToViewport(submenu, level), 0)
     }
-
+    //@+node:felix.20260410221042.1: *4* closeAllSubmenus
     public closeAllSubmenus() {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
@@ -536,7 +537,7 @@ export class MenuManager {
         );
         this.focusedMenuItem = null;
     }
-
+    //@+node:felix.20260410221027.1: *4* focusMenuItem
     public focusMenuItem(item: HTMLDivElement | null) {
         if (!item) return; // Safety check
         if (this.focusedMenuItem) this.focusedMenuItem.classList.remove("focused");
@@ -552,7 +553,7 @@ export class MenuManager {
             ancestor = ancestor.parentElement?.closest(".submenu")?.parentElement?.closest(".menu-item");
         }
     }
-
+    //@+node:felix.20260410221009.1: *4* closeMenusEvent
     public closeMenusEvent(e: MouseEvent) {
         this.OUTLINE_MENU.style.display = "none";
         this.BODY_MENU.style.display = "none";
@@ -564,7 +565,7 @@ export class MenuManager {
             this.activeTopMenu = null;
         }
     }
-
+    //@+node:felix.20260410221001.1: *4* toggleMenu
     public toggleMenu() {
         this.isMenuShown = !this.isMenuShown;
         this.OUTLINE_MENU.style.display = "none";
@@ -587,6 +588,7 @@ export class MenuManager {
         workspace.layout.positionCrossDragger();
     }
     //@+node:felix.20260407223125.1: *3* Icon Buttons
+    //@+node:felix.20260410221235.1: *4* buildIconButtons
     public buildIconButtons(entries: ButtonEntry[]): void {
         // Build div with class "icon-button" for each entry and add to ICON_BUTTONS_CONTAINER
         this.ICON_BUTTONS_CONTAINER.innerHTML = '';
@@ -641,7 +643,7 @@ export class MenuManager {
             this.ICON_BUTTONS_CONTAINER.appendChild(button);
         }
     }
-
+    //@+node:felix.20260410221228.1: *4* refreshIconButtons
     public refreshIconButtons(entries: ButtonEntry[]): void {
         for (const entry of entries) {
             if (entry.domElementRef) {
@@ -670,12 +672,12 @@ export class MenuManager {
             }
         }
     }
-
     //@+node:felix.20260323010746.1: *3* Document Tabs
+    //@+node:felix.20260410221252.1: *4* clearDocumentTabs
     public clearDocumentTabs() {
         this.DOCUMENT_TABS.innerHTML = "";
     }
-
+    //@+node:felix.20260410221256.1: *4* createDocumentTab
     public createDocumentTab(title: string, tooltip: string, isActive: boolean): HTMLDivElement {
         const tab = document.createElement("div");
         tab.className = "document-tab" + (isActive ? " active" : "");
@@ -689,6 +691,7 @@ export class MenuManager {
         return tab;
     }
     //@+node:felix.20260323010715.1: *3* Buttons State and Visibility
+    //@+node:felix.20260410221347.1: *4* updateButtonVisibility
     public updateButtonVisibility = (hasMarked: boolean, hasHistory: boolean, noOpenedDocuments = false) => {
         this.toggleButtonVisibility(this.NEXT_MARKED_BTN, this.PREV_MARKED_BTN, this.SHOW_PREV_NEXT_MARK.checked && hasMarked && !noOpenedDocuments);
         this.toggleButtonVisibility(this.TOGGLE_MARK_BTN, null, this.SHOW_TOGGLE_MARK.checked && !noOpenedDocuments);
@@ -718,22 +721,22 @@ export class MenuManager {
         }
         this.TRIGGER_AREA.style.width = ((visibleButtonCount * 40) + 10) + 'px';
     }
-
+    //@+node:felix.20260410221342.1: *4* updateMarkedButtonStates
     public updateMarkedButtonStates(hasMarkedNodes: boolean) {
         this.NEXT_MARKED_BTN.disabled = !hasMarkedNodes;
         this.PREV_MARKED_BTN.disabled = !hasMarkedNodes;
     }
-
+    //@+node:felix.20260410221338.1: *4* updateHoistButtonStates
     public updateHoistButtonStates(hoist: boolean, deHoist: boolean) {
         this.HOIST_BTN.disabled = !hoist;
         this.DEHOIST_BTN.disabled = !deHoist;
     }
-
+    //@+node:felix.20260410221334.1: *4* updateHistoryButtonStates
     public updateHistoryButtonStates(previous: boolean, next: boolean) {
         this.PREV_BTN.disabled = !previous;
         this.NEXT_BTN.disabled = !next;
     }
-
+    //@+node:felix.20260410221330.1: *4* toggleButtonVisibility
     public toggleButtonVisibility(button1: HTMLElement | null, button2: HTMLElement | null, isVisible: boolean) {
         if (button1) {
             button1.classList.toggle('hidden-button', !isVisible);
@@ -742,7 +745,7 @@ export class MenuManager {
             button2.classList.toggle('hidden-button', !isVisible);
         }
     }
-
+    //@+node:felix.20260410221325.1: *4* showButtons
     public setupButtonContainerAutoHide() {
         let hideTimeout: ReturnType<typeof setTimeout>;
         const showButtons = () => {
@@ -776,10 +779,11 @@ export class MenuManager {
         }, 1500);
     }
     //@+node:felix.20260406002848.1: *3* At-Buttons
+    //@+node:felix.20260410221409.1: *4* clearAtButtons
     public clearAtButtons(): void {
         this.AT_BUTTONS_CONTAINER.innerHTML = '';
     }
-
+    //@+node:felix.20260410221404.1: *4* createAtButton
     public createAtButton(label: string, tooltip: string, icon: number): HTMLDivElement {
         const button = document.createElement("div");
         button.classList.add("at-button");
@@ -789,7 +793,6 @@ export class MenuManager {
         this.AT_BUTTONS_CONTAINER.appendChild(button);
         return button;
     }
-
     //@-others
 
 }
