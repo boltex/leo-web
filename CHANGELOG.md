@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.14
+
+- ...
+
 ## 1.0.13
 
 - Improved icon font and icons-buttons padding & size.
