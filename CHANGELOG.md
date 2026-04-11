@@ -2,7 +2,7 @@
 
 ## 1.0.13
 
-- ...
+- Improved icon font and icons-buttons padding & size.
 
 ## 1.0.12
 
