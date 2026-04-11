@@ -1718,7 +1718,6 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         // Note: insertNewlineHelper already exists.
         const c = this.c;
         const w = this.editWidget();
-        console.log('hi');
         if (!w) {
             return;
         }
@@ -3014,7 +3013,6 @@ export class EditCommandsClass extends BaseEditCommandsClass {
             return;
         }
         if (g.isTextWrapper(w)) {
-            console.log('selectAllText: not implemented for text wrappers');
             w.selectAllText();
         }
     }

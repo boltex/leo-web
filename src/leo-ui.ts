@@ -371,7 +371,6 @@ export class LeoUI extends NullGui {
         // Then clear the workspace from db and force-refresh the page to restart leoWeb
         // This will have the effect of closing all opened documents and then asking for a new workspace
         for (const c of g.app.commanders()) {
-            console.log('closing commander: ', c.fileName());
             const closed = await g.app.closeLeoWindow(c.frame)
             const allow = !c.exists && closed; // was successfully closed and the exist flag is now false, meaning the commander is really closed.
             if (!allow) {
@@ -2603,7 +2602,6 @@ export class LeoUI extends NullGui {
                 }
             }
 
-            console.log('Opening recent file: ', filename);
             // Either way, try to open the file
             await this.openLeoFile(new Uri(filename));
 
