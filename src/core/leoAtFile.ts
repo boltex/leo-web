@@ -4067,6 +4067,7 @@ export class AtFile {
     }
     //@+node:felix.20251214160339.296: *4* at.exception
     public exception(e: any, message: string): void {
+        console.log(e);
         this.error(message);
         g.es_exception(e);
     }
