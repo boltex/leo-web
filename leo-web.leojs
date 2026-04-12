@@ -268,6 +268,10 @@
           "vh": "Command classes",
           "children": [
             {
+              "gnx": "felix.20260411212425.1",
+              "vh": "@file src/commands/abbrevCommands.ts"
+            },
+            {
               "gnx": "felix.20251214160853.2",
               "vh": "@file src/commands/baseCommands.ts"
             },
@@ -493,6 +497,7 @@
     "ekr.20140831085423.18639": "Here is what you *must know* to understand Leo's core:\n\n1. A **widget** is an actual Qt widget.\n\nLeo's core seldom accesses widgets directly.  Instead...\n\n2. A **wrapper class** defines a standard api that hides the details\n   of the underlying gui **text** widgets.\n\nLeo's core uses this api almost exclusively. That is, Leo's core code treats wrappers *as if* they were only text widgets there are!\n\nThere is, however, a back door for (hopefully rare!) special cases. All wrapper classes define an official ``widget`` ivar, so core or plugin code can gain access to the real Qt widget using wrapper.widget. Searching for wrapper.widget will find all gui-dependent snippets of code in Leo's core.\n",
     "ekr.20140831085423.18630": "This outline contains all of Leo's core source code.\n\nLeo's code uses the following conventions throughout:\n\nc:  a commander.\nch: a character.\nd:  a dict.\nf:  an open file.\nfn: a file name.\ng:  the leoGlobals module.\ni, j, k: indices into a string.\np:  a Position.\ns:  a string.\nt:  a text widget.\nu:  an undoer.\nw:  a gui widget.\nv:  a Vnode\nz:  a local temp.\n\nIn more limited contexts, the following conventions apply:\n\nsi:     a g.ShortcutInfo object.\nks:     a g.KeyStroke object\nstroke: a KeyStroke object.\n\nbtw:    leoFrame.BaseTextWrapper\nstw:    leoFrame.StringTextWrapper\n\nbqtw:   qt_text.BaseQTextWrapper\nlqtb:   qt_text.LeoQTextBrowser\nqhlw:   qt_text.QHeadlineWrapper\nqmbw:   qt_text.QMinibufferWrapper\nqlew:   qt_text.QLineEditWrapper\nqsciw:  qt_text.QScintiallaWrapper\nqtew:   qt_text.QTextEditWrapper",
     "ekr.20140831085423.18631": "The following 'official' ivars will always exist:\n\nc.frame                 The frame containing the log,body,tree, etc.\nc.frame.body            The body pane.\nc.frame.body.widget     The gui widget for the body pane.\nc.frame.body.wrapper    The high level interface for the body widget.\nc.frame.iconBar         The icon bar.\nc.frame.log             The log pane.\nc.frame.log.widget      The gui widget for the log pane.\nc.frame.log.wrapper     The high-level inteface for the log pane.\nc.frame.tree            The tree pane.\n\nThe following were official ivars that no longer exist:\n\nc.frame.body.bodyCtrl   Use c.frame.body.wrapper instead.\nc.frame.log.logCtrl     Use c.frame.log.wrapper instead.\n",
+    "felix.20251214160853.466": "/**\n * Command decorator for the helpCommandsClass class. \n */\nfunction cmd(p_name: string, p_doc: string) {\n    return new_cmd_decorator(p_name, p_doc, ['c', 'helpCommands']);\n}\n",
     "felix.20251214160933.1": "// Leo loads these plugins automatically.  Do not add them to @enabled-plugins nodes.\n\n// These plugins now contain the importer code for all kinds of @auto nodes.\n// Each plugin must define a top-level importer_dict dictionary describing the plugin.\n@language typescript\n",
     "felix.20251214160938.1": "// Leo loads these plugins automatically.  Do not add them to @enabled-plugins nodes.\n\n// These plugins contain the write code for all kinds of special @auto nodes.\n// Each plugin must define a top-level writer_dict dictionary describing the plugin.\n@language typescript\n"
   }
