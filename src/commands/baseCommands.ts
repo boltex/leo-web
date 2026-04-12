@@ -19,7 +19,7 @@ import { Bead } from '../core/leoUndo';
  */
 export class BaseEditCommandsClass {
     public c: Commands;
-    public w!: StringTextWrapper;
+    public w: StringTextWrapper | null;
     public undoData: Bead | undefined;
 
     //@+others
@@ -32,6 +32,7 @@ export class BaseEditCommandsClass {
      */
     constructor(c: Commands) {
         this.c = c;
+        this.w = null;
     }
     //@+node:felix.20251214160853.6: *3* BaseEdit.begin/endCommand (handles undo)
     //@+node:felix.20251214160853.7: *4* BaseEdit.beginCommand
