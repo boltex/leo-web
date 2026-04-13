@@ -779,8 +779,26 @@ export class Controller {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
             e.preventDefault();
         }
-        this.handlePaneKeyDown(e, "outline");
-
+        if (
+            this.handlePaneKeyDown(e, "outline")
+        ) {
+            return;
+        }
+        // Handle abbreviations.
+        if (!workspace.outline.headlineFinish || e.key.length > 1) {
+            // Not in headline editing mode, or its a non-printable key, so just get out.
+            return;
+        }
+        // Was a Single Printable Character, so check for abbrev expansion.
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        if (c.k.abbrevOn && c.abbrevCommands.expandAbbrev(e, e)) {
+            // Prevent the typing from doing anything!
+            e.preventDefault();
+            // Not a real command, so we have to do the refresh ourselves
+            // after expanding the abbrev to update the outline pane content.
+            g.app.gui.fullRefresh(true);
+            return;
+        }
     }
     //@+node:felix.20260322221320.1: *4* handleBodyPaneKeyDown
     private handleBodyPaneKeyDown = (e: KeyboardEvent) => {
@@ -789,7 +807,25 @@ export class Controller {
             e.preventDefault();
         }
 
-        this.handlePaneKeyDown(e, "body");
+        if (
+            this.handlePaneKeyDown(e, "body")
+        ) {
+            return;
+        }
+        // Handle abbreviations.
+        if (e.key.length > 1) {
+            return;
+        }
+        // Was a Single Printable Character, so check for abbrev expansion.
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        if (c.k.abbrevOn && c.abbrevCommands.expandAbbrev(e, e)) {
+            // Prevent the typing from doing anything!
+            e.preventDefault();
+            // Not a real command, so we have to do the refresh ourselves
+            // after expanding the abbrev to update the body pane content.
+            g.app.gui.fullRefresh(true);
+            return;
+        }
     }
     //@+node:felix.20260322221302.1: *4* handleLogPaneKeyDown
     private handleLogPaneKeyDown = (e: KeyboardEvent) => {
@@ -812,7 +848,10 @@ export class Controller {
 
     }
     //@+node:felix.20260322221225.1: *4* handlePaneKeyDown
-    private handlePaneKeyDown(e: KeyboardEvent, pane: "outline" | "body" | "find"): void {
+    /**
+     * Returns true if the key event was handled and should not be processed further, false otherwise.
+     */
+    private handlePaneKeyDown(e: KeyboardEvent, pane: "outline" | "body" | "find"): boolean {
         // Build key string representation (e.g., "ctrl+shift+q", "shift+alt+left")
         const parts: string[] = [];
 
@@ -876,9 +915,10 @@ export class Controller {
 
                 e.preventDefault();
                 this.doCommand(keybind.command);
-                return;
+                return true;
             }
         }
+        return false;
 
     };
     //@+node:felix.20260322221155.1: *4* handleGlobalKeyDown

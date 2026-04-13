@@ -123,6 +123,10 @@ export class LeoGui {
     //     c.k.masterKeyHandler(event)
     //     c.outerUpdate()
     //@+node:felix.20251213133753.218: *3* LeoGui: Must be defined in subclasses
+    //@+node:felix.20260412205816.1: *4* LeoGui.triggerBodySave
+    public triggerBodySave() {
+        this.oops();
+    }
     //@+node:felix.20251213133753.219: *4* LeoGui.destroySelf
     public destroySelf(): void {
         this.oops();

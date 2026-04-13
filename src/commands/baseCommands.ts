@@ -119,6 +119,17 @@ export class BaseEditCommandsClass {
         //     pass
         // else:
         //     w = c.frame.body and c.frame.body.wrapper
+        if (g.workspace.outline.headlineFinish) {
+            // Is editing a headline, so return the headline widget.
+            const w = c.frame.tree.edit_widget(c.p);
+            if (w && forceFocus) {
+                c.widgetWantsFocusNow(w);
+            }
+            if (w) {
+                this.w = w;
+                return w;
+            }
+        }
 
         const w = c.frame.body && c.frame.body.wrapper;
 

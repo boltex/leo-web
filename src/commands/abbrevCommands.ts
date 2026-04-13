@@ -87,13 +87,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Reload all abbreviation settings.
      */
     public reload_settings(): void {
-
         this.abbrevs = {};
         this.init_settings();
         this.init_abbrev();
         this.init_tree_abbrev();
         this.init_env();
-
     }
 
     public reloadSettings(): void {
@@ -104,7 +102,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     /**
      * Init the user abbreviations from @data global-abbreviations and @data abbreviations nodes.
      */
-    init_abbrev(): void {
+    private init_abbrev(): void {
 
         const c = this.c;
         const table: [string, string][] = [
@@ -154,7 +152,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     /**
      * Init c.abbrev_subst_env by executing the contents of the @data abbreviations-subst-env node.
      */
-    public init_env(): void {
+    private init_env(): void {
         const c = this.c;
         const at = c.atFileCommands;
         if (c.abbrev_place_start && this.enabled) {
@@ -286,25 +284,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Init d from tree_s, the text of a copied outline.
      */
     private init_tree_abbrev_helper(d: Record<string, string>, tree_s: string): void {
-        /*
-        c = self.c
-        hidden_root = c.fileCommands.getPosFromClipboard(tree_s)
-        if not hidden_root:
-            g.trace('no pasted node')
-            return
-        for p in hidden_root.children():
-            for s in g.splitLines(p.b):
-                if s.strip() and not s.startswith('#'):
-                    abbrev_name = s.strip()
-                    # #926: Allow organizer nodes by searching all descendants.
-                    for child in p.subtree():
-                        if child.h.strip() == abbrev_name:
-                            abbrev_s = c.fileCommands.outline_to_clipboard_string(child)
-                            d[abbrev_name] = abbrev_s
-                            break
-                    else:
-                        g.trace(f"no definition for {abbrev_name}")
-        */
 
         const c = this.c;
         const hidden_root = c.fileCommands.getPosFromClipboard(tree_s);
@@ -343,8 +322,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      *
      * Return True if the abbreviation was expanded.
      */
-    public expandAbbrev(event: Event, stroke: KeyboardEvent): boolean {
-
+    public expandAbbrev(event: any, stroke: KeyboardEvent): boolean {
+        console.log('in expandAbbrev', stroke);
         const c = this.c;
         const p = c.p;
         const w = this.editWidget(false);
@@ -358,14 +337,15 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
         const [s, i, j, prefixes] = this.get_prefixes(w);
         let found = false;
-        let new_i: number, tag: string, word: string, val: string;
+        let new_i: number, tag: string | null, word: string | null, val: string | null;
         tag = '';
         word = '';
         val = '';
         new_i = i;
+        console.log('prefixes', prefixes);
         for (const prefix of prefixes) {
             [new_i, tag, word, val] = this.match_prefix(ch, i, j, prefix, s);
-            if (word) {
+            if (word && val != null) {
                 // #4462: Make only one substitution in headlines.
                 if (name.startsWith('head')) {
                     this.make_first_headline_substitution(i, j, p, val);
@@ -385,20 +365,22 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         if (!found) {
             return false;
         }
+        // Ok there really is an abbreviation to expand.
+        g.app.gui.triggerBodySave();
         c.abbrev_subst_env['_abr'] = word;
         if (tag === 'tree') {
             this.root = p.copy();
             this.last_hit = p.copy();
-            this.expand_tree(w, i, j, val, word);
+            this.expand_tree(w, i, j, val!, word!);
             c.undoer.clearAndWarn('tree-abbreviation');
         } else {
             // Never expand a search for text matches.
-            const place_holder = val.includes('__NEXT_PLACEHOLDER');
+            const place_holder = val!.includes('__NEXT_PLACEHOLDER');
             const expand_search = place_holder && !!(this.last_hit && this.last_hit.v);
             if (!expand_search) {
                 this.last_hit = null;
             }
-            this.expand_text(w, i, j, val, word, expand_search);
+            this.expand_text(w, i, j, val!, word!, expand_search);
             // Restore the selection range.
             if (this.save_ins !== null && this.save_sel !== null) {
                 const [sel1, sel2] = this.save_sel;
@@ -512,50 +494,57 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * If found, select the place-holder (without the delims).
      */
     public find_place_holder(p: Position, do_placeholder: boolean): boolean {
-        /*
-        c = self.c
-        # Do #438: Search for placeholder in headline.
-        s = p.h
-        if do_placeholder or c.abbrev_place_start and c.abbrev_place_start in s:
-            new_s, i, j = self.next_place(s, offset=0)
-            if i is not None:
-                p.h = new_s
-                c.redraw(p)
-                c.editHeadline()
-                w = c.edit_widget(p)
-                w.setSelectionRange(i, j, insert=j)
-                return True
-        s = p.b
-        if do_placeholder or c.abbrev_place_start and c.abbrev_place_start in s:
-            new_s, i, j = self.next_place(s, offset=0)
-            if i is None:
-                return False
-            w = c.frame.body.wrapper
-            switch = p != c.p
-            if switch:
-                c.selectPosition(p)
-            else:
-                scroll = w.getYScrollPosition()
-            w.setAllText(new_s)
-            p.v.b = new_s
-            if switch:
-                c.redraw()
-            w.setSelectionRange(i, j, insert=j)
-            if switch:
-                w.seeInsertPoint()
-            else:
-                # Keep the scroll point if possible.
-                w.setYScrollPosition(scroll)
-                w.seeInsertPoint()
-            c.bodyWantsFocusNow()
-            return True
-        # #453: do nothing here.
-        # c.frame.body.forceFullRecolor()
-        # c.bodyWantsFocusNow()
-        return False
-        */
 
-        return false; // TODO: Implement.
+        const c = this.c;
+        // do #438: Search for placeholder in headline.
+        let s = p.h;
+        if (do_placeholder || (c.abbrev_place_start && s.includes(c.abbrev_place_start))) {
+            const [new_s, i, j] = this.next_place(s, 0);
+            if (i != null && j != null) {
+                p.h = new_s;
+                c.redraw(p);
+                c.editHeadline();
+                const w = c.edit_widget(p);
+                if (w) {
+                    w.setSelectionRange(i, j, j);
+                }
+                return true;
+            }
+        }
+        s = p.b;
+        if (do_placeholder || (c.abbrev_place_start && s.includes(c.abbrev_place_start))) {
+            const [new_s, i, j] = this.next_place(s, 0);
+            if (i == null || j == null) {
+                return false;
+            }
+            const w = c.frame.body.wrapper;
+            const switch_ = !p.__eq__(c.p);
+            let scroll: number | null = null;
+            if (switch_) {
+                c.selectPosition(p);
+            } else {
+                scroll = w.getYScrollPosition();
+            }
+            w.setAllText(new_s);
+            p.v.b = new_s;
+            if (switch_) {
+                c.redraw();
+            }
+            w.setSelectionRange(i, j, j);
+            if (switch_) {
+                w.seeInsertPoint();
+            } else {
+                // Keep the scroll point if possible.
+                w.setYScrollPosition(scroll!);
+                w.seeInsertPoint();
+            }
+            c.bodyWantsFocusNow();
+            return true;
+        }
+        // #453: do nothing here.
+        // c.frame.body.forceFullRecolor()
+        // c.bodyWantsFocusNow()
+        return false;
 
     }
     //@+node:felix.20260412000214.7: *4* abbrev.make_script_substitutions
@@ -606,7 +595,54 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             c.p.v.b = w.getAllText()
         return val, do_placeholder
         */
-        return [val, false]; // temporary
+
+        const c = this.c;
+        const w = c.frame.body.wrapper;
+
+        if (!c.abbrev_subst_start) {
+            return [val, false];
+        }
+        // Nothing to undo.
+        if (!val.includes(c.abbrev_subst_start)) {
+            return [val, false];
+        }
+        // Perform all scripting substitutions.
+        this.save_ins = null;
+        this.save_sel = null;
+        while (val.includes(c.abbrev_subst_start)) {
+            const [prefix, rest] = val.split(c.abbrev_subst_start, 2);
+            const content_split = rest.split(c.abbrev_subst_end, 2);
+            if (content_split.length !== 2) {
+                break;
+            }
+            const [content, rest_after] = content_split;
+            try {
+                this.expanding = true;
+                c.abbrev_subst_env['x'] = '';
+                // TODO : use Function constructor instead of eval for better security and performance.
+                console.log('TODO : LEO-WEB : make_script_substitutions : SKIPPING RUNNING SCRIPT FOR NOW !');
+                // eslint-disable-next-line no-eval
+                // eval(content);
+            } catch (e) {
+                g.es_print('exception evaluating', content);
+                g.es_exception(e);
+            } finally {
+                this.expanding = false;
+            }
+            const x = c.abbrev_subst_env['x'] || '';
+            val = `${prefix}${x}${rest_after}`;
+            // Save the selection range.
+            this.save_ins = w.getInsertPoint();
+            this.save_sel = w.getSelectionRange();
+        }
+        if (val === "__NEXT_PLACEHOLDER") {
+            // user explicitly called for next placeholder in an abbreviation inserted previously
+            val = '';
+            return [val, true];
+        } else {
+            c.p.v.b = w.getAllText();
+            return [val, false];
+        }
     }
     //@+node:felix.20260412000214.8: *4* abbrev.make_script_substitutions_in_headline
     /**
@@ -641,6 +677,36 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         ins = i + len(val)
         c.frame.tree.editLabel(p, selection=(ins, ins, ins))
         */
+
+        const c = this.c;
+        c.endEditing();  // Required.
+        const pattern = new RegExp(
+            `^(.*)${c.abbrev_subst_start}(.+)${c.abbrev_subst_end}(.*)$`
+        );
+        const m = pattern.exec(val);
+        if (m) {
+            const content = m[2];
+            c.abbrev_subst_env['x'] = '';
+            try {
+                // TODO : use Function constructor instead of eval for better security and performance.
+                console.log('TODO : LEO-WEB : make_first_headline_substitution : SKIPPING RUNNING SCRIPT FOR NOW !');
+                // eslint-disable-next-line no-eval
+                // eval(content);
+                const x = c.abbrev_subst_env['x'] || '';
+                val = `${m[1]}${x}${m[3]}`;
+            } catch (e) {
+                // Leave p.h alone.
+                g.trace('scripting error in', p.h);
+                g.es_exception(e);
+            }
+        }
+        // #4529
+        p.h = `${p.h.slice(0, i)}${val}${p.h.slice(j)}`;
+        // Set the insertion point and continue editing the headline.
+        const ins = i + val.length;
+        c.frame.tree.editLabel(p, false, [ins, ins, ins]);
+
+
     }
 
     //@+node:felix.20260412000214.9: *4* abbrev.match_prefix
@@ -649,30 +715,36 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      */
     public match_prefix(
         ch: string, i: number, j: number, prefix: string, s: string
-    ): [number, string, string, string] {
-        /*
-        i = j - len(prefix)
-        word = g.checkUnicode(prefix) + g.checkUnicode(ch)
-        tag = 'tree'
-        val = self.tree_abbrevs_d.get(word)
-        if not val:
-            val, tag = self.abbrevs.get(word, (None, None))
-        if val:
-            # Require a word match if the abbreviation is itself a word.
-            if ch in ' \t\n':
-                word = word.rstrip()
-            if word.isalnum() and word[0].isalpha():
-                if i == 0 or s[i - 1] in ' \t\n':
-                    pass
-                else:
-                    i -= 1
-                    word, val = None, None  # 2017/03/19.
-        else:
-            i -= 1
-            word, val = None, None
-        return i, tag, word, val
-        */
-        return [0, '', '', '']; // Dummy.
+    ): [number, string | null, string | null, string | null] {
+
+        i = j - prefix.length;
+        let word: string | null = g.checkUnicode(prefix) + g.checkUnicode(ch);
+        let tag: string | null = 'tree';
+        let val: string | null = this.tree_abbrevs_d[word];
+        if (!val) {
+            [val, tag] = this.abbrevs[word] || [null, null];
+        }
+        if (val) {
+            // Require a word match if the abbreviation is itself a word.
+            if (' \t\n'.includes(ch)) {
+                word = word.trimEnd();
+            }
+            if (/^[a-zA-Z0-9]+$/.test(word) && /^[a-zA-Z]/.test(word[0])) {
+                if (i === 0 || ' \t\n'.includes(s[i - 1])) {
+                    // pass
+                } else {
+                    i -= 1;
+                    word = null;
+                    val = null;  // 2017/03/19.
+                }
+            }
+        } else {
+            i -= 1;
+            word = null;
+            val = null;
+        }
+        return [i, tag, word, val];
+
     }
 
     //@+node:felix.20260412000214.10: *4* abbrev.next_place
@@ -681,7 +753,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * return (s2,start,end) where s2 is s without the <| and |>,
      * and start, end are the positions of the beginning and end of block.
      */
-    public next_place(s: string, offset = 0): [string, number, number] {
+    public next_place(s: string, offset = 0): [string, number | null, number | null] {
         /*
         c = self.c
         if c.abbrev_place_start is None or c.abbrev_place_end is None:
@@ -702,7 +774,32 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         end = start + len(place_holder)
         return s2, start, end
         */
-        return [s, 0, 0]; // Dummy.
+
+        const c = this.c;
+        if (c.abbrev_place_start == null || c.abbrev_place_end == null) {
+            return [s, null, null];  // #1345.
+        }
+        let new_pos = s.indexOf(c.abbrev_place_start, offset);
+        let new_end = s.indexOf(c.abbrev_place_end, offset);
+        if (new_pos < 0 || new_end < 0) {
+            if (offset) {
+                new_pos = s.indexOf(c.abbrev_place_start);
+                new_end = s.indexOf(c.abbrev_place_end);
+                if (new_pos >= 0 && new_end >= 0) {
+                    g.es("Found earlier placeholder");
+                }
+            }
+            if (new_pos < 0 || new_end < 0) {
+                return [s, null, null];
+            }
+        }
+        const start = new_pos;
+        const place_holder_delim = s.slice(new_pos, new_end + c.abbrev_place_end.length);
+        const place_holder = place_holder_delim.slice(c.abbrev_place_start.length, -c.abbrev_place_end.length);
+        const s2 = s.slice(0, start) + place_holder + s.slice(start + place_holder_delim.length);
+        const end = start + place_holder.length;
+        return [s2, start, end];
+
     }
 
     //@+node:felix.20260412000214.11: *4* abbrev.replace_selection
@@ -710,64 +807,69 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Replace w[i:j] by s.
      */
     public replace_selection(w: StringTextWrapper, i: number, j: number, s?: string): void {
-        /*
-        p, u = self.c.p, self.c.undoer
-        w_name = g.app.gui.widget_name(w)
-        bunch = u.beforeChangeBody(p)
-        if i == j:
-            abbrev = ''
-        else:
-            abbrev = w.get(i, j)
-            w.delete(i, j)
-        if s is not None:
-            w.insert(i, s)
-        if w_name.startswith('head'):
-            pass  # Don't set p.h here!
-        else:
-            # Fix part of #438. Don't leave the headline.
-            p.v.b = w.getAllText()
-            u.afterChangeBody(p, 'Abbreviation', bunch)
-        # Adjust self.save_sel & self.save_ins
-        if s is not None and self.save_sel is not None:
-            i, j = self.save_sel
-            ins = self.save_ins
-            delta = len(s) - len(abbrev)
-            self.save_sel = i + delta, j + delta
-            self.save_ins = ins + delta
-        */
+        const p = this.c.p;
+        const u = this.c.undoer;
+        const w_name = g.app.gui.widget_name(w);
+        const bunch = u.beforeChangeBody(p);
+        let abbrev: string;
+        if (i === j) {
+            abbrev = '';
+        } else {
+            abbrev = w.get(i, j);
+            w.delete(i, j);
+        }
+        if (s != null) {
+            w.insert(i, s);
+        }
+        if (!w_name.startsWith('head')) {
+            // Fix part of #438. Don't leave the headline.
+            p.v.b = w.getAllText();
+            u.afterChangeBody(p, 'Abbreviation', bunch);
+        }
+        // Adjust self.save_sel & self.save_ins
+        if (s != null && this.save_sel != null) {
+            let [sel_i, sel_j] = this.save_sel;
+            const ins = this.save_ins!;
+            const delta = s.length - abbrev.length;
+            this.save_sel = [sel_i + delta, sel_j + delta];
+            this.save_ins = ins + delta;
+        }
     }
 
     //@+node:felix.20260412000214.12: *4* abbrev_get_ch
     /**
      * Get the ch from the stroke.
      */
-    public get_ch(event: Event, stroke: KeyboardEvent, w: StringTextWrapper): string {
-        /*
-        ch = g.checkUnicode(event and event.char or '')
-        if self.expanding:
-            return None
-        if w.hasSelection():
-            return None
-        assert g.isStrokeOrNone(stroke), stroke
-        if stroke in ('BackSpace', 'Delete'):
-            return None
-        d = {'Return': '\n', 'Tab': '\t', 'space': ' ', 'underscore': '_'}
-        if stroke:
-            ch = d.get(stroke.s, stroke.s)
-            if len(ch) > 1:
-                if (
-                    stroke.find('Ctrl+') > -1 or
-                    stroke.find('Alt+') > -1 or
-                    stroke.find('Meta+') > -1
-                ):  # fmt: skip
-                    ch = ''
-                else:
-                    ch = event.char if event else ''
-        else:
-            ch = event.char
-        return ch
-        */
-        return ''; // TODO
+    public get_ch(event: any, stroke: KeyboardEvent, w: StringTextWrapper): string | null {
+        let ch: string | null = g.checkUnicode(event ? event.char : '');
+        if (this.expanding) {
+            return null;
+        }
+        if (w.hasSelection()) {
+            return null;
+        }
+        if ('BackSpace Delete'.includes(stroke.key)) {
+            return null;
+        }
+        const d: Record<string, string> = {
+            'Enter': '\n',
+            'Tab': '\t',
+            ' ': ' ',
+            'Space': ' ',
+            'Underscore': '_',
+        };
+        if (stroke.key) {
+            ch = d[stroke.key] || stroke.key;
+            if (ch.length > 1) {
+                if (stroke.ctrlKey || stroke.altKey || stroke.metaKey) {
+                    ch = '';
+                } else {
+                    ch = event ? event.char : '';
+                }
+            }
+        }
+        console.log('get_ch', stroke.key, '->', ch);
+        return ch;
     }
 
     //@+node:felix.20260412000214.13: *4* abbrev_get_prefixes
@@ -775,83 +877,112 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Return the prefixes at the current insertion point of w.
      */
     public get_prefixes(w: StringTextWrapper): [string, number, number, string[]] {
-        /*
-        # New code allows *any* sequence longer than 1 to be an abbreviation.
-        # Any whitespace stops the search.
-        s = w.getAllText()
-        j = w.getInsertPoint()
-        i, prefixes = j - 1, []
-        while len(s) > i >= 0 and s[i] not in ' \t\n':
-            prefixes.append(s[i:j])
-            i -= 1
-        prefixes = list(reversed(prefixes))
-        if '' not in prefixes:
-            prefixes.append('')
-        return s, i, j, prefixes
-        */
 
-        return ['', 0, 0, []]  // Stub.
+
+        // New code allows *any* sequence longer than 1 to be an abbreviation.
+        // Any whitespace stops the search.
+        // const s = w.getAllText();
+        // const j = w.getInsertPoint();
+
+        // TODO: get all text and insertion point directly from the dom.
+        const inHeadline = !!g.workspace.outline.headlineFinish;
+        let s;
+        let j;
+        if (inHeadline) {
+            s = g.workspace.outline.HEADLINE_INPUT.value;
+            j = g.workspace.outline.HEADLINE_INPUT.selectionStart || 0;
+        } else {
+            s = g.workspace.body.getBody();
+            j = g.workspace.body.getBodyInsertOffset();
+        }
+
+        let i = j - 1;
+        const prefixes: string[] = [];
+        while (i >= 0 && !' \t\n'.includes(s[i])) {
+            prefixes.push(s.slice(i, j));
+            i -= 1;
+        }
+        prefixes.reverse();
+        if (!prefixes.includes('')) {
+            prefixes.push('');
+        }
+        return [s, i, j, prefixes];
+
     }
     //@+node:felix.20260412000219.1: *3* abbrev.dynamic abbreviation...
     //@+node:felix.20260412000219.2: *4* abbrev.dynamicCompletion C-M-/
     @cmd('dabbrev-completion', 'Insert the common prefix of all dynamic abbrev\'s matching the present word. This corresponds to C-M-/ in Emacs.')
     public dynamicCompletion(event?: Event): void {
-        /*
-        c, p = self.c, self.c.p
-        w = self.editWidget(event)
-        if not w:
-            return
-        s = w.getAllText()
-        ins = ins1 = w.getInsertPoint()
-        if 0 < ins < len(s) and not g.isWordChar(s[ins]):
-            ins1 -= 1
-        i, j = g.getWord(s, ins1)
-        word = w.get(i, j)
-        aList = self.getDynamicList(w, word)
-        if not aList:
-            return
-        # Bug fix: remove s itself, otherwise we can not extend beyond it.
-        if word in aList and len(aList) > 1:
-            aList.remove(word)
-        prefix = functools.reduce(g.longestCommonPrefix, aList)
-        if prefix.strip():
-            ypos = w.getYScrollPosition()
-            b = c.undoer.beforeChangeNodeContents(p)
-            s = s[:i] + prefix + s[j:]
-            w.setAllText(s)
-            w.setInsertPoint(i + len(prefix))
-            w.setYScrollPosition(ypos)
-            c.undoer.afterChangeNodeContents(p, command='dabbrev-completion', bunch=b)
-            c.recolor()
-        */
+        const c = this.c;
+        const p = c.p;
+        const w = this.editWidget();
+        if (!w) {
+            return;
+        }
+        const s = w.getAllText();
+        const ins = w.getInsertPoint();
+        let ins1 = ins;
+        if (ins > 0 && ins < s.length && !g.isWordChar(s[ins])) {
+            ins1 -= 1;
+        }
+        const [i, j] = g.getWord(s, ins1);
+        const word = w.get(i, j);
+        let aList = this.getDynamicList(w, word);
+        if (!aList.length) {
+            return;
+        }
+        // Bug fix: remove s itself, otherwise we can not extend beyond it.
+        if (aList.includes(word) && aList.length > 1) {
+            aList = aList.filter(item => item !== word);
+        }
+        const prefix = aList.length
+            ? aList.reduce((a, b) => g.longestCommonPrefix(a, b))
+            : "";
+        if (prefix.trim()) {
+            const ypos = w.getYScrollPosition();
+            const bunch = c.undoer.beforeChangeNodeContents(p);
+            const new_s = s.slice(0, i) + prefix + s.slice(j);
+            w.setAllText(new_s);
+            w.setInsertPoint(i + prefix.length);
+            w.setYScrollPosition(ypos);
+            c.undoer.afterChangeNodeContents(p, 'dabbrev-completion', bunch);
+            c.recolor();
+        }
     }
 
     //@+node:felix.20260412000219.3: *4* abbrev.dynamicExpansion M-/ & helper
-    @cmd('dabbrev-expands',
+    @cmd(
+        'dabbrev-expands',
         'Inserts the longest common prefix of the word at the cursor. Displays all possible completions if the prefix is the same as the word.'
     )
-    public dynamicExpansion(event?: Event): void {
-        /*
-        w = self.editWidget(event)
-        if not w:
-            return
-        s = w.getAllText()
-        ins = ins1 = w.getInsertPoint()
-        if 0 < ins < len(s) and not g.isWordChar(s[ins]):
-            ins1 -= 1
-        i, j = g.getWord(s, ins1)
-        # This allows the cursor to be placed anywhere in the word.
-        w.setInsertPoint(j)
-        word = w.get(i, j)
-        aList = self.getDynamicList(w, word)
-        if not aList:
-            return
-        if word in aList and len(aList) > 1:
-            aList.remove(word)
-        prefix = functools.reduce(g.longestCommonPrefix, aList)
-        prefix = prefix.strip()
-        self.dynamicExpandHelper(event, prefix, aList, w)
-        */
+    public async dynamicExpansion(event?: Event): Promise<void> {
+
+        // TODO RETURN PROMISE AND/OR MAKE ASYNC!
+
+        const w = this.editWidget();
+        if (!w) {
+            return;
+        }
+        const s = w.getAllText();
+        const ins = w.getInsertPoint();
+        let ins1 = ins;
+        if (ins > 0 && ins < s.length && !g.isWordChar(s[ins])) {
+            ins1 -= 1;
+        }
+        const [i, j] = g.getWord(s, ins1);
+        // This allows the cursor to be placed anywhere in the word.
+        w.setInsertPoint(j);
+        const word = w.get(i, j);
+        let aList = this.getDynamicList(w, word);
+        if (!aList.length) {
+            return;
+        }
+        if (aList.includes(word) && aList.length > 1) {
+            aList = aList.filter(item => item !== word);
+        }
+        const prefix = aList.reduce((a, b) => g.longestCommonPrefix(a, b)).trim();
+        return this.dynamicExpandHelper(event, prefix, aList, w);
+
     }
 
     //@+node:felix.20260412000219.4: *5* abbrev.dynamicExpandHelper
@@ -859,55 +990,76 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * State handler for dabbrev-expands command.
      */
     public dynamicExpandHelper(
-        event: Event,
+        event: any,
         prefix?: string,
         aList?: string[],
         w?: StringTextWrapper
-    ): void {
-        /*
-        c, k = self.c, self.c.k
-        self.w = w
-        if prefix is None:
-            prefix = ''
-        prefix2 = 'dabbrev-expand: '
-        c.frame.log.deleteTab('Completion')
-        g.es('', '\n'.join(aList or []), tabName='Completion')
-        # Protect only prefix2 so tab completion and backspace to work properly.
-        k.setLabelBlue(prefix2, protect=True)
-        k.setLabelBlue(prefix2 + prefix, protect=False)
-        k.get1Arg(event, handler=self.dynamicExpandHelper1, tabList=aList, prefix=prefix)
+    ): Thenable<void> {
 
+        const c = this.c;
+        const k = this.c.k;
+        this.w = w || null;
+        if (!prefix) {
+            prefix = '';
+        }
+        const prefix2 = 'dabbrev-expand: ';
+        g.es('', (aList || []).join('\n'), 'Completion');
+
+        // TODO : USE g.app.gui.get1Arg INSTEAD! (chain up to dynamicExpandHelper1 passing the result as an argument)
+
+        // Protect only prefix2 so tab completion and backspace to work properly.
+        // k.setLabelBlue(prefix2, true);
+        // k.setLabelBlue(prefix2 + prefix, false);
+        // k.get1Arg(event, this.dynamicExpandHelper1, aList, prefix);
+        // Signature is: 
+        /*
+            options: {
+            title: string;
+            value: string;
+            prompt: string;
+            placeHolder?: string;
+        },
+        tabList?: string[]
         */
+        return g.app.gui.get1Arg({
+
+        }, aList).then((arg) => {
+            this.dynamicExpandHelper1(arg);
+        });
     }
 
     /**
      * Finisher for dabbrev-expands.
      */
-    public dynamicExpandHelper1(event: Event): void {
-        /*
-        c, k = self.c, self.c.k
-        p = c.p
-        c.frame.log.deleteTab('Completion')
-        k.clearState()
-        k.resetLabel()
-        if k.arg:
-            w = self.w
-            s = w.getAllText()
-            ypos = w.getYScrollPosition()
-            b = c.undoer.beforeChangeNodeContents(p)
-            ins = ins1 = w.getInsertPoint()
-            if 0 < ins < len(s) and not g.isWordChar(s[ins]):
-                ins1 -= 1
-            i, j = g.getWord(s, ins1)
-            # word = s[i: j]
-            s = s[:i] + k.arg + s[j:]
-            w.setAllText(s)
-            w.setInsertPoint(i + len(k.arg))
-            w.setYScrollPosition(ypos)
-            c.undoer.afterChangeNodeContents(p, command='dabbrev-expand', bunch=b)
-            c.recolor()
-        
-        */
+    public dynamicExpandHelper1(arg?: string): void {
+        if (arg == null) {
+            return;
+        }
+        // use arg instead of k.arg, and chain up to this method from dynamicExpandHelper using g.app.gui.get1Arg
+        const c = this.c;
+        const p = c.p;
+        if (arg) {
+            const w = this.w;
+            if (!w) {
+                return;
+            }
+            const s = w.getAllText();
+            const ypos = w.getYScrollPosition();
+            const b = c.undoer.beforeChangeNodeContents(p);
+            const ins = w.getInsertPoint();
+            let ins1 = ins;
+            if (ins > 0 && ins < s.length && !g.isWordChar(s[ins])) {
+                ins1 -= 1;
+            }
+            const [i, j] = g.getWord(s, ins1);
+            // word = s[i: j]
+            const new_s = s.slice(0, i) + arg + s.slice(j);
+            w.setAllText(new_s);
+            w.setInsertPoint(i + arg.length);
+            w.setYScrollPosition(ypos);
+            c.undoer.afterChangeNodeContents(p, 'dabbrev-expand', b);
+            c.recolor();
+        }
     }
 
     //@+node:felix.20260412000219.5: *4* abbrev.getDynamicList (helper)
@@ -915,19 +1067,22 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Return a list of dynamic abbreviations.
      */
     public getDynamicList(w: StringTextWrapper, s: string): string[] {
-        /*
-        if self.globalDynamicAbbrevs:
-            # Look in all nodes.h
-            items = []
-            for p in self.c.all_unique_positions():
-                items.extend(self.dynaregex.findall(p.b))
-        else:
-            # Just look in this node.
-            items = self.dynaregex.findall(w.getAllText())
-        items = sorted(set([z for z in items if z.startswith(s)]))
-        return items
-        */
-        return []; // todo: implement
+        if (this.globalDynamicAbbrevs) {
+            // Look in all nodes.h
+            const items: string[] = [];
+            for (const p of this.c.all_unique_positions()) {
+                const matches = p.b.match(this.dynaregex);
+                if (matches) {
+                    items.push(...matches);
+                }
+            }
+            return Array.from(new Set(items.filter(z => z.startsWith(s)))).sort();
+        } else {
+            // Just look in this node.
+            const matches = w.getAllText().match(this.dynaregex);
+            const items = matches ? matches.filter(z => z.startsWith(s)) : [];
+            return Array.from(new Set(items)).sort();
+        }
     }
 
     //@+node:felix.20260412000224.1: *3* abbrev.static abbrevs
@@ -936,43 +1091,40 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Enter the abbreviation 's' into the self.abbrevs dict.
      */
     public addAbbrevHelper(s: string, tag = ''): void {
-        /*
-        if not s.strip():
-            return
-        try:
-            d = self.abbrevs
-            data = s.split('=')
-            # Do *not* strip ws so the user can specify ws.
-            name = data[0].replace('\\t', '\t').replace('\\n', '\n')
-            val = '='.join(data[1:])
-            if val.endswith('\n'):
-                val = val[:-1]
-            val = self.n_regex.sub('\n', val).replace('\\\\n', '\\n')
-            old, tag = d.get(
-                name,
-                (None, None),
-            )
-            if old and old != val and not g.unitTesting:
-                g.es_print(f"redefining abbreviation {name}\nfrom {old!r} to {val!r}")
-            d[name] = val, tag
-        except ValueError:
-            g.es_print(f"bad abbreviation: {s}")
-        */
-        // TODO !
+        if (!s.trim()) {
+            return;
+        }
+        try {
+            const d = this.abbrevs;
+            const data = s.split('=');
+            // Do *not* strip ws so the user can specify ws.
+            const name = data[0].replace(/\\t/g, '\t').replace(/\\n/g, '\n');
+            let val = data.slice(1).join('=');
+            if (val.endsWith('\n')) {
+                val = val.slice(0, -1);
+            }
+            val = val.replace(/\\n/g, '\n');
+            let old: string | null = null;
+            [old, tag] = d[name] || [null, null];
+            if (old && old !== val && !g.unitTesting) {
+                g.es_print(`redefining abbreviation ${name}\nfrom ${JSON.stringify(old)} to ${JSON.stringify(val)}`);
+            }
+            d[name] = [val, tag];
 
+        } catch (e) {
+            g.es_print(`bad abbreviation: ${s} `);
+        }
     }
 
     //@+node:felix.20260412000224.3: *4* abbrev.killAllAbbrevs
     @cmd('abbrev-kill-all', 'Delete all abbreviations.')
     public killAllAbbrevs(): void {
-
         this.abbrevs = {};
     }
 
     //@+node:felix.20260412000224.4: *4* abbrev.listAbbrevs
     @cmd('abbrev-list', 'List all abbreviations.')
     public listAbbrevs(): void {
-
         const d = this.abbrevs;
         if (Object.keys(d).length > 0) {
             g.es_print('Abbreviations...');
@@ -981,12 +1133,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 const [val, tag] = d[name];
                 const val_display = val.replace('\n', '\\n');
                 const tag_display = tag ? `${tag}: ` : '';
-                g.es_print('', `${tag_display}${name}=${val_display}`);
+                g.es_print('', `${tag_display}${name}=${val_display} `);
             }
         } else {
             g.es_print('No present abbreviations');
         }
-
     }
 
     //@+node:felix.20260412000224.5: *4* abbrev.toggleAbbrevMode

@@ -1268,6 +1268,7 @@ export class NullTree {
         //     d[p.v.gnx] = w;
         //     w.setAllText(p.h);
         // }
+        console.log('in edit_widget, w is', w);
         return w;
     }
     //@+node:felix.20251213133753.184: *3* NullTree.editLabel
@@ -1277,12 +1278,12 @@ export class NullTree {
     public editLabel(
         p: Position,
         selectAll = false,
-        selection?: any
+        selection?: [number, number, number]
     ): [undefined, StringTextWrapper | undefined] {
         this.endEditLabel();
         if (p && p.__bool__()) {
-            // ! LEO-WEB : Mimic from qt_tree
 
+            // ! LEO-WEB : Mimic from qt_tree
             const d = this.editWidgetsDict;
 
             let wrapper = d[p.v.gnx];
@@ -1293,7 +1294,14 @@ export class NullTree {
                 wrapper.setAllText(p.h);
             }
 
-            // const wrapper = new StringTextWrapper(this.c, 'head-wrapper');
+            console.log('TODO: maybe also call g.app.gui.editHeadline(p, selectAll, selection); ???');
+            if (selectAll) {
+                wrapper.selectAllText();
+            } else if (selection) {
+                // selection is [i, j, ins] where ins is the text between i and j.
+                wrapper.setSelectionRange(selection[0], selection[1], selection[2]);
+            }
+
             const e = undefined;
             return [e, wrapper];
         }
