@@ -323,11 +323,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Return True if the abbreviation was expanded.
      */
     public expandAbbrev(event: any, stroke: KeyboardEvent): boolean {
-        console.log('in expandAbbrev', stroke);
         const c = this.c;
         const p = c.p;
         const w = this.editWidget(false);
         const name = g.app.gui.widget_name(w);
+        console.log(name, 'in expandAbbrev', stroke.key);
         if (!w) {
             return false;
         }
@@ -884,7 +884,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         // const s = w.getAllText();
         // const j = w.getInsertPoint();
 
-        // TODO: get all text and insertion point directly from the dom.
+        // LEO-WEB: get all text and insertion point directly from the dom.
         const inHeadline = !!g.workspace.outline.headlineFinish;
         let s;
         let j;
@@ -898,6 +898,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
         let i = j - 1;
         const prefixes: string[] = [];
+        // Check for space, tab, or newline before the insertion point.  If found, do not include it in the prefix.
         while (i >= 0 && !' \t\n'.includes(s[i])) {
             prefixes.push(s.slice(i, j));
             i -= 1;

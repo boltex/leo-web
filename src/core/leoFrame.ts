@@ -1268,6 +1268,14 @@ export class NullTree {
         //     d[p.v.gnx] = w;
         //     w.setAllText(p.h);
         // }
+
+        // TEST WITH RETURNING A NEW WIDGET EVEN IF NOT IN DICT, TO SEE IF IT CAUSES PROBLEMS.
+        if (!w) {
+            w = new StringTextWrapper(this.c, 'head-wrapper');
+            d[p.v.gnx] = w;
+            w.setAllText(p.h);
+        }
+
         console.log('in edit_widget, w is', w);
         return w;
     }

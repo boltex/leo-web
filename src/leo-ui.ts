@@ -1649,7 +1649,7 @@ export class LeoUI extends NullGui {
 
         if (saveSelectionOnly) {
             c.frame.tree.editLabel(node); // <-- THIS SHOULD CREATE IT !
-            const headlineWidget = c.edit_widget(node) as StringTextWrapper;
+            const headlineWidget = c.edit_widget(node);
             if (headlineWidget && headlineWidget.sel) {
                 headlineWidget.setSelectionRange(newSelection[0], newSelection[1], newSelection[2]);
             } else {
