@@ -149,7 +149,7 @@ export class MenuManager {
             }
 
             const li = document.createElement('li');
-            if (entry.action) {
+            if (entry.command) {
                 li.classList.add('menu-item');
             }
 
@@ -178,10 +178,10 @@ export class MenuManager {
             if (!enabled) {
                 li.classList.add('disabled');
             }
-            if (entry.action) {
+            if (entry.command) {
                 li.addEventListener('click', () => {
                     if (!li.classList.contains('disabled')) {
-                        workspace.controller.doCommand(entry.action as string);
+                        workspace.controller.doCommand(entry.command as string);
                     }
                 });
             }
@@ -301,7 +301,7 @@ export class MenuManager {
                         }
                     });
                 }
-            } else if (entry.action) {
+            } else if (entry.command) {
                 // First check for enabledFlagsSet and enabledFlagsClear to determine if the item should be enabled
                 let enabled = true;
                 if (entry.enabledFlagsSet) {
@@ -328,7 +328,7 @@ export class MenuManager {
                     this.closeAllSubmenus();
                     workspace.layout.restoreLastFocusedElement();
                     this.activeTopMenu = null;
-                    workspace.controller.doCommand(entry.action as string);
+                    workspace.controller.doCommand(entry.command as string);
                 });
 
                 if (entry.enabledFlagsSet || entry.enabledFlagsClear) {
@@ -598,7 +598,7 @@ export class MenuManager {
             if (entry.tooltip) {
                 button.title = entry.tooltip;
             }
-            if (entry.action) {
+            if (entry.command) {
                 // First check for enabledFlagsSet and enabledFlagsClear to determine if the item should be enabled
                 let enabled = true;
                 if (entry.enabledFlagsSet) {
@@ -631,7 +631,7 @@ export class MenuManager {
                     this.closeAllSubmenus();
                     workspace.layout.restoreLastFocusedElement();
                     this.activeTopMenu = null;
-                    workspace.controller.doCommand(entry.action as string);
+                    workspace.controller.doCommand(entry.command as string);
                 });
 
                 if (entry.enabledFlagsSet || entry.enabledFlagsClear) {
