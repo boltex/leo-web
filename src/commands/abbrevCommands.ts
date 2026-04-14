@@ -185,7 +185,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 // eslint-disable-next-line no-eval
                 // eval(script);
                 console.log('TODO : LEO-WEB : @data abbreviations-subst-env : SKIPPING RUNNING SCRIPT FOR NOW !');
-                // instead output tehe script to help debug
+                // instead output the script to help debug
                 console.log('Script from @data abbreviations-subst-env :');
                 console.log(script);
 
@@ -327,7 +327,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         const p = c.p;
         const w = this.editWidget(false);
         const name = g.app.gui.widget_name(w);
-        console.log(name, 'in expandAbbrev', stroke.key);
         if (!w) {
             return false;
         }
@@ -335,28 +334,27 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         if (!ch) {
             return false;
         }
-        const [s, i, j, prefixes] = this.get_prefixes(w);
+        let [s, i, j, prefixes] = this.get_prefixes(w);
         let found = false;
-        let new_i: number, tag: string | null, word: string | null, val: string | null;
+        let tag: string | null, word: string | null, val: string | null;
         tag = '';
         word = '';
         val = '';
-        new_i = i;
-        console.log('prefixes', prefixes);
         for (const prefix of prefixes) {
-            [new_i, tag, word, val] = this.match_prefix(ch, i, j, prefix, s);
+            [i, tag, word, val] = this.match_prefix(ch, i, j, prefix, s);
             if (word && val != null) {
                 // #4462: Make only one substitution in headlines.
                 if (name.startsWith('head')) {
                     this.make_first_headline_substitution(i, j, p, val);
                     return true;
                 }
-                if (val === '__NEXT_PLACEHOLDER') {
-                    const insertPoint = w.getInsertPoint();
-                    if (insertPoint > 0) {
-                        w.delete(insertPoint - 1);
-                    }
-                }
+                // ! IN LEO-WEB , DO THIS RIGHT AFTER triggering the body save.
+                // if (val === '__NEXT_PLACEHOLDER') {
+                //    i = w.getInsertPoint();
+                //     if (i > 0) {
+                //         w.delete(i - 1);
+                //     }
+                // }
                 // Do not call c.endEditing here.
                 found = true;
                 break;
@@ -367,6 +365,13 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
         // Ok there really is an abbreviation to expand.
         g.app.gui.triggerBodySave();
+        // ! This was moved from the for loop because in LEO-WEB we want to trigger the body save before deleting the placeholder.
+        if (val === '__NEXT_PLACEHOLDER') {
+            i = w.getInsertPoint();
+            if (i > 0) {
+                w.delete(i - 1);
+            }
+        }
         c.abbrev_subst_env['_abr'] = word;
         if (tag === 'tree') {
             this.root = p.copy();
@@ -410,7 +415,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         word: string,
         expand_search = false,
     ): void {
-
         const c = this.c;
         let do_placeholder = false;
         if (word === c.config.getString("abbreviations-next-placeholder")) {
@@ -552,49 +556,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Make scripting substitutions in node p.
      */
     public make_script_substitutions(i: number, j: number, val: string): [string, boolean] {
-        /*
-        c = self.c
-        w = c.frame.body.wrapper
-        if not c.abbrev_subst_start:
-            return val, False
-        # Nothing to undo.
-        if c.abbrev_subst_start not in val:
-            return val, False
-
-        # Perform all scripting substitutions.
-        self.save_ins = None
-        self.save_sel = None
-        while c.abbrev_subst_start in val:
-            prefix, rest = val.split(c.abbrev_subst_start, 1)
-            content = rest.split(c.abbrev_subst_end, 1)
-            if len(content) != 2:
-                break
-            content, rest = content  # type:ignore
-            try:
-                self.expanding = True
-                c.abbrev_subst_env['x'] = ''
-                exec(content, c.abbrev_subst_env, c.abbrev_subst_env)  # type:ignore
-            except Exception:
-                g.es_print('exception evaluating', content)
-                g.es_exception()
-            finally:
-                self.expanding = False
-            x = c.abbrev_subst_env.get('x')
-            if x is None:
-                x = ''
-            val = f"{prefix}{x}{rest}"
-            # Save the selection range.
-            self.save_ins = w.getInsertPoint()
-            self.save_sel = w.getSelectionRange()
-        if val == "__NEXT_PLACEHOLDER":
-            # user explicitly called for next placeholder in an abbreviation inserted previously
-            val = ''
-            do_placeholder = True
-        else:
-            do_placeholder = False
-            c.p.v.b = w.getAllText()
-        return val, do_placeholder
-        */
 
         const c = this.c;
         const w = c.frame.body.wrapper;
@@ -621,14 +582,15 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 c.abbrev_subst_env['x'] = '';
                 // TODO : use Function constructor instead of eval for better security and performance.
                 console.log('TODO : LEO-WEB : make_script_substitutions : SKIPPING RUNNING SCRIPT FOR NOW !');
+                console.log('make_script_substitutions : content to run :', content);
                 // eslint-disable-next-line no-eval
                 // eval(content);
             } catch (e) {
                 g.es_print('exception evaluating', content);
                 g.es_exception(e);
             } finally {
-                this.expanding = false;
             }
+            this.expanding = false;
             const x = c.abbrev_subst_env['x'] || '';
             val = `${prefix}${x}${rest_after}`;
             // Save the selection range.
@@ -649,34 +611,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Make *only* the first scripting substitution in p.h.
      */
     public make_first_headline_substitution(i: number, j: number, p: Position, val: string): void {
-        /*
-        c = self.c
-        c.endEditing()  # Required.
-        pattern = re.compile(
-            r'^(.*)%s(.+)%s(.*)$'
-            % (
-                re.escape(c.abbrev_subst_start),
-                re.escape(c.abbrev_subst_end),
-            )
-        )
-        if m := pattern.match(val):
-            content = m.group(2)
-            c.abbrev_subst_env['x'] = ''
-            try:
-                exec(content, c.abbrev_subst_env, c.abbrev_subst_env)
-                x = c.abbrev_subst_env.get('x')
-                if x:
-                    val = f"{m.group(1)}{x}{m.group(3)}"
-            except Exception:
-                # Leave p.h alone.
-                g.trace('scripting error in', p.h)
-                g.es_exception()
-        # #4529
-        p.h = f"{p.h[:i]}{val}{p.h[j:]}"
-        # Set the insertion point and continue editing the headline.
-        ins = i + len(val)
-        c.frame.tree.editLabel(p, selection=(ins, ins, ins))
-        */
 
         const c = this.c;
         c.endEditing();  // Required.
@@ -690,6 +624,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             try {
                 // TODO : use Function constructor instead of eval for better security and performance.
                 console.log('TODO : LEO-WEB : make_first_headline_substitution : SKIPPING RUNNING SCRIPT FOR NOW !');
+                console.log('make_first_headline_substitution : content to run :', content);
                 // eslint-disable-next-line no-eval
                 // eval(content);
                 const x = c.abbrev_subst_env['x'] || '';
@@ -705,7 +640,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         // Set the insertion point and continue editing the headline.
         const ins = i + val.length;
         c.frame.tree.editLabel(p, false, [ins, ins, ins]);
-
 
     }
 
@@ -754,26 +688,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * and start, end are the positions of the beginning and end of block.
      */
     public next_place(s: string, offset = 0): [string, number | null, number | null] {
-        /*
-        c = self.c
-        if c.abbrev_place_start is None or c.abbrev_place_end is None:
-            return s, None, None  # #1345.
-        new_pos = s.find(c.abbrev_place_start, offset)
-        new_end = s.find(c.abbrev_place_end, offset)
-        if (new_pos < 0 or new_end < 0) and offset:
-            new_pos = s.find(c.abbrev_place_start)
-            new_end = s.find(c.abbrev_place_end)
-            if not (new_pos < 0 or new_end < 0):
-                g.es("Found earlier placeholder")
-        if new_pos < 0 or new_end < 0:
-            return s, None, None
-        start = new_pos
-        place_holder_delim = s[new_pos : new_end + len(c.abbrev_place_end)]
-        place_holder = place_holder_delim[len(c.abbrev_place_start) : -len(c.abbrev_place_end)]
-        s2 = s[:start] + place_holder + s[start + len(place_holder_delim) :]
-        end = start + len(place_holder)
-        return s2, start, end
-        */
 
         const c = this.c;
         if (c.abbrev_place_start == null || c.abbrev_place_end == null) {
@@ -846,9 +760,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             return null;
         }
         if (w.hasSelection()) {
+            g.app.gui.triggerBodySave(); // Force the DOM body content to be saved to the position's b and widget's text.
             return null;
         }
-        if ('BackSpace Delete'.includes(stroke.key)) {
+        if (stroke.key === 'Backspace' || stroke.key === 'Delete') {
             return null;
         }
         const d: Record<string, string> = {
@@ -868,7 +783,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 }
             }
         }
-        console.log('get_ch', stroke.key, '->', ch);
         return ch;
     }
 
@@ -877,7 +791,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Return the prefixes at the current insertion point of w.
      */
     public get_prefixes(w: StringTextWrapper): [string, number, number, string[]] {
-
 
         // New code allows *any* sequence longer than 1 to be an abbreviation.
         // Any whitespace stops the search.

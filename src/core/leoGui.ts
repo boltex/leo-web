@@ -15,6 +15,7 @@ import { StringFindTabManager } from './findTabManager';
 import { Position } from './leoNodes';
 import { Commands } from './leoCommands';
 import { LeoFrame, StringTextWrapper } from './leoFrame';
+import { Focus, ReqRefresh } from '../types';
 
 //@-<< leoGui imports >>
 //@+others
@@ -548,7 +549,7 @@ export class NullGui extends LeoGui {
     public override makeAllBindings(): void { }
 
     public launchRefresh(): void { }
-    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void { }
+    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void { }
     public showNavResults(): void { }
 
     public override replaceClipboardWith(s: string): Thenable<string> {

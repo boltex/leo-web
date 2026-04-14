@@ -879,18 +879,35 @@ export class LeoUI extends NullGui {
     /**
      * * Refreshes all parts.
      */
-    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void {
-        this.setupRefresh(
-            p_keepFocus ? Focus.NoChange : this.finalFocus,
-            {
-                tree: true,
-                body: true,
-                states: true,
-                buttons: true,
-                documents: true,
-                goto: true,
-            }
-        );
+    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void {
+
+        if (keepFocus) {
+            this.finalFocus = Focus.NoChange;
+        }
+
+        if (finalFocus) {
+            this.finalFocus = finalFocus;
+        }
+
+        if (refreshType) {
+            this.setupRefresh(
+                this.finalFocus,
+                refreshType
+            );
+        } else {
+            this.setupRefresh(
+                this.finalFocus,
+                {
+                    tree: true,
+                    body: true,
+                    states: true,
+                    buttons: true,
+                    documents: true,
+                    goto: true,
+                }
+            );
+        }
+
         if (instantRefresh) {
             // Launch the tree and body refresh immediately!
             workspace.controller.buildRowsRenderTreeLeo();

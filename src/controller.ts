@@ -4,7 +4,7 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, Focus, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -796,7 +796,10 @@ export class Controller {
             e.preventDefault();
             // Not a real command, so we have to do the refresh ourselves
             // after expanding the abbrev to update the outline pane content.
-            g.app.gui.fullRefresh(true);
+            g.app.gui.fullRefresh(true, false, Focus.NoChange, {
+                tree: true,
+                states: true,
+            },);
             return;
         }
     }
@@ -823,7 +826,14 @@ export class Controller {
             e.preventDefault();
             // Not a real command, so we have to do the refresh ourselves
             // after expanding the abbrev to update the body pane content.
-            g.app.gui.fullRefresh(true);
+            g.app.gui.fullRefresh(true, false, Focus.Body, {
+                tree: true,
+                body: true,
+                scroll: true,
+                // documents: false,
+                // buttons: false,
+                states: true,
+            },);
             return;
         }
     }

@@ -1480,7 +1480,7 @@ export class StringTextWrapper {
      * StringTextWrapper.
      */
     public delete(i: number, j?: number): void {
-        if (j === undefined) {
+        if (j == null) {
             j = i + 1;
         }
         // This allows subclasses to use this base class method.
@@ -1507,7 +1507,7 @@ export class StringTextWrapper {
      * StringTextWrapper.
      */
     public get(i: number, j?: number): string {
-        if (j === undefined) {
+        if (j == null) {
             j = i + 1;
         }
         const s = this.s.substring(i, j);
@@ -1527,8 +1527,8 @@ export class StringTextWrapper {
      */
     public getInsertPoint(): number {
         let i = this.ins;
-        if (i === undefined) {
-            if (this.virtualInsertPoint === undefined) {
+        if (i == null) {
+            if (this.virtualInsertPoint == null) {
                 i = 0;
             } else {
                 i = this.virtualInsertPoint;
