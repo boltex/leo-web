@@ -60,6 +60,35 @@ export class Controller {
             console.warn(`Command not found: ${commandName}`);
         }
     }
+    //@+node:felix.20260414231550.1: *3* refreshAbbrev
+    public refreshAbbrev(): void {
+
+        const w = g.app.gui.get_focus();
+        const focus = g.app.gui.widget_name(w).toLowerCase();
+        if (focus.includes('tree') || focus.includes('head')) {
+            console.log('refresh outline');
+            // g.app.gui.fullRefresh(true, false, Focus.NoChange, {
+            //     tree: true,
+            //     states: true,
+            // }, true);
+            g.app.gui.fullRefresh(true, true);
+            // TODO : UNCOMMENT BELOW MAYBE?
+            setTimeout(() => {
+                // Select headline if needed after refresh.
+                g.app.gui.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);
+            }, 0);
+        } else {
+            console.log('refresh body');
+            g.app.gui.fullRefresh(true, false, Focus.Body, {
+                tree: true,
+                body: true,
+                scroll: true,
+                // documents: false,
+                // buttons: false,
+                states: true,
+            });
+        }
+    }
     //@+node:felix.20260322222300.1: *3* Initialization & Setup
     //@+others
     //@+node:felix.20260322222024.1: *4* initializeInteractions
@@ -792,14 +821,8 @@ export class Controller {
         // Was a Single Printable Character, so check for abbrev expansion.
         const c = g.app.windowList[g.app.gui.frameIndex].c;
         if (c.k.abbrevOn && c.abbrevCommands.expandAbbrev(e, e)) {
-            // Prevent the typing from doing anything!
-            e.preventDefault();
-            // Not a real command, so we have to do the refresh ourselves
-            // after expanding the abbrev to update the outline pane content.
-            g.app.gui.fullRefresh(true, false, Focus.NoChange, {
-                tree: true,
-                states: true,
-            },);
+            e.preventDefault(); // Prevent the typing from doing anything!
+            this.refreshAbbrev();
             return;
         }
     }
@@ -822,18 +845,8 @@ export class Controller {
         // Was a Single Printable Character, so check for abbrev expansion.
         const c = g.app.windowList[g.app.gui.frameIndex].c;
         if (c.k.abbrevOn && c.abbrevCommands.expandAbbrev(e, e)) {
-            // Prevent the typing from doing anything!
-            e.preventDefault();
-            // Not a real command, so we have to do the refresh ourselves
-            // after expanding the abbrev to update the body pane content.
-            g.app.gui.fullRefresh(true, false, Focus.Body, {
-                tree: true,
-                body: true,
-                scroll: true,
-                // documents: false,
-                // buttons: false,
-                states: true,
-            },);
+            e.preventDefault(); // Prevent the typing from doing anything!
+            this.refreshAbbrev();
             return;
         }
     }

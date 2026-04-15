@@ -10,7 +10,7 @@ import * as g from '../core/leoGlobals';
 import { new_cmd_decorator } from '../core/decorators';
 import { BaseEditCommandsClass } from './baseCommands';
 import { Commands } from '../core/leoCommands';
-import { Position, VNode } from '../core/leoNodes';
+import { Position } from '../core/leoNodes';
 import { StringTextWrapper } from '../core/leoFrame';
 //@-<< abbrevCommands imports & abbreviations >>
 

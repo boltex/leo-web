@@ -1275,8 +1275,6 @@ export class NullTree {
             d[p.v.gnx] = w;
             w.setAllText(p.h);
         }
-
-        console.log('in edit_widget, w is', w);
         return w;
     }
     //@+node:felix.20251213133753.184: *3* NullTree.editLabel

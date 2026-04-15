@@ -879,7 +879,7 @@ export class LeoUI extends NullGui {
     /**
      * * Refreshes all parts.
      */
-    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void {
+    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh, preserveRange?: boolean): void {
 
         if (keepFocus) {
             this.finalFocus = Focus.NoChange;
@@ -892,7 +892,8 @@ export class LeoUI extends NullGui {
         if (refreshType) {
             this.setupRefresh(
                 this.finalFocus,
-                refreshType
+                refreshType,
+                preserveRange
             );
         } else {
             this.setupRefresh(
@@ -1610,6 +1611,10 @@ export class LeoUI extends NullGui {
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         const w_p: Position = p_node || c.p;
+        const w = c.edit_widget(c.p);
+        if (w) {
+            c.set_focus(w);
+        }
 
         this.triggerBodySave();
 
