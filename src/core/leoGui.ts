@@ -549,7 +549,7 @@ export class NullGui extends LeoGui {
     public override makeAllBindings(): void { }
 
     public launchRefresh(): void { }
-    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh, preserveRange?: boolean): void { }
+    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void { }
     public showNavResults(): void { }
 
     public override replaceClipboardWith(s: string): Thenable<string> {

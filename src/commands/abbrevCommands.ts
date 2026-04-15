@@ -344,7 +344,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             [i, tag, word, val] = this.match_prefix(ch, i, j, prefix, s);
             if (word && val != null) {
                 // #4462: Make only one substitution in headlines.
-                if (name.startsWith('head')) {
+                if (val !== '__NEXT_PLACEHOLDER' && this.enabled && name.startsWith('head')) {
                     this.make_first_headline_substitution(i, j, p, val);
                     return true;
                 }
@@ -506,7 +506,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             const [new_s, i, j] = this.next_place(s, 0);
             if (i != null && j != null) {
                 p.h = new_s;
-                c.redraw(p);
+                c.redraw(p, true); // Instant refresh: p may not be in flat rows of outline manager
                 c.editHeadline();
                 const w = c.edit_widget(p);
                 if (w) {
@@ -528,6 +528,9 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 c.selectPosition(p);
             } else {
                 scroll = w.getYScrollPosition();
+            }
+            if (w) {
+                c.set_focus(w);
             }
             w.setAllText(new_s);
             p.v.b = new_s;

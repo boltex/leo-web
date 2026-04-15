@@ -66,11 +66,6 @@ export class Controller {
         const w = g.app.gui.get_focus();
         const focus = g.app.gui.widget_name(w).toLowerCase();
         if (focus.includes('tree') || focus.includes('head')) {
-            console.log('refresh outline');
-            // g.app.gui.fullRefresh(true, false, Focus.NoChange, {
-            //     tree: true,
-            //     states: true,
-            // }, true);
             g.app.gui.fullRefresh(true, true);
             // TODO : UNCOMMENT BELOW MAYBE?
             setTimeout(() => {
@@ -78,8 +73,7 @@ export class Controller {
                 g.app.gui.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);
             }, 0);
         } else {
-            console.log('refresh body');
-            g.app.gui.fullRefresh(true, false, Focus.Body, {
+            g.app.gui.fullRefresh(false, false, Focus.Body, {
                 tree: true,
                 body: true,
                 scroll: true,
@@ -157,22 +151,6 @@ export class Controller {
             }
         });
         // Setup handler for the "Revert to Undo State" option in the undo context menu
-        /*
-        workspace.menu.UNDO_MENU.querySelector('.menu-item')?.addEventListener('click', () => {
-            if (this._lastUndoBeadIndex !== null) {
-                workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
-                this._lastUndoBeadIndex = null; // Reset after handling
-            }
-            // close the undo context menu after clicking the option
-            workspace.menu.UNDO_MENU.style.display = 'none';
-        });
-        */
-        // instead of commented above code , build this in UNDO_MENU:
-        /*
-         <ul>
-             <li class="menu-item"><span class="menu-label">Revert to Undo State</span></li>
-         </ul>
-        */
         const undoMenu = workspace.menu.UNDO_MENU;
         const ul_element = document.createElement('ul');
         const menuItemElement = document.createElement('li');
@@ -822,7 +800,10 @@ export class Controller {
         const c = g.app.windowList[g.app.gui.frameIndex].c;
         if (c.k.abbrevOn && c.abbrevCommands.expandAbbrev(e, e)) {
             e.preventDefault(); // Prevent the typing from doing anything!
-            this.refreshAbbrev();
+            g.app.gui.endEditHeadline();
+            setTimeout(() => {
+                this.refreshAbbrev();
+            }, 0);
             return;
         }
     }

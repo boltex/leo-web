@@ -77,7 +77,6 @@ export class LeoUI extends NullGui {
     private _revealType: RevealType = RevealType.NoReveal; // Type of reveal for the selected node (when refreshing outline)
 
     public finalFocus: Focus = Focus.NoChange; // Set in _setupRefresh : Last command issued had focus on outline, as opposed to the body
-    public refreshPreserveRange = false; // this makes the next refresh cycle preserve the "findFocusTree" flag once.
 
     private __refreshNode: Position | undefined; // Set in _setupRefresh : Last command issued a specific node to reveal
     private _lastRefreshNodeTS: number = 0;
@@ -795,10 +794,8 @@ export class LeoUI extends NullGui {
      * @param p_finalFocus kind of pane for focus to be placed after refresh, if any. If not specified, focus will be preserved.
      * @param p_refreshType Refresh flags for each UI part
     */
-    public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh, p_preserveRange?: boolean): void {
-        if (p_preserveRange) {
-            this.refreshPreserveRange = true; // Will be cleared after a refresh cycle.
-        }
+    public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh): void {
+
         // Set final "focus-placement"
         this.finalFocus = p_finalFocus;
 
@@ -879,7 +876,7 @@ export class LeoUI extends NullGui {
     /**
      * * Refreshes all parts.
      */
-    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh, preserveRange?: boolean): void {
+    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void {
 
         if (keepFocus) {
             this.finalFocus = Focus.NoChange;
@@ -892,8 +889,7 @@ export class LeoUI extends NullGui {
         if (refreshType) {
             this.setupRefresh(
                 this.finalFocus,
-                refreshType,
-                preserveRange
+                refreshType
             );
         } else {
             this.setupRefresh(
@@ -2162,8 +2158,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
             this.launchRefresh();
 
@@ -2186,8 +2181,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
 
             this.launchRefresh();
@@ -2269,8 +2263,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
             this.launchRefresh();
 
@@ -2292,8 +2285,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
 
             this.launchRefresh();
