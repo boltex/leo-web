@@ -12,6 +12,13 @@ import { BaseEditCommandsClass } from './baseCommands';
 import { Commands } from '../core/leoCommands';
 import { Position } from '../core/leoNodes';
 import { StringTextWrapper } from '../core/leoFrame';
+import * as path from 'path';
+import * as os from 'os';
+import * as et from 'elementtree';
+import * as difflib from 'difflib';
+import * as csv from 'csvtojson';
+import KSUID from 'ksuid';
+
 //@-<< abbrevCommands imports & abbreviations >>
 
 //@+others
@@ -187,7 +194,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 console.log('TODO : LEO-WEB : @data abbreviations-subst-env : SKIPPING RUNNING SCRIPT FOR NOW !');
                 // instead output the script to help debug
                 console.log('Script from @data abbreviations-subst-env :');
-                console.log(script);
+                // console.log(script);
 
             } catch (e) {
                 g.es('Error executing @data abbreviations-subst-env');
@@ -216,6 +223,23 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             'g': g,
             '_values': {},
         };
+        // * Default NODE Modules
+        c.abbrev_subst_env['Buffer'] = Buffer;
+        c.abbrev_subst_env['crypto'] = crypto;
+        c.abbrev_subst_env['os'] = os;
+        c.abbrev_subst_env['path'] = path;
+        c.abbrev_subst_env['process'] = process;
+
+        // * Imported Libraries
+        c.abbrev_subst_env['pako'] = g.pako;
+        c.abbrev_subst_env['showdown'] = g.showdown;
+        c.abbrev_subst_env['dayjs'] = g.dayjs;
+        c.abbrev_subst_env['md5'] = g.md5;
+        c.abbrev_subst_env['csvtojson'] = csv;
+        c.abbrev_subst_env['difflib'] = difflib;
+        c.abbrev_subst_env['elementtree'] = et;
+        c.abbrev_subst_env['ksuid'] = KSUID;
+
         c.abbrev_subst_start = c.config.getString('abbreviations-subst-start') || '';
         // Local settings.
         this.enabled = (
@@ -322,7 +346,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      *
      * Return True if the abbreviation was expanded.
      */
-    public expandAbbrev(event: any, stroke: KeyboardEvent): boolean {
+    public expandAbbrev(event: any, stroke: KeyboardEvent): false | Promise<boolean> {
         const c = this.c;
         const p = c.p;
         const w = this.editWidget(false);
@@ -345,8 +369,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             if (word && val != null) {
                 // #4462: Make only one substitution in headlines.
                 if (val !== '__NEXT_PLACEHOLDER' && this.enabled && name.startsWith('head')) {
-                    this.make_first_headline_substitution(i, j, p, val);
-                    return true;
+                    return this.make_first_headline_substitution(i, j, p, val);
+
                 }
                 // ! IN LEO-WEB , DO THIS RIGHT AFTER triggering the body save.
                 // if (val === '__NEXT_PLACEHOLDER') {
@@ -363,37 +387,43 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         if (!found) {
             return false;
         }
-        // Ok there really is an abbreviation to expand.
-        g.app.gui.triggerBodySave();
-        // ! This was moved from the for loop because in LEO-WEB we want to trigger the body save before deleting the placeholder.
-        if (val === '__NEXT_PLACEHOLDER') {
-            i = w.getInsertPoint();
-            if (i > 0) {
-                w.delete(i - 1);
-            }
-        }
-        c.abbrev_subst_env['_abr'] = word;
-        if (tag === 'tree') {
-            this.root = p.copy();
-            this.last_hit = p.copy();
-            this.expand_tree(w, i, j, val!, word!);
-            c.undoer.clearAndWarn('tree-abbreviation');
-        } else {
-            // Never expand a search for text matches.
-            const place_holder = val!.includes('__NEXT_PLACEHOLDER');
-            const expand_search = place_holder && !!(this.last_hit && this.last_hit.v);
-            if (!expand_search) {
-                this.last_hit = null;
-            }
-            this.expand_text(w, i, j, val!, word!, expand_search);
-            // Restore the selection range.
-            if (this.save_ins !== null && this.save_sel !== null) {
-                const [sel1, sel2] = this.save_sel;
-                w.setSelectionRange(sel1, sel2, this.save_ins);
-            }
 
-        }
-        return true;
+        // return a promise for the rest of the function, since some of the functions it calls are async.  
+        return (async () => {
+
+            // Ok there really is an abbreviation to expand.
+            g.app.gui.triggerBodySave();
+            // ! This was moved from the for loop because in LEO-WEB we want to trigger the body save before deleting the placeholder.
+            if (val === '__NEXT_PLACEHOLDER') {
+                i = w.getInsertPoint();
+                if (i > 0) {
+                    w.delete(i - 1);
+                }
+            }
+            c.abbrev_subst_env['_abr'] = word;
+            if (tag === 'tree') {
+                this.root = p.copy();
+                this.last_hit = p.copy();
+                await this.expand_tree(w, i, j, val!, word!);
+                c.undoer.clearAndWarn('tree-abbreviation');
+            } else {
+                // Never expand a search for text matches.
+                const place_holder = val!.includes('__NEXT_PLACEHOLDER');
+                const expand_search = place_holder && !!(this.last_hit && this.last_hit.v);
+                if (!expand_search) {
+                    this.last_hit = null;
+                }
+                await this.expand_text(w, i, j, val!, word!, expand_search);
+                // Restore the selection range.
+                if (this.save_ins !== null && this.save_sel !== null) {
+                    const [sel1, sel2] = this.save_sel;
+                    w.setSelectionRange(sel1, sel2, this.save_ins);
+                }
+
+            }
+            return true;
+        })();
+
 
     }
 
@@ -401,27 +431,27 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     /**
      * Execute the content in the environment, and return the result.
      */
-    public exec_content(content: string): void { }
+    public async exec_content(content: string): Promise<void> { }
 
     //@+node:felix.20260412000214.3: *4* abbrev.expand_text
     /**
      * Make a text expansion at location i,j of widget w.
      */
-    public expand_text(
+    public async expand_text(
         w: StringTextWrapper,
         i: number,
         j: number,
         val: string,
         word: string,
         expand_search = false,
-    ): void {
+    ): Promise<void> {
         const c = this.c;
         let do_placeholder = false;
         if (word === c.config.getString("abbreviations-next-placeholder")) {
             val = '';
             do_placeholder = true;
         } else {
-            [val, do_placeholder] = this.make_script_substitutions(i, j, val);
+            [val, do_placeholder] = await this.make_script_substitutions(i, j, val);
         }
         this.replace_selection(w, i, j, val);
         // Search to the end.  We may have been called via a tree abbrev.
@@ -444,7 +474,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Paste tree_s as children of c.p.
      * This happens *before* any substitutions are made.
      */
-    public expand_tree(w: StringTextWrapper, i: number, j: number, tree_s: string, word: string): void {
+    public async expand_tree(w: StringTextWrapper, i: number, j: number, tree_s: string, word: string): Promise<void> {
 
         const c = this.c;
         if (!c.canPasteOutline(tree_s)) {
@@ -458,7 +488,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         // Original code.  Probably unwise to change it.
         let do_placeholder = false;
         for (const p of old_p.self_and_subtree()) {
-            const [val, placeholder] = this.make_script_substitutions(0, 0, p.b);
+            const [val, placeholder] = await this.make_script_substitutions(0, 0, p.b);
             if (!placeholder) {
                 p.b = val;
             }
@@ -558,7 +588,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     /**
      * Make scripting substitutions in node p.
      */
-    public make_script_substitutions(i: number, j: number, val: string): [string, boolean] {
+    public async make_script_substitutions(i: number, j: number, val: string): Promise<[string, boolean]> {
 
         const c = this.c;
         const w = c.frame.body.wrapper;
@@ -580,21 +610,55 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 break;
             }
             const [content, rest_after] = content_split;
+            let x;
+            let func;
             try {
                 this.expanding = true;
-                c.abbrev_subst_env['x'] = '';
+                // c.abbrev_subst_env['x'] = '';  // Not using x from abbrev_subst_env.
                 // TODO : use Function constructor instead of eval for better security and performance.
+                // See executeScriptHelper in leoCommands.ts for an example of how to do this.
                 console.log('TODO : LEO-WEB : make_script_substitutions : SKIPPING RUNNING SCRIPT FOR NOW !');
                 console.log('make_script_substitutions : content to run :', content);
+                //
+                // exec(content, c.abbrev_subst_env, c.abbrev_subst_env)  # type:ignore
+                const scriptWrapper = `return (async () => {
+                    try {
+                        ${content}
+                    } catch (e) { 
+                        g.handleScriptException(c, p, e); 
+                    }
+                })();`;
                 // eslint-disable-next-line no-eval
                 // eval(content);
+                func = new Function(
+                    // 'c',
+                    // 'g',
+                    // 'input',
+                    // 'p',
+                    // '__name__',
+                    // 'script_args',
+                    // 'script_gnx',
+                    ...Object.keys(c.abbrev_subst_env),
+                    scriptWrapper
+                );
+
+
+
+
+
             } catch (e) {
                 g.es_print('exception evaluating', content);
                 g.es_exception(e);
             } finally {
             }
             this.expanding = false;
-            const x = c.abbrev_subst_env['x'] || '';
+            if (func) {
+
+                x = await func(...Object.keys(c.abbrev_subst_env).map(k => c.abbrev_subst_env[k]));
+            } else {
+                x = "";
+            }
+            // const x = c.abbrev_subst_env['x'] || ''; // Get x with "x = await func(...Object.keys(d).map(k => d[k]));"
             val = `${prefix}${x}${rest_after}`;
             // Save the selection range.
             this.save_ins = w.getInsertPoint();
@@ -613,7 +677,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     /**
      * Make *only* the first scripting substitution in p.h.
      */
-    public make_first_headline_substitution(i: number, j: number, p: Position, val: string): void {
+    public async make_first_headline_substitution(i: number, j: number, p: Position, val: string): Promise<boolean> {
 
         const c = this.c;
         c.endEditing();  // Required.
@@ -643,6 +707,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         // Set the insertion point and continue editing the headline.
         const ins = i + val.length;
         c.frame.tree.editLabel(p, false, [ins, ins, ins]);
+        return true;
 
     }
 

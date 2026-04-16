@@ -798,13 +798,18 @@ export class Controller {
         }
         // Was a Single Printable Character, so check for abbrev expansion.
         const c = g.app.windowList[g.app.gui.frameIndex].c;
-        if (c.k.abbrevOn && c.abbrevCommands.expandAbbrev(e, e)) {
-            e.preventDefault(); // Prevent the typing from doing anything!
-            g.app.gui.endEditHeadline();
-            setTimeout(() => {
-                this.refreshAbbrev();
-            }, 0);
-            return;
+        if (c.k.abbrevOn) {
+            const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
+            if (abbrevPromise) {
+                e.preventDefault(); // Prevent the typing from doing anything!
+                abbrevPromise.then((expanded) => {
+                    g.app.gui.endEditHeadline();
+                    setTimeout(() => {
+                        this.refreshAbbrev();
+                    }, 0);
+                    return;
+                });
+            }
         }
     }
     //@+node:felix.20260322221320.1: *4* handleBodyPaneKeyDown
@@ -825,10 +830,15 @@ export class Controller {
         }
         // Was a Single Printable Character, so check for abbrev expansion.
         const c = g.app.windowList[g.app.gui.frameIndex].c;
-        if (c.k.abbrevOn && c.abbrevCommands.expandAbbrev(e, e)) {
-            e.preventDefault(); // Prevent the typing from doing anything!
-            this.refreshAbbrev();
-            return;
+        if (c.k.abbrevOn) {
+            const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
+            if (abbrevPromise) {
+                e.preventDefault(); // Prevent the typing from doing anything!
+                abbrevPromise.then((expanded) => {
+                    this.refreshAbbrev();
+                    return;
+                });
+            }
         }
     }
     //@+node:felix.20260322221302.1: *4* handleLogPaneKeyDown
