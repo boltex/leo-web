@@ -614,13 +614,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             let func;
             try {
                 this.expanding = true;
-                // c.abbrev_subst_env['x'] = '';  // Not using x from abbrev_subst_env.
-                // TODO : use Function constructor instead of eval for better security and performance.
-                // See executeScriptHelper in leoCommands.ts for an example of how to do this.
-                console.log('TODO : LEO-WEB : make_script_substitutions : SKIPPING RUNNING SCRIPT FOR NOW !');
-                console.log('make_script_substitutions : content to run :', content);
-                //
-                // exec(content, c.abbrev_subst_env, c.abbrev_subst_env)  # type:ignore
+
                 const scriptWrapper = `return (async () => {
                     try {
                         ${content}
@@ -628,36 +622,25 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                         g.handleScriptException(c, p, e); 
                     }
                 })();`;
-                // eslint-disable-next-line no-eval
-                // eval(content);
+
                 func = new Function(
-                    // 'c',
-                    // 'g',
-                    // 'input',
-                    // 'p',
-                    // '__name__',
-                    // 'script_args',
-                    // 'script_gnx',
                     ...Object.keys(c.abbrev_subst_env),
                     scriptWrapper
                 );
 
-
-
-
+                if (func) {
+                    x = await func(...Object.keys(c.abbrev_subst_env).map(k => c.abbrev_subst_env[k]));
+                } else {
+                    x = "";
+                }
 
             } catch (e) {
                 g.es_print('exception evaluating', content);
                 g.es_exception(e);
             } finally {
+                this.expanding = false;
             }
-            this.expanding = false;
-            if (func) {
 
-                x = await func(...Object.keys(c.abbrev_subst_env).map(k => c.abbrev_subst_env[k]));
-            } else {
-                x = "";
-            }
             // const x = c.abbrev_subst_env['x'] || ''; // Get x with "x = await func(...Object.keys(d).map(k => d[k]));"
             val = `${prefix}${x}${rest_after}`;
             // Save the selection range.
@@ -678,23 +661,44 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Make *only* the first scripting substitution in p.h.
      */
     public async make_first_headline_substitution(i: number, j: number, p: Position, val: string): Promise<boolean> {
-
+        console.log('val', val);
         const c = this.c;
+        console.log(c.abbrev_subst_start, c.abbrev_subst_end);
         c.endEditing();  // Required.
+        // const pattern = new RegExp(
+        //     `^(.*)${c.abbrev_subst_start}(.+)${c.abbrev_subst_end}(.*)$`
+        // );
         const pattern = new RegExp(
-            `^(.*)${c.abbrev_subst_start}(.+)${c.abbrev_subst_end}(.*)$`
+            `^(.*?)${g.reEscape(c.abbrev_subst_start)}(.+?)${g.reEscape(c.abbrev_subst_end)}(.*)$`
         );
         const m = pattern.exec(val);
+        console.log('match', m);
         if (m) {
             const content = m[2];
-            c.abbrev_subst_env['x'] = '';
+            // c.abbrev_subst_env['x'] = ''; // not using x from abbrev_subst_env.
+            let x;
+            let func;
             try {
-                // TODO : use Function constructor instead of eval for better security and performance.
-                console.log('TODO : LEO-WEB : make_first_headline_substitution : SKIPPING RUNNING SCRIPT FOR NOW !');
-                console.log('make_first_headline_substitution : content to run :', content);
-                // eslint-disable-next-line no-eval
-                // eval(content);
-                const x = c.abbrev_subst_env['x'] || '';
+                const scriptWrapper = `return (async () => {
+                    try {
+                        ${content}
+                    } catch (e) { 
+                        g.handleScriptException(c, p, e); 
+                    }
+                })();`;
+
+                func = new Function(
+                    ...Object.keys(c.abbrev_subst_env),
+                    scriptWrapper
+                );
+
+                if (func) {
+                    x = await func(...Object.keys(c.abbrev_subst_env).map(k => c.abbrev_subst_env[k]));
+                } else {
+                    x = "";
+                }
+
+                // const x = c.abbrev_subst_env['x'] || '';
                 val = `${m[1]}${x}${m[3]}`;
             } catch (e) {
                 // Leave p.h alone.
@@ -938,9 +942,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         'Inserts the longest common prefix of the word at the cursor. Displays all possible completions if the prefix is the same as the word.'
     )
     public async dynamicExpansion(event?: Event): Promise<void> {
-
-        // TODO RETURN PROMISE AND/OR MAKE ASYNC!
-
         const w = this.editWidget();
         if (!w) {
             return;
@@ -964,7 +965,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
         const prefix = aList.reduce((a, b) => g.longestCommonPrefix(a, b)).trim();
         return this.dynamicExpandHelper(event, prefix, aList, w);
-
     }
 
     //@+node:felix.20260412000219.4: *5* abbrev.dynamicExpandHelper
@@ -986,25 +986,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
         const prefix2 = 'dabbrev-expand: ';
         g.es('', (aList || []).join('\n'), 'Completion');
-
-        // TODO : USE g.app.gui.get1Arg INSTEAD! (chain up to dynamicExpandHelper1 passing the result as an argument)
-
-        // Protect only prefix2 so tab completion and backspace to work properly.
-        // k.setLabelBlue(prefix2, true);
-        // k.setLabelBlue(prefix2 + prefix, false);
-        // k.get1Arg(event, this.dynamicExpandHelper1, aList, prefix);
-        // Signature is: 
-        /*
-            options: {
-            title: string;
-            value: string;
-            prompt: string;
-            placeHolder?: string;
-        },
-        tabList?: string[]
-        */
         return g.app.gui.get1Arg({
-
+            title: 'dabbrev-expand',
+            value: prefix,
+            prompt: 'dabbrev-expand: ',
         }, aList).then((arg) => {
             this.dynamicExpandHelper1(arg);
         });
