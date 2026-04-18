@@ -3416,6 +3416,29 @@ export class LeoUI extends NullGui {
             });
     }
 
+    public runAskOkCancelStringDialog(
+        c: Commands,
+        title: string,
+        message: string,
+        cancelButtonText = "Cancel",
+        okButtonText = "Ok",
+        defaultParam = '',
+    ): Thenable<string> {
+
+        return workspace.dialog.showInputDialog({
+            title: title,
+            prompt: message,
+            placeholder: title,
+            value: defaultParam,
+        }).then((id) => {
+            if (id) {
+                return id;
+            }
+            return '';
+        });
+
+    }
+
     public runAskYesNoDialog(
         c: Commands | undefined,
         title: string,

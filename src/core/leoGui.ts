@@ -217,10 +217,9 @@ export class LeoGui {
         c: Commands,
         title: string,
         message: string,
-        cancelButtonText: string,
-        okButtonText: string,
+        cancelButtonText: string | undefined,
+        okButtonText: string | undefined,
         defaultParam = '',
-        wide = false
     ): any {
         this.oops();
     }

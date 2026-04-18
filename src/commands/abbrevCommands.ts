@@ -178,28 +178,43 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             // #1674: Avoid unnecessary entries in c.fileCommands.gnxDict.
             const root = c.rootPosition()!;
             // Similar to g.getScript.
-            console.log('TODO : LEO-WEB : @data abbreviations-subst-env : SKIPPING CONVERTING SCRIPT FOR NOW !');
-            // script = await at.stringToString(
-            //     root,
-            //     script,
-            //     true,
-            //     false,
-            // );
-            // script = script.replace(/\r\n/g, '\n');
+            at.stringToString(
+                root,
+                script,
+                true,
+                false,
+            ).then(content => {
+                content.replace(/\r\n/g, '\n');
+                let func;
 
-            try {
-                // TODO : use Function constructor instead of eval for better security and performance.
-                // eslint-disable-next-line no-eval
-                // eval(script);
-                console.log('TODO : LEO-WEB : @data abbreviations-subst-env : SKIPPING RUNNING SCRIPT FOR NOW !');
-                // instead output the script to help debug
-                console.log('Script from @data abbreviations-subst-env :');
-                // console.log(script);
+                try {
+                    const scriptWrapper = `return (async () => {
+                        try {
+                            ${content}
+                        } catch (e) { 
+                            g.handleScriptException(c, p, e); 
+                        }
+                    })();`;
 
-            } catch (e) {
-                g.es('Error executing @data abbreviations-subst-env');
-                g.es_exception(e);
-            }
+                    func = new Function(
+                        ...Object.keys(c.abbrev_subst_env),
+                        scriptWrapper
+                    );
+
+                    if (func) {
+                        func(...Object.keys(c.abbrev_subst_env).map(k => c.abbrev_subst_env[k]));
+                    } else {
+                        g.es('No content in @data abbreviations-subst-env');
+                    }
+
+                } catch (e) {
+                    g.es('Error executing @data abbreviations-subst-env');
+                    g.es_exception(e);
+                }
+
+            }).catch(error => {
+                console.error('Error in stringToString for @data abbreviations-subst-env:', error);
+            });
 
         } else {
             c.abbrev_subst_start = '';  // Was False.

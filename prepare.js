@@ -46,3 +46,14 @@ fs.writeFileSync(fileName, JSON.stringify(file, null, 2), function writeJSON(err
 });
 
 console.log("Added git info in package.json");
+
+// copy leoSettings.leojs to leoSettings.json
+const sourceFile = './leoSettings.leojs';
+const destFile = './leoSettings.json';
+fs.copyFile(sourceFile, destFile, (err) => {
+    if (err) {
+        console.log("Error copying leoSettings.leojs to leoSettings.json", err);
+    } else {
+        console.log('leoSettings.leojs was copied to leoSettings.json');
+    }
+});
