@@ -8,9 +8,6 @@ yarn-error.log*
 dist/
 build/
 
-# leoSettings.json
-leoSettings.json
-
 # TypeScript
 *.tsbuildinfo
 
