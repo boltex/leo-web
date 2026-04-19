@@ -64,6 +64,9 @@
   --input-dialog-display: none;
   /* quickpick-dialog */
   --quickpick-dialog-display: none;
+  /* tips-dialog */
+  --tips-dialog-display: none;
+
   /* document tabs visibility */
   --doc-tabs-display: flex;
   --collapse-all-btn-display: inline-flex;
@@ -215,6 +218,10 @@
 
 [data-show-quickpick-dialog="true"] {
   --quickpick-dialog-display: flex;
+}
+
+[data-show-tips-dialog="true"] {
+  --tips-dialog-display: flex;
 }
 
 [data-no-opened-documents="true"] {
@@ -1899,6 +1906,27 @@ mark {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Tips dialog */
+#tips-dialog {
+  display: var(--tips-dialog-display);
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+#tips-dialog .modal-content button {
+  display: block;
+  /* margin-right: 8px; */
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--find-border-color);
+  background: var(--resizer-color);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+#tips-dialog .modal-content button:hover {
+  background: var(--hover-bg);
 }
 
 .shortcuts {

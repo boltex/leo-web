@@ -27,11 +27,12 @@ export class DialogManager {
     private MODAL_DIALOG: HTMLElement;
     private INPUT_DIALOG: HTMLElement;
     private QUICKPICK_DIALOG: HTMLElement;
+    private TIPS_DIALOG: HTMLElement;
 
     private TOAST: HTMLElement;
     private MODAL_DIALOG_TITLE: HTMLElement;
     private MODAL_DIALOG_DESCRIPTION: HTMLElement;
-    private MODAL_DIALOG_BTN_CONTAINER: HTMLElement;
+    private MODAL_DIALOG_BTN_CONTAINER: HTMLElement;    
 
     private INPUT_DIALOG_TITLE: HTMLElement;
     private INPUT_DIALOG_DESCRIPTION: HTMLElement;
@@ -75,6 +76,7 @@ export class DialogManager {
         this.MODAL_DIALOG = document.getElementById('message-dialog')!;
         this.INPUT_DIALOG = document.getElementById('input-dialog')!;
         this.QUICKPICK_DIALOG = document.getElementById('quickpick-dialog')!;
+        this.TIPS_DIALOG = document.getElementById('tips-dialog')!;
 
         this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;

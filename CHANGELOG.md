@@ -3,6 +3,7 @@
 ## 1.0.14
 
 - Implemented abbreviations.
+- Fixed arrow key and undo/redo behavior while typing in outline headlines.
 
 ## 1.0.13
 
