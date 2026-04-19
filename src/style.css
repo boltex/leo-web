@@ -1396,38 +1396,6 @@ select.setting-select {
   user-select: none;
 }
 
-#log-pane .config-col.shortcuts {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 0 0;
-  font-size: 0.8em;
-  color: var(--find-text-color);
-  gap: 0;
-  /* min-width: 285px; */
-  cursor: default;
-  user-select: none;
-}
-
-#log-pane .config-col.shortcuts li {
-  padding: 0.25rem 0.5rem;
-  display: flex;
-  align-items: center;
-}
-
-#log-pane .config-col.shortcuts kbd {
-  display: inline-block;
-  padding: 0.1rem 0.4rem;
-  margin: 0 0.2rem;
-  font-family: monospace;
-  font-size: 0.9em;
-  line-height: 1.4;
-  color: var(--text-color);
-  background-color: var(--resizer-color);
-  border: 1px solid var(--find-border-color);
-  border-radius: 3px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-}
-
 #log-pane .find-col,
 #log-pane .config-col {
   display: flex;
@@ -1931,6 +1899,38 @@ mark {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.shortcuts {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0 0;
+  font-size: 0.8em;
+  color: var(--find-text-color);
+  gap: 0;
+  /* min-width: 285px; */
+  cursor: default;
+  user-select: none;
+}
+
+.shortcuts li {
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.shortcuts kbd {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  margin: 0 0.2rem;
+  font-family: monospace;
+  font-size: 0.9em;
+  line-height: 1.4;
+  color: var(--text-color);
+  background-color: var(--resizer-color);
+  border: 1px solid var(--find-border-color);
+  border-radius: 3px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 /*@+node:felix.20260321142234.1: ** Syntax Highlighting*/
