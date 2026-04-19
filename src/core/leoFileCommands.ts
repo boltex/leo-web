@@ -1602,8 +1602,18 @@ export class FileCommands {
         let v: VNode | undefined;
         try {
             // This encoding must match the encoding used in outline_to_clipboard_string.
-            const s_bytes = g.toEncodedString(s, this.leo_file_encoding, true);
-            v = new FastRead(c, {}).readFileFromClipboard(s_bytes);
+            if (s.trimStart().startsWith('{')) {
+                // Maybe JSON
+                v = new FastRead(c, {}).readFileFromJsonClipboard(
+                    s
+                );
+            } else {
+                // This encoding must match the encoding used in outline_to_clipboard_string.
+                const s_bytes = g.toEncodedString(s, this.leo_file_encoding, true);
+                v = new FastRead(c, {}).readFileFromClipboard(
+                    s_bytes
+                );
+            }
             if (!v) {
                 g.es('the clipboard is not valid');
                 return undefined;

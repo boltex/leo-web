@@ -9,7 +9,7 @@ import { VNode } from '../core/leoNodes';
 import { FastRead } from '../core/leoFileCommands';
 import { Commands } from '../core/leoCommands';
 import { ScriptingController } from '../core/mod_scripting';
-import leoSettings from '../../leoSettings.json';
+import leoSettings from '../../leoSettings.leojs';
 
 //@+others
 //@+node:felix.20251214160853.114: ** Class CommanderHelpCommands

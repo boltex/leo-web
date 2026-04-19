@@ -65,7 +65,7 @@ import { ScriptingController } from './mod_scripting';
 import { SessionManager, TopLevelSessionsCommands } from './leoSessions';
 import { BaseWriter } from '../writers/basewriter';
 import * as leoPlugins from './leoPlugins';
-import leoSettings from '../../leoSettings.json';
+import leoSettings from '../../leoSettings.leojs';
 
 //@-<< imports >>
 //@+others

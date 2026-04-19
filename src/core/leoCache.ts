@@ -95,7 +95,8 @@ export class CommanderWrapper {
             this.user_keys.add(prop);
             this.db[`${this.c.mFileName}:::${prop}`] = value;
         } else {
-            console.log('Error db has no filename KEY !');
+            // called by abbrevCommand finishCreate very early
+            // console.log('Error db has no filename KEY !');
         }
         return true;
     }

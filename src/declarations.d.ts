@@ -5,6 +5,11 @@
 
 // ambient module declaration for https://www.npmjs.com/package/date-format-lite
 declare module "date-format-lite" { }
+declare module "*.leojs" {
+    const value: any;
+    export default value;
+}
+
 
 // date-format-lite augments built-in Date
 interface Date {

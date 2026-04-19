@@ -19,7 +19,7 @@ import { Bead } from '../core/leoUndo';
  */
 export class BaseEditCommandsClass {
     public c: Commands;
-    public w!: StringTextWrapper;
+    public w: StringTextWrapper | null;
     public undoData: Bead | undefined;
 
     //@+others
@@ -32,6 +32,7 @@ export class BaseEditCommandsClass {
      */
     constructor(c: Commands) {
         this.c = c;
+        this.w = null;
     }
     //@+node:felix.20251214160853.6: *3* BaseEdit.begin/endCommand (handles undo)
     //@+node:felix.20251214160853.7: *4* BaseEdit.beginCommand
@@ -118,6 +119,17 @@ export class BaseEditCommandsClass {
         //     pass
         // else:
         //     w = c.frame.body and c.frame.body.wrapper
+        if (g.workspace.outline.headlineFinish) {
+            // Is editing a headline, so return the headline widget.
+            const w = c.frame.tree.edit_widget(c.p);
+            if (w && forceFocus) {
+                c.widgetWantsFocusNow(w);
+            }
+            if (w) {
+                this.w = w;
+                return w;
+            }
+        }
 
         const w = c.frame.body && c.frame.body.wrapper;
 

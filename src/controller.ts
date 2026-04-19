@@ -4,7 +4,7 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, Focus, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -58,6 +58,29 @@ export class Controller {
             return command(...args);
         } else {
             console.warn(`Command not found: ${commandName}`);
+        }
+    }
+    //@+node:felix.20260414231550.1: *3* refreshAbbrev
+    public refreshAbbrev(): void {
+
+        const w = g.app.gui.get_focus();
+        const focus = g.app.gui.widget_name(w).toLowerCase();
+        if (focus.includes('tree') || focus.includes('head')) {
+            g.app.gui.fullRefresh(true, true);
+            // TODO : UNCOMMENT BELOW MAYBE?
+            setTimeout(() => {
+                // Select headline if needed after refresh.
+                g.app.gui.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);
+            }, 0);
+        } else {
+            g.app.gui.fullRefresh(false, false, Focus.Body, {
+                tree: true,
+                body: true,
+                scroll: true,
+                // documents: false,
+                // buttons: false,
+                states: true,
+            });
         }
     }
     //@+node:felix.20260322222300.1: *3* Initialization & Setup
@@ -128,22 +151,6 @@ export class Controller {
             }
         });
         // Setup handler for the "Revert to Undo State" option in the undo context menu
-        /*
-        workspace.menu.UNDO_MENU.querySelector('.menu-item')?.addEventListener('click', () => {
-            if (this._lastUndoBeadIndex !== null) {
-                workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
-                this._lastUndoBeadIndex = null; // Reset after handling
-            }
-            // close the undo context menu after clicking the option
-            workspace.menu.UNDO_MENU.style.display = 'none';
-        });
-        */
-        // instead of commented above code , build this in UNDO_MENU:
-        /*
-         <ul>
-             <li class="menu-item"><span class="menu-label">Revert to Undo State</span></li>
-         </ul>
-        */
         const undoMenu = workspace.menu.UNDO_MENU;
         const ul_element = document.createElement('ul');
         const menuItemElement = document.createElement('li');
@@ -779,8 +786,31 @@ export class Controller {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
             e.preventDefault();
         }
-        this.handlePaneKeyDown(e, "outline");
-
+        if (
+            this.handlePaneKeyDown(e, "outline")
+        ) {
+            return;
+        }
+        // Handle abbreviations.
+        if (!workspace.outline.headlineFinish || e.key.length > 1) {
+            // Not in headline editing mode, or its a non-printable key, so just get out.
+            return;
+        }
+        // Was a Single Printable Character, so check for abbrev expansion.
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        if (c.k.abbrevOn) {
+            const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
+            if (abbrevPromise) {
+                e.preventDefault(); // Prevent the typing from doing anything!
+                abbrevPromise.then((expanded) => {
+                    g.app.gui.endEditHeadline();
+                    setTimeout(() => {
+                        this.refreshAbbrev();
+                    }, 0);
+                    return;
+                });
+            }
+        }
     }
     //@+node:felix.20260322221320.1: *4* handleBodyPaneKeyDown
     private handleBodyPaneKeyDown = (e: KeyboardEvent) => {
@@ -789,7 +819,27 @@ export class Controller {
             e.preventDefault();
         }
 
-        this.handlePaneKeyDown(e, "body");
+        if (
+            this.handlePaneKeyDown(e, "body")
+        ) {
+            return;
+        }
+        // Handle abbreviations.
+        if (e.key.length > 1) {
+            return;
+        }
+        // Was a Single Printable Character, so check for abbrev expansion.
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        if (c.k.abbrevOn) {
+            const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
+            if (abbrevPromise) {
+                e.preventDefault(); // Prevent the typing from doing anything!
+                abbrevPromise.then((expanded) => {
+                    this.refreshAbbrev();
+                    return;
+                });
+            }
+        }
     }
     //@+node:felix.20260322221302.1: *4* handleLogPaneKeyDown
     private handleLogPaneKeyDown = (e: KeyboardEvent) => {
@@ -812,7 +862,10 @@ export class Controller {
 
     }
     //@+node:felix.20260322221225.1: *4* handlePaneKeyDown
-    private handlePaneKeyDown(e: KeyboardEvent, pane: "outline" | "body" | "find"): void {
+    /**
+     * Returns true if the key event was handled and should not be processed further, false otherwise.
+     */
+    private handlePaneKeyDown(e: KeyboardEvent, pane: "outline" | "body" | "find"): boolean {
         // Build key string representation (e.g., "ctrl+shift+q", "shift+alt+left")
         const parts: string[] = [];
 
@@ -876,9 +929,10 @@ export class Controller {
 
                 e.preventDefault();
                 this.doCommand(keybind.command);
-                return;
+                return true;
             }
         }
+        return false;
 
     };
     //@+node:felix.20260322221155.1: *4* handleGlobalKeyDown

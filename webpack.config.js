@@ -36,7 +36,7 @@ module.exports = (env, argv) => {
         },
         resolve: {
             mainFields: ["browser", "module", "main"], // look for `browser` entry point in imported node modules
-            extensions: [".ts", ".js", ".json"], // support ts-files and js-files
+            extensions: [".ts", ".js", ".json", ".leojs"], // support ts-files, js-files, json-files, and leojs-files as json files.
             alias: {
                 // Point explicitly to TypeScript's library file; services variant not present in TS 5.x
                 typescript: require.resolve('typescript/lib/typescript.js'),
@@ -59,6 +59,10 @@ module.exports = (env, argv) => {
         },
         module: {
             rules: [
+                {
+                    test: /.leojs$/i,
+                    type: "json",
+                },
                 {
                     test: /\.css$/,
                     use: ["style-loader", "css-loader"],
