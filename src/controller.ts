@@ -780,18 +780,36 @@ export class Controller {
         }
         // Block if its UNDO or REDO (ctrl+z, ctrl+shift+z, ctrl+y) even if they are not enabled, 
         // to prevent interfering with browser shortcuts
+        // BUT ONLY IF NOT CURRENTLY EDITING A HEADLINE: we want to let browser regular undo/redo.
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-            e.preventDefault();
+            if (!workspace.outline.headlineFinish) {
+                e.preventDefault();
+            } else {
+                return; // Let browser handle undo/redo in headline editing mode
+            }
         }
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
-            e.preventDefault();
+            if (!workspace.outline.headlineFinish) {
+                e.preventDefault();
+            } else {
+                return; // Let browser handle undo/redo in headline editing mode
+            }
         }
+        // Allow arrows, pageup/down, home,end for moving cursor and selecting with editing the headline 
+        if (workspace.outline.headlineFinish) {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"].includes(e.key)) {
+                return; // Let browser handle arrow keys in headline editing mode
+            }
+        }
+
+        // Ok now we actually want to handle the possible command.
         if (
             this.handlePaneKeyDown(e, "outline")
         ) {
             return;
         }
-        // Handle abbreviations.
+
+        // Past this point, we only want to handle abbrev expansion.
         if (!workspace.outline.headlineFinish || e.key.length > 1) {
             // Not in headline editing mode, or its a non-printable key, so just get out.
             return;

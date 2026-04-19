@@ -1059,7 +1059,10 @@ export class LeoUI extends NullGui {
         // Add no-focus-outline class to body pane to avoid unwanted focus outline when preventFocus is true
         if (preventFocus) {
             workspace.layout.BODY_PANE.classList.add('no-focus-outline');
+        } else {
+            g.app.gui.set_focus(c, c.frame.body.widget);
         }
+
 
         workspace.body.setBodySelection(w_selection, this._refreshType.scroll); // Note, in some browser, this has a side-effect of setting focus in body.
         this._refreshType.scroll = false;

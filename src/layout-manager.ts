@@ -4,6 +4,8 @@
 //@+node:felix.20260322230606.1: ** << imports >>
 import * as utils from './utils';
 import { workspace } from './workspace';
+import * as g from './core/leoGlobals';
+
 //@-<< imports >>
 //@+others
 //@+node:felix.20260322230638.1: ** LayoutManager
@@ -56,9 +58,18 @@ export class LayoutManager {
         // Setup 'focusin' listeners for both outline and body panes to track the last focused element between them
         this.OUTLINE_PANE.addEventListener('focusin', () => {
             this.lastFocusedBodyOrOutline = 'outline';
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            const w = g.app.gui.get_focus(c);
+            let focus = g.app.gui.widget_name(w);
+            if (focus.includes('tree') || focus.includes('head')) {
+                return; // If focus is already in the tree or headline, we don't want to steal it and set it to the canvas, as that would cause issues with keyboard navigation in the tree and headline editing.
+            }
+            g.app.gui.set_focus(c, c.frame.tree.canvas);
         });
         this.BODY_PANE.addEventListener('focusin', () => {
             this.lastFocusedBodyOrOutline = 'body';
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            g.app.gui.set_focus(c, c.frame.body.widget);
         });
     }
 
