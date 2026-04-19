@@ -18,6 +18,7 @@ import * as et from 'elementtree';
 import * as difflib from 'difflib';
 import * as csv from 'csvtojson';
 import KSUID from 'ksuid';
+import * as typescript from 'typescript';
 
 //@-<< abbrevCommands imports & abbreviations >>
 
@@ -184,10 +185,38 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 true,
                 false,
             ).then(content => {
+
+                const tsCompileOptions: typescript.CompilerOptions = {
+                    noEmitOnError: true,
+                    noImplicitAny: false,
+                    target: typescript.ScriptTarget.ES2020,
+                    module: typescript.ModuleKind.CommonJS
+                };
+
+                const result = typescript.transpileModule(content, {
+                    compilerOptions: tsCompileOptions
+                });
+                const errors: string[] = [];
+
+                if (result.diagnostics && result.diagnostics.length > 0) {
+                    // Handle the compilation errors.
+                    // For example, you can log them:
+                    result.diagnostics.forEach(diagnostic => {
+                        const message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+                        errors.push(message);
+                    });
+                    g.es(errors.join("\n"));
+                    return; // Print errors and cancel running the script.
+                } else {
+                    // The code compiled successfully, you can now proceed to run it.
+                    content = result.outputText;
+                }
+
                 content.replace(/\r\n/g, '\n');
                 let func;
 
                 try {
+                    content += '\n'; // Make sure we end the script properly.
                     const scriptWrapper = `return (async () => {
                         try {
                             ${content}
@@ -624,12 +653,39 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             if (content_split.length !== 2) {
                 break;
             }
-            const [content, rest_after] = content_split;
+            let [content, rest_after] = content_split;
             let x;
             let func;
+
+            const tsCompileOptions: typescript.CompilerOptions = {
+                noEmitOnError: true,
+                noImplicitAny: false,
+                target: typescript.ScriptTarget.ES2020,
+                module: typescript.ModuleKind.CommonJS
+            };
+
+            const result = typescript.transpileModule(content, {
+                compilerOptions: tsCompileOptions
+            });
+            const errors: string[] = [];
+
+            if (result.diagnostics && result.diagnostics.length > 0) {
+                // Handle the compilation errors.
+                // For example, you can log them:
+                result.diagnostics.forEach(diagnostic => {
+                    const message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+                    errors.push(message);
+                });
+                g.es(errors.join("\n"));
+                return [val, false]; // Print errors and cancel running the script.
+            } else {
+                // The code compiled successfully, you can now proceed to run it.
+                content = result.outputText;
+            }
+
             try {
                 this.expanding = true;
-
+                content += '\n'; // Make sure we end the script properly.
                 const scriptWrapper = `return (async () => {
                     try {
                         ${content}

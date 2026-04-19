@@ -3134,7 +3134,7 @@ export class AtFile {
         if (level > 2) {
             return `${gnx}: *${level}* ${h}`;
         }
-        return `${gnx}: ${'*'.repeat(level)} ${h}`;
+        return `${gnx}: ${'*'.repeat(Math.max(0, level))} ${h}`;
     }
     //@+node:felix.20251214160339.258: *6* at.removeCommentDelims
     /**

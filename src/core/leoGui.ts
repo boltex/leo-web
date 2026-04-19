@@ -583,16 +583,17 @@ export class NullGui extends LeoGui {
     }
 
     public selectOpenedLeoDocument(index: number): Promise<unknown> {
-        this.oops();
         return Promise.resolve();
     }
     public closeLeoFile(index: number): Promise<unknown> {
-        this.oops();
         return Promise.resolve();
     }
     public clickAtButton(button: any): Promise<unknown> {
-        this.oops();
         return Promise.resolve();
+    }
+
+    public endEditHeadline(): void {
+        return;
     }
 
     public override widget_name(widget: any): string {
@@ -602,7 +603,7 @@ export class NullGui extends LeoGui {
         return '';
     }
     public set_focus(commander: Commands, widget: any): void {
-        //
+        return;
     }
     public get_focus(c?: Commands): any {
         return;
