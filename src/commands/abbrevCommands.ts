@@ -732,9 +732,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Make *only* the first scripting substitution in p.h.
      */
     public async make_first_headline_substitution(i: number, j: number, p: Position, val: string): Promise<boolean> {
-        console.log('val', val);
         const c = this.c;
-        console.log(c.abbrev_subst_start, c.abbrev_subst_end);
         c.endEditing();  // Required.
         // const pattern = new RegExp(
         //     `^(.*)${c.abbrev_subst_start}(.+)${c.abbrev_subst_end}(.*)$`
@@ -743,7 +741,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             `^(.*?)${g.reEscape(c.abbrev_subst_start)}(.+?)${g.reEscape(c.abbrev_subst_end)}(.*)$`
         );
         const m = pattern.exec(val);
-        console.log('match', m);
         if (m) {
             const content = m[2];
             // c.abbrev_subst_env['x'] = ''; // not using x from abbrev_subst_env.

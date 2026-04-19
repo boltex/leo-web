@@ -244,6 +244,40 @@
               ]
             },
             {
+              "gnx": "felix.20260418234843.1",
+              "vh": "Broken @@outline-data tree-abbreviations nodes",
+              "children": [
+                {
+                  "gnx": "felix.20260411220658.42",
+                  "vh": "demo;;",
+                  "children": [
+                    {
+                      "gnx": "felix.20260411220658.43",
+                      "vh": "@@button MyDemo @key=Ctrl-9",
+                      "children": [
+                        {
+                          "gnx": "felix.20260411220658.44",
+                          "vh": "<< imports >>"
+                        },
+                        {
+                          "gnx": "felix.20260411220658.45",
+                          "vh": "script_string"
+                        },
+                        {
+                          "gnx": "felix.20260411220658.46",
+                          "vh": "class myDemo"
+                        },
+                        {
+                          "gnx": "felix.20260411220658.47",
+                          "vh": "wrappers"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "gnx": "felix.20260411220658.23",
               "vh": "@outline-data tree-abbreviations",
               "children": [
@@ -253,23 +287,23 @@
                   "children": [
                     {
                       "gnx": "felix.20260411220658.25",
-                      "vh": "@@file importers/{|{x=name}|}.py",
+                      "vh": "@@file importers/{|{return name}|}.py",
                       "children": [
                         {
                           "gnx": "felix.20260411220658.26",
-                          "vh": "class {|{x=cap_name}|}_Importer",
+                          "vh": "class {|{return cap_name}|}_Importer",
                           "children": [
                             {
                               "gnx": "felix.20260411220658.27",
-                              "vh": "{|{x=name}|}.Overrides",
+                              "vh": "{|{return name}|}.Overrides",
                               "children": [
                                 {
                                   "gnx": "felix.20260411220658.28",
-                                  "vh": "{|{x=name}|}.clean_headline"
+                                  "vh": "{|{return name}|}.clean_headline"
                                 },
                                 {
                                   "gnx": "felix.20260411220658.29",
-                                  "vh": "{|{x=name}|}.clean_nodes"
+                                  "vh": "{|{return name}|}.clean_nodes"
                                 }
                               ]
                             }
@@ -277,15 +311,15 @@
                         },
                         {
                           "gnx": "felix.20260411220658.30",
-                          "vh": "class class {|{x=cap_name}|}_ScanState",
+                          "vh": "class class {|{return cap_name}|}_ScanState",
                           "children": [
                             {
                               "gnx": "felix.20260411220658.31",
-                              "vh": "{|{x=name}|}_state.level"
+                              "vh": "{|{return name}|}_state.level"
                             },
                             {
                               "gnx": "felix.20260411220658.32",
-                              "vh": "{|{x=name}|}_state.update"
+                              "vh": "{|{return name}|}_state.update"
                             }
                           ]
                         }
@@ -336,28 +370,36 @@
                   ]
                 },
                 {
-                  "gnx": "felix.20260411220658.42",
-                  "vh": "demo;;",
+                  "gnx": "felix.20260419003515.1",
+                  "vh": "test;;",
                   "children": [
                     {
-                      "gnx": "felix.20260411220658.43",
-                      "vh": "@@button MyDemo @key=Ctrl-9",
+                      "gnx": "felix.20260419003515.2",
+                      "vh": "inside",
                       "children": [
                         {
-                          "gnx": "felix.20260411220658.44",
-                          "vh": "<< imports >>"
-                        },
+                          "gnx": "felix.20260419003515.3",
+                          "vh": "insideinside"
+                        }
+                      ]
+                    },
+                    {
+                      "gnx": "felix.20260419003515.4",
+                      "vh": "inside 2 <|sfsf|> jk",
+                      "children": [
                         {
-                          "gnx": "felix.20260411220658.45",
-                          "vh": "script_string"
-                        },
+                          "gnx": "felix.20260419003515.5",
+                          "vh": "newHeadline"
+                        }
+                      ]
+                    },
+                    {
+                      "gnx": "felix.20260419003515.6",
+                      "vh": "inside3",
+                      "children": [
                         {
-                          "gnx": "felix.20260411220658.46",
-                          "vh": "class myDemo"
-                        },
-                        {
-                          "gnx": "felix.20260411220658.47",
-                          "vh": "wrappers"
+                          "gnx": "felix.20260419003515.7",
+                          "vh": "bla <|fafa|> bla"
                         }
                       ]
                     }
@@ -1281,7 +1323,7 @@
     "felix.20260411220658.2": "True: enable abbreviations\nFalse disable abbreviations\n",
     "felix.20260411220658.3": "Scripting abbreviations will be enabled if:\n    \n1. @bool enable-abbreviations = True\n2. *either* this setting or @bool scripting-at-script-nodes = True",
     "felix.20260411220658.4": "# Comments lines (lines starting with '#') are ignored.\n# Non-comment lines should have the form::\n#\n#    name=definition\n\n# Definitions in @data abbreviation nodes override definitions in @data\n# global-abbreviation nodes.\n\n# Typically you would define @data global-abbreviation nodes\n# in myLeoSettings.leo and @data abbreviation nodes in local files.\n\n# Abbreviations of Greek letters:\n\n#  alph;;=α\n#  beta;;=β\n#  delt;;=δ\n#  gam;;=γ\n#  mu;;=μ\n#  pi;;=π\n#  sig;;=σ\n#  Delt;;=Δ\n#  Sig;;=Σ\n#  pm;;=±\n\n#  Abbreviations for currency symbols.\n\n#  cent;;=¢\n#  euro;;=€\n#  pound;;=£\n#  yen;;=¥\n\n# Abbreviations for other symbols.\n\n#  .;;=…\n#  3fourths;;=¾\n#  because;;=∵\n#  bullet;;=•\n#  cross;;=✖\n#  degree;;=°\n#  divide;;=÷\n#  ergo;;=∴\n#  exists;;=∃\n#  half;;=½\n#  infinity;;=∞\n#  quarter;;=¼\n#  tick;;=✔\n",
-    "felix.20260417204930.1": "// EKR 2013/09/25: revised docstring and improved get_user().\n// EKR 2015/04/28: added insert() and do(). Split this node into pieces.\n// Félix 2026/04/17: converted to typescript.\n\n@language typescript\n\n/*\n\n**Important**: scripting abbreviations are in effect only if the following\nsetting is in effect::\n    \n    @bool enable-abbreviations = True\n    \nand one (or both) of the following are in effect::\n    \n    @bool scripting-at-script-nodes = True\n    @bool scripting-abbreviations = True\n\nThis node defines the environment in which substitution scripts are\nevaluated. For example, if this node contains `import time`, then an\nabbreviation like::\n\n    date;;={|{import time;x=time.asctime()}|}\n\ncan be written more simply as::\n\n    date;;={|{x=time.asctime()}|}\n\nThe environment will contain the following pre-defined values:\n\n- `c` and `g`, as usual.\n- `values`: a dict. see ask() and get() below.\n- `_abr`, the abbreviation being expanded.\n\n*/\n",
+    "felix.20260417204930.1": "// EKR 2013/09/25: revised docstring and improved get_user().\n// EKR 2015/04/28: added insert() and do(). Split this node into pieces.\n// Félix 2026/04/17: converted to typescript.\n\n@language typescript\n\n/*\n\n**Important**: scripting abbreviations are in effect only if the following\nsetting is in effect::\n    \n    @bool enable-abbreviations = True\n    \nand one (or both) of the following are in effect::\n    \n    @bool scripting-at-script-nodes = True\n    @bool scripting-abbreviations = True\n\nThis node defines the environment in which substitution scripts are\nevaluated. \n\nThe environment will contain the following pre-defined values:\n\n- `c` and `g`, as usual.\n- `values`: a dict. see ask() and get() below.\n- `_abr`, the abbreviation being expanded.\n\n*/\n",
     "felix.20260417204930.2": "/*\ndef ask(s, default=\"\", prompt=None):\n    \"\"\"Ask, always, for a value for template field 's'\"\"\"\n    x = g.app.gui.runAskOkCancelStringDialog(\n        c,\n        title = s,\n        message = prompt or s,\n        default = default,\n    )\n    _values[s] = x\n    return x or ''\n*/\n\n/**\n * Ask, always, for a value for template field 's'\n */\nask = async function (s, _default = \"\", prompt = null): Promise<string> { \n   const  x = await g.app.gui.runAskOkCancelStringDialog(\n        c,\n        s,\n        prompt || s,\n        undefined, \n        undefined, \n        _default\n    );\n    _values[s] = x;\n    return x || '';\n};",
     "felix.20260417204930.3": "// Python version\n/*\ndef close_xml():\n    \"\"\"simple, but usually right, code to close open XML tags\"\"\"\n    tCurPosition = c.frame.body.widget.textCursor().position()    \n    i = tCurPosition - len(_abr)\n    b = c.p.b\n    skips = 1\n    while i and skips:\n        s = []\n        while i and b[i] != '>':\n            i -= 1\n        i -= 1\n        while i and (b[i] != '<' or (s and b[i] == '<' and s[0] == '/')):\n            s[0:0] = b[i]\n            i -= 1\n            if s and s[0] == '<' and len(s) > 1 and s[1] == '/':\n                skips += 1  # a closed tag indicates search one more tag\n        skips -= 1\n    s = ''.join([i if i.isalpha() else ' ' for i in s])\n    if s.strip():\n        return \"</%s>\" % (s.split(None, 1)[0])\n    else:\n        return \"</\"\n*/\n\n/**\n * simple, but usually right, code to close open XML tags\n */\nclose_xml = function(): string {\n    \n    // let tCurPosition = c.frame.body.widget.textCursor().position();\n\n    // let tCurPosition = g.workspace.body.getBodyInsertOffset(); // direct DOM access, not sure if this is correct\n\n    let tCurPosition = c.frame.body.wrapper.getInsertPoint();\n\n    let i = tCurPosition - _abr.length;\n    let b = c.p.b;\n    let skips = 1;\n    while (i && skips) {\n        let s = [];\n        while (i && b[i] != '>') {\n            i -= 1;\n        }\n        i -= 1;\n        while (i && (b[i] != '<' || (s.length > 0 && b[i] == '<' && s[0] == '/'))) {\n            s.unshift(b[i]);\n            i -= 1;\n            if (s.length > 0 && s[0] == '<' && s.length > 1 && s[1] == '/') {\n                skips += 1; // a closed tag indicates search one more tag\n            }\n        }\n        skips -= 1;\n    }\n    let sStr = s.join('');\n    let sClean = sStr.replace(/[^a-zA-Z]/g, ' ');\n    if (sClean.trim()) {\n        return \"</\" + sClean.split(/\\s+/, 1)[0] + \">\";\n    } else {\n        return \"</\";\n    }\n};\n",
     "felix.20260417204930.4": "// Python version\n/*\ndef django_tag():\n    \"\"\"expand {block content} to \n       {% block content %}\\n{% end_block content %} with proper\n       indentation (for Django web templates)\"\"\"\n    from leo.core.leoQt import QtCore\n    widget = c.frame.body.widget\n    scrollPosition = widget.getYScrollPosition()\n    textCursor = widget.textCursor()\n    tCurPosition = textCursor.position()  \n    i = tCurPosition - len(_abr)\n    b = c.p.b\n    s = []\n    while i and b[i] != '{':\n        s[0:0] = b[i]\n        i -= 1\n    start = i\n    s = ''.join(s)\n    s_close = s.split()[0]\n    indent = 0\n    while i and b[i] != '\\n':\n        indent += 1\n        i -= 1\n    if indent:\n        indent -= 1\n    def later(c=c, indent=indent, b=b, s=s, _abr=_abr):\n        offset = len(\"%s{%% %s %%}\\n    %s\" % (b[:start], s, ' '*indent))\n        c.p.b = \"%s{%% %s %%}\\n    %s\\n%s{%% end%s %%}%s\" % (\n            b[:start], s, ' '*indent, ' '*indent, s_close, b[start+len(s)+len(_abr):]\n        )\n        widget.setYScrollPosition(scrollPosition)\n        textCursor.setPosition(offset)\n        widget.setTextCursor(textCursor)\n        c.bodyWantsFocusNow()\n        \n    QtCore.QTimer.singleShot(0, later)\n\n*/\n\n// Typescript version\n/**\n * expand {block content} to \n * {% block content %}\\n{% end_block content %} with proper\n * indentation (for Django web templates)\n */\ndjango_tag = function() {\n    const widget = c.frame.body.wrapper;\n    // const scrollPosition = widget.getYScrollPosition();\n    // const textCursor = widget.textCursor();\n    let tCurPosition = c.frame.body.wrapper.getInsertPoint();\n\n    let i = tCurPosition - _abr.length;\n    const b =  g.workspace.body.getBody();\n    let s = [];\n    while (i && b[i] !== '{') {\n        s.unshift(b[i]);\n        i -= 1;\n    }\n    const start = i;\n    s = s.join('');\n    const s_close = s.split(' ')[0];\n    let indent = 0;\n    while (i && b[i] !== '\\n') {\n        indent += 1;\n        i -= 1;\n    }\n    if (indent) {\n        indent -= 1;\n    }\n    setTimeout(() => {\n\n        const offset = `${b.slice(0, start)}{% ${s} %}\\n${' '.repeat(indent)}${b.slice(start + s.length + _abr.length)}`;\n        c.p.b = `${b.slice(0, start)}{% ${s} %}\\n${' '.repeat(indent)}\\n${' '.repeat(indent)}{% end${s_close} %}${b.slice(start + s.length + _abr.length)}`;\n\n        // widget.setYScrollPosition(scrollPosition);\n        // textCursor.setPosition(offset);\n        // widget.setTextCursor(textCursor);\n        widget.setInsertPoint(offset)\n\n        c.bodyWantsFocusNow(); \n    }, 0);\n    \n}\n",
@@ -1299,15 +1341,20 @@
     "felix.20260411220658.20": "# This abbreviation will only work with @bool scripting-abbreviations = True\n# (or @bool scripting-at-script-nodes = True)\n\n# Original Python code:\n# date;;={|{x=time.asctime()}|}\n\ndate;;={|{return new Date().toString().slice(0,24)}|}\n\n",
     "felix.20260411220658.21": "# type html;; to insert template and ,, to select next <|placeholder|>\n\nhtml;;=<html>\n\\:<head>\n\\:<title><|title|></title>\n\\:<style>\n\\:</style>\n\\:</head>\n\\:<body>\n\\:<|content|>\n\\:</body>\n\\:</html>\n\n",
     "felix.20260411220658.22": "# By convention, most abbreviations end with ;; so that you won't type them by accident.\n# However, you can fix misspellings as shown here.\n\n# teh=the\n# hellow=hello\n\n",
-    "felix.20260411220658.23": "# The headline must be: @outline-data tree-abbreviations\n\n# A list tree abbreviation names.\n\n# For each abbreviation name, there should be corresponding child node,\n# the **abbreviation node** whose headline matches the abbreviation name.\n\n# When a tree abbreviation fires, Leo pastes all the descendants of\n# the abbreviation node as the last children of the presently selected node.\n\nimporter;;\nper-commander-plugin;;\ndemo;;\n",
-    "felix.20260411220658.25": "'''\nThe @auto importer for the {|{x=get_language()}|} language.\n\nCreated {|{x=time.strftime(\"%Y/%m/%d\")}|} by the `importer;;` abbreviation.\n'''\nimport leo.plugins.importers.linescanner as linescanner\nImporter = linescanner.Importer\n@others\nimporter_dict = {\n    'class': {|{x=cap_name}|}_Importer,\n    'extensions': [<|comma-separated lists of extensions|>],\n        # Example: ['.c', '.cc', '.c++', '.cpp', '.cxx', '.h', '.h++']\n}\n@language python\n@tabwidth -4\n\n\n",
-    "felix.20260411220658.26": "class {|{x=cap_name}|}_Importer(Importer):\n    '''The importer for the {|{x=name}|} lanuage.'''\n\n    def __init__(self, importCommands):\n        '''{|{x=cap_name}|}_Importer.__init__'''\n        super().__init__(\n            importCommands,\n            language = '{|{x=name}|}',\n            state_class = {|{x=cap_name}|}_ScanState,\n            strict = <|True leading whitespace is significant. Otherwise False|>,\n        )\n        \n    @others\n",
+    "felix.20260411220658.43": "'''\nA template for demonstrations based on plugins/demo.py.\nThe demo;; abbreviation will create this tree.\n'''\n<< imports >>\n@others\n# Use the *same* command/key binding for demo-start and demo.next.\ntry:\n    if getattr(g.app, 'demo', None):\n        g.app.demo.next()\n    else:\n        g.cls()\n        print('starting demo')\n        demo = MyDemo(c, trace=False)\n        demo.bind('callout', callout)\n        demo.bind('title', title)\n        demo.start(script_string=script_string)\nexcept Exception:\n    g.app.demo = None\n    raise\n",
+    "felix.20260411220658.44": "if c.isChanged(): c.save()\nimport imp\nfrom leo.core.leoQt import QtGui\nimport leo.plugins.demo as demo_module\nimp.reload(demo_module)",
+    "felix.20260411220658.45": "# A short example. Change as needed.\nscript_string = '''\\\ncallout('Callout 1 centered')\ntitle('This is title 1')\n###\ncallout('Callout 2 (700, 200)', position=[700, 200])\ntitle('This is title 2')\ndemo.next()\n'''\n",
+    "felix.20260411220658.46": "class MyDemo (demo_module.Demo):\n    \n    def setup_script(self):\n        '''Delete all previously shown widgets.'''\n        self.delete_widgets()",
+    "felix.20260411220658.47": "def callout(text, **keys):\n    w = demo_module.Callout(text, **keys)\n    \ndef title(text, **keys):\n    w = demo_module.Title(text, **keys)\n",
+    "felix.20260411220658.23": "# The headline must be: @outline-data tree-abbreviations\n\n# A list tree abbreviation names.\n\n# For each abbreviation name, there should be corresponding child node,\n# the **abbreviation node** whose headline matches the abbreviation name.\n\n# When a tree abbreviation fires, Leo pastes all the descendants of\n# the abbreviation node as the last children of the presently selected node.\n\n# 'demo' seems broken since the demo plugin was modified to use a different API. I will fix it later.\n# demo;;\n\nimporter;;\nper-commander-plugin;;\ntest;;\n\n",
+    "felix.20260411220658.25": "'''\nThe @auto importer for the {|{return get_language()}|} language.\n\nCreated {|{return new Date().toLocaleDateString('en-CA')}|} by the `importer;;` abbreviation.\n'''\nimport leo.plugins.importers.linescanner as linescanner\nImporter = linescanner.Importer\n@others\nimporter_dict = {\n    'class': {|{return cap_name}|}_Importer,\n    'extensions': [<|comma-separated lists of extensions|>],\n        # Example: ['.c', '.cc', '.c++', '.cpp', '.cxx', '.h', '.h++']\n}\n@language python\n@tabwidth -4\n\n\n",
+    "felix.20260411220658.26": "class {|{return cap_name}|}_Importer(Importer):\n    '''The importer for the {|{return name}|} language.'''\n\n    def __init__(self, importCommands):\n        '''{|{return cap_name}|}_Importer.__init__'''\n        super().__init__(\n            importCommands,\n            language = '{|{return name}|}',\n            state_class = {|{return cap_name}|}_ScanState,\n            strict = <|True leading whitespace is significant. Otherwise False|>,\n        )\n        \n    @others\n",
     "felix.20260411220658.27": "# These can be overridden in subclasses.\n",
     "felix.20260411220658.28": "### Define an override if desired...\n\nif 0: # The base class\n    def clean_headline(self, s):\n        '''Return a cleaned up headline s.'''\n        return s.strip()\n        \n# A more complex example, for the C language.\n\n# def clean_headline(self, s):\n    # '''Return a cleaned up headline s.'''\n    # import re\n    # type1 = r'(static|extern)*'\n    # type2 = r'(void|int|float|double|char)*'\n    # class_pattern = r'\\s*(%s)\\s*class\\s+(\\w+)' % (type1)\n    # pattern = r'\\s*(%s)\\s*(%s)\\s*(\\w+)' % (type1, type2)\n    # m = re.match(class_pattern, s)\n    # if m:\n        # prefix1 = '%s ' % (m.group(1)) if m.group(1) else ''\n        # return '%sclass %s' % (prefix1, m.group(2))\n    # m = re.match(pattern, s)\n    # if m:\n        # prefix1 = '%s ' % (m.group(1)) if m.group(1) else ''\n        # prefix2 = '%s ' % (m.group(2)) if m.group(2) else ''\n        # h = m.group(3) or '<no c function name>'\n        # return '%s%s%s' % (prefix1, prefix2, h)\n    # else:\n        # return s\n",
-    "felix.20260411220658.29": "def clean_nodes(self, parent):\n    '''\n    Clean all nodes in parent's tree.\n    Subclasses override this as desired.\n    See perl_i.clean_nodes for an examplle.\n    '''\n    pass\n",
-    "felix.20260411220658.30": "class {|{x=cap_name}|}_ScanState:\n    '''A class representing the state of the {|{x=name}|} line-oriented scan.'''\n    \n    def __init__(self, d=None):\n        '''{|{x=cap_name}|}_ScanState.__init__'''\n        if d:\n            prev = d.get('prev')\n            self.context = prev.context\n            ### Adjust these by hand.\n            self.curlies = prev.curlies\n        else:\n            self.context = ''\n            ### Adjust these by hand.\n            self.curlies = 0\n\n    def __repr__(self):\n        '''{|{x=cap_name}|}_ScanState.__repr__'''\n        ### Adjust these by hand.\n        return \"{|{x=cap_name}|}_ScanState context: %r curlies: %s\" % (\n            self.context, self.curlies)\n\n    __str__ = __repr__\n\n    @others\n\n",
-    "felix.20260411220658.31": "def level(self):\n    '''{|{x=cap_name}|}_ScanState.level.'''\n    return <|self.curlies|>\n        ### Examples:\n        # self.indent # for python, coffeescript.\n        # self.curlies\n        # (self, curlies, self.parens)\n",
-    "felix.20260411220658.32": "def update(self, data):\n    '''\n    {|{x=cap_name}|}_ScanState.update\n\n    Update the state using the 6-tuple returned by v2_scan_line.\n    Return i = data[1]\n    '''\n    context, i, delta_c, delta_p, delta_s, bs_nl = data\n    # All ScanState classes must have a context ivar.\n    self.context = context\n    self.curlies += delta_c  \n    ### Update {|{x=cap_name}|}_ScanState ivars\n    # self.bs_nl = bs_nl\n    # self.parens += delta_p\n    # self.squares += delta_s\n    return i\n",
+    "felix.20260411220658.29": "def clean_nodes(self, parent):\n    '''\n    Clean all nodes in parent's tree.\n    Subclasses override this as desired.\n    See perl_i.clean_nodes for an example.\n    '''\n    pass\n",
+    "felix.20260411220658.30": "class {|{return cap_name}|}_ScanState:\n    '''A class representing the state of the {|{return name}|} line-oriented scan.'''\n    \n    def __init__(self, d=None):\n        '''{|{return cap_name}|}_ScanState.__init__'''\n        if d:\n            prev = d.get('prev')\n            self.context = prev.context\n            ### Adjust these by hand.\n            self.curlies = prev.curlies\n        else:\n            self.context = ''\n            ### Adjust these by hand.\n            self.curlies = 0\n\n    def __repr__(self):\n        '''{|{return cap_name}|}_ScanState.__repr__'''\n        ### Adjust these by hand.\n        return \"{|{return cap_name}|}_ScanState context: %r curlies: %s\" % (\n            self.context, self.curlies)\n\n    __str__ = __repr__\n\n    @others\n\n",
+    "felix.20260411220658.31": "def level(self):\n    '''{|{return cap_name}|}_ScanState.level.'''\n    return <|self.curlies|>\n        ### Examples:\n        # self.indent # for python, coffeescript.\n        # self.curlies\n        # (self, curlies, self.parens)\n",
+    "felix.20260411220658.32": "def update(self, data):\n    '''\n    {|{return cap_name}|}_ScanState.update\n\n    Update the state using the 6-tuple returned by v2_scan_line.\n    Return i = data[1]\n    '''\n    context, i, delta_c, delta_p, delta_s, bs_nl = data\n    # All ScanState classes must have a context ivar.\n    self.context = context\n    self.curlies += delta_c  \n    ### Update {|{return cap_name}|}_ScanState ivars\n    # self.bs_nl = bs_nl\n    # self.parens += delta_p\n    # self.squares += delta_s\n    return i\n",
     "felix.20260411220658.34": "<< docstring >>\n### From leoSettings.leo\n# Created 2017/05/30\n@language python\n@tabwidth -4\n__version__ = '0.0'\n<< version history >>\n<< imports >>\n@others",
     "felix.20260411220658.35": "'''\n<|docstring|>\n'''\n",
     "felix.20260411220658.36": "@\nPut notes about each version here.\n<|Initial version notes|>",
@@ -1316,11 +1363,12 @@
     "felix.20260411220658.39": "def onCreate (tag, keys):\n    \n    c = keys.get('c')\n    if c:\n        thePluginController = pluginController(c)\n",
     "felix.20260411220658.40": "class <|Controller Class Name|>:\n    \n    @others",
     "felix.20260411220658.41": "def __init__ (self,c):\n    \n    self.c = c\n    # Warning: hook handlers must use keywords.get('c'), NOT self.c.\n    <|ivars|>",
-    "felix.20260411220658.43": "'''\nA template for demonstrations based on plugins/demo.py.\nThe demo;; abbreviation will create this tree.\n'''\n<< imports >>\n@others\n# Use the *same* command/key binding for demo-start and demo.next.\ntry:\n    if getattr(g.app, 'demo', None):\n        g.app.demo.next()\n    else:\n        g.cls()\n        print('starting demo')\n        demo = MyDemo(c, trace=False)\n        demo.bind('callout', callout)\n        demo.bind('title', title)\n        demo.start(script_string=script_string)\nexcept Exception:\n    g.app.demo = None\n    raise\n",
-    "felix.20260411220658.44": "if c.isChanged(): c.save()\nimport imp\nfrom leo.core.leoQt import QtGui\nimport leo.plugins.demo as demo_module\nimp.reload(demo_module)",
-    "felix.20260411220658.45": "# A short example. Change as needed.\nscript_string = '''\\\ncallout('Callout 1 centered')\ntitle('This is title 1')\n###\ncallout('Callout 2 (700, 200)', position=[700, 200])\ntitle('This is title 2')\ndemo.next()\n'''\n",
-    "felix.20260411220658.46": "class MyDemo (demo_module.Demo):\n    \n    def setup_script(self):\n        '''Delete all previously shown widgets.'''\n        self.delete_widgets()",
-    "felix.20260411220658.47": "def callout(text, **keys):\n    w = demo_module.Callout(text, **keys)\n    \ndef title(text, **keys):\n    w = demo_module.Title(text, **keys)\n",
+    "felix.20260419003515.2": "sdfs\nsdf\nsdfsd\nf <|hello|>\n\nbnlsbfls",
+    "felix.20260419003515.3": "inside inside \n\nsome more: <|test2|>\n\nend of that node",
+    "felix.20260419003515.4": "and inside 2\n\nend\n",
+    "felix.20260419003515.5": "also has inside to replace <|sfsfsfs|> hoho\n",
+    "felix.20260419003515.6": "has text inside to replace:  <|fsfsf|>\n\nok \n",
+    "felix.20260419003515.7": "noting inside though\n",
     "felix.20260411220658.48": "The end of a placeholder for template expansions, e.g.\n`|>`. See @string abbreviations-place-start.",
     "felix.20260411220658.49": "Start of a placeholder for template expansions.  E.g.\nthe ``<|`` in::\n\n    w;;=while <|condition|>:\n    \\:    <|code|>\n\nThis would expand with the ``<|condition|>`` selected, and ``,,``,\nif that's an abbreviation linked to next_place(), see \n``@@data abbreviations examples``, would select ``<|code|>``.",
     "felix.20260411220658.50": "See abbreviations-subst-start.  This setting,\nabbreviations-subst-end, has no effect if\nabbreviations-subst-start is not set.",
