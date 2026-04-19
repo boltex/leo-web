@@ -2,7 +2,7 @@
 
 ## 1.0.14
 
-- ...
+- Implemented abbreviations.
 
 ## 1.0.13
 
@@ -19,7 +19,7 @@
 ## 1.0.10
 
 - Fixed showQuickPick dialog and added escape keypress detection to all modal dialogs.
-- Fixed minibuffer icons
+- Fixed minibuffer icons.
 
 ## 1.0.9
 
