@@ -5,6 +5,7 @@
 
 // ambient module declaration for https://www.npmjs.com/package/date-format-lite
 declare module "date-format-lite" { }
+declare module '*.css'; // For import './style.css'; in src/index.ts
 declare module "*.leojs" {
     const value: any;
     export default value;

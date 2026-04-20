@@ -15,6 +15,7 @@ import { keybindings } from "./keybindings";
 import { QuickSearchController } from "./core/quicksearch";
 import { nullButtonWidget } from "./core/leoFrame";
 import { RClick } from "./core/mod_scripting";
+import { tips } from "./tips";
 
 //@-<< imports >>
 //@+others
@@ -627,6 +628,10 @@ export class Controller {
         workspace.logPane.showTab("log");
 
         let dirHandle: FileSystemDirectoryHandle | null = null;
+
+        // Pre-start: show 'tips' splash screen offering 'show tips at startup' checkbox
+        // and wait for the user to press 'ok'.
+        await workspace.dialog.showTipsDialog(tips[0]);
 
         // 1 Try restoring previous workspace
         try {

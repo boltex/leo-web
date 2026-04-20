@@ -1,0 +1,53 @@
+//@+leo-ver=5-thin
+//@+node:felix.20260419195952.1: * @file src/tips.ts
+//@+<< imports >>
+//@+node:felix.20260419200011.1: ** << imports >>
+import { TipsEntry } from "./types";
+
+//@-<< imports >>
+//@+others
+//@+node:felix.20260419200019.1: ** tips
+export const tips: TipsEntry[] = [
+    {
+        title: 'Leo Editor with Outline',
+        description: 'Keyboard shortcuts for navigating and editing the outline.',
+        content:`
+            <div class="help-column">
+                <ul class="config-col shortcuts">
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>I</kbd></span> — Insert Node</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>U</kbd></span> — Move Up</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>D</kbd></span> — Move Down</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>L</kbd></span> — Move Left</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>R</kbd></span> — Move Right</li>
+
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></span> —
+                        Copy
+                        Node</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></span> —
+                        Paste
+                        Node</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd></span> —
+                        Cut Node
+                    </li>
+                </ul>
+            </div>
+            <div class="help-column">
+                <ul class="config-col shortcuts">
+                    <li><span class="kbd-spacer"><kbd>Arrows</kbd></span> — Navigate Outline</li>
+                    <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>Arrows</kbd></span> — Navigate from
+                        anywhere</li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>F</kbd></span> — Find (Reset Scope)
+                    </li>
+                    <li><span class="kbd-spacer"><kbd>F2</kbd>/<kbd>F3</kbd></span> — Previous/Next Match
+                    </li>
+                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>M</kbd></span> — Mark Node</li>
+                    <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>-</kbd></span> — Collapse All</li>
+                </ul>
+            </div>
+            `
+    }
+];
+//@-others
+//@@language typescript
+//@@tabwidth -4
+//@-leo

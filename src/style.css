@@ -1411,6 +1411,7 @@ select.setting-select {
   min-width: 110px;
 }
 
+#tips-dialog label,
 #log-pane .find-col label,
 #log-pane .config-col label,
 #log-pane .nav-col label {
@@ -1454,6 +1455,7 @@ select.setting-select {
   pointer-events: none;
 }
 
+#tips-dialog input[type="checkbox"],
 #log-pane input[type="checkbox"],
 #log-pane input[type="radio"] {
   flex-shrink: 0;
@@ -1556,6 +1558,8 @@ input[type="checkbox"]:focus-visible:checked::after {
   border-width: 0 2px 2px 0;
 }
 
+#tips-dialog input:focus,
+#tips-dialog input:focus-visible,
 #find-controls input:focus,
 #find-controls input:focus-visible,
 #find-controls select:focus,
@@ -1721,6 +1725,11 @@ input[type="checkbox"]:focus-visible:checked::after {
   padding: 16px 20px;
   border-radius: 8px;
   background: var(--body-pane-color);
+
+  /* background: hsl(from var(--body-pane-color) h s l / 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); */
+
   color: var(--text-color);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   border: 1px solid var(--find-border-color);
@@ -1914,8 +1923,17 @@ mark {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
+#tips-dialog-content {
+  display: flex;
+}
+
+#tips-dialog label {
+  margin-top: 12px;
+}
+
 #tips-dialog .modal-content button {
   display: block;
+  float: right;
   /* margin-right: 8px; */
   padding: 8px 12px;
   border-radius: 6px;

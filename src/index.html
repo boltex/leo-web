@@ -245,6 +245,10 @@
                             <input id="show-collapse-all" type="checkbox" name="config-option" checked />
                             Collapse All
                         </label>
+                        <label for="show-tips">
+                            <input id="show-tips" type="checkbox" name="config-option" />
+                            Show tips on startup
+                        </label>
                         <!-- Future possible options: visibility for chapters, toolbars, etc. -->
                         <!-- <label for="show-chapters">
                         <input id="show-chapters" type="checkbox" name="config-option" />
@@ -367,48 +371,15 @@
     </div>
 
     <div id="tips-dialog" class="modal" tabindex="-1">
-        <h2 id="tips-dialog-title"></h2>
-        <p id="tips-dialog-description"></p>
         <div class="modal-content">
-            <div id="help-content">
-                <div class="help-column">
-                    <ul class="config-col shortcuts">
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>I</kbd></span> — Insert Node</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>U</kbd></span> — Move Up</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>D</kbd></span> — Move Down</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>L</kbd></span> — Move Left</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>R</kbd></span> — Move Right</li>
-
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></span> —
-                            Copy
-                            Node</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></span> —
-                            Paste
-                            Node</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd></span> —
-                            Cut Node
-                        </li>
-                    </ul>
-                </div>
-                <div class="help-column">
-                    <ul class="config-col shortcuts">
-                        <li><span class="kbd-spacer"><kbd>Arrows</kbd></span> — Navigate Outline</li>
-                        <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>Arrows</kbd></span> — Navigate from
-                            anywhere</li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>F</kbd></span> — Find (Reset Scope)
-                        </li>
-                        <li><span class="kbd-spacer"><kbd>F2</kbd>/<kbd>F3</kbd></span> — Previous/Next Match
-                        </li>
-                        <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>M</kbd></span> — Mark Node</li>
-                        <li><span class="kbd-spacer"><kbd>Alt</kbd>+<kbd>-</kbd></span> — Collapse All</li>
-                    </ul>
-                </div>
-            </div>
-            <button id="tips-dialog-btn">Ok</button>
-            <label for="show-tips">
-                <input id="show-tips" type="checkbox" name="config-option" />
+            <h2 id="tips-dialog-title"></h2>
+            <p id="tips-dialog-description"></p>
+            <div id="tips-dialog-content"></div>
+            <label for="show-tips-startup">
+                <input id="show-tips-startup" type="checkbox" name="config-option" />
                 Show tips on startup
             </label>
+            <button id="tips-dialog-btn" class="modal-dialog-btn">Ok</button>
         </div>
     </div>
 

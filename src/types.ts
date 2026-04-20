@@ -82,6 +82,12 @@ export interface ButtonEntry {
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
     domElementRef?: HTMLElement; // Reference to the button to refresh its enabled/disabled state.
 }
+//@+node:felix.20260419200206.1: ** TipsEntry
+export interface TipsEntry {
+    title: string;
+    description: string;
+    content: string;
+}
 //@+node:felix.20251211213200.1: ** FileStat
 export interface FileStat {
     type: 'file' | 'directory';
@@ -111,6 +117,12 @@ export interface FilePath {
     handle: FileSystemDirectoryHandle;
 }
 
+//@+node:felix.20260419201101.1: ** TipsDialogOptions
+export interface TipsDialogOptions {
+    title: string;
+    description?: string;
+    content: string;
+}
 //@+node:felix.20251211213209.1: ** OpenDialogOptions
 /**
  * Options to configure the behaviour of a file open dialog.

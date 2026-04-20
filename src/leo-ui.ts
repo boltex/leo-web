@@ -3401,7 +3401,8 @@ export class LeoUI extends NullGui {
             version,
             {
                 modal: true,
-                detail: theCopyright
+                // double the newlines to create a line break between version and copyright, since 'detail' is shown below the version in smaller font.
+                detail: theCopyright.replace(/\n/g, '\n\n')
             });
     }
     //@+node:felix.20260322232941.1: *4* Ask Dialogs

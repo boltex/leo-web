@@ -9,6 +9,7 @@ import {
     MessageOptions,
     QuickPickItem,
     QuickPickOptions,
+    TipsDialogOptions
 } from './types';
 import { Uri, workspace } from './workspace';
 
@@ -32,7 +33,7 @@ export class DialogManager {
     private TOAST: HTMLElement;
     private MODAL_DIALOG_TITLE: HTMLElement;
     private MODAL_DIALOG_DESCRIPTION: HTMLElement;
-    private MODAL_DIALOG_BTN_CONTAINER: HTMLElement;    
+    private MODAL_DIALOG_BTN_CONTAINER: HTMLElement;
 
     private INPUT_DIALOG_TITLE: HTMLElement;
     private INPUT_DIALOG_DESCRIPTION: HTMLElement;
@@ -42,12 +43,18 @@ export class DialogManager {
     private QUICKPICK_DIALOG_INPUT: HTMLInputElement;
     private QUICKPICK_DIALOG_LIST: HTMLElement;
 
+    private TIPS_DIALOG_TITLE: HTMLElement;
+    private TIPS_DIALOG_DESCRIPTION: HTMLElement;
+    private TIPS_DIALOG_CONTENT: HTMLElement;
+    private TIPS_DIALOG_BTN: HTMLButtonElement;
+    private TIPS_DIALOG_SHOW_STARTUP: HTMLInputElement;
+
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
     private __quickPickScrollTimeout: ReturnType<typeof setTimeout> | null = null;
     private __toastResolvers: Array<(value: PromiseLike<undefined> | undefined) => void> = [];
 
     private __dialogQueue: Array<{
-        type: 'message' | 'input' | 'singleChar' | 'quickPick' | 'openFile' | 'saveFile';
+        type: 'message' | 'input' | 'singleChar' | 'quickPick' | 'tips' | 'openFile' | 'saveFile';
         // For message dialogs
         message?: string;
         options?: MessageOptions;
@@ -57,6 +64,8 @@ export class DialogManager {
         // For quick pick
         quickPickItems?: QuickPickItem[];
         quickPickOptions?: QuickPickOptions;
+        // for tips dialog
+        tipsDialogOptions?: TipsDialogOptions;
         // For file dialogs
         openDialogOptions?: OpenDialogOptions;
         saveDialogOptions?: SaveDialogOptions;
@@ -90,6 +99,11 @@ export class DialogManager {
         this.QUICKPICK_DIALOG_INPUT = document.getElementById('quickpick-dialog-input')! as HTMLInputElement;
         this.QUICKPICK_DIALOG_LIST = document.getElementById('quickpick-dialog-list')!;
 
+        this.TIPS_DIALOG_TITLE = document.getElementById('tips-dialog-title')!;
+        this.TIPS_DIALOG_DESCRIPTION = document.getElementById('tips-dialog-description')!;
+        this.TIPS_DIALOG_CONTENT = document.getElementById('tips-dialog-content')!;
+        this.TIPS_DIALOG_BTN = document.getElementById('tips-dialog-btn')! as HTMLButtonElement;
+        this.TIPS_DIALOG_SHOW_STARTUP = document.getElementById('show-tips-startup')! as HTMLInputElement;
     }
 
     //@+others
@@ -237,6 +251,20 @@ export class DialogManager {
             }
         });
     }
+    //@+node:felix.20260419172756.1: *3* showTipsDialog
+    public showTipsDialog(options: TipsDialogOptions): Thenable<undefined> {
+        return new Promise<undefined>((resolve) => {
+            this.__dialogQueue.push({
+                type: 'tips',
+                tipsDialogOptions: options,
+                resolve
+            });
+
+            if (!this.isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
     //@+node:felix.20260322225815.1: *3* showOpenDialog
     public async showOpenDialog(options?: OpenDialogOptions): Promise<Uri[] | null> {
         return new Promise((resolve) => {
@@ -308,6 +336,9 @@ export class DialogManager {
                 break;
             case 'quickPick':
                 this._showQuickPickInternal(dialog);
+                break;
+            case 'tips':
+                this._showTipsDialogInternal(dialog);
                 break;
             case 'openFile':
                 this._showOpenDialogInternal(dialog);
@@ -858,6 +889,56 @@ export class DialogManager {
         setTimeout(() => {
             this.QUICKPICK_DIALOG_INPUT.focus();
         }, 0);
+    }
+    //@+node:felix.20260419173929.1: *3* _showTipsDialogInternal
+    private _showTipsDialogInternal(dialog: any): void {
+        const options = dialog.tipsDialogOptions;
+        this.HTML_ELEMENT.setAttribute('data-show-tips-dialog', 'true');
+        this.TIPS_DIALOG.onkeydown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this._cleanupFocusTrap();
+                this.HTML_ELEMENT.setAttribute('data-show-tips-dialog', 'false');
+                this.TIPS_DIALOG.onkeydown = null; // Remove its own keydown.
+                this.TIPS_DIALOG_BTN.onclick = null;
+                this.isDialogOpen = false;
+                this._restorePreDialogFocus();
+                dialog.resolve(undefined);
+                setTimeout(() => this._processDialogQueue(), 100);
+            }
+        };
+
+        const tipsCallback = () => {
+            this._cleanupFocusTrap();
+            this.HTML_ELEMENT.setAttribute('data-show-tips-dialog', 'false');
+            this.TIPS_DIALOG.onkeydown = null;
+            this.TIPS_DIALOG_BTN.onclick = null;
+            this.isDialogOpen = false;
+            this._restorePreDialogFocus();
+            dialog.resolve(undefined);
+            setTimeout(() => this._processDialogQueue(), 100);
+        };
+
+        this.TIPS_DIALOG_BTN.textContent = 'OK';
+        this.TIPS_DIALOG_BTN.onclick = tipsCallback;
+        console.log('dialog', dialog);
+
+        this.TIPS_DIALOG_TITLE.textContent = options.title;
+        this.TIPS_DIALOG_DESCRIPTION.textContent = options.description ?? '';
+        this.TIPS_DIALOG_CONTENT.innerHTML = options.content ?? '';
+
+        // Get the modal dialog container element
+        const tipsDialog = document.querySelector('#tips-dialog') as HTMLElement;
+        if (tipsDialog) {
+            this._cleanupFocusTrap();
+            this.__activeFocusTrap = this._setupFocusTrap(tipsDialog);
+        }
+
+        setTimeout(() => {
+            this.TIPS_DIALOG_BTN.focus();
+        }, 0);
+
     }
     //@+node:felix.20260322224248.1: *3* _showOpenDialogInternal
     private async _showOpenDialogInternal(dialog: any): Promise<void> {

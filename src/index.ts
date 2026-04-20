@@ -30,7 +30,7 @@ class LeoWebApp {
             this.setupApp();
         }
     }
-    
+
     private async setupApp(): Promise<void> {
 
         const dialog = new DialogManager();
@@ -54,7 +54,7 @@ class LeoWebApp {
         const controller = new Controller();
         workspace.setController(controller);
         await controller.initialize();
-        
+
         const w_start = process.hrtime();
         (g.workspaceUri as Uri) = new Uri('/');
         // #1472: bind to g immediately.
