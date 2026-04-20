@@ -9,7 +9,7 @@ import {
     MessageOptions,
     QuickPickItem,
     QuickPickOptions,
-    TipsDialogOptions
+    TipsDialogOptions as WelcomeDialogOptions
 } from './types';
 import { Uri, workspace } from './workspace';
 
@@ -28,7 +28,7 @@ export class DialogManager {
     private MODAL_DIALOG: HTMLElement;
     private INPUT_DIALOG: HTMLElement;
     private QUICKPICK_DIALOG: HTMLElement;
-    private TIPS_DIALOG: HTMLElement;
+    private WELCOME_DIALOG: HTMLElement;
 
     private TOAST: HTMLElement;
     private MODAL_DIALOG_TITLE: HTMLElement;
@@ -43,18 +43,18 @@ export class DialogManager {
     private QUICKPICK_DIALOG_INPUT: HTMLInputElement;
     private QUICKPICK_DIALOG_LIST: HTMLElement;
 
-    private TIPS_DIALOG_TITLE: HTMLElement;
-    private TIPS_DIALOG_DESCRIPTION: HTMLElement;
-    private TIPS_DIALOG_CONTENT: HTMLElement;
-    private TIPS_DIALOG_BTN: HTMLButtonElement;
-    private TIPS_DIALOG_SHOW_STARTUP: HTMLInputElement;
+    private WELCOME_DIALOG_TITLE: HTMLElement;
+    private WELCOME_DIALOG_DESCRIPTION: HTMLElement;
+    private WELCOME_DIALOG_CONTENT: HTMLElement;
+    private WELCOME_DIALOG_BTN: HTMLButtonElement;
+    private WELCOME_DIALOG_SHOW_STARTUP: HTMLInputElement;
 
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
     private __quickPickScrollTimeout: ReturnType<typeof setTimeout> | null = null;
     private __toastResolvers: Array<(value: PromiseLike<undefined> | undefined) => void> = [];
 
     private __dialogQueue: Array<{
-        type: 'message' | 'input' | 'singleChar' | 'quickPick' | 'tips' | 'openFile' | 'saveFile';
+        type: 'message' | 'input' | 'singleChar' | 'quickPick' | 'welcome' | 'openFile' | 'saveFile';
         // For message dialogs
         message?: string;
         options?: MessageOptions;
@@ -64,8 +64,8 @@ export class DialogManager {
         // For quick pick
         quickPickItems?: QuickPickItem[];
         quickPickOptions?: QuickPickOptions;
-        // for tips dialog
-        tipsDialogOptions?: TipsDialogOptions;
+        // for welcome dialog
+        welcomeDialogOptions?: WelcomeDialogOptions;
         // For file dialogs
         openDialogOptions?: OpenDialogOptions;
         saveDialogOptions?: SaveDialogOptions;
@@ -85,7 +85,7 @@ export class DialogManager {
         this.MODAL_DIALOG = document.getElementById('message-dialog')!;
         this.INPUT_DIALOG = document.getElementById('input-dialog')!;
         this.QUICKPICK_DIALOG = document.getElementById('quickpick-dialog')!;
-        this.TIPS_DIALOG = document.getElementById('tips-dialog')!;
+        this.WELCOME_DIALOG = document.getElementById('welcome-dialog')!;
 
         this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;
@@ -99,11 +99,11 @@ export class DialogManager {
         this.QUICKPICK_DIALOG_INPUT = document.getElementById('quickpick-dialog-input')! as HTMLInputElement;
         this.QUICKPICK_DIALOG_LIST = document.getElementById('quickpick-dialog-list')!;
 
-        this.TIPS_DIALOG_TITLE = document.getElementById('tips-dialog-title')!;
-        this.TIPS_DIALOG_DESCRIPTION = document.getElementById('tips-dialog-description')!;
-        this.TIPS_DIALOG_CONTENT = document.getElementById('tips-dialog-content')!;
-        this.TIPS_DIALOG_BTN = document.getElementById('tips-dialog-btn')! as HTMLButtonElement;
-        this.TIPS_DIALOG_SHOW_STARTUP = document.getElementById('show-tips-startup')! as HTMLInputElement;
+        this.WELCOME_DIALOG_TITLE = document.getElementById('welcome-dialog-title')!;
+        this.WELCOME_DIALOG_DESCRIPTION = document.getElementById('welcome-dialog-description')!;
+        this.WELCOME_DIALOG_CONTENT = document.getElementById('welcome-dialog-content')!;
+        this.WELCOME_DIALOG_BTN = document.getElementById('welcome-dialog-btn')! as HTMLButtonElement;
+        this.WELCOME_DIALOG_SHOW_STARTUP = document.getElementById('show-welcome-startup')! as HTMLInputElement;
     }
 
     //@+others
@@ -251,12 +251,12 @@ export class DialogManager {
             }
         });
     }
-    //@+node:felix.20260419172756.1: *3* showTipsDialog
-    public showTipsDialog(options: TipsDialogOptions): Thenable<undefined> {
+    //@+node:felix.20260419172756.1: *3* showWelcomeDialog
+    public showWelcomeDialog(options: WelcomeDialogOptions): Thenable<undefined> {
         return new Promise<undefined>((resolve) => {
             this.__dialogQueue.push({
-                type: 'tips',
-                tipsDialogOptions: options,
+                type: 'welcome',
+                welcomeDialogOptions: options,
                 resolve
             });
 
@@ -337,8 +337,8 @@ export class DialogManager {
             case 'quickPick':
                 this._showQuickPickInternal(dialog);
                 break;
-            case 'tips':
-                this._showTipsDialogInternal(dialog);
+            case 'welcome':
+                this._showWelcomeDialogInternal(dialog);
                 break;
             case 'openFile':
                 this._showOpenDialogInternal(dialog);
@@ -890,18 +890,18 @@ export class DialogManager {
             this.QUICKPICK_DIALOG_INPUT.focus();
         }, 0);
     }
-    //@+node:felix.20260419173929.1: *3* _showTipsDialogInternal
-    private _showTipsDialogInternal(dialog: any): void {
-        const options = dialog.tipsDialogOptions;
-        this.HTML_ELEMENT.setAttribute('data-show-tips-dialog', 'true');
-        this.TIPS_DIALOG.onkeydown = (e) => {
+    //@+node:felix.20260419173929.1: *3* _showWelcomeDialogInternal
+    private _showWelcomeDialogInternal(dialog: any): void {
+        const options = dialog.welcomeDialogOptions;
+        this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'true');
+        this.WELCOME_DIALOG.onkeydown = (e) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
                 e.stopPropagation();
                 this._cleanupFocusTrap();
-                this.HTML_ELEMENT.setAttribute('data-show-tips-dialog', 'false');
-                this.TIPS_DIALOG.onkeydown = null; // Remove its own keydown.
-                this.TIPS_DIALOG_BTN.onclick = null;
+                this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'false');
+                this.WELCOME_DIALOG.onkeydown = null; // Remove its own keydown.
+                this.WELCOME_DIALOG_BTN.onclick = null;
                 this.isDialogOpen = false;
                 this._restorePreDialogFocus();
                 dialog.resolve(undefined);
@@ -911,32 +911,31 @@ export class DialogManager {
 
         const tipsCallback = () => {
             this._cleanupFocusTrap();
-            this.HTML_ELEMENT.setAttribute('data-show-tips-dialog', 'false');
-            this.TIPS_DIALOG.onkeydown = null;
-            this.TIPS_DIALOG_BTN.onclick = null;
+            this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'false');
+            this.WELCOME_DIALOG.onkeydown = null;
+            this.WELCOME_DIALOG_BTN.onclick = null;
             this.isDialogOpen = false;
             this._restorePreDialogFocus();
             dialog.resolve(undefined);
             setTimeout(() => this._processDialogQueue(), 100);
         };
 
-        this.TIPS_DIALOG_BTN.textContent = 'OK';
-        this.TIPS_DIALOG_BTN.onclick = tipsCallback;
-        console.log('dialog', dialog);
+        this.WELCOME_DIALOG_BTN.textContent = 'OK';
+        this.WELCOME_DIALOG_BTN.onclick = tipsCallback;
 
-        this.TIPS_DIALOG_TITLE.textContent = options.title;
-        this.TIPS_DIALOG_DESCRIPTION.textContent = options.description ?? '';
-        this.TIPS_DIALOG_CONTENT.innerHTML = options.content ?? '';
+        this.WELCOME_DIALOG_TITLE.textContent = options.title;
+        this.WELCOME_DIALOG_DESCRIPTION.textContent = options.description ?? '';
+        this.WELCOME_DIALOG_CONTENT.innerHTML = options.content ?? '';
 
         // Get the modal dialog container element
-        const tipsDialog = document.querySelector('#tips-dialog') as HTMLElement;
+        const tipsDialog = document.querySelector('#welcome-dialog') as HTMLElement;
         if (tipsDialog) {
             this._cleanupFocusTrap();
             this.__activeFocusTrap = this._setupFocusTrap(tipsDialog);
         }
 
         setTimeout(() => {
-            this.TIPS_DIALOG_BTN.focus();
+            this.WELCOME_DIALOG_BTN.focus();
         }, 0);
 
     }

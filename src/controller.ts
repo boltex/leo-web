@@ -631,7 +631,7 @@ export class Controller {
 
         // Pre-start: show 'tips' splash screen offering 'show tips at startup' checkbox
         // and wait for the user to press 'ok'.
-        await workspace.dialog.showTipsDialog(tips[0]);
+        await workspace.dialog.showWelcomeDialog(tips[0]);
 
         // 1 Try restoring previous workspace
         try {
