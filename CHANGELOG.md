@@ -2,8 +2,9 @@
 
 ## 1.0.14
 
-- Implemented abbreviations.
+- Implemented Leo's abbreviations functionality.
 - Fixed arrow key and undo/redo behavior while typing in outline headlines.
+- Added welcome screen.
 
 ## 1.0.13
 
