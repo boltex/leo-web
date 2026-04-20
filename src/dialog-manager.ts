@@ -902,6 +902,7 @@ export class DialogManager {
                 this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'false');
                 this.WELCOME_DIALOG.onkeydown = null; // Remove its own keydown.
                 this.WELCOME_DIALOG_BTN.onclick = null;
+                this.WELCOME_DIALOG_SHOW_STARTUP.onchange = null;
                 this.isDialogOpen = false;
                 this._restorePreDialogFocus();
                 dialog.resolve(undefined);
@@ -914,6 +915,7 @@ export class DialogManager {
             this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'false');
             this.WELCOME_DIALOG.onkeydown = null;
             this.WELCOME_DIALOG_BTN.onclick = null;
+            this.WELCOME_DIALOG_SHOW_STARTUP.onchange = null;
             this.isDialogOpen = false;
             this._restorePreDialogFocus();
             dialog.resolve(undefined);
@@ -926,6 +928,13 @@ export class DialogManager {
         this.WELCOME_DIALOG_TITLE.textContent = options.title;
         this.WELCOME_DIALOG_DESCRIPTION.textContent = options.description ?? '';
         this.WELCOME_DIALOG_CONTENT.innerHTML = options.content ?? '';
+
+        // Set checkbox to current config preference
+        this.WELCOME_DIALOG_SHOW_STARTUP.checked = workspace.menu.SHOW_WELCOME_AT_STARTUP.checked;
+
+        this.WELCOME_DIALOG_SHOW_STARTUP.onchange = () => {
+            workspace.menu.SHOW_WELCOME_AT_STARTUP.checked = this.WELCOME_DIALOG_SHOW_STARTUP.checked;
+        };
 
         // Get the modal dialog container element
         const tipsDialog = document.querySelector('#welcome-dialog') as HTMLElement;

@@ -55,8 +55,8 @@ export class LogPaneManager {
     public UNDO_CONTENT: HTMLElement; // Container for undo nodes, which will be rendered as child elements within this container.
 
     // Config Controls
-    public PREVIOUS_NEXT_HISTORY: HTMLInputElement; // checkbox
-    public SHOW_COLLAPSE_ALL: HTMLInputElement; // checkbox
+    public FIRST_FOCUSABLE_CONTROL: HTMLInputElement; // checkbox
+    public LAST_FOCUSABLE_CONTROL: HTMLInputElement; // checkbox
 
     // Nav controls
     public SEARCH_OPTIONS: HTMLSelectElement; // select
@@ -141,8 +141,8 @@ export class LogPaneManager {
         this.SCOPE_FILE = document.getElementById('scope-file')! as HTMLInputElement; // radio button
 
         // Config Controls
-        this.PREVIOUS_NEXT_HISTORY = document.getElementById('show-prev-next-history')! as HTMLInputElement; // checkbox
-        this.SHOW_COLLAPSE_ALL = document.getElementById('show-collapse-all')! as HTMLInputElement; // checkbox
+        this.FIRST_FOCUSABLE_CONTROL = document.getElementById('show-prev-next-history')! as HTMLInputElement; // checkbox
+        this.LAST_FOCUSABLE_CONTROL = document.getElementById('show-welcome')! as HTMLInputElement; // checkbox
 
         // Nav controls
         this.SEARCH_OPTIONS = document.getElementById('searchOptions') as HTMLSelectElement; // select
@@ -298,16 +298,16 @@ export class LogPaneManager {
         });
 
         // * Deal with keyboard presses on specific 'config' tab controls.
-        this.PREVIOUS_NEXT_HISTORY.addEventListener('keydown', (e) => {
+        this.FIRST_FOCUSABLE_CONTROL.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && e.shiftKey) {
                 e.preventDefault();
-                this.SHOW_COLLAPSE_ALL.focus();
+                this.LAST_FOCUSABLE_CONTROL.focus();
             }
         });
-        this.SHOW_COLLAPSE_ALL.addEventListener('keydown', (e) => {
+        this.LAST_FOCUSABLE_CONTROL.addEventListener('keydown', (e) => {
             if (e.key === 'Tab' && !e.shiftKey) {
                 e.preventDefault();
-                this.PREVIOUS_NEXT_HISTORY.focus();
+                this.FIRST_FOCUSABLE_CONTROL.focus();
             }
         });
     }

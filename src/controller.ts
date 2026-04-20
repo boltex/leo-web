@@ -1250,7 +1250,8 @@ export class Controller {
             findMark: logPane.OPT_MARK_FINDS.checked,
             findHeadline: logPane.OPT_HEADLINE.checked,
             findBody: logPane.OPT_BODY.checked,
-            findScope: selectedFindScope
+            findScope: selectedFindScope,
+            showWelcomeAtStartup: menu.SHOW_WELCOME_AT_STARTUP.checked
         };
         utils.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
     }
@@ -1271,6 +1272,7 @@ export class Controller {
                 menu.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
                 menu.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
                 menu.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
+                menu.SHOW_WELCOME_AT_STARTUP.checked = prefs.showWelcomeAtStartup ?? true;
                 // Find-pane options
                 logPane.OPT_WHOLE.checked = prefs.findWholeWord ?? logPane.OPT_WHOLE.checked;
                 logPane.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? logPane.OPT_IGNORECASE.checked;

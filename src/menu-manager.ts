@@ -62,7 +62,7 @@ export class MenuManager {
     public SHOW_THEME_TOGGLE: HTMLInputElement;
     public SHOW_NODE_ICONS: HTMLInputElement;
     public SHOW_COLLAPSE_ALL: HTMLInputElement;
-
+    public SHOW_WELCOME_AT_STARTUP: HTMLInputElement;
 
     public activeTopMenu: HTMLDivElement | null = null;
     public focusedMenuItem: HTMLDivElement | null = null;
@@ -117,6 +117,7 @@ export class MenuManager {
         this.SHOW_THEME_TOGGLE = document.getElementById('show-theme-toggle')! as HTMLInputElement;
         this.SHOW_NODE_ICONS = document.getElementById('show-node-icons')! as HTMLInputElement;
         this.SHOW_COLLAPSE_ALL = document.getElementById('show-collapse-all')! as HTMLInputElement;
+        this.SHOW_WELCOME_AT_STARTUP = document.getElementById('show-welcome')! as HTMLInputElement;
 
         this.topLevelItems.length = 0;
         this.topLevelSubmenus.clear();
