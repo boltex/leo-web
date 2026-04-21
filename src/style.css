@@ -1921,6 +1921,7 @@ mark {
 #welcome-dialog {
   display: var(--welcome-dialog-display);
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  user-select: none; /* Prevent text selection in the welcome dialog */
 }
 
 #welcome-dialog-content {
