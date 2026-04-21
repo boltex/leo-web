@@ -233,13 +233,6 @@ export class Controller {
         document.addEventListener('click', (e) => {
             workspace.menu.closeMenusEvent(e);
         });
-        document.addEventListener('contextmenu', (e) => {
-            const target = e.target;
-            workspace.menu.closeMenusEvent(e);
-            if (!(target instanceof Element) || !target.closest('.allow-context')) {
-                e.preventDefault();
-            }
-        });
     }
     //@+node:felix.20260322221923.1: *4* setupButtonHandlers
     private setupButtonHandlers() {
@@ -620,6 +613,15 @@ export class Controller {
     //@+others
     //@+node:felix.20260322221549.1: *4* initialize
     public async initialize() {
+        // The context menu prevention is setup before anything to prevent browser's default.
+        document.addEventListener('contextmenu', (e) => {
+            const target = e.target;
+            workspace.menu.closeMenusEvent(e);
+            if (!(target instanceof Element) || !target.closest('.allow-context')) {
+                e.preventDefault();
+            }
+        });
+
         // outline-find-container is initially hidden to prevent FOUC
         workspace.layout.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();

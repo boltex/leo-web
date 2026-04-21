@@ -1,4 +1,4 @@
-# Leo Web Editor
+# Leo for the Web
 
 A browser-based version of the Leo Editor, available at [https://boltex.github.io/leo-web/](https://boltex.github.io/leo-web/)
 

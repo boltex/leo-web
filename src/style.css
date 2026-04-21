@@ -1925,6 +1925,7 @@ mark {
 
 #welcome-dialog-content {
   display: flex;
+  justify-content: space-around;
 }
 
 #welcome-dialog label {
@@ -1934,7 +1935,6 @@ mark {
 #welcome-dialog .modal-content button {
   display: block;
   float: right;
-  /* margin-right: 8px; */
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--find-border-color);
@@ -1943,8 +1943,33 @@ mark {
   cursor: pointer;
 }
 
+#welcome-dialog-title {
+  display: inline;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
 #welcome-dialog .modal-content button:hover {
   background: var(--hover-bg);
+}
+
+#welcome-dialog-description {
+  margin-top: 2px;
+}
+
+#welcome-dialog-leo-logo {
+  float: left;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 7px;
+  margin-right: 12px;
+}
+
+#welcome-dialog-github-logo {
+  display: inline;
+  float: right;
+  width: 32px;
+  height: 32px;
 }
 
 .shortcuts {
@@ -1954,7 +1979,6 @@ mark {
   font-size: 0.8em;
   color: var(--find-text-color);
   gap: 0;
-  /* min-width: 285px; */
   cursor: default;
   user-select: none;
 }

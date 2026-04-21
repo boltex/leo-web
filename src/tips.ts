@@ -9,9 +9,9 @@ import { TipsEntry } from "./types";
 //@+node:felix.20260419200019.1: ** tips
 export const tips: TipsEntry[] = [
     {
-        title: 'Leo Editor with Outline',
-        description: 'Keyboard shortcuts for navigating and editing the outline.',
-        content:`
+        title: 'Leo for the Web',
+        description: 'Keyboard shortcuts for editing and navigating the outline.',
+        content: `
             <div class="help-column">
                 <ul class="config-col shortcuts">
                     <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>I</kbd></span> — Insert Node</li>
