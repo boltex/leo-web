@@ -47,6 +47,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
     const commands: [string, (...args: any[]) => any][] = [
 
         [CMD.ABOUT_LEO, () => leoUI.command(LEOCMD.ABOUT_LEO, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.WELCOME_SCREEN, () => leoUI.command(LEOCMD.WELCOME_SCREEN, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.DOCUMENTATION, () => leoUI.showDocumentation()],
         [CMD.TOGGLE_MENU, () => leoUI.toggleMenu()],
 
@@ -72,8 +73,6 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.PASTE_TEXT, () => leoUI.command(LEOCMD.PASTE_TEXT, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.Body })],
         [CMD.SELECT_ALL_TEXT, () => leoUI.command(LEOCMD.SELECT_ALL_TEXT, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
 
-        [CMD.SHOW_WELCOME, () => leoUI.showSettings()],
-        [CMD.SHOW_SETTINGS, () => leoUI.showSettings()],
         [CMD.SHOW_OUTLINE, () => leoUI.showOutline()], // Also focuses on outline
         [CMD.SHOW_LOG, () => leoUI.showLogPane()],
         [CMD.SHOW_BODY, () => leoUI.showBody()], // Also focuses on body

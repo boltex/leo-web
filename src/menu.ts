@@ -423,6 +423,7 @@ export const menuData: MenuEntry[] = [
     {
         label: "Help",
         entries: [
+            { label: "Welcome", command: CMD.WELCOME_SCREEN },
             { label: "Documentation", command: CMD.DOCUMENTATION },
             { label: "About", command: CMD.ABOUT_LEO, enabledFlagsSet: [FLAGS.TREE_OPENED] },
         ],

@@ -391,12 +391,6 @@ export class LeoUI extends NullGui {
 
         return Promise.resolve(true);
     }
-    //@+node:felix.20260323003332.1: *4* showSettings
-    public showSettings(): Promise<unknown> {
-        // TODO : Remove? or implement a settings/welcome UI ?
-        console.log('TODO ! showSettings called to show settings UI');
-        return Promise.resolve();
-    }
     //@+node:felix.20260323003252.1: *4* put_help
     public put_help(c: Commands, s: string, short_title: string): void {
         s = g.dedent(s.trimEnd());

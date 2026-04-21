@@ -782,11 +782,6 @@ export class Commands {
         return g.app.gui.goAnywhere();
     }
 
-    //@+node:felix.20251214160339.454: *3* @cmd showWelcomeSettings
-    @cmd('show-welcome-settings', 'Open the Leo-Web welcome and settings screen.')
-    public showSettings(): Thenable<unknown> {
-        return g.app.gui.showSettings();
-    }
     //@+node:felix.20251214160339.455: *3* @cmd exportHTMLOutlineViewer
     @cmd('export-html-outline-viewer', 'Export the outline viewer as HTML.')
     public async exportHTMLOutlineViewer() {

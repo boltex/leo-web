@@ -254,6 +254,7 @@ export class Constants {
 
         // Window/UI
         TOGGLE_MENU: Constants.NAME + ".toggleMenu",
+        WELCOME_SCREEN: Constants.NAME + ".welcomeScreen",
         DOCUMENTATION: Constants.NAME + ".documentation",
         ABOUT_LEO: Constants.NAME + ".aboutLeo",
         LIGHT_THEME: Constants.NAME + ".lightTheme",
@@ -264,8 +265,6 @@ export class Constants {
         CHOOSE_NEW_WORKSPACE: Constants.NAME + ".chooseNewWorkspace",
 
         // Access to the Settings/Welcome Webview
-        SHOW_WELCOME: Constants.NAME + ".showWelcomePage", // Always available: not in the commandPalette section of package.json
-        SHOW_SETTINGS: Constants.NAME + ".showSettingsPage", // Always available: not in the commandPalette section of package.json
         STATUS_BAR: Constants.NAME + ".statusBar", // Status Bar Click Command
         // Leo Documents
         SET_OPENED_FILE: Constants.NAME + ".setOpenedFile",
@@ -567,6 +566,7 @@ export class Constants {
     public static LEO_COMMANDS = {
 
         ABOUT_LEO: "about-leo",
+        WELCOME_SCREEN: "welcome",
 
         // * File Commands
         // NEW: 'new', // newLeoFile used instead
