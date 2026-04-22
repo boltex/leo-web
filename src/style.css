@@ -1718,6 +1718,12 @@ input[type="checkbox"]:focus-visible:checked::after {
   align-items: center;
   justify-content: center;
 }
+
+.modal:focus,
+.modal:focus-visible {
+  outline: none;
+}
+
 .modal-content {
   position: relative;
   max-width: 520px;

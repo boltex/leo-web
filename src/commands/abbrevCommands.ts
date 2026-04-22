@@ -414,7 +414,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 // #4462: Make only one substitution in headlines.
                 if (val !== '__NEXT_PLACEHOLDER' && this.enabled && name.startsWith('head')) {
                     return this.make_first_headline_substitution(i, j, p, val);
-
                 }
                 // ! IN LEO-WEB , DO THIS RIGHT AFTER triggering the body save.
                 // if (val === '__NEXT_PLACEHOLDER') {
@@ -467,7 +466,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             }
             return true;
         })();
-
 
     }
 
