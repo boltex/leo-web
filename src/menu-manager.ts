@@ -61,7 +61,6 @@ export class MenuManager {
     public SHOW_LAYOUT_ORIENTATION: HTMLInputElement;
     public SHOW_THEME_TOGGLE: HTMLInputElement;
     public SHOW_NODE_ICONS: HTMLInputElement;
-    public SHOW_COLLAPSE_ALL: HTMLInputElement;
     public SHOW_WELCOME_AT_STARTUP: HTMLInputElement;
 
     public activeTopMenu: HTMLDivElement | null = null;
@@ -116,7 +115,6 @@ export class MenuManager {
         this.SHOW_LAYOUT_ORIENTATION = document.getElementById('show-layout-orientation')! as HTMLInputElement;
         this.SHOW_THEME_TOGGLE = document.getElementById('show-theme-toggle')! as HTMLInputElement;
         this.SHOW_NODE_ICONS = document.getElementById('show-node-icons')! as HTMLInputElement;
-        this.SHOW_COLLAPSE_ALL = document.getElementById('show-collapse-all')! as HTMLInputElement;
         this.SHOW_WELCOME_AT_STARTUP = document.getElementById('show-welcome')! as HTMLInputElement;
 
         this.topLevelItems.length = 0;
@@ -700,7 +698,6 @@ export class MenuManager {
         this.toggleButtonVisibility(this.HOIST_BTN, this.DEHOIST_BTN, this.SHOW_HOIST_DEHOIST.checked && !noOpenedDocuments);
         this.toggleButtonVisibility(this.LAYOUT_TOGGLE, null, this.SHOW_LAYOUT_ORIENTATION.checked);  // show even when no documents opened.
         this.toggleButtonVisibility(this.THEME_TOGGLE, null, this.SHOW_THEME_TOGGLE.checked); // show even when no documents opened.
-        this.toggleButtonVisibility(this.COLLAPSE_ALL_BTN, null, this.SHOW_COLLAPSE_ALL.checked && !noOpenedDocuments);
         let visibleButtonCount = 0; // Count visible buttons to adjust trigger area width
         if (this.SHOW_PREV_NEXT_MARK.checked && hasMarked) {
             visibleButtonCount += 2;

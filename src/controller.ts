@@ -301,7 +301,6 @@ export class Controller {
         menu.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_THEME_TOGGLE.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_NODE_ICONS.addEventListener('change', workspace.outline.updateNodeIcons);
-        menu.SHOW_COLLAPSE_ALL.addEventListener('change', this.refreshButtonVisibility);
     }
     //@+node:felix.20260322221812.1: *4* refreshButtonVisibility
     private refreshButtonVisibility = () => {
@@ -1244,7 +1243,6 @@ export class Controller {
             showLayoutOrientation: menu.SHOW_LAYOUT_ORIENTATION.checked,
             showThemeToggle: menu.SHOW_THEME_TOGGLE.checked,
             showNodeIcons: menu.SHOW_NODE_ICONS.checked,
-            showCollapseAll: menu.SHOW_COLLAPSE_ALL.checked,
             // Find-pane options
             findWholeWord: logPane.OPT_WHOLE.checked,
             findIgnoreCase: logPane.OPT_IGNORECASE.checked,
@@ -1273,7 +1271,6 @@ export class Controller {
                 menu.SHOW_LAYOUT_ORIENTATION.checked = prefs.showLayoutOrientation ?? true;
                 menu.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
                 menu.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
-                menu.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
                 menu.SHOW_WELCOME_AT_STARTUP.checked = prefs.showWelcomeAtStartup ?? true;
                 // Find-pane options
                 logPane.OPT_WHOLE.checked = prefs.findWholeWord ?? logPane.OPT_WHOLE.checked;
