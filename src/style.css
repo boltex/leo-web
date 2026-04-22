@@ -2006,7 +2006,7 @@ mark {
   border-radius: 50%;
   transform: scale(0);
   transition: transform 0.1s ease;
-  opacity: 0.35;
+  opacity: 0.25;
   z-index: -1;
 }
 #welcome-dialog-github-logo::after {
