@@ -26,7 +26,7 @@ For other usage scenarios, see [other Leo implementations](#other-leo-editor-imp
 
 ## Limitations
 
-- Unlike LeoInteg & LeoJS, Leo-Web cannot access your ~/.leo folder nor its 'myLeoSettings.leo' file. It can only access your chosen workspace.
+- Unlike LeoInteg & LeoJS, Leo-Web cannot access arbitrary folders like ~/.leo or the 'myLeoSettings.leo' file it may contain. It can only access your chosen workspace.
 - A myLeoSettings file can still be used if it is located at the root of your chosen workspace. (_Leo-Web will generate one for you if absent with the 'open myLeoSettings' command_)
 - U.I. related settings are accessed in a tab from the log pane instead of the usual 'LeoSettings/myLeoSettings' files.
 - To keep Leo-Web light and fast, it does not support .db files.
@@ -35,13 +35,6 @@ For other usage scenarios, see [other Leo implementations](#other-leo-editor-imp
 - `Ctrl+TAB`, `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
 - There is a single log pane, shared across opened Leo documents.
 - Leo-Web shares the same core implementation as LeoJS for the web, so the original Leo docutils features are missing.
-
-### Not Yet Implemented
-
-- Nav pane
-- \@button pane
-- Undo history pane
-- Abbreviations
 
 ## Contributing
 

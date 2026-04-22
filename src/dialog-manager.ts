@@ -1115,13 +1115,13 @@ export class DialogManager {
 
             if (e.shiftKey) {
                 // Shift+Tab: if on first element, move to last
-                if (document.activeElement === firstElement) {
+                if (document.activeElement === firstElement || !document.activeElement || !focusableElements.includes(document.activeElement as HTMLElement)) {
                     e.preventDefault();
                     lastElement.focus();
                 }
             } else {
                 // Tab: if on last element, move to first
-                if (document.activeElement === lastElement) {
+                if (document.activeElement === lastElement || !document.activeElement || !focusableElements.includes(document.activeElement as HTMLElement)) {
                     e.preventDefault();
                     firstElement.focus();
                 }
