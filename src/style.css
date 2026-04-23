@@ -1973,14 +1973,6 @@ mark {
   color: var(--find-text-color);
 }
 
-#welcome-dialog-leo-logo {
-  float: left;
-  width: 32px;
-  height: 32px;
-  margin-bottom: 7px;
-  margin-right: 12px;
-}
-
 #welcome-dialog-github-logo {
   display: inline;
   float: right;
