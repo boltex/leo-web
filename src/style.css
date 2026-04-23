@@ -1927,7 +1927,7 @@ mark {
 #welcome-dialog {
   display: var(--welcome-dialog-display);
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  user-select: none; /* Prevent text selection in the welcome dialog */
+  user-select: none;
 }
 
 #welcome-dialog-content {
@@ -1949,7 +1949,9 @@ mark {
 
 #welcome-dialog .modal-content button {
   display: block;
-  float: right;
+  position: absolute;
+  right: 18px;
+  bottom: 13px;
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--find-border-color);
@@ -1958,19 +1960,18 @@ mark {
   cursor: pointer;
 }
 
-#welcome-dialog-title {
-  display: inline;
-  margin-bottom: 0;
-  margin-top: 0;
-}
-
 #welcome-dialog .modal-content button:hover {
   background: var(--hover-bg);
 }
 
 #welcome-dialog-description {
-  margin-top: 2px;
+  margin-top: 10px;
+  margin-bottom: 12px;
   color: var(--find-text-color);
+}
+
+#welcome-dialog-description:empty {
+  display: none;
 }
 
 #welcome-dialog-github-logo {
@@ -1998,7 +1999,7 @@ mark {
   border-radius: 50%;
   transform: scale(0);
   transition: transform 0.1s ease;
-  opacity: 0.25;
+  opacity: 0.2;
   z-index: -1;
 }
 #welcome-dialog-github-logo::after {
@@ -2029,8 +2030,15 @@ mark {
 
 #welcome-dialog-github-logo:focus,
 #welcome-dialog-github-logo:focus-visible {
-  /* hide outline */
   outline: none;
+}
+
+#welcome-dialog-bottom {
+  text-align: center;
+}
+
+.subtitle {
+  color: var(--find-text-color);
 }
 
 .shortcuts {
