@@ -1,40 +1,46 @@
-# Leo for the Web
+# ![Leo Editor](https://raw.githubusercontent.com/boltex/leo-web/master/public/leoapp.png) Leo for the Web
 
-A browser-based version of the Leo Editor, available at [https://boltex.github.io/leo-web/](https://boltex.github.io/leo-web/)
+A lightweight, browser-based port of the Leo Editor, the iconic outliner and scriptable literate programming environment.
 
-Leo is a fundamentally different way of using and organizing data, programs and scripts. [📺 Introduction Video](https://www.youtube.com/watch?v=SYwlfdEukD4)
+👉 Try it now: https://boltex.github.io/leo-web/
+
+Leo is a fundamentally different way to organize code, notes, and ideas. [📺 Watch the introduction](https://www.youtube.com/watch?v=SYwlfdEukD4)
 
 > See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
 > or on [github](https://github.com/leo-editor/leo-editor).
 
+_If you find it useful, please consider [starring it on GitHub](https://github.com/boltex/leo-web "Star it on GitHub")._
+
 ## About
 
-This project is a TypeScript implementation that brings the Leo Editor experience to the web. (_Scriptable in either Javascript or Typescript_) It uses the browser's **File System API** for local file access.
+Leo-Web brings the core Leo experience to the browser.
 
-### Commonly Prohibited or Restricted Locations:
+- Work with Leo outlines without installing anything
+- Script using JavaScript or TypeScript
+- Access local files using the browser File System API
 
-- **System Directories:** C:\Windows, C:\Program Files, C:\Program Files (x86).
-- **Root Directories:** The root of the C: drive or other fixed drives.
-- **User Profiles:** Often directly, Documents, Downloads, Desktop.
-- **System Files:** Any folder containing crucial system data or "sensitive" locations.
+### File System Access
 
-### How to Overcome Restrictions:
+Leo-Web uses the browser's File System API. Due to browser security constraints, access is limited to a user-approved _workspace_ directory.
 
-- **Subdirectories:** The API usually allows access to subdirectories within user folders (e.g., Documents/MyProject), just not the top-level restricted folders themselves.
+For example:
 
-For other usage scenarios, see [other Leo implementations](#other-leo-editor-implementations) for versions that support online repositories, or integrated as VSCode extensions.
+- You can work inside project folders (e.g., C:/MyProject)
+- You cannot access system-level directories or unrestricted root locations. Although access to _subdirectories_ within user folders (e.g., Documents/MyProject) is permitted.
 
 ## Limitations
 
-- Unlike LeoInteg & LeoJS, Leo-Web cannot access arbitrary folders like ~/.leo or the 'myLeoSettings.leo' file it may contain. It can only access your chosen workspace.
-- A myLeoSettings file can still be used if it is located at the root of your chosen workspace. (_Leo-Web will generate one for you if absent with the 'open myLeoSettings' command_)
-- U.I. related settings are accessed in a tab from the log pane instead of the usual 'LeoSettings/myLeoSettings' files.
-- To keep Leo-Web light and fast, it does not support .db files.
-- Running in the browser, Leo scripts cannot launch OS shell commands.
-- Absolute paths are not supported with the browser's file API. Use relative paths exclusively for external files.
-- `Ctrl+TAB`, `Ctrl+N` and `Ctrl+T` are reserved by the browser for opening new windows or tabs.
-- There is a single log pane, shared across opened Leo documents.
-- Leo-Web shares the same core implementation as LeoJS for the web, so the original Leo docutils features are missing.
+### Browser Constraints
+
+- No access to the original Leo's `~/.leo` settings folder.
+- No execution of OS shell commands
+- No absolute file paths (relative paths only)
+- Some keybindings are reserved by the browser (`Ctrl+TAB`, `Ctrl+N` and `Ctrl+T`)
+
+### Settings
+
+- `myLeoSettings.leo` must be at the root of your chosen workspace
+- UI settings are available via the log pane tab
 
 ## Contributing
 
@@ -42,17 +48,21 @@ If you would like to modify or build this project yourself, see CONTRIBUTING.md 
 
 ## Other Leo Editor implementations
 
-To instead work with _files directly inside online repositories_, such as on GitHub and Azure-Repos, use the [LeoJS VSCode extension](https://github.com/boltex/leojs#web-based-development) within VSCode for the web. (It also can run in the desktop version of VSCode for local file editing)
+For working with _files directly inside online repositories_, such as on GitHub and Azure-Repos, use the [LeoJS VSCode extension](https://github.com/boltex/leojs#web-based-development) within VSCode for the web. (It also can run in the desktop version of VSCode for unrestricted local file editing)
 
 To work with the original Python implementation of Leo integrated into VSCode, use the [LeoInteg VSCode extension](https://github.com/boltex/leointeg#-leo-for-visual-studio-code).
 
 ## Acknowledgments
 
-See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
-or on [github](https://github.com/leo-editor/leo-editor).
+Leo-Web is built on the ideas and work of the original Leo Editor authors:
 
-### _Special Thanks to_
+[leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
 
-Edward K. Ream, and to all who have participated, no matter how small or big the contribution, to the creation of the original Leo Editor!
+Special thanks to Edward K. Ream and all contributors to Leo.
 
-## 🤍 To sponsor, donate or contribute see my [user page 🦁](https://boltex.github.io/)
+---
+
+## Support
+
+If you find this project useful, consider supporting or contributing:  
+[boltex.github.io](https://boltex.github.io/)
