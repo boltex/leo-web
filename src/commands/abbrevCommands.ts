@@ -506,7 +506,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 p.moveToThreadNext();
             }
         } else {
-            this.find_place_holder(p, do_placeholder);
+            if (this.find_place_holder(p, do_placeholder)) {
+                // Don't restore the insert point when selecting next placeholder.
+                this.save_ins = null;
+                this.save_sel = null;
+            }
         }
 
     }
