@@ -2,7 +2,7 @@
 
 ## 1.0.15
 
-- ...
+- Fixed build process.
 
 ## 1.0.14
 

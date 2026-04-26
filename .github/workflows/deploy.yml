@@ -36,7 +36,7 @@ jobs:
       - name: Build
         run: npm run build # Creates  'dist' folder
         env:
-          GOOGLE_TAG_ID: ${{ vars.GOOGLE_TAG_ID }}
+          GOOGLE_TAG_ID: ${{ vars.GOOGLE_TAG_ID }} # Pass the Google Tag ID as an environment variable
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
