@@ -2991,15 +2991,6 @@ export function* enumerate(it: any, start = 0) {
     }
 }
 //@+node:felix.20251207215313.157: *4* g.angleBrackets & virtual_event_name
-/*
- def angleBrackets(s: str) -> str:
-    """Returns < < s > >"""
-    lt = "<<"
-    rt = ">>"
-    return lt + s + rt
-
-virtual_event_name = angleBrackets
- */
 /**
  * Return < < s > >
  */
@@ -3022,17 +3013,19 @@ export function ensureTrailingNewlines(s: string, n: number): string {
 }
 
 //@+node:felix.20251207215313.159: *4* g.longestCommonPrefix & g.itemsMatchingPrefixInList
-/*
-def longestCommonPrefix(s1: str, s2: str) -> str:
-    """Find the longest prefix common to strings s1 and s2."""
-    prefix = ''
-    for ch in s1:
-        if s2.startswith(prefix + ch):
-            prefix = prefix + ch
-        else:
-            return prefix
-    return prefix
+export function longestCommonPrefix(s1: string, s2: string): string {
+    let prefix = '';
+    for (const ch of s1) {
+        if (s2.startsWith(prefix + ch)) {
+            prefix = prefix + ch;
+        } else {
+            return prefix;
+        }
+    }
+    return prefix;
+}
 
+/*
 def itemsMatchingPrefixInList(s: str, aList: List[str], matchEmptyPrefix: bool=False) -> Tuple[List, str]:
     """This method returns a sorted list items of aList whose prefix is s.
 

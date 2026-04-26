@@ -100,12 +100,16 @@
           "vh": "@file src/menu.ts"
         },
         {
-          "gnx": "felix.20260407013645.1",
-          "vh": "@file src/toolbar-buttons.ts"
-        },
-        {
           "gnx": "felix.20260321200500.1",
           "vh": "@file src/outline-manager.ts"
+        },
+        {
+          "gnx": "felix.20260419195952.1",
+          "vh": "@file src/tips.ts"
+        },
+        {
+          "gnx": "felix.20260407013645.1",
+          "vh": "@file src/toolbar-buttons.ts"
         },
         {
           "gnx": "felix.20251211000618.1",
@@ -267,6 +271,10 @@
           "gnx": "felix.20251214160853.1",
           "vh": "Command classes",
           "children": [
+            {
+              "gnx": "felix.20260411212425.1",
+              "vh": "@file src/commands/abbrevCommands.ts"
+            },
             {
               "gnx": "felix.20251214160853.2",
               "vh": "@file src/commands/baseCommands.ts"

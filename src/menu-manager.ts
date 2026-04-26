@@ -61,8 +61,7 @@ export class MenuManager {
     public SHOW_LAYOUT_ORIENTATION: HTMLInputElement;
     public SHOW_THEME_TOGGLE: HTMLInputElement;
     public SHOW_NODE_ICONS: HTMLInputElement;
-    public SHOW_COLLAPSE_ALL: HTMLInputElement;
-
+    public SHOW_WELCOME_AT_STARTUP: HTMLInputElement;
 
     public activeTopMenu: HTMLDivElement | null = null;
     public focusedMenuItem: HTMLDivElement | null = null;
@@ -116,7 +115,7 @@ export class MenuManager {
         this.SHOW_LAYOUT_ORIENTATION = document.getElementById('show-layout-orientation')! as HTMLInputElement;
         this.SHOW_THEME_TOGGLE = document.getElementById('show-theme-toggle')! as HTMLInputElement;
         this.SHOW_NODE_ICONS = document.getElementById('show-node-icons')! as HTMLInputElement;
-        this.SHOW_COLLAPSE_ALL = document.getElementById('show-collapse-all')! as HTMLInputElement;
+        this.SHOW_WELCOME_AT_STARTUP = document.getElementById('show-welcome')! as HTMLInputElement;
 
         this.topLevelItems.length = 0;
         this.topLevelSubmenus.clear();
@@ -149,7 +148,7 @@ export class MenuManager {
             }
 
             const li = document.createElement('li');
-            if (entry.action) {
+            if (entry.command) {
                 li.classList.add('menu-item');
             }
 
@@ -178,10 +177,10 @@ export class MenuManager {
             if (!enabled) {
                 li.classList.add('disabled');
             }
-            if (entry.action) {
+            if (entry.command) {
                 li.addEventListener('click', () => {
                     if (!li.classList.contains('disabled')) {
-                        workspace.controller.doCommand(entry.action as string);
+                        workspace.controller.doCommand(entry.command as string);
                     }
                 });
             }
@@ -301,7 +300,7 @@ export class MenuManager {
                         }
                     });
                 }
-            } else if (entry.action) {
+            } else if (entry.command) {
                 // First check for enabledFlagsSet and enabledFlagsClear to determine if the item should be enabled
                 let enabled = true;
                 if (entry.enabledFlagsSet) {
@@ -328,7 +327,7 @@ export class MenuManager {
                     this.closeAllSubmenus();
                     workspace.layout.restoreLastFocusedElement();
                     this.activeTopMenu = null;
-                    workspace.controller.doCommand(entry.action as string);
+                    workspace.controller.doCommand(entry.command as string);
                 });
 
                 if (entry.enabledFlagsSet || entry.enabledFlagsClear) {
@@ -598,7 +597,7 @@ export class MenuManager {
             if (entry.tooltip) {
                 button.title = entry.tooltip;
             }
-            if (entry.action) {
+            if (entry.command) {
                 // First check for enabledFlagsSet and enabledFlagsClear to determine if the item should be enabled
                 let enabled = true;
                 if (entry.enabledFlagsSet) {
@@ -631,7 +630,7 @@ export class MenuManager {
                     this.closeAllSubmenus();
                     workspace.layout.restoreLastFocusedElement();
                     this.activeTopMenu = null;
-                    workspace.controller.doCommand(entry.action as string);
+                    workspace.controller.doCommand(entry.command as string);
                 });
 
                 if (entry.enabledFlagsSet || entry.enabledFlagsClear) {
@@ -699,7 +698,6 @@ export class MenuManager {
         this.toggleButtonVisibility(this.HOIST_BTN, this.DEHOIST_BTN, this.SHOW_HOIST_DEHOIST.checked && !noOpenedDocuments);
         this.toggleButtonVisibility(this.LAYOUT_TOGGLE, null, this.SHOW_LAYOUT_ORIENTATION.checked);  // show even when no documents opened.
         this.toggleButtonVisibility(this.THEME_TOGGLE, null, this.SHOW_THEME_TOGGLE.checked); // show even when no documents opened.
-        this.toggleButtonVisibility(this.COLLAPSE_ALL_BTN, null, this.SHOW_COLLAPSE_ALL.checked && !noOpenedDocuments);
         let visibleButtonCount = 0; // Count visible buttons to adjust trigger area width
         if (this.SHOW_PREV_NEXT_MARK.checked && hasMarked) {
             visibleButtonCount += 2;

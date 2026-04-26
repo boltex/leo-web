@@ -9,6 +9,7 @@ import {
     MessageOptions,
     QuickPickItem,
     QuickPickOptions,
+    TipsDialogOptions as WelcomeDialogOptions
 } from './types';
 import { Uri, workspace } from './workspace';
 
@@ -27,6 +28,7 @@ export class DialogManager {
     private MODAL_DIALOG: HTMLElement;
     private INPUT_DIALOG: HTMLElement;
     private QUICKPICK_DIALOG: HTMLElement;
+    private WELCOME_DIALOG: HTMLElement;
 
     private TOAST: HTMLElement;
     private MODAL_DIALOG_TITLE: HTMLElement;
@@ -41,12 +43,18 @@ export class DialogManager {
     private QUICKPICK_DIALOG_INPUT: HTMLInputElement;
     private QUICKPICK_DIALOG_LIST: HTMLElement;
 
+    private WELCOME_DIALOG_TITLE: HTMLElement;
+    private WELCOME_DIALOG_DESCRIPTION: HTMLElement;
+    private WELCOME_DIALOG_CONTENT: HTMLElement;
+    private WELCOME_DIALOG_BTN: HTMLButtonElement;
+    private WELCOME_DIALOG_SHOW_STARTUP: HTMLInputElement;
+
     private __toastTimer: ReturnType<typeof setTimeout> | null = null;
     private __quickPickScrollTimeout: ReturnType<typeof setTimeout> | null = null;
     private __toastResolvers: Array<(value: PromiseLike<undefined> | undefined) => void> = [];
 
     private __dialogQueue: Array<{
-        type: 'message' | 'input' | 'singleChar' | 'quickPick' | 'openFile' | 'saveFile';
+        type: 'message' | 'input' | 'singleChar' | 'quickPick' | 'welcome' | 'openFile' | 'saveFile';
         // For message dialogs
         message?: string;
         options?: MessageOptions;
@@ -56,6 +64,8 @@ export class DialogManager {
         // For quick pick
         quickPickItems?: QuickPickItem[];
         quickPickOptions?: QuickPickOptions;
+        // for welcome dialog
+        welcomeDialogOptions?: WelcomeDialogOptions;
         // For file dialogs
         openDialogOptions?: OpenDialogOptions;
         saveDialogOptions?: SaveDialogOptions;
@@ -75,6 +85,7 @@ export class DialogManager {
         this.MODAL_DIALOG = document.getElementById('message-dialog')!;
         this.INPUT_DIALOG = document.getElementById('input-dialog')!;
         this.QUICKPICK_DIALOG = document.getElementById('quickpick-dialog')!;
+        this.WELCOME_DIALOG = document.getElementById('welcome-dialog')!;
 
         this.MODAL_DIALOG_TITLE = document.getElementById('modal-dialog-title')!;
         this.MODAL_DIALOG_DESCRIPTION = document.getElementById('modal-dialog-description')!;
@@ -88,6 +99,11 @@ export class DialogManager {
         this.QUICKPICK_DIALOG_INPUT = document.getElementById('quickpick-dialog-input')! as HTMLInputElement;
         this.QUICKPICK_DIALOG_LIST = document.getElementById('quickpick-dialog-list')!;
 
+        this.WELCOME_DIALOG_TITLE = document.getElementById('welcome-dialog-title')!;
+        this.WELCOME_DIALOG_DESCRIPTION = document.getElementById('welcome-dialog-description')!;
+        this.WELCOME_DIALOG_CONTENT = document.getElementById('welcome-dialog-content')!;
+        this.WELCOME_DIALOG_BTN = document.getElementById('welcome-dialog-btn')! as HTMLButtonElement;
+        this.WELCOME_DIALOG_SHOW_STARTUP = document.getElementById('show-welcome-startup')! as HTMLInputElement;
     }
 
     //@+others
@@ -235,6 +251,20 @@ export class DialogManager {
             }
         });
     }
+    //@+node:felix.20260419172756.1: *3* showWelcomeDialog
+    public showWelcomeDialog(options: WelcomeDialogOptions): Thenable<undefined> {
+        return new Promise<undefined>((resolve) => {
+            this.__dialogQueue.push({
+                type: 'welcome',
+                welcomeDialogOptions: options,
+                resolve
+            });
+
+            if (!this.isDialogOpen) {
+                this._processDialogQueue();
+            }
+        });
+    }
     //@+node:felix.20260322225815.1: *3* showOpenDialog
     public async showOpenDialog(options?: OpenDialogOptions): Promise<Uri[] | null> {
         return new Promise((resolve) => {
@@ -306,6 +336,9 @@ export class DialogManager {
                 break;
             case 'quickPick':
                 this._showQuickPickInternal(dialog);
+                break;
+            case 'welcome':
+                this._showWelcomeDialogInternal(dialog);
                 break;
             case 'openFile':
                 this._showOpenDialogInternal(dialog);
@@ -857,6 +890,64 @@ export class DialogManager {
             this.QUICKPICK_DIALOG_INPUT.focus();
         }, 0);
     }
+    //@+node:felix.20260419173929.1: *3* _showWelcomeDialogInternal
+    private _showWelcomeDialogInternal(dialog: any): void {
+        const options = dialog.welcomeDialogOptions;
+        this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'true');
+        this.WELCOME_DIALOG.onkeydown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                this._cleanupFocusTrap();
+                this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'false');
+                this.WELCOME_DIALOG.onkeydown = null; // Remove its own keydown.
+                this.WELCOME_DIALOG_BTN.onclick = null;
+                this.WELCOME_DIALOG_SHOW_STARTUP.onchange = null;
+                this.isDialogOpen = false;
+                this._restorePreDialogFocus();
+                dialog.resolve(undefined);
+                setTimeout(() => this._processDialogQueue(), 100);
+            }
+        };
+
+        const tipsCallback = () => {
+            this._cleanupFocusTrap();
+            this.HTML_ELEMENT.setAttribute('data-show-welcome-dialog', 'false');
+            this.WELCOME_DIALOG.onkeydown = null;
+            this.WELCOME_DIALOG_BTN.onclick = null;
+            this.WELCOME_DIALOG_SHOW_STARTUP.onchange = null;
+            this.isDialogOpen = false;
+            this._restorePreDialogFocus();
+            dialog.resolve(undefined);
+            setTimeout(() => this._processDialogQueue(), 100);
+        };
+
+        this.WELCOME_DIALOG_BTN.textContent = 'OK';
+        this.WELCOME_DIALOG_BTN.onclick = tipsCallback;
+
+        this.WELCOME_DIALOG_TITLE.textContent = options.title;
+        this.WELCOME_DIALOG_DESCRIPTION.textContent = options.description ?? '';
+        this.WELCOME_DIALOG_CONTENT.innerHTML = options.content ?? '';
+
+        // Set checkbox to current config preference
+        this.WELCOME_DIALOG_SHOW_STARTUP.checked = workspace.menu.SHOW_WELCOME_AT_STARTUP.checked;
+
+        this.WELCOME_DIALOG_SHOW_STARTUP.onchange = () => {
+            workspace.menu.SHOW_WELCOME_AT_STARTUP.checked = this.WELCOME_DIALOG_SHOW_STARTUP.checked;
+        };
+
+        // Get the modal dialog container element
+        const tipsDialog = document.querySelector('#welcome-dialog') as HTMLElement;
+        if (tipsDialog) {
+            this._cleanupFocusTrap();
+            this.__activeFocusTrap = this._setupFocusTrap(tipsDialog);
+        }
+
+        setTimeout(() => {
+            this.WELCOME_DIALOG_BTN.focus();
+        }, 0);
+
+    }
     //@+node:felix.20260322224248.1: *3* _showOpenDialogInternal
     private async _showOpenDialogInternal(dialog: any): Promise<void> {
         const options = dialog.openDialogOptions;
@@ -1024,13 +1115,13 @@ export class DialogManager {
 
             if (e.shiftKey) {
                 // Shift+Tab: if on first element, move to last
-                if (document.activeElement === firstElement) {
+                if (document.activeElement === firstElement || !document.activeElement || !focusableElements.includes(document.activeElement as HTMLElement)) {
                     e.preventDefault();
                     lastElement.focus();
                 }
             } else {
                 // Tab: if on last element, move to first
-                if (document.activeElement === lastElement) {
+                if (document.activeElement === lastElement || !document.activeElement || !focusableElements.includes(document.activeElement as HTMLElement)) {
                     e.preventDefault();
                     firstElement.focus();
                 }

@@ -15,6 +15,7 @@ import { StringFindTabManager } from './findTabManager';
 import { Position } from './leoNodes';
 import { Commands } from './leoCommands';
 import { LeoFrame, StringTextWrapper } from './leoFrame';
+import { Focus, ReqRefresh } from '../types';
 
 //@-<< leoGui imports >>
 //@+others
@@ -123,6 +124,10 @@ export class LeoGui {
     //     c.k.masterKeyHandler(event)
     //     c.outerUpdate()
     //@+node:felix.20251213133753.218: *3* LeoGui: Must be defined in subclasses
+    //@+node:felix.20260412205816.1: *4* LeoGui.triggerBodySave
+    public triggerBodySave() {
+        this.oops();
+    }
     //@+node:felix.20251213133753.219: *4* LeoGui.destroySelf
     public destroySelf(): void {
         this.oops();
@@ -212,10 +217,9 @@ export class LeoGui {
         c: Commands,
         title: string,
         message: string,
-        cancelButtonText: string,
-        okButtonText: string,
+        cancelButtonText: string | undefined,
+        okButtonText: string | undefined,
         defaultParam = '',
-        wide = false
     ): any {
         this.oops();
     }
@@ -506,11 +510,6 @@ export class LeoGui {
         return Promise.resolve();
     }
 
-    //@+node:felix.20251213133753.248: *4* showSettings
-    public showSettings(): Thenable<unknown> {
-        return Promise.resolve();
-    }
-
     //@+node:felix.20260222131953.1: *4* setLeoID
     public setLeoIDCommand(): Thenable<unknown> {
         return Promise.resolve();
@@ -544,7 +543,7 @@ export class NullGui extends LeoGui {
     public override makeAllBindings(): void { }
 
     public launchRefresh(): void { }
-    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void { }
+    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void { }
     public showNavResults(): void { }
 
     public override replaceClipboardWith(s: string): Thenable<string> {
@@ -579,16 +578,17 @@ export class NullGui extends LeoGui {
     }
 
     public selectOpenedLeoDocument(index: number): Promise<unknown> {
-        this.oops();
         return Promise.resolve();
     }
     public closeLeoFile(index: number): Promise<unknown> {
-        this.oops();
         return Promise.resolve();
     }
     public clickAtButton(button: any): Promise<unknown> {
-        this.oops();
         return Promise.resolve();
+    }
+
+    public endEditHeadline(): void {
+        return;
     }
 
     public override widget_name(widget: any): string {
@@ -598,7 +598,7 @@ export class NullGui extends LeoGui {
         return '';
     }
     public set_focus(commander: Commands, widget: any): void {
-        //
+        return;
     }
     public get_focus(c?: Commands): any {
         return;

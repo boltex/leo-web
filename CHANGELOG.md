@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.14
+
+- Implemented Leo's abbreviations functionality.
+- Fixed arrow key and undo/redo behavior while typing in outline headlines.
+- Added welcome screen.
+
 ## 1.0.13
 
 - Improved icon font and icons-buttons padding & size.
@@ -15,7 +21,7 @@
 ## 1.0.10
 
 - Fixed showQuickPick dialog and added escape keypress detection to all modal dialogs.
-- Fixed minibuffer icons
+- Fixed minibuffer icons.
 
 ## 1.0.9
 

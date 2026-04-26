@@ -4,6 +4,8 @@
 //@+node:felix.20260322230606.1: ** << imports >>
 import * as utils from './utils';
 import { workspace } from './workspace';
+import * as g from './core/leoGlobals';
+
 //@-<< imports >>
 //@+others
 //@+node:felix.20260322230638.1: ** LayoutManager
@@ -56,9 +58,24 @@ export class LayoutManager {
         // Setup 'focusin' listeners for both outline and body panes to track the last focused element between them
         this.OUTLINE_PANE.addEventListener('focusin', () => {
             this.lastFocusedBodyOrOutline = 'outline';
+            if (!g.app || g.app.windowList.length === 0) {
+                return; // If there are no open documents, we don't want to try to set focus to the canvas as that would cause errors. Focus will be set to the canvas when a document is opened and the outline pane is focused for the first time.
+            }
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            const w = g.app.gui.get_focus(c);
+            let focus = g.app.gui.widget_name(w);
+            if (focus.includes('tree') || focus.includes('head')) {
+                return; // If focus is already in the tree or headline, we don't want to steal it and set it to the canvas, as that would cause issues with keyboard navigation in the tree and headline editing.
+            }
+            g.app.gui.set_focus(c, c.frame.tree.canvas);
         });
         this.BODY_PANE.addEventListener('focusin', () => {
             this.lastFocusedBodyOrOutline = 'body';
+            if (!g.app || g.app.windowList.length === 0) {
+                return; // If there are no open documents, we don't want to try to set focus to the body widget as that would cause errors. Focus will be set to the body widget when a document is opened and the body pane is focused for the first time.
+            }
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            g.app.gui.set_focus(c, c.frame.body.widget);
         });
     }
 

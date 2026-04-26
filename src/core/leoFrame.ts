@@ -1268,6 +1268,13 @@ export class NullTree {
         //     d[p.v.gnx] = w;
         //     w.setAllText(p.h);
         // }
+
+        // TEST WITH RETURNING A NEW WIDGET EVEN IF NOT IN DICT, TO SEE IF IT CAUSES PROBLEMS.
+        if (!w) {
+            w = new StringTextWrapper(this.c, 'head-wrapper');
+            d[p.v.gnx] = w;
+            w.setAllText(p.h);
+        }
         return w;
     }
     //@+node:felix.20251213133753.184: *3* NullTree.editLabel
@@ -1277,12 +1284,12 @@ export class NullTree {
     public editLabel(
         p: Position,
         selectAll = false,
-        selection?: any
+        selection?: [number, number, number]
     ): [undefined, StringTextWrapper | undefined] {
         this.endEditLabel();
         if (p && p.__bool__()) {
-            // ! LEO-WEB : Mimic from qt_tree
 
+            // ! LEO-WEB : Mimic from qt_tree
             const d = this.editWidgetsDict;
 
             let wrapper = d[p.v.gnx];
@@ -1293,7 +1300,14 @@ export class NullTree {
                 wrapper.setAllText(p.h);
             }
 
-            // const wrapper = new StringTextWrapper(this.c, 'head-wrapper');
+            console.log('TODO: maybe also call g.app.gui.editHeadline(p, selectAll, selection); ???');
+            if (selectAll) {
+                wrapper.selectAllText();
+            } else if (selection) {
+                // selection is [i, j, ins] where ins is the text between i and j.
+                wrapper.setSelectionRange(selection[0], selection[1], selection[2]);
+            }
+
             const e = undefined;
             return [e, wrapper];
         }
@@ -1464,7 +1478,7 @@ export class StringTextWrapper {
      * StringTextWrapper.
      */
     public delete(i: number, j?: number): void {
-        if (j === undefined) {
+        if (j == null) {
             j = i + 1;
         }
         // This allows subclasses to use this base class method.
@@ -1491,7 +1505,7 @@ export class StringTextWrapper {
      * StringTextWrapper.
      */
     public get(i: number, j?: number): string {
-        if (j === undefined) {
+        if (j == null) {
             j = i + 1;
         }
         const s = this.s.substring(i, j);
@@ -1511,8 +1525,8 @@ export class StringTextWrapper {
      */
     public getInsertPoint(): number {
         let i = this.ins;
-        if (i === undefined) {
-            if (this.virtualInsertPoint === undefined) {
+        if (i == null) {
+            if (this.virtualInsertPoint == null) {
                 i = 0;
             } else {
                 i = this.virtualInsertPoint;

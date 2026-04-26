@@ -4,7 +4,7 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, Focus, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
@@ -15,6 +15,7 @@ import { keybindings } from "./keybindings";
 import { QuickSearchController } from "./core/quicksearch";
 import { nullButtonWidget } from "./core/leoFrame";
 import { RClick } from "./core/mod_scripting";
+import { tips } from "./tips";
 
 //@-<< imports >>
 //@+others
@@ -58,6 +59,29 @@ export class Controller {
             return command(...args);
         } else {
             console.warn(`Command not found: ${commandName}`);
+        }
+    }
+    //@+node:felix.20260414231550.1: *3* refreshAbbrev
+    public refreshAbbrev(): void {
+
+        const w = g.app.gui.get_focus();
+        const focus = g.app.gui.widget_name(w).toLowerCase();
+        if (focus.includes('tree') || focus.includes('head')) {
+            g.app.gui.fullRefresh(true, true);
+            // TODO : UNCOMMENT BELOW MAYBE?
+            setTimeout(() => {
+                // Select headline if needed after refresh.
+                g.app.gui.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);
+            }, 0);
+        } else {
+            g.app.gui.fullRefresh(false, false, Focus.Body, {
+                tree: true,
+                body: true,
+                scroll: true,
+                // documents: false,
+                // buttons: false,
+                states: true,
+            });
         }
     }
     //@+node:felix.20260322222300.1: *3* Initialization & Setup
@@ -128,22 +152,6 @@ export class Controller {
             }
         });
         // Setup handler for the "Revert to Undo State" option in the undo context menu
-        /*
-        workspace.menu.UNDO_MENU.querySelector('.menu-item')?.addEventListener('click', () => {
-            if (this._lastUndoBeadIndex !== null) {
-                workspace.controller.doCommand(Constants.COMMANDS.REVERT_TO_UNDO, this._lastUndoBeadIndex);
-                this._lastUndoBeadIndex = null; // Reset after handling
-            }
-            // close the undo context menu after clicking the option
-            workspace.menu.UNDO_MENU.style.display = 'none';
-        });
-        */
-        // instead of commented above code , build this in UNDO_MENU:
-        /*
-         <ul>
-             <li class="menu-item"><span class="menu-label">Revert to Undo State</span></li>
-         </ul>
-        */
         const undoMenu = workspace.menu.UNDO_MENU;
         const ul_element = document.createElement('ul');
         const menuItemElement = document.createElement('li');
@@ -225,13 +233,6 @@ export class Controller {
         document.addEventListener('click', (e) => {
             workspace.menu.closeMenusEvent(e);
         });
-        document.addEventListener('contextmenu', (e) => {
-            const target = e.target;
-            workspace.menu.closeMenusEvent(e);
-            if (!(target instanceof Element) || !target.closest('.allow-context')) {
-                e.preventDefault();
-            }
-        });
     }
     //@+node:felix.20260322221923.1: *4* setupButtonHandlers
     private setupButtonHandlers() {
@@ -300,7 +301,6 @@ export class Controller {
         menu.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_THEME_TOGGLE.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_NODE_ICONS.addEventListener('change', workspace.outline.updateNodeIcons);
-        menu.SHOW_COLLAPSE_ALL.addEventListener('change', this.refreshButtonVisibility);
     }
     //@+node:felix.20260322221812.1: *4* refreshButtonVisibility
     private refreshButtonVisibility = () => {
@@ -612,6 +612,15 @@ export class Controller {
     //@+others
     //@+node:felix.20260322221549.1: *4* initialize
     public async initialize() {
+        // The context menu prevention is setup before anything to prevent browser's default.
+        document.addEventListener('contextmenu', (e) => {
+            const target = e.target;
+            workspace.menu.closeMenusEvent(e);
+            if (!(target instanceof Element) || !target.closest('.allow-context')) {
+                e.preventDefault();
+            }
+        });
+
         // outline-find-container is initially hidden to prevent FOUC
         workspace.layout.OUTLINE_FIND_CONTAINER.style.visibility = 'visible';
         this.loadConfigPreferences();
@@ -620,6 +629,10 @@ export class Controller {
         workspace.logPane.showTab("log");
 
         let dirHandle: FileSystemDirectoryHandle | null = null;
+
+        // Pre-start: show 'tips' splash screen offering 'show tips at startup' checkbox
+        // and wait for the user to press 'ok'.
+        await workspace.dialog.showWelcomeDialog(tips[0]);
 
         // 1 Try restoring previous workspace
         try {
@@ -773,14 +786,55 @@ export class Controller {
         }
         // Block if its UNDO or REDO (ctrl+z, ctrl+shift+z, ctrl+y) even if they are not enabled, 
         // to prevent interfering with browser shortcuts
+        // BUT ONLY IF NOT CURRENTLY EDITING A HEADLINE: we want to let browser regular undo/redo.
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-            e.preventDefault();
+            if (!workspace.outline.headlineFinish) {
+                e.preventDefault();
+            } else {
+                return; // Let browser handle undo/redo in headline editing mode
+            }
         }
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
-            e.preventDefault();
+            if (!workspace.outline.headlineFinish) {
+                e.preventDefault();
+            } else {
+                return; // Let browser handle undo/redo in headline editing mode
+            }
         }
-        this.handlePaneKeyDown(e, "outline");
+        // Allow arrows, pageup/down, home,end for moving cursor and selecting with editing the headline 
+        if (workspace.outline.headlineFinish) {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"].includes(e.key)) {
+                return; // Let browser handle arrow keys in headline editing mode
+            }
+        }
 
+        // Ok now we actually want to handle the possible command.
+        if (
+            this.handlePaneKeyDown(e, "outline")
+        ) {
+            return;
+        }
+
+        // Past this point, we only want to handle abbrev expansion.
+        if (!workspace.outline.headlineFinish || e.key.length > 1) {
+            // Not in headline editing mode, or its a non-printable key, so just get out.
+            return;
+        }
+        // Was a Single Printable Character, so check for abbrev expansion.
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        if (c.k.abbrevOn) {
+            const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
+            if (abbrevPromise) {
+                e.preventDefault(); // Prevent the typing from doing anything!
+                abbrevPromise.then((expanded) => {
+                    g.app.gui.endEditHeadline();
+                    setTimeout(() => {
+                        this.refreshAbbrev();
+                    }, 0);
+                    return;
+                });
+            }
+        }
     }
     //@+node:felix.20260322221320.1: *4* handleBodyPaneKeyDown
     private handleBodyPaneKeyDown = (e: KeyboardEvent) => {
@@ -789,7 +843,27 @@ export class Controller {
             e.preventDefault();
         }
 
-        this.handlePaneKeyDown(e, "body");
+        if (
+            this.handlePaneKeyDown(e, "body")
+        ) {
+            return;
+        }
+        // Handle abbreviations.
+        if (e.key.length > 1) {
+            return;
+        }
+        // Was a Single Printable Character, so check for abbrev expansion.
+        const c = g.app.windowList[g.app.gui.frameIndex].c;
+        if (c.k.abbrevOn) {
+            const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
+            if (abbrevPromise) {
+                e.preventDefault(); // Prevent the typing from doing anything!
+                abbrevPromise.then((expanded) => {
+                    this.refreshAbbrev();
+                    return;
+                });
+            }
+        }
     }
     //@+node:felix.20260322221302.1: *4* handleLogPaneKeyDown
     private handleLogPaneKeyDown = (e: KeyboardEvent) => {
@@ -812,7 +886,10 @@ export class Controller {
 
     }
     //@+node:felix.20260322221225.1: *4* handlePaneKeyDown
-    private handlePaneKeyDown(e: KeyboardEvent, pane: "outline" | "body" | "find"): void {
+    /**
+     * Returns true if the key event was handled and should not be processed further, false otherwise.
+     */
+    private handlePaneKeyDown(e: KeyboardEvent, pane: "outline" | "body" | "find"): boolean {
         // Build key string representation (e.g., "ctrl+shift+q", "shift+alt+left")
         const parts: string[] = [];
 
@@ -876,9 +953,10 @@ export class Controller {
 
                 e.preventDefault();
                 this.doCommand(keybind.command);
-                return;
+                return true;
             }
         }
+        return false;
 
     };
     //@+node:felix.20260322221155.1: *4* handleGlobalKeyDown
@@ -1165,7 +1243,6 @@ export class Controller {
             showLayoutOrientation: menu.SHOW_LAYOUT_ORIENTATION.checked,
             showThemeToggle: menu.SHOW_THEME_TOGGLE.checked,
             showNodeIcons: menu.SHOW_NODE_ICONS.checked,
-            showCollapseAll: menu.SHOW_COLLAPSE_ALL.checked,
             // Find-pane options
             findWholeWord: logPane.OPT_WHOLE.checked,
             findIgnoreCase: logPane.OPT_IGNORECASE.checked,
@@ -1173,7 +1250,8 @@ export class Controller {
             findMark: logPane.OPT_MARK_FINDS.checked,
             findHeadline: logPane.OPT_HEADLINE.checked,
             findBody: logPane.OPT_BODY.checked,
-            findScope: selectedFindScope
+            findScope: selectedFindScope,
+            showWelcomeAtStartup: menu.SHOW_WELCOME_AT_STARTUP.checked
         };
         utils.safeLocalStorageSet('configPreferences', JSON.stringify(preferences));
     }
@@ -1193,7 +1271,7 @@ export class Controller {
                 menu.SHOW_LAYOUT_ORIENTATION.checked = prefs.showLayoutOrientation ?? true;
                 menu.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
                 menu.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
-                menu.SHOW_COLLAPSE_ALL.checked = prefs.showCollapseAll ?? true;
+                menu.SHOW_WELCOME_AT_STARTUP.checked = prefs.showWelcomeAtStartup ?? true;
                 // Find-pane options
                 logPane.OPT_WHOLE.checked = prefs.findWholeWord ?? logPane.OPT_WHOLE.checked;
                 logPane.OPT_IGNORECASE.checked = prefs.findIgnoreCase ?? logPane.OPT_IGNORECASE.checked;

@@ -1277,7 +1277,7 @@ export class CommanderOutlineCommands {
                 break;
             } else {
                 wrapped = true;
-                p = c.rootPosition()!;
+                p = c.lastPosition();
             }
         }
         if (!p || !p.__bool__()) {

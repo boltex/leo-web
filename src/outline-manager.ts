@@ -306,7 +306,7 @@ export class OutlineManager {
                 this.HEADLINE_INPUT.style.width = (viewportWidth - inputLeft) - 19 + "px";
             }
         }
-        if (hadToggled) {
+        if (hadToggled || !this.firstRenderDone) {
             // Had toggled rows, but we might re-render in the very next moments, so we don't want to clear toggled state yet,
             // but we want to make sure it will be cleared before the next real render to avoid keeping toggled state.
             if (this.clearToggledTimer) {

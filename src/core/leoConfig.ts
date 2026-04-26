@@ -3076,14 +3076,14 @@ export class LocalConfigManager {
             fn = 'myLeoSettings.leo';
             p = c.config.findSettingsPosition(setting);
         }
-        if (!p) {
+        if (!p || !p.__bool__()) {
             const root = c.config.settingsRoot();
             if (!root) {
                 return;
             }
             fn = 'leoSettings.leo';
             p = c.config.findSettingsPosition(setting);
-            if (!p) {
+            if (!p || !p.__bool__()) {
                 p = root.insertAsLastChild();
             }
         }

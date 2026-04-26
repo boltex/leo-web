@@ -531,6 +531,22 @@ export class BodyManager {
         const text = this._bodyPane.textContent ?? "";
         return text.endsWith(SENTINEL_CHAR) ? text.slice(0, -1) : text;
     }
+    //@+node:felix.20260412214139.1: *3* getBodyInsertOffset
+    public getBodyInsertOffset(): number {
+        // Returns the offset in the body text of the insert point.
+        const domSelection = document.getSelection();
+        if (!domSelection || domSelection.rangeCount === 0) {
+            return 0;
+        }
+
+        const range = domSelection.getRangeAt(0);
+        if (!this._bodyPane.contains(range.commonAncestorContainer)) {
+            return 0;
+        }
+        return this._domPointToTextOffset(domSelection.focusNode!, domSelection.focusOffset);
+
+    }
+
     //@+node:felix.20260322210318.1: *3* _getTextNodeAtIndex
     private _getTextNodeAtIndex(root: Node, index: number): { node: Node; offset: number } | null {
         const SENTINEL_CLASS = "leo-sentinel";

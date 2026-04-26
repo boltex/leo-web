@@ -41,7 +41,7 @@ export interface FlatRowLeo {
 export interface ContextMenuEntry {
     label: string;
     kind?: QuickPickItemKind; // Optional kind (default or separator). If not specified, defaults to a regular entry.
-    action?: string; // Command to execute when the entry is selected
+    command?: string; // Command to execute when the entry is selected
     keyboardShortcut?: string;
     enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
@@ -50,7 +50,7 @@ export interface ContextMenuEntry {
 //@+node:felix.20251211213155.1: ** MenuEntry
 export interface MenuEntry {
     label: string;
-    action?: string; // Command to execute when the entry is selected
+    command?: string; // Command to execute when the entry is selected
     keyboardShortcut?: string;
     enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
@@ -77,10 +77,16 @@ export interface ButtonEntry {
     icon?: string;
     label?: string; // could have text instead of or in addition to icon, for accessibility and/or if icon fails to load
     tooltip?: string;
-    action: string; // Command to execute when the entry is selected
+    command: string; // Command to execute when the entry is selected
     enabledFlagsSet?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be true in workspace.getContext() for the entry to be enabled
     enabledFlagsClear?: string[]; // Strings from constants.CONTEXT_FLAGS that need to be false in workspace.getContext() for the entry to be enabled
     domElementRef?: HTMLElement; // Reference to the button to refresh its enabled/disabled state.
+}
+//@+node:felix.20260419200206.1: ** TipsEntry
+export interface TipsEntry {
+    title: string;
+    description: string;
+    content: string;
 }
 //@+node:felix.20251211213200.1: ** FileStat
 export interface FileStat {
@@ -111,6 +117,12 @@ export interface FilePath {
     handle: FileSystemDirectoryHandle;
 }
 
+//@+node:felix.20260419201101.1: ** TipsDialogOptions
+export interface TipsDialogOptions {
+    title: string;
+    description?: string;
+    content: string;
+}
 //@+node:felix.20251211213209.1: ** OpenDialogOptions
 /**
  * Options to configure the behaviour of a file open dialog.

@@ -52,6 +52,7 @@ import * as csv from 'csvtojson';
 import KSUID from 'ksuid';
 import { Uri } from '../workspace';
 import { OutlineViewerHtml } from '../outline-viewer-html';
+import { AbbrevCommandsClass } from '../commands/abbrevCommands';
 
 //@-<< imports >>
 //@+others
@@ -237,20 +238,27 @@ export class Commands {
     // These ivars are set later by leoEditCommands.createEditCommanders
     public editCommands: EditCommandsClass;
     public db: any; // CommanderWrapper; //  Record<string, any>; // IS A DATABASE 
+    public abbrevCommands: AbbrevCommandsClass;
     public bufferCommands: BufferCommandsClass;
     public editFileCommands: EditFileCommandsClass;
     public theScriptingController!: ScriptingController; // Set in leoApp at 'open2' event.
     public gotoCommands: GoToCommands;
     public rstCommands: RstCommands;
     public helpCommands: HelpCommandsClass;
-    public keyHandler: any = undefined; // TODO same as k
-    public k: any = undefined; // TODO same as keyHandler
+    public keyHandler: any; // TODO same as k
+    public k: any; // TODO same as keyHandler
     public killBufferCommands: KillBufferCommandsClass;
     public rectangleCommands: RectangleCommandsClass;
 
     public config!: LocalConfigManager; // Set in constructor indirectly
     public quicksearch_controller: QuickSearchController | undefined;
     public id: number; // Replaces python id function
+
+    public abbrev_place_end: string = '';
+    public abbrev_place_start: string = '';
+    public abbrev_subst_end: string = '';
+    public abbrev_subst_env: Record<string, any> = {};
+    public abbrev_subst_start: string = '';
 
     //@+node:felix.20251214160339.419: *3* constructor & helpers
     constructor(
@@ -313,6 +321,7 @@ export class Commands {
         this.persistenceController = new PersistenceDataController(c);
 
         // command handlers...
+        this.abbrevCommands = new AbbrevCommandsClass(c);
         this.bufferCommands = new BufferCommandsClass(c);
         this.editCommands = new EditCommandsClass(c);
         this.editFileCommands = new EditFileCommandsClass(c);
@@ -327,6 +336,7 @@ export class Commands {
 
         // Create the list of subcommanders.
         this.subCommanders = [
+            this.abbrevCommands,
             this.atFileCommands,
             this.bufferCommands,
             this.chapterController,
@@ -351,6 +361,9 @@ export class Commands {
 
         // From finishCreate
         c.frame.finishCreate();
+        // Only c.abbrevCommands needs a finishCreate method.
+        c.abbrevCommands.finishCreate()
+        // Finish other objects...
         c.createCommandNames();
         c.findCommands.finishCreate();
 
@@ -769,11 +782,6 @@ export class Commands {
         return g.app.gui.goAnywhere();
     }
 
-    //@+node:felix.20251214160339.454: *3* @cmd showWelcomeSettings
-    @cmd('show-welcome-settings', 'Open the Leo-Web welcome and settings screen.')
-    public showSettings(): Thenable<unknown> {
-        return g.app.gui.showSettings();
-    }
     //@+node:felix.20251214160339.455: *3* @cmd exportHTMLOutlineViewer
     @cmd('export-html-outline-viewer', 'Export the outline viewer as HTML.')
     public async exportHTMLOutlineViewer() {

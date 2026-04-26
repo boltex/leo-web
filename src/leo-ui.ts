@@ -77,7 +77,6 @@ export class LeoUI extends NullGui {
     private _revealType: RevealType = RevealType.NoReveal; // Type of reveal for the selected node (when refreshing outline)
 
     public finalFocus: Focus = Focus.NoChange; // Set in _setupRefresh : Last command issued had focus on outline, as opposed to the body
-    public refreshPreserveRange = false; // this makes the next refresh cycle preserve the "findFocusTree" flag once.
 
     private __refreshNode: Position | undefined; // Set in _setupRefresh : Last command issued a specific node to reveal
     private _lastRefreshNodeTS: number = 0;
@@ -391,12 +390,6 @@ export class LeoUI extends NullGui {
         window.location.reload();
 
         return Promise.resolve(true);
-    }
-    //@+node:felix.20260323003332.1: *4* showSettings
-    public showSettings(): Promise<unknown> {
-        // TODO : Remove? or implement a settings/welcome UI ?
-        console.log('TODO ! showSettings called to show settings UI');
-        return Promise.resolve();
     }
     //@+node:felix.20260323003252.1: *4* put_help
     public put_help(c: Commands, s: string, short_title: string): void {
@@ -795,10 +788,8 @@ export class LeoUI extends NullGui {
      * @param p_finalFocus kind of pane for focus to be placed after refresh, if any. If not specified, focus will be preserved.
      * @param p_refreshType Refresh flags for each UI part
     */
-    public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh, p_preserveRange?: boolean): void {
-        if (p_preserveRange) {
-            this.refreshPreserveRange = true; // Will be cleared after a refresh cycle.
-        }
+    public setupRefresh(p_finalFocus: Focus, p_refreshType?: ReqRefresh): void {
+
         // Set final "focus-placement"
         this.finalFocus = p_finalFocus;
 
@@ -879,18 +870,35 @@ export class LeoUI extends NullGui {
     /**
      * * Refreshes all parts.
      */
-    public fullRefresh(p_keepFocus?: boolean, instantRefresh?: boolean): void {
-        this.setupRefresh(
-            p_keepFocus ? Focus.NoChange : this.finalFocus,
-            {
-                tree: true,
-                body: true,
-                states: true,
-                buttons: true,
-                documents: true,
-                goto: true,
-            }
-        );
+    public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void {
+
+        if (keepFocus) {
+            this.finalFocus = Focus.NoChange;
+        }
+
+        if (finalFocus) {
+            this.finalFocus = finalFocus;
+        }
+
+        if (refreshType) {
+            this.setupRefresh(
+                this.finalFocus,
+                refreshType
+            );
+        } else {
+            this.setupRefresh(
+                this.finalFocus,
+                {
+                    tree: true,
+                    body: true,
+                    states: true,
+                    buttons: true,
+                    documents: true,
+                    goto: true,
+                }
+            );
+        }
+
         if (instantRefresh) {
             // Launch the tree and body refresh immediately!
             workspace.controller.buildRowsRenderTreeLeo();
@@ -1045,7 +1053,10 @@ export class LeoUI extends NullGui {
         // Add no-focus-outline class to body pane to avoid unwanted focus outline when preventFocus is true
         if (preventFocus) {
             workspace.layout.BODY_PANE.classList.add('no-focus-outline');
+        } else {
+            g.app.gui.set_focus(c, c.frame.body.widget);
         }
+
 
         workspace.body.setBodySelection(w_selection, this._refreshType.scroll); // Note, in some browser, this has a side-effect of setting focus in body.
         this._refreshType.scroll = false;
@@ -1593,6 +1604,10 @@ export class LeoUI extends NullGui {
         const c = g.app.windowList[this.frameIndex].c;
         const u = c.undoer;
         const w_p: Position = p_node || c.p;
+        const w = c.edit_widget(c.p);
+        if (w) {
+            c.set_focus(w);
+        }
 
         this.triggerBodySave();
 
@@ -1649,7 +1664,7 @@ export class LeoUI extends NullGui {
 
         if (saveSelectionOnly) {
             c.frame.tree.editLabel(node); // <-- THIS SHOULD CREATE IT !
-            const headlineWidget = c.edit_widget(node) as StringTextWrapper;
+            const headlineWidget = c.edit_widget(node);
             if (headlineWidget && headlineWidget.sel) {
                 headlineWidget.setSelectionRange(newSelection[0], newSelection[1], newSelection[2]);
             } else {
@@ -2140,8 +2155,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
             this.launchRefresh();
 
@@ -2164,8 +2178,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
 
             this.launchRefresh();
@@ -2247,8 +2260,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
             this.launchRefresh();
 
@@ -2270,8 +2282,7 @@ export class LeoUI extends NullGui {
                     // documents: false,
                     // buttons: false,
                     states: true,
-                },
-                this.findFocusTree
+                }
             );
 
             this.launchRefresh();
@@ -3384,7 +3395,8 @@ export class LeoUI extends NullGui {
             version,
             {
                 modal: true,
-                detail: theCopyright
+                // double the newlines to create a line break between version and copyright, since 'detail' is shown below the version in smaller font.
+                detail: theCopyright.replace(/\n/g, '\n\n')
             });
     }
     //@+node:felix.20260322232941.1: *4* Ask Dialogs
@@ -3400,6 +3412,29 @@ export class LeoUI extends NullGui {
                 modal: true,
                 detail: message
             });
+    }
+
+    public runAskOkCancelStringDialog(
+        c: Commands,
+        title: string,
+        message: string,
+        cancelButtonText = "Cancel",
+        okButtonText = "Ok",
+        defaultParam = '',
+    ): Thenable<string> {
+
+        return workspace.dialog.showInputDialog({
+            title: title,
+            prompt: message,
+            placeholder: title,
+            value: defaultParam,
+        }).then((id) => {
+            if (id) {
+                return id;
+            }
+            return '';
+        });
+
     }
 
     public runAskYesNoDialog(

@@ -9,7 +9,9 @@ import { VNode } from '../core/leoNodes';
 import { FastRead } from '../core/leoFileCommands';
 import { Commands } from '../core/leoCommands';
 import { ScriptingController } from '../core/mod_scripting';
-import leoSettings from '../../leoSettings.json';
+import leoSettings from '../../leoSettings.leojs';
+import { tips } from "../tips";
+
 
 //@+others
 //@+node:felix.20251214160853.114: ** Class CommanderHelpCommands
@@ -36,6 +38,12 @@ export class CommanderHelpCommands {
             url,
             email
         );
+    }
+
+    //@+node:felix.20260420235632.1: *3* c_help.welcomeScreen
+    @commander_command('welcome', 'Open the Welcome Splash Screen.')
+    public welcomeScreen(this: Commands): Thenable<unknown> {
+        return g.workspace.dialog.showWelcomeDialog(tips[0]);
     }
 
     //@+node:felix.20251214160853.116: *3* c_help.Open Leo files

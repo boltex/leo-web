@@ -1,6 +1,11 @@
 {
     "compilerOptions": {
         "moduleResolution": "node10",
+        "types": [
+            "wicg-file-system-access",
+            "webpack-env"
+        ],
+        "allowArbitraryExtensions": true,
         "resolveJsonModule": true,
         "jsx": "react-jsx",
         "experimentalDecorators": true,

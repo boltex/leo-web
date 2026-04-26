@@ -5,6 +5,8 @@ const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const googleTagId = process.env.GOOGLE_TAG_ID || '';
+
 module.exports = (env, argv) => {
     const isProd = argv?.mode === 'production' || process.env.NODE_ENV === 'production';
     console.log('isProd', isProd);
@@ -19,7 +21,6 @@ module.exports = (env, argv) => {
             path: path.join(__dirname, "./dist"),
             // libraryTarget: "commonjs",
         },
-
         optimization: {
             minimize: true,
             minimizer: [
@@ -36,7 +37,7 @@ module.exports = (env, argv) => {
         },
         resolve: {
             mainFields: ["browser", "module", "main"], // look for `browser` entry point in imported node modules
-            extensions: [".ts", ".js", ".json"], // support ts-files and js-files
+            extensions: [".ts", ".js", ".json", ".leojs"], // support ts-files, js-files, json-files, and leojs-files as json files.
             alias: {
                 // Point explicitly to TypeScript's library file; services variant not present in TS 5.x
                 typescript: require.resolve('typescript/lib/typescript.js'),
@@ -59,6 +60,10 @@ module.exports = (env, argv) => {
         },
         module: {
             rules: [
+                {
+                    test: /.leojs$/i,
+                    type: "json",
+                },
                 {
                     test: /\.css$/,
                     use: ["style-loader", "css-loader"],
@@ -96,6 +101,9 @@ module.exports = (env, argv) => {
                 template: './src/index.html',
                 favicon: './public/favicon.ico',
                 title: 'Leo Web Editor',
+                templateParameters: {
+                    googleTagId,
+                },
             }),
             new CopyWebpackPlugin({
                 patterns: [
