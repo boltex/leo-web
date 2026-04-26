@@ -5,6 +5,8 @@ const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const googleTagId = process.env.GOOGLE_TAG_ID || '';
+
 module.exports = (env, argv) => {
     const isProd = argv?.mode === 'production' || process.env.NODE_ENV === 'production';
     console.log('isProd', isProd);
@@ -19,7 +21,6 @@ module.exports = (env, argv) => {
             path: path.join(__dirname, "./dist"),
             // libraryTarget: "commonjs",
         },
-
         optimization: {
             minimize: true,
             minimizer: [
@@ -100,6 +101,9 @@ module.exports = (env, argv) => {
                 template: './src/index.html',
                 favicon: './public/favicon.ico',
                 title: 'Leo Web Editor',
+                templateParameters: {
+                    googleTagId,
+                },
             }),
             new CopyWebpackPlugin({
                 patterns: [

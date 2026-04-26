@@ -35,6 +35,8 @@ jobs:
 
       - name: Build
         run: npm run build # Creates  'dist' folder
+        env:
+          GOOGLE_TAG_ID: ${{ vars.GOOGLE_TAG_ID }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
