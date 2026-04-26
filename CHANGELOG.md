@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.15
+
+- ...
+
 ## 1.0.14
 
 - Implemented Leo's abbreviations functionality.
