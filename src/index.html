@@ -7,15 +7,11 @@
 <!--@+node:felix.20260321124846.1: ** head-->
 
 <head>
-    <% if (htmlWebpackPlugin.options.googleTagId) { %>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= htmlWebpackPlugin.options.googleTagId %>"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag("js", new Date());
-        gtag("config", "<%= htmlWebpackPlugin.options.googleTagId %>");
-    </script>
-    <% } %><meta charset="UTF-8">
+    <% if (googleTagId) { %>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= googleTagId %>"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag("js", new Date()); gtag("config", "<%= googleTagId %>");</script>
+    <% } %>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leo Editor for the web</title>
     <meta name="theme-color" content="#555555">
