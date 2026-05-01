@@ -2,7 +2,8 @@
 
 ## 1.0.16
 
-- ...
+- Simplified welcome screen.
+- Made 'open leoSettings.leo' open as non-dirty.
 
 ## 1.0.15
 

@@ -8,41 +8,41 @@
 
 <head>
     <% if (googleTagId) { %>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= googleTagId %>"></script>
-    <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag("js", new Date()); gtag("config", "<%= googleTagId %>");</script>
-    <% } %>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leo Editor for the web</title>
-    <meta name="theme-color" content="#555555">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <style>
-        /* Inline CSS to prevent FOUC */
-        html {
-            background-color: #555555;
-            transition: background-color 0.3s ease-in;
-        }
+        <script async src="https://www.googletagmanager.com/gtag/js?id=<%= googleTagId %>"></script>
+        <script>window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag("js", new Date()); gtag("config", "<%= googleTagId %>");</script>
+        <% } %>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Leo Editor for the web</title>
+            <meta name="theme-color" content="#555555">
+            <meta name="mobile-web-app-capable" content="yes">
+            <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+            <style>
+                /* Inline CSS to prevent FOUC */
+                html {
+                    background-color: #555555;
+                    transition: background-color 0.3s ease-in;
+                }
 
-        body {
-            opacity: 0;
-            transition: opacity 0.3s ease-in;
-            overflow-y: hidden;
-        }
+                body {
+                    opacity: 0;
+                    transition: opacity 0.3s ease-in;
+                    overflow-y: hidden;
+                }
 
-        body.loaded {
-            opacity: 1;
-        }
+                body.loaded {
+                    opacity: 1;
+                }
 
-        html.loaded {
-            background-color: transparent;
-        }
-    </style>
-    <link rel="stylesheet" href="leoicons.css">
-    <link rel="manifest" href="manifest.webmanifest">
-    <link rel="icon" href="favicon.ico" sizes="32x32">
-    <link rel="icon" href="icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+                html.loaded {
+                    background-color: transparent;
+                }
+            </style>
+            <link rel="stylesheet" href="leoicons.css">
+            <link rel="manifest" href="manifest.webmanifest">
+            <link rel="icon" href="favicon.ico" sizes="32x32">
+            <link rel="icon" href="icon.svg" type="image/svg+xml">
+            <link rel="apple-touch-icon" href="apple-touch-icon.png">
 </head>
 
 <!--@+node:felix.20260321124849.1: ** body-->
@@ -377,8 +377,8 @@
         aria-labelledby="welcome-dialog-title">
         <div class="modal-content">
             <h2>
-                <a id="welcome-dialog-github-logo" href="https://github.com/boltex/leo-web" target="_blank"
-                    title="Github Repository" rel="noopener noreferrer">
+                <a id="welcome-dialog-github-logo" href="https://github.com/boltex/leo-web/#-leo-for-the-web"
+                    target="_blank" title="Github Repository" rel="noopener noreferrer">
                     <svg aria-hidden="true" focusable="false" class="octicon octicon-mark-github" viewBox="0 0 24 24"
                         width="32" height="32" fill="currentColor" display="inline-block" overflow="visible"
                         style="vertical-align:text-bottom">

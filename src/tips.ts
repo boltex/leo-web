@@ -17,7 +17,6 @@ export const tips: TipsEntry[] = [
                 <ul class="config-col shortcuts">
                     <li><span class="subtitle">Create & Rename</span></li>
                     <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>I</kbd></span> — Insert Node</li>
-                    <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>&#96;</kbd></span> — Clone Node</li>
                     <li><span class="kbd-spacer"><kbd>Ctrl</kbd>+<kbd>H</kbd></span> — Edit Headline</li>
 
                     <li><span class="subtitle">Reorganize</span></li>

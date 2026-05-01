@@ -341,7 +341,7 @@ export class LeoUI extends NullGui {
     //@+node:felix.20260323003442.1: *4* showDocumentation
     public showDocumentation(): void {
         // Open Leo Web documentation URL in new browser tab (for now, github repo)
-        const docUrl = 'https://github.com/boltex/leo-web/';
+        const docUrl = 'https://github.com/boltex/leo-web/#-leo-for-the-web';
         window.open(docUrl, '_blank');
     }
     //@+node:felix.20260323003430.1: *4* todo
