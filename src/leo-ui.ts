@@ -1347,9 +1347,10 @@ export class LeoUI extends NullGui {
     //@+node:felix.20260323001131.1: *4* Minibuffer & helpers
     /**
      * Opens quickPick minibuffer pallette to choose from all commands in this file's commander
+     * a caller can pre-select a command by passing its name as argument, but it's not required since the user can also just start typing to filter the list.
      * @returns Promise from the command resolving - or resolve with undefined if cancelled
      */
-    public async minibuffer(): Promise<unknown> {
+    public async minibuffer(commandName?: string): Promise<unknown> {
 
         this.triggerBodySave();
         const c = g.app.windowList[this.frameIndex].c;
@@ -1441,13 +1442,25 @@ export class LeoUI extends NullGui {
 
         w_choices.push(...w_withDetails);
 
-        const w_picked = await workspace.dialog.showQuickPick(w_choices, {
-            placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
-        });
+        let w_picked: QuickPickItem | undefined;
+
+        if (commandName && commandName.trim() !== "") {
+            // if a commandName is passed, try to find it in the list and pre-select it in the quickPick
+            const foundIndex = w_choices.findIndex(choice => choice.label === commandName);
+            if (foundIndex >= 0) {
+                w_picked = w_choices[foundIndex];
+            }
+
+        }
+        if (!w_picked) {
+            w_picked = await workspace.dialog.showQuickPick(w_choices, {
+                placeHolder: Constants.USER_MESSAGES.MINIBUFFER_PROMPT,
+            });
+        }
 
         // To check for numeric line goto 'easter egg'
         const lastInput = workspace.dialog.getLastQuickPickInput();
-        if (lastInput && /^\d+$/.test(lastInput)) {
+        if (!commandName && lastInput && /^\d+$/.test(lastInput)) {
             // * Was an integer EASTER EGG
             this.setupRefresh(
                 Focus.Body,

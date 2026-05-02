@@ -3,6 +3,7 @@
 //@+<< imports >>
 //@+node:felix.20260323010551.1: ** << imports >>
 import { workspace } from './workspace';
+import { Constants } from "./constants";
 import { ButtonEntry, ContextMenuEntry, MenuEntry, QuickPickItemKind } from "./types";
 
 //@-<< imports >>
@@ -589,8 +590,32 @@ export class MenuManager {
     //@+node:felix.20260407223125.1: *3* Icon Buttons
     //@+node:felix.20260410221235.1: *4* buildIconButtons
     public buildIconButtons(entries: ButtonEntry[]): void {
-        // Build div with class "icon-button" for each entry and add to ICON_BUTTONS_CONTAINER
         this.ICON_BUTTONS_CONTAINER.innerHTML = '';
+
+        /*
+        // First add a select element for chapter dropdown. Will be (re)populated in refreshIconButtons.
+        const chapterSelect = document.createElement('select');
+        chapterSelect.id = 'chapter-dropdown';
+        chapterSelect.className = 'icon-button';
+        chapterSelect.title = 'Jump to Chapter';
+        this.ICON_BUTTONS_CONTAINER.appendChild(chapterSelect);
+        chapterSelect.addEventListener('change', () => {
+            if (chapterSelect.value) {
+                workspace.controller.doCommand(Constants.COMMANDS.MINIBUFFER, chapterSelect.value);
+            }
+        });
+        // For now, set a single option saying 'main' which has the value "chapter-select-main".
+        const testOption = document.createElement('option');
+        testOption.value = "chapter-select-test";
+        testOption.textContent = "test";
+        chapterSelect.appendChild(testOption);
+        const mainOption = document.createElement('option');
+        mainOption.value = "chapter-select-main";
+        mainOption.textContent = "main";
+        chapterSelect.appendChild(mainOption);
+        */
+
+        // Build div with class "icon-button" for each entry and add to ICON_BUTTONS_CONTAINER
         for (const entry of entries) {
             const button = document.createElement('div');
             button.className = entry.icon ? 'icon-button glicon ' + entry.icon : 'icon-button';
@@ -644,6 +669,8 @@ export class MenuManager {
     }
     //@+node:felix.20260410221228.1: *4* refreshIconButtons
     public refreshIconButtons(entries: ButtonEntry[]): void {
+        // Todo: refresh the soon-to-be-implemented 'chapter-dropdown' select element first. 
+
         for (const entry of entries) {
             if (entry.domElementRef) {
                 let enabled = true;

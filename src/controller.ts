@@ -631,8 +631,10 @@ export class Controller {
         let dirHandle: FileSystemDirectoryHandle | null = null;
 
         // Pre-start: show 'tips' splash screen offering 'show tips at startup' checkbox
-        // and wait for the user to press 'ok'.
-        await workspace.dialog.showWelcomeDialog(tips[0]);
+        // and wait for the user to press 'ok'. (if the )
+        if (workspace.menu.SHOW_WELCOME_AT_STARTUP.checked && tips.length > 0) {
+            await workspace.dialog.showWelcomeDialog(tips[0]);
+        }
 
         // 1 Try restoring previous workspace
         try {

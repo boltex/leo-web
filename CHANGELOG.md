@@ -2,7 +2,7 @@
 
 ## 1.0.17
 
-- ...
+- Fixed welcome screen.
 
 ## 1.0.16
 
