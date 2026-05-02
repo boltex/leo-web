@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.16
+
+- Simplified welcome screen.
+- Made 'open leoSettings.leo' open as non-dirty.
+- Fixed markdown writer.
+
 ## 1.0.15
 
 - Fixed build process.

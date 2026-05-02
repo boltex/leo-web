@@ -166,7 +166,10 @@ export class CommanderHelpCommands {
                 c.hiddenRootNode = ok;
             }
 
-            c.setChanged();
+            // * the leoSettings.leo file is read-only, so we don't set the changed flag on the commander.
+            // * User can then close it without being prompted to save, and can copy settings from it without worrying about accidentally modifying the original.
+            // c.setChanged(); // ! LEAVE UNCHANGED TO AVOID DIRTY FLAG ON SETTINGS FILE
+
             lm.finishOpen(c);
             g.doHook('new', { old_c: old_c, c: c, new_c: c });
 
