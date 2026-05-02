@@ -4,6 +4,7 @@
 
 - Simplified welcome screen.
 - Made 'open leoSettings.leo' open as non-dirty.
+- Fixed markdown writer.
 
 ## 1.0.15
 
