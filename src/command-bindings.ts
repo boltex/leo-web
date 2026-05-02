@@ -83,7 +83,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.SHORT_LEGACY_UNL_TO_CLIPBOARD, () => leoUI.unlToClipboard("shortLegacy")], // Not referenced in package.json
         [CMD.FULL_LEGACY_UNL_TO_CLIPBOARD, () => leoUI.unlToClipboard("fullLegacy")], // Not referenced in package.json
 
-        [CMD.MINIBUFFER, () => leoUI.minibuffer()], // Is referenced in package.json
+        [CMD.MINIBUFFER, (p_commandName?: string) => leoUI.minibuffer(p_commandName)], // Is referenced in package.json
         [CMD.SET_LEO_ID, () => leoUI.setLeoIDCommand()],
         [CMD.OPEN_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
         [CMD.OPEN_MY_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_MY_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
