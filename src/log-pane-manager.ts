@@ -67,6 +67,8 @@ export class LogPaneManager {
     public FREEZE: HTMLElement;
     public GOTO_PANE: HTMLElement;
 
+    // 
+
     public HTML_ELEMENT: HTMLElement;
 
     // Find/Nav state
@@ -152,6 +154,8 @@ export class LogPaneManager {
 
         this.FREEZE = document.getElementById('freeze') as HTMLElement; // Simple div
         this.GOTO_PANE = document.getElementById('gotoPane') as HTMLElement; // Simple div
+
+        //
 
         this.HTML_ELEMENT = document.documentElement;
 
@@ -271,6 +275,8 @@ export class LogPaneManager {
             this.handleIsTagSwitch(w_wasSet);
         });
 
+        // setup click handlers for quick-find nav buttons
+        // todo
 
         // Setup tab/shift-tab to manage focus between controls and/or the body/outline panes.
         // * Deal with pressing tab in the log content area to place focus on body-pane itself.

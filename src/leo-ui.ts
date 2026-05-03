@@ -1631,9 +1631,8 @@ export class LeoUI extends NullGui {
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
      * @returns Thenable that resolves when done
      */
-    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number, number], p_retried?: boolean): Promise<Position> {
+    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number, number]): Promise<Position> {
         const c = g.app.windowList[this.frameIndex].c;
-        const u = c.undoer;
         const w_p: Position = p_node || c.p;
         const w = c.edit_widget(c.p);
         if (w) {
@@ -1650,6 +1649,11 @@ export class LeoUI extends NullGui {
 
         this.inEditHeadline++;
         this.leoStates.inHeadlineEdit = true;
+
+        // check if headline is exactly "newHeadline". If so and selection is not passed, turn selectAll to true.
+        if (!selectAll && w_p.h === "newHeadline" && !selection) {
+            selectAll = true;
+        }
 
         // this await will pause so the debounced 'getStates' can run and refresh the undo pane and other states.
         let headlineResult = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);
