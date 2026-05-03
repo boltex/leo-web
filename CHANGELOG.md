@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.19
+
+- ...
+
 ## 1.0.18
 
 - Added select-chapter and select-chapter-main buttons visible only if the outline actually contains @chapter nodes.
