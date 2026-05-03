@@ -464,6 +464,18 @@ export class LeoUI extends NullGui {
                     break;
                 }
             }
+            if (w_hasChapters && utils) {
+                // get selected chapter name - or 'main'.
+                let selectedChapter = 'main';
+                const cc = c.chapterController;
+                if (cc && cc.selectedChapter) {
+                    selectedChapter = cc.selectedChapter.name;
+                }
+                utils.setContext(Constants.CONTEXT_FLAGS.LEO_CHAPTER, selectedChapter);
+            } else {
+                utils.setContext(Constants.CONTEXT_FLAGS.LEO_CHAPTER, undefined);
+            }
+
             if (c.hoistStack.length) {
                 const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
                 w_topIsChapter = w_ph.h.startsWith('@chapter ');

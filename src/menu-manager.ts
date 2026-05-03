@@ -714,6 +714,14 @@ export class MenuManager {
                 } else {
                     entry.domElementRef.classList.add("hidden");
                 }
+                if (entry.command === Constants.COMMANDS.CHAPTER_SELECT) {
+                    const labelSpan = entry.domElementRef.querySelector(".button-label");
+                    const chapterName = workspace.getContext(Constants.CONTEXT_FLAGS.LEO_CHAPTER);
+                    if (labelSpan && chapterName) {
+                        labelSpan.textContent = chapterName;
+                    }
+                }
+
             }
         }
     }

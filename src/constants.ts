@@ -193,6 +193,7 @@ export class Constants {
         LEO_CAN_HOIST: "leoWebCanHoist", // isNotRoot equivalent, Computed by hand
         LEO_HAS_CHAPTERS: "leoWebHasChapters", // Has at least one @chapter node in the outline
         LEO_TOP_HOIST_CHAPTER: "leoWebTopHoistChapter",
+        LEO_CHAPTER: "leoWebChapter", // name of the selected chapter, otherwise undefined
         LEO_EDIT_HEADLINE: "leoWebEditHeadline",
         LEO_HAS_MARKED: "leoWebHasMarked",
 
