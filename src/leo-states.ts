@@ -325,6 +325,16 @@ export class LeoStates {
         this._leoRoot = p_value;
         utils.setContext(Constants.CONTEXT_FLAGS.LEO_CAN_HOIST, !p_value);
     }
+
+    private _leoHasChapters: boolean = false;
+    get leoHasChapters(): boolean {
+        return this._leoHasChapters;
+    }
+    set leoHasChapters(p_value: boolean) {
+        this._leoHasChapters = p_value;
+        utils.setContext(Constants.CONTEXT_FLAGS.LEO_HAS_CHAPTERS, p_value);
+    }
+
     //@+node:felix.20260322231940.1: *3* setSelectedNodeFlags
     public setSelectedNodeFlags(p_node: Position): void {
         const hasParent = p_node.hasParent();
@@ -355,6 +365,7 @@ export class LeoStates {
         this.leoRoot = !p_states.canHoist;
         this.leoTopHoistChapter = p_states.topIsChapter;
         this.leoHasMarked = p_states.hasMarked;
+        this.leoHasChapters = p_states.hasChapters;
     }
     //@-others
 

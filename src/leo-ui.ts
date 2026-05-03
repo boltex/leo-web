@@ -452,12 +452,30 @@ export class LeoUI extends NullGui {
             let w_canHoist = true;
             let w_topIsChapter = false;
             let w_hasMarked = false;
+            let w_hasChapters = false;
             for (const v of c.all_unique_nodes()) {
                 if (v.isMarked()) {
                     w_hasMarked = true;
+                }
+                if (v.h.startsWith('@chapter ')) {
+                    w_hasChapters = true;
+                }
+                if (w_hasMarked && w_hasChapters) {
                     break;
                 }
             }
+            if (w_hasChapters && utils) {
+                // get selected chapter name - or 'main'.
+                let selectedChapter = 'main';
+                const cc = c.chapterController;
+                if (cc && cc.selectedChapter) {
+                    selectedChapter = cc.selectedChapter.name;
+                }
+                utils.setContext(Constants.CONTEXT_FLAGS.LEO_CHAPTER, selectedChapter);
+            } else {
+                utils.setContext(Constants.CONTEXT_FLAGS.LEO_CHAPTER, undefined);
+            }
+
             if (c.hoistStack.length) {
                 const w_ph = c.hoistStack[c.hoistStack.length - 1].p;
                 w_topIsChapter = w_ph.h.startsWith('@chapter ');
@@ -483,7 +501,7 @@ export class LeoUI extends NullGui {
                 canHoist: w_canHoist,
                 topIsChapter: w_topIsChapter,
                 hasMarked: w_hasMarked,
-                // 
+                hasChapters: w_hasChapters, // Has at least one @chapter node in the outline
             };
             states.setLeoStateFlags(w_states);
             this.refreshUndoPane();
@@ -1613,9 +1631,8 @@ export class LeoUI extends NullGui {
      * @param p_node Specifies which node to rename, or leave undefined to rename the currently selected node
      * @returns Thenable that resolves when done
      */
-    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number, number], p_retried?: boolean): Promise<Position> {
+    public async editHeadline(p_node?: Position, selectAll?: boolean, selection?: [number, number, number]): Promise<Position> {
         const c = g.app.windowList[this.frameIndex].c;
-        const u = c.undoer;
         const w_p: Position = p_node || c.p;
         const w = c.edit_widget(c.p);
         if (w) {
@@ -1632,6 +1649,11 @@ export class LeoUI extends NullGui {
 
         this.inEditHeadline++;
         this.leoStates.inHeadlineEdit = true;
+
+        // check if headline is exactly "newHeadline". If so and selection is not passed, turn selectAll to true.
+        if (!selectAll && w_p.h === "newHeadline" && !selection) {
+            selectAll = true;
+        }
 
         // this await will pause so the debounced 'getStates' can run and refresh the undo pane and other states.
         let headlineResult = await workspace.outline.openHeadlineInputBox(w_p, selectAll, selection);

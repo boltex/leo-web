@@ -659,7 +659,6 @@ export const keybindings: Keybinding[] = [
         key: "arrowdown",
         outline: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED],
-        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.GOTO_NEXT_VISIBLE,
@@ -674,7 +673,6 @@ export const keybindings: Keybinding[] = [
         key: "arrowup",
         outline: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED],
-        enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
         command: CMD.GOTO_PREV_VISIBLE,

@@ -803,10 +803,10 @@ export class Controller {
                 return; // Let browser handle undo/redo in headline editing mode
             }
         }
-        // Allow arrows, pageup/down, home,end for moving cursor and selecting with editing the headline 
+        // Allow arrows left and right,, pageup/down, home,end for moving cursor and selecting with editing the headline 
         if (workspace.outline.headlineFinish) {
-            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"].includes(e.key)) {
-                return; // Let browser handle arrow keys in headline editing mode
+            if (["ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End"].includes(e.key)) {
+                return; // Let browser handle left-right arrow keys in headline editing mode. (up/down will navigate away)
             }
         }
 
