@@ -452,9 +452,15 @@ export class LeoUI extends NullGui {
             let w_canHoist = true;
             let w_topIsChapter = false;
             let w_hasMarked = false;
+            let w_hasChapters = false;
             for (const v of c.all_unique_nodes()) {
                 if (v.isMarked()) {
                     w_hasMarked = true;
+                }
+                if (v.h.startsWith('@chapter ')) {
+                    w_hasChapters = true;
+                }
+                if (w_hasMarked && w_hasChapters) {
                     break;
                 }
             }
@@ -483,7 +489,7 @@ export class LeoUI extends NullGui {
                 canHoist: w_canHoist,
                 topIsChapter: w_topIsChapter,
                 hasMarked: w_hasMarked,
-                // 
+                hasChapters: w_hasChapters, // Has at least one @chapter node in the outline
             };
             states.setLeoStateFlags(w_states);
             this.refreshUndoPane();

@@ -97,7 +97,6 @@ export class Constants {
         PROMPT_EDIT_HEADLINE: "Edit Headline",
         PROMPT_INSERT_NODE: "Insert Node",
         PROMPT_INSERT_CHILD: "Insert Child",
-        DEFAULT_HEADLINE: "New Headline",
 
         TITLE_GOTO_GLOBAL_LINE: "Goto global line", // TODO : REMOVE IF NOT USED
         PLACEHOLDER_GOTO_GLOBAL_LINE: "#", // TODO : REMOVE IF NOT USED
@@ -192,6 +191,7 @@ export class Constants {
         LEO_CAN_PROMOTE: "leoWebCanPromote",
         LEO_CAN_DEHOIST: "leoWebCanDehoist",
         LEO_CAN_HOIST: "leoWebCanHoist", // isNotRoot equivalent, Computed by hand
+        LEO_HAS_CHAPTERS: "leoWebHasChapters", // Has at least one @chapter node in the outline
         LEO_TOP_HOIST_CHAPTER: "leoWebTopHoistChapter",
         LEO_EDIT_HEADLINE: "leoWebEditHeadline",
         LEO_HAS_MARKED: "leoWebHasMarked",

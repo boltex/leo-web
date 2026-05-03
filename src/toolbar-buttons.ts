@@ -12,6 +12,11 @@ const FLAGS = Constants.CONTEXT_FLAGS;
 //@+node:felix.20260407013836.1: ** Toolbar Buttons
 export const toolbarButtons: ButtonEntry[] = [
 
+    // chapter main, only visible if there are chapters in the outline. (only enabled if hoisted is a chapter)
+    { icon: "leo-chapter-main", command: CMD.CHAPTER_MAIN, tooltip: "Go to Main Chapter", enabledFlagsSet: [FLAGS.LEO_TOP_HOIST_CHAPTER], visibleFlagsSet: [FLAGS.LEO_HAS_CHAPTERS] },
+    // select chapter button, only visible if there are chapters in the outline.
+    { icon: "leo-chapter-select", label: 'main', command: CMD.CHAPTER_SELECT, tooltip: "Select Chapter", enabledFlagsSet: [FLAGS.TREE_OPENED], visibleFlagsSet: [FLAGS.LEO_HAS_CHAPTERS] },
+
     // New
     { icon: "leo-new-file", command: CMD.NEW_FILE, tooltip: "New Leo File" },
     // Open
@@ -49,10 +54,6 @@ export const toolbarButtons: ButtonEntry[] = [
 
     // recent files
     { icon: "leo-open-recent", command: CMD.RECENT_FILES, tooltip: "Open Recent Files" },
-
-    // select chapter
-    { icon: "leo-chapter-select", tooltip: "Select Chapter", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.CHAPTER_SELECT },
-
 
     // Execute Script
     { label: "▷", command: CMD.EXECUTE, tooltip: "Run leo script (Ctrl+B)", enabledFlagsSet: [FLAGS.TREE_OPENED] },

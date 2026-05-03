@@ -546,6 +546,21 @@ body {
   opacity: 0.4;
 }
 
+.icon-button.hidden {
+  display: none;
+}
+
+.button-label {
+  font-family: var(--menu-font-family);
+  font-size: 0.875rem;
+  vertical-align: text-top;
+  margin-left: 2px;
+  display: inline-block;
+  max-width: 60px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 .at-button::before {
   position: absolute;
 }

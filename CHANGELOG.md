@@ -2,7 +2,8 @@
 
 ## 1.0.18
 
-- ...
+- Added select-chapter and select-chapter-main buttons visible only if the outline actually contains @chapter nodes.
+- Fixed cff command as per Leo's #4640
 
 ## 1.0.17
 
