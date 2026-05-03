@@ -2,6 +2,7 @@
 //@+node:felix.20260321200150.1: * @file src/log-pane-manager.ts
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
+import { Constants } from "./constants";
 import { LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
 import { workspace } from './workspace';
 
@@ -67,7 +68,11 @@ export class LogPaneManager {
     public FREEZE: HTMLElement;
     public GOTO_PANE: HTMLElement;
 
-    // 
+    public FIND_QUICK_CHANGED: HTMLButtonElement;
+    public FIND_QUICK_MARKED: HTMLButtonElement;
+    public FIND_QUICK_TIMELINE: HTMLButtonElement;
+    public FIND_QUICK_HISTORY: HTMLButtonElement;
+    public FIND_QUICK_SELECTED: HTMLButtonElement;
 
     public HTML_ELEMENT: HTMLElement;
 
@@ -155,7 +160,12 @@ export class LogPaneManager {
         this.FREEZE = document.getElementById('freeze') as HTMLElement; // Simple div
         this.GOTO_PANE = document.getElementById('gotoPane') as HTMLElement; // Simple div
 
-        //
+        // Find Quick buttons
+        this.FIND_QUICK_CHANGED = document.getElementById('find-quick-changed') as HTMLButtonElement;
+        this.FIND_QUICK_MARKED = document.getElementById('find-quick-marked') as HTMLButtonElement;
+        this.FIND_QUICK_TIMELINE = document.getElementById('find-quick-timeline') as HTMLButtonElement;
+        this.FIND_QUICK_HISTORY = document.getElementById('find-quick-history') as HTMLButtonElement;
+        this.FIND_QUICK_SELECTED = document.getElementById('find-quick-selected') as HTMLButtonElement;
 
         this.HTML_ELEMENT = document.documentElement;
 
@@ -276,7 +286,21 @@ export class LogPaneManager {
         });
 
         // setup click handlers for quick-find nav buttons
-        // todo
+        this.FIND_QUICK_CHANGED.addEventListener('click', () => {
+            workspace.controller.doCommand(Constants.COMMANDS.FIND_QUICK_CHANGED);
+        });
+        this.FIND_QUICK_MARKED.addEventListener('click', () => {
+            workspace.controller.doCommand(Constants.COMMANDS.FIND_QUICK_MARKED);
+        });
+        this.FIND_QUICK_TIMELINE.addEventListener('click', () => {
+            workspace.controller.doCommand(Constants.COMMANDS.FIND_QUICK_TIMELINE);
+        });
+        this.FIND_QUICK_HISTORY.addEventListener('click', () => {
+            workspace.controller.doCommand(Constants.COMMANDS.FIND_QUICK_HISTORY);
+        });
+        this.FIND_QUICK_SELECTED.addEventListener('click', () => {
+            workspace.controller.doCommand(Constants.COMMANDS.FIND_QUICK_SELECTED);
+        });
 
         // Setup tab/shift-tab to manage focus between controls and/or the body/outline panes.
         // * Deal with pressing tab in the log content area to place focus on body-pane itself.
