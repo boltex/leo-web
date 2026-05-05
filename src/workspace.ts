@@ -12,6 +12,8 @@ import { LayoutManager } from "./layout-manager";
 import { LogPaneManager } from "./log-pane-manager";
 import { MenuManager } from "./menu-manager";
 import { OutlineManager } from "./outline-manager";
+import { ClipboardManager } from "./clipboard-manager";
+
 //@-<< imports >>
 //@+others
 //@+node:felix.20260323135107.1: ** Constants
@@ -177,6 +179,7 @@ class Workspace {
     public outline!: OutlineManager;
     public body!: BodyManager;
     public logPane!: LogPaneManager;
+    public clipboard!: ClipboardManager;
 
 
     public controller!: Controller;
@@ -210,7 +213,9 @@ class Workspace {
     public setLogPaneView(logPane: LogPaneManager) {
         this.logPane = logPane;
     }
-
+    public setClipboardManager(clipboard: ClipboardManager) {
+        this.clipboard = clipboard;
+    }
     public setController(controller: Controller) {
         this.controller = controller;
     }

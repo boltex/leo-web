@@ -40,6 +40,10 @@
           "vh": "@file src/body-manager.ts"
         },
         {
+          "gnx": "felix.20260504161016.1",
+          "vh": "@file src/clipboard-manager.ts"
+        },
+        {
           "gnx": "felix.20260321195044.1",
           "vh": "@file src/command-bindings.ts"
         },

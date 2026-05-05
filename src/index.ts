@@ -13,6 +13,7 @@ import { LayoutManager } from './layout-manager';
 import { OutlineManager } from './outline-manager';
 import { BodyManager } from './body-manager';
 import { LogPaneManager } from './log-pane-manager';
+import { ClipboardManager } from './clipboard-manager';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
@@ -50,6 +51,9 @@ class LeoWebApp {
 
         const logPane = new LogPaneManager();
         workspace.setLogPaneView(logPane);
+
+        const clipboard = new ClipboardManager();
+        workspace.setClipboardManager(clipboard);
 
         const controller = new Controller();
         workspace.setController(controller);

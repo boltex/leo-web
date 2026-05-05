@@ -262,6 +262,7 @@ export class CommanderOutlineCommands {
         'Nodes do *not* retain their original identify.'
     )
     public asyncPasteOutline(this: Commands): Thenable<unknown> {
+        console.log("---- Asynchronously pasting outline from clipboard ----");
         return g.app.gui.asyncGetTextFromClipboard().then((clipboard) => {
             this.pasteOutline(clipboard);
             return true;
