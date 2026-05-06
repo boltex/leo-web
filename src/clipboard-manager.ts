@@ -44,6 +44,9 @@ export class ClipboardManager {
         void this._detectClipboardCapabilities();
     }
 
+    public getClipboardState(): ClipboardState {
+        return { ...this.state };
+    }
 
     public getInternalClipboard(): string {
         return this.state.internalText;
