@@ -59,6 +59,12 @@ class LeoWebApp {
         workspace.setController(controller);
         await controller.initialize();
 
+        // Now that the controller is initialized, we can initialize the clipboard manager,
+        // which will also ask the user for permissions if needed,
+        // and we want to do that as late as possible to avoid asking for
+        // permissions before the user has chosen the workspace they want to open.
+        clipboard.initialize();
+
         const w_start = process.hrtime();
         (g.workspaceUri as Uri) = new Uri('/');
         // #1472: bind to g immediately.

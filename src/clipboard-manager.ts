@@ -26,11 +26,10 @@ export class ClipboardManager {
             permissionWrite: 'unknown',
             lastSyncFailed: false,
         };
-
-        this._initializeCapabilities();
     }
 
-    private _initializeCapabilities(): void {
+    // To be called by the workspace when initializing, after getting workspace permissions.
+    public initialize(): void {
         this.state.systemAvailable =
             typeof navigator !== 'undefined' &&
             !!navigator.clipboard;
@@ -171,6 +170,29 @@ export class ClipboardManager {
         } catch {
             this.state.permissionWrite = 'unknown';
         }
+
+
+        // Use showInformationMessage if clipboard is unavailable to inform the user about potential limitations.
+        if (!this.state.systemAvailable || !this.state.secureContext) {
+            const message = this._getClipboardUnavailableReason();
+
+            void workspace.dialog.showInformationMessage(
+                'Clipboard API may be unavailable.',
+                { detail: message }
+            );
+        } else {
+            // Firefox or other may not support that.
+            try {
+                console.log('Setting up clipboard change listener.');
+                navigator.clipboard.addEventListener("clipboardchange", (event) => {
+                    console.log('Clipboard content changed, updated internal clipboard.');
+                    workspace.clipboard.readClipboardText();
+                });
+            } catch (e) {
+                console.warn('Clipboard API not available, clipboard change events will not be detected.', e);
+            }
+        }
+
     }
 
     private _getClipboardUnavailableReason(): string {
