@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.20
+
+- ...
+
 ## 1.0.19
 
 - Improved system clipboard permissions handling and messaging.
