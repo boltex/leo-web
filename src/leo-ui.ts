@@ -1811,13 +1811,7 @@ export class LeoUI extends NullGui {
      * @returns a promise of the clipboard string content
      */
     public asyncGetTextFromClipboard(): Thenable<string> {
-        console.log("---- Asynchronously getting clipboard text ----");
         return workspace.clipboard.readClipboardText();
-        // return navigator.clipboard.readText().then((s) => {
-        //     // also set immediate clipboard string for possible future read
-        //     this.clipboardContents = s;
-        //     return this.getTextFromClipboard();
-        // });
     }
     //@+node:felix.20260410230916.1: *4* replaceClipboardWith
     /**
@@ -1826,11 +1820,7 @@ export class LeoUI extends NullGui {
      * @returns a promise that resolves when the string is put on the clipboard
      */
     public replaceClipboardWith(s: string): Thenable<void> {
-        console.log("---- Asynchronously replacing clipboard text ----");
         return workspace.clipboard.writeClipboardText(s);
-
-        // this.clipboardContents = s; // also set immediate clipboard string
-        // return navigator.clipboard.writeText(s).then(() => { return s; });
     }
     //@+node:felix.20260322235907.1: *3* Nav and Goto
     //@+node:felix.20260322235938.1: *4* goAnywhere

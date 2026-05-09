@@ -16,6 +16,7 @@ export class ClipboardManager {
 
     private hasWarnedReadFailure = false;
     private hasWarnedWriteFailure = false;
+    private listenerAdded = false;
 
     constructor() {
         this.state = {
@@ -56,6 +57,8 @@ export class ClipboardManager {
     }
 
     public async writeClipboardText(text: string): Promise<void> {
+
+        // Set internal clipboard immediately to avoid data loss, even if system clipboard write fails.
         this.setInternalClipboard(text);
 
         try {
@@ -67,15 +70,13 @@ export class ClipboardManager {
 
             if (!this.hasWarnedWriteFailure) {
                 this.hasWarnedWriteFailure = true;
-
                 const message = this._getClipboardFailureMessage('write', err);
-                const detail = `${message} ${this._describeClipboardError(err)}`;
-
                 void workspace.dialog.showInformationMessage(
-                    'Clipboard write unavailable.',
-                    { detail }
+                    'System Clipboard Unavailable.',
+                    { modal: true, detail: message }
                 );
             }
+
         }
     }
 
@@ -93,13 +94,10 @@ export class ClipboardManager {
 
             if (!this.hasWarnedReadFailure) {
                 this.hasWarnedReadFailure = true;
-
                 const message = this._getClipboardFailureMessage('read', err);
-                const detail = `${message} ${this._describeClipboardError(err)}`;
-
                 void workspace.dialog.showInformationMessage(
-                    'Clipboard read unavailable.',
-                    { detail }
+                    'System Clipboard Unavailable.',
+                    { modal: true, detail: message }
                 );
             }
 
@@ -108,10 +106,33 @@ export class ClipboardManager {
     }
 
     private _getClipboardFailureMessage(operation: 'read' | 'write', error: unknown): string {
+
+        const reason = this._getClipboardFailureReason(operation, error);
+
+        const internalNote = 'Internal copy/paste still works, but not with other apps.';
+
+        const fixHint = this._getClipboardPermissionHint();
+
+        return `${reason} ${internalNote}\n\n${fixHint}`;
+    }
+
+    private _getClipboardPermissionHint(): string {
+        // Chrome-focused guidance (also valid enough for most Chromium browsers).
+        const chromeSteps =
+            'Click the leftmost icon inside the address bar ("View site information"), set Clipboard permission to "Allowed", then reload this page.';
+
+        if (!this.state.secureContext) {
+            return `Open this app over HTTPS or localhost, then retry. ${chromeSteps}`;
+        }
+
+        return chromeSteps;
+    }
+
+    private _getClipboardFailureReason(operation: 'read' | 'write', error: unknown): string {
         if (error instanceof DOMException) {
             switch (error.name) {
                 case 'NotAllowedError':
-                    return `Browser denied clipboard ${operation} access. This usually requires a user gesture or granted permission.`;
+                    return `Browser denied clipboard ${operation} access.`;
                 case 'SecurityError':
                     return 'Clipboard API requires HTTPS or localhost.';
                 case 'NotFoundError':
@@ -147,52 +168,51 @@ export class ClipboardManager {
     }
 
     private async _detectClipboardCapabilities(): Promise<void> {
-        if (!navigator.permissions?.query) {
+        if (typeof navigator === 'undefined' || !navigator.clipboard) {
+            this.state.systemAvailable = false;
             return;
         }
-
-        try {
-            const readPerm = await navigator.permissions.query({
-                name: 'clipboard-read' as PermissionName
-            });
-
-            this.state.permissionRead = readPerm.state;
-        } catch {
+        if (navigator.permissions?.query) {
+            try {
+                const readPerm = await navigator.permissions.query({
+                    name: 'clipboard-read' as PermissionName
+                });
+                this.state.permissionRead = readPerm.state;
+            } catch {
+                this.state.permissionRead = 'unknown';
+            }
+            try {
+                const writePerm = await navigator.permissions.query({
+                    name: 'clipboard-write' as PermissionName
+                });
+                this.state.permissionWrite = writePerm.state;
+            } catch {
+                this.state.permissionWrite = 'unknown';
+            }
+        } else {
             this.state.permissionRead = 'unknown';
-        }
-
-        try {
-            const writePerm = await navigator.permissions.query({
-                name: 'clipboard-write' as PermissionName
-            });
-
-            this.state.permissionWrite = writePerm.state;
-        } catch {
             this.state.permissionWrite = 'unknown';
         }
 
-
-        // Use showInformationMessage if clipboard is unavailable to inform the user about potential limitations.
+        // Keep this logic running even when Permissions API is missing.
         if (!this.state.systemAvailable || !this.state.secureContext) {
             const message = this._getClipboardUnavailableReason();
-
             void workspace.dialog.showInformationMessage(
                 'Clipboard API may be unavailable.',
                 { detail: message }
             );
         } else {
-            // Firefox or other may not support that.
             try {
-                console.log('Setting up clipboard change listener.');
-                navigator.clipboard.addEventListener("clipboardchange", (event) => {
-                    console.log('Clipboard content changed, updated internal clipboard.');
-                    workspace.clipboard.readClipboardText();
-                });
+                if (!this.listenerAdded) {
+                    navigator.clipboard.addEventListener('clipboardchange', () => {
+                        void this.readClipboardText();
+                    });
+                    this.listenerAdded = true;
+                }
             } catch (e) {
                 console.warn('Clipboard API not available, clipboard change events will not be detected.', e);
             }
         }
-
     }
 
     private _getClipboardUnavailableReason(): string {
