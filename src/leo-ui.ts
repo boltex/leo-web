@@ -219,19 +219,6 @@ export class LeoUI extends NullGui {
 
         window.addEventListener('beforeunload', this.onBeforeUnload);
 
-        // Firefox or other may not support that.
-        try {
-            navigator.clipboard.addEventListener("clipboardchange", (event) => {
-                navigator.clipboard.readText().then((s) => {
-                    this.clipboardContents = s;
-                }).catch((e) => {
-                    console.error('Error reading clipboard contents: ', e);
-                });
-            });
-        } catch (e) {
-            console.warn('Clipboard API not available, clipboard change events will not be detected.', e);
-        }
-
         // * Leo Find Panel
         workspace.logPane.setPostMessageCallback(this._resolveFindPaneMessage.bind(this));
 
@@ -1782,12 +1769,12 @@ export class LeoUI extends NullGui {
      * Put UNL of current node on the clipboard. 
      * @para optional unlType to specify type.
      */
-    public unlToClipboard(unlType?: UnlType): Thenable<string> {
+    public unlToClipboard(unlType?: UnlType): Thenable<void> {
         let unl = "";
         const c = g.app.windowList[this.frameIndex].c;
         const p = c.p;
         if (!p.v) {
-            return Promise.resolve('');
+            return Promise.resolve();
         }
         if (unlType) {
             switch (unlType) {
@@ -1814,7 +1801,7 @@ export class LeoUI extends NullGui {
      * Returns clipboard content
     */
     public getTextFromClipboard(): string {
-        return this.clipboardContents;
+        return workspace.clipboard.getInternalClipboard();
     }
     //@+node:felix.20260410230922.1: *4* asyncGetTextFromClipboard
     /**
@@ -1824,11 +1811,7 @@ export class LeoUI extends NullGui {
      * @returns a promise of the clipboard string content
      */
     public asyncGetTextFromClipboard(): Thenable<string> {
-        return navigator.clipboard.readText().then((s) => {
-            // also set immediate clipboard string for possible future read
-            this.clipboardContents = s;
-            return this.getTextFromClipboard();
-        });
+        return workspace.clipboard.readClipboardText();
     }
     //@+node:felix.20260410230916.1: *4* replaceClipboardWith
     /**
@@ -1836,9 +1819,8 @@ export class LeoUI extends NullGui {
      * @param s actual string content to go onto the clipboard
      * @returns a promise that resolves when the string is put on the clipboard
      */
-    public replaceClipboardWith(s: string): Thenable<string> {
-        this.clipboardContents = s; // also set immediate clipboard string
-        return navigator.clipboard.writeText(s).then(() => { return s; });
+    public replaceClipboardWith(s: string): Thenable<void> {
+        return workspace.clipboard.writeClipboardText(s);
     }
     //@+node:felix.20260322235907.1: *3* Nav and Goto
     //@+node:felix.20260322235938.1: *4* goAnywhere

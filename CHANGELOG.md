@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.19
+
+- Improved system clipboard permissions handling and messaging.
+- Fixed backslashes in replacement strings, as per Leo's #4660
+
 ## 1.0.18
 
 - Added select-chapter and select-chapter-main buttons visible only if the outline actually contains @chapter nodes.

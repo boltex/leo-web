@@ -13,6 +13,7 @@ import { LayoutManager } from './layout-manager';
 import { OutlineManager } from './outline-manager';
 import { BodyManager } from './body-manager';
 import { LogPaneManager } from './log-pane-manager';
+import { ClipboardManager } from './clipboard-manager';
 process.hrtime = require('browser-process-hrtime'); // Overwrite 'hrtime' of process
 
 class LeoWebApp {
@@ -51,9 +52,18 @@ class LeoWebApp {
         const logPane = new LogPaneManager();
         workspace.setLogPaneView(logPane);
 
+        const clipboard = new ClipboardManager();
+        workspace.setClipboardManager(clipboard);
+
         const controller = new Controller();
         workspace.setController(controller);
         await controller.initialize();
+
+        // Now that the controller is initialized, we can initialize the clipboard manager,
+        // which will also ask the user for permissions if needed,
+        // and we want to do that as late as possible to avoid asking for
+        // permissions before the user has chosen the workspace they want to open.
+        clipboard.initialize();
 
         const w_start = process.hrtime();
         (g.workspaceUri as Uri) = new Uri('/');
