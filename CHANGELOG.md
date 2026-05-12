@@ -2,7 +2,7 @@
 
 ## 1.0.21
 
-- ...
+- Allow .leojs JSON format for "myLeoSettings".
 
 ## 1.0.20
 
