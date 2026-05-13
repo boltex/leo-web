@@ -215,10 +215,12 @@ export class CommanderHelpCommands {
 
             let ok;
 
+            const workspaceName = g.workspace.workspaceDirHandle ? g.workspace.workspaceDirHandle.name : "/";
+
             ok = await g.app.gui.runAskYesNoDialog(
                 c,
                 'Create myLeoSettings.leojs?',
-                `Create myLeoSettings.leojs in ${homeLeoDir}?`
+                `Create myLeoSettings.leojs in ${workspaceName}?`
             );
 
             if (ok === 'no') {
