@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.0.21
+
+- Allow .leojs JSON format for "myLeoSettings".
+- Fixed 'home' key in body pane to go to the start of non-space characters, or start of line if non before cursor.
+- Fixed find-def triggers: ctrl+click on spaces will no longer call find-def.
+- Brought back a 'demo;;' abbreviation in leoSettings.leo. (a simple script for now, but may get more complex)
+
 ## 1.0.20
 
 - Fixed Java importer as per Leo's #4471

@@ -699,7 +699,10 @@ export class LeoFind {
     @cmd('find-var', 'Find the class, def or assignment to var of the word under the cursor.')
     public find_def(): [number, Position, string][] {
         const word = this._compute_find_def_word();
-        return this.do_find_def(word);
+        if (!word) {
+            return [];
+        }
+        return this.do_find_def(word || '');
     }
 
     // Compatibility. 

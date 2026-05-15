@@ -626,6 +626,12 @@ export const keybindings: Keybinding[] = [
         enabledFlagsClear: [FLAGS.IN_HEADLINE_EDIT]
     },
     {
+        command: CMD.BACK_TO_HOME,
+        key: "home",
+        body: true,
+        enabledFlagsSet: [FLAGS.TREE_OPENED]
+    },
+    {
         command: CMD.GOTO_LAST_VISIBLE,
         key: "end",
         outline: true,
