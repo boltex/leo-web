@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.22
+
+- ...
+
 ## 1.0.21
 
 - Allow .leojs JSON format for "myLeoSettings".
