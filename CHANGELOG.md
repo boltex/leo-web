@@ -3,6 +3,7 @@
 ## 1.0.21
 
 - Allow .leojs JSON format for "myLeoSettings".
+- Fixed 'home' key in body pane to go to the start of non-space characters, or start of line if non before cursor.
 
 ## 1.0.20
 
