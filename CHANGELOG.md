@@ -4,6 +4,7 @@
 
 - Added 'Copy UNL to clipboard' to the body and outline context-menus.
 - Added tooltips to the body pane's UNL and URL links.
+- Fixed handleUrlHelper to give focus to the opened browser tab in all circumstances.
 
 ## 1.0.21
 
