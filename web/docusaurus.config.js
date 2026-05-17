@@ -40,7 +40,7 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         gtag: {
-          trackingID: 'G-6YLK1QW8SS',
+          trackingID: 'G-KH6D1R9Q7Z', // TODO : USE ENV VARS FOR THIS !
         },
         docs: {
           sidebarPath: './sidebars.js',
@@ -177,38 +177,43 @@ const config = {
         theme: prismThemes.github,
         darkTheme: prismThemes.oneDark,
       },
-      algolia: {
-        // The application ID provided by Algolia
-        appId: '3O12YAXPHG',
 
-        // Public API key: it is safe to commit it
-        apiKey: 'f3496193458172c3b4a11a6aa5c701bc',
+      // RESTORE ALGOLIA WHEN WE GET A NEW API KEY FOR LEO-WEB ONCE THIS SITE IS LIVE
+      // (ALSO USE ENV VARS FOR THE API KEY AND APP ID !)
+      // See https://dashboard.algolia.com/account/application/new/configure?plan=v8.5-docsearch 
 
-        indexName: 'boltexio',
+      // algolia: {
+      //   // The application ID provided by Algolia
+      //   appId: '',
 
-        // Optional: see doc section below
-        contextualSearch: false,
+      //   // Public API key: it is safe to commit it
+      //   apiKey: '',
 
-        // Optional: Specify domains where the navigation should occur through window.location instead on history.push.
-        // Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-        // externalUrlRegex: 'external\\.com|domain\\.com',
+      //   indexName: '',
 
-        // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl.
-        // You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
-        // replaceSearchResultPathname: {
-        //   from: '/docs/', // or as RegExp: /\/docs\//
-        //   to: '/',
-        // },
+      //   // Optional: see doc section below
+      //   contextualSearch: false,
 
-        // Optional: Algolia search parameters
-        searchParameters: {},
+      //   // Optional: Specify domains where the navigation should occur through window.location instead on history.push.
+      //   // Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+      //   // externalUrlRegex: 'external\\.com|domain\\.com',
 
-        // Optional: path for search page that enabled by default (`false` to disable it)
-        searchPagePath: 'search',
+      //   // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl.
+      //   // You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+      //   // replaceSearchResultPathname: {
+      //   //   from: '/docs/', // or as RegExp: /\/docs\//
+      //   //   to: '/',
+      //   // },
 
-        // Optional: whether the insights feature is enabled or not on Docsearch (`false` by default)
-        insights: false,
-      }
+      //   // Optional: Algolia search parameters
+      //   searchParameters: {},
+
+      //   // Optional: path for search page that enabled by default (`false` to disable it)
+      //   searchPagePath: 'search',
+
+      //   // Optional: whether the insights feature is enabled or not on Docsearch (`false` by default)
+      //   insights: false,
+      // }
 
     }),
   customFields: {
