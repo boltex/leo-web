@@ -94,6 +94,21 @@ Prism.hooks.add('before-tokenize', (env) => {
     };
 });
 
+Prism.hooks.add('wrap', (env) => {
+    if (
+        env.type === 'leo-unl-gnx' ||
+        env.type === 'leo-unl-headline' ||
+        env.type === 'leo-unl-gnxonly'
+    ) {
+        env.attributes.title = 'Follow UNL (ctrl + click)';
+    }
+    if (
+        env.type === 'leo-url'
+    ) {
+        env.attributes.title = 'Follow link (ctrl + click)';
+    }
+});
+
 //@+node:felix.20260322204358.1: ** Constants
 const LANGUAGE_ALIASES: Record<string, string> = {
     shell: "bash",

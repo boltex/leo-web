@@ -28,6 +28,8 @@ export const bodyPaneContextMenuData: ContextMenuEntry[] = [
     { label: "Copy", command: CMD.COPY_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+C" },
     { label: "Paste", command: CMD.PASTE_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+V" },
     { label: "Select All", command: CMD.SELECT_ALL_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+A" },
+    { label: "", kind: QuickPickItemKind.Separator },
+    { label: "Copy UNL to clipboard", command: CMD.UNL_TO_CLIPBOARD, enabledFlagsSet: [FLAGS.TREE_OPENED] },
 ];
 //@+node:felix.20260323132915.1: ** Outline Context Menu
 export const outlinePaneContextMenuData: ContextMenuEntry[] = [
@@ -36,8 +38,10 @@ export const outlinePaneContextMenuData: ContextMenuEntry[] = [
     { label: "", kind: QuickPickItemKind.Separator },
     { label: "Hoist", command: CMD.HOIST_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_HOIST] },
     { label: "De-Hoist", command: CMD.DEHOIST, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_DEHOIST] },
-    { label: "Mark", command: CMD.MARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], enabledFlagsClear: [FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
-    { label: "Unmark", command: CMD.UNMARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
+    // Use toggle mark command label instead and just use 'mark' which toggles anyways to save a space in the menu
+    { label: "Mark/Unmark", command: CMD.MARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+M" },
+    // { label: "Mark", command: CMD.MARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], enabledFlagsClear: [FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
+    // { label: "Unmark", command: CMD.UNMARK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_MARKED], keyboardShortcut: "Ctrl+M" },
     { label: "Tag-Node", command: CMD.TAG_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
     { label: "", kind: QuickPickItemKind.Separator },
     { label: "Cut-Node", command: CMD.CUT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+X" },
@@ -47,6 +51,7 @@ export const outlinePaneContextMenuData: ContextMenuEntry[] = [
     { label: "Insert-Node", command: CMD.INSERT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+I" },
     { label: "Clone-Node", command: CMD.CLONE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+`" },
     { label: "", kind: QuickPickItemKind.Separator },
+    { label: "Copy UNL to clipboard", command: CMD.UNL_TO_CLIPBOARD, enabledFlagsSet: [FLAGS.TREE_OPENED] },
     // Todo: open URL if @url or UNL node.
     { label: "Refresh From Disk", command: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_ATFILE] },
 ];

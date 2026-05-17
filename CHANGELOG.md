@@ -2,7 +2,8 @@
 
 ## 1.0.22
 
-- ...
+- Added 'Copy UNL to clipboard' to the body and outline context-menus.
+- Added tooltips to the body pane's UNL and URL links.
 
 ## 1.0.21
 

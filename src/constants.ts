@@ -295,6 +295,7 @@ export class Constants {
         GOTO_LINE_IN_LEO_OUTLINE: Constants.NAME + ".gotoLineInLeoOutline",
         IMPORT_INTO_LEO_OUTLINE: Constants.NAME + ".importIntoLeoOutline",
         HANDLE_UNL: Constants.NAME + ".handleUnl",
+        UNL_TO_CLIPBOARD: Constants.NAME + ".unlToClipboard",
         SHORT_GNX_UNL_TO_CLIPBOARD: Constants.NAME + ".shortGnxUnlToClipboard",
         FULL_GNX_UNL_TO_CLIPBOARD: Constants.NAME + ".fullGnxUnlToClipboard",
         SHORT_LEGACY_UNL_TO_CLIPBOARD: Constants.NAME + "shortLegacyUnlToClipboard",
