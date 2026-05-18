@@ -34,19 +34,19 @@ const config = {
     locales: ['en'],
   },
 
-  // plugins: [
-  //   [
-  //     '@docusaurus/plugin-client-redirects',
-  //     {
-  //       redirects: [
-  //         {
-  //           to: '/docs/getting-started/introduction',
-  //           from: ['/docs'],
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // ],
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            to: '/docs/getting-started/introduction',
+            from: ['/docs'],
+          },
+        ],
+      },
+    ],
+  ],
 
   presets: [
     [
