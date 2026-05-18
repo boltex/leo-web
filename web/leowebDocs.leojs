@@ -8,20 +8,6 @@
       "vh": "Web pages",
       "children": [
         {
-          "gnx": "felix.20240816231251.1",
-          "vh": "Homepage",
-          "children": [
-            {
-              "gnx": "felix.20240816231257.1",
-              "vh": "@file  src/pages/index.js"
-            },
-            {
-              "gnx": "felix.20240816231349.1",
-              "vh": "@file  src/pages/index.module.css"
-            }
-          ]
-        },
-        {
           "gnx": "felix.20240816231217.1",
           "vh": "Homepage Features",
           "children": [

@@ -604,9 +604,6 @@ A **session** specifies a list of .leo files that Leo opens automatically when L
 - `help-for-find-commands`
 - `help-for-creating-external-files`
 
-`open-online-home`\
-    Opens the LeoJS home page at [https://boltex.github.io/leojs/](/leojs/).
-
 `open-online-tutorials`\
     Opens the LeoJS tutorials page at [https://boltex.github.io/leojs/docs/getting-started/tutorial-basics](../getting-started/tutorial-basics.md).
 
