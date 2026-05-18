@@ -34,6 +34,20 @@ const config = {
     locales: ['en'],
   },
 
+  // plugins: [
+  //   [
+  //     '@docusaurus/plugin-client-redirects',
+  //     {
+  //       redirects: [
+  //         {
+  //           to: '/docs/getting-started/introduction',
+  //           from: ['/docs'],
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // ],
+
   presets: [
     [
       'classic',
@@ -71,6 +85,7 @@ const config = {
         logo: {
           alt: 'Leo-Web Logo',
           src: 'img/leoapp256px.png',
+          href: '/docs/getting-started/introduction',
         },
         items: [
           // {
