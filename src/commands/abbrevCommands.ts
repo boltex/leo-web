@@ -52,6 +52,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Ctor for AbbrevCommandsClass class.
      */
     constructor(c: Commands) {
+        super(c); // Call the parent class constructor
 
         this.c = c;
         // Set local ivars.
@@ -73,7 +74,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Return True if the abbreviation was expanded.
      */
     public expandAbbrev(event: any, stroke: KeyboardEvent): false | Promise<boolean> {
-        
+
         // Define ins, prefixes, self.in_head and self.w
         // Return if there is nothing to do.
         //@+<< expandAbbrev: prolog >>
@@ -139,20 +140,24 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             const word = prefix + ch;
             const i = ins - prefix.length;
 
-            const tree_expansion = this.tree_abbrevs_d.get(word);
+            const tree_expansion = this.tree_abbrevs_d[word];
             if (tree_expansion) {
                 this.expand_tree(i, ins, word, tree_expansion);
-                this.make_all_scripting_substitutions(word);
-                this.init_place_holder_search(false);
-                return true;
+                return this.make_all_scripting_substitutions(word).then(() => {
+                    return this.init_place_holder_search(false);
+                }).then(() => {
+                    return true;
+                });
             }
 
-            const expansion = this.abbrevs.get(word);
+            const expansion = this.abbrevs[word];
             if (expansion) {
                 this.replace_selection(i, ins, expansion);
-                this.make_script_substitutions(word);
-                this.init_place_holder_search(true);
-                return true;
+                return this.make_script_substitutions(word).then(() => {
+                    return this.init_place_holder_search(true);
+                }).then(() => {
+                    return true;
+                });
             }
         }
 
@@ -181,8 +186,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     /**
      * Get the ch from the stroke.
      */
-    public get_ch(event: any, stroke: KeyboardEvent, w: StringTextWrapper): string {
-        let ch: string | null = g.checkUnicode(event ? event.char : '');
+    public get_ch(event: any, stroke: KeyboardEvent): string {
+        let ch: string = g.checkUnicode(event ? event.char : '');
         if (stroke.key === 'Backspace' || stroke.key === 'Delete') {
             return '';
         }
@@ -281,6 +286,13 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
     //@+node:felix.20260518221202.9: *4* abbrev: expansion
     //@+node:felix.20260518221202.10: *5* abbrev.expand_tree
+    // New Typescript Implementation
+    public async expand_tree(i: number, j: number, word: string, expansion: string): Promise<void> {
+        // TODO
+    }
+
+    // Original Python
+    /*
     def expand_tree(self, i: int, j: int, word: str, expansion: str) -> None:
         """
         Paste `expansion` as children of c.p.
@@ -343,7 +355,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         u.afterChangeGroup(c.p, undoType=undoType)
         c.redraw(c.p)
 
+    */
     //@+node:felix.20260518221202.11: *5* abbrev.init_place_holder_search
+    // Original Python
+    /* 
     def init_place_holder_search(self, *, node_only: bool) -> None:
         c = self.c
         p = c.p
@@ -389,7 +404,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         self.w.setInsertPoint(0)  # Start search at start.
         finder.interactive_search_helper(settings=settings)
 
+    */
     //@+node:felix.20260518221202.12: *5* abbrev.replace_selection
+    // Original Python
+    /* 
     def replace_selection(self, i: int, j: int, s: str) -> None:
         """Undoably replace w[i:j] by s."""
         c = self.c
@@ -411,8 +429,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         # Complete the undo.
         u.afterChangeNodeContents(p, command='Abbreviation', bunch=bunch)
 
+    */
     //@+node:felix.20260518221202.13: *4* abbrev: script substitution
     //@+node:felix.20260518221202.14: *5* abbrev.make_all_scripting_substitutions
+    // Original Python
+    /* 
     def make_all_scripting_substitutions(self, word: str) -> None:
         """Make scripting substitutions throughout c.p's tree."""
         c = self.c
@@ -441,7 +462,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             p.b = self._substitution_helper(p.b)
             p.h = self._substitution_helper(p.h)
 
+    */
     //@+node:felix.20260518221202.15: *5* abbrev.make_script_substitutions
+    // Original Python
+    /* 
     def make_script_substitutions(self, word: str) -> None:
         """
         Replace word by scripting expansion in p.h or p.b.
@@ -477,7 +501,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 p.setSelection(new_ins, len(new_contents))
                 w.setInsertPoint(new_ins)
 
+    */
     //@+node:felix.20260518221202.16: *5* abbrev._substitution_helper
+    // Original Python
+    /* 
     def _substitution_helper(self, content: str) -> str:
         """
         Replace 'word' by the 'definition' in the 'content' string.
@@ -509,27 +536,35 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             content = f"{prefix}{x}{rest}"
         return content
 
+    */
     //@+node:felix.20260518221202.17: *3* abbrev.finishCreate
-    def finishCreate(self) -> None:
-        """AbbrevCommandsClass.finishCreate."""
-        self.reload_settings()
-
+    /**
+     * AbbrevCommandsClass.finishCreate.
+     */
+    public finishCreate(): void {
+        this.reload_settings();
+    }
     //@+node:felix.20260518221202.18: *3* abbrev.reload_settings & helpers
-    def reload_settings(self) -> None:
-        """Reload all abbreviation settings."""
-        self.abbrevs = {}
-        self.init_settings()
-        self.init_abbrev()
-        self.init_tree_abbrev()
-        self.init_env()
+    /**
+     * Reload all abbreviation settings.
+     */
+    public reload_settings(): void {
+        this.abbrevs = {};
+        this.init_settings();
+        this.init_abbrev();
+        this.init_tree_abbrev();
+        this.init_env();
+    }
 
-    reloadSettings = reload_settings
-
+    public reloadSettings(): void {
+        this.reload_settings();
+    }
     //@+node:felix.20260518221202.19: *4* abbrev.init_abbrev & helper
+    // Original Python
+    /*
     def init_abbrev(self) -> None:
         """
-        Init the user abbreviations from @data global-abbreviations
-        and @data abbreviations nodes.
+        Init the user abbreviations from @data global-abbreviations and @data abbreviations nodes.
         """
         c = self.c
         table = (
@@ -557,7 +592,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             for s in sorted(result):
                 self.addAbbrevHelper(s)
 
+    */
     //@+node:felix.20260518221202.20: *5* abbrev.addAbbrevHelper
+    // Original Python
+    /*
     def addAbbrevHelper(self, s: str, tag: str = '') -> None:
         """Enter the abbreviation 's' into the self.abbrevs dict."""
         if not s.strip():
@@ -577,8 +615,12 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             d[name] = val
         except ValueError:
             g.es_print(f"bad abbreviation: {s}")
+    */
+
 
     //@+node:felix.20260518221202.21: *4* abbrev.init_env
+    // Original Python
+    /*
     def init_env(self) -> None:
         """
         Init c.abbrev_subst_env by executing the contents of the
@@ -621,8 +663,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         except Exception:
             g.es('Error executing @data abbreviations-subst-env')
             g.es_exception()
+    */
 
     //@+node:felix.20260518221202.22: *4* abbrev.init_settings
+    // Original Python
+    /*
     def init_settings(self) -> None:
         """Called from AbbrevCommands.reload_settings aka reloadSettings."""
         c = self.c
@@ -655,8 +700,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         c.abbrev_subst_env = {'c': c, 'g': g, '_values': {}}  # May be augmented in init_env.
         c.abbrev_subst_start = getString('abbreviations-subst-start') or '{|{'
         c.abbrev_subst_end = getString('abbreviations-subst-end') or '}|}'
+    */
 
     //@+node:felix.20260518221202.23: *4* abbrev.init_tree_abbrev
+    // Original Python
+    /*
     def init_tree_abbrev(self) -> None:
         """Init tree_abbrevs_d from @data tree-abbreviations nodes."""
         c = self.c
@@ -690,8 +738,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             finally:
                 g.app.disable_redraw = old_disable
         self.tree_abbrevs_d = d
+    /*
 
     //@+node:felix.20260518221202.24: *5* abbrev.init_tree_abbrev_helper
+    // Original Python
+    /*
     def init_tree_abbrev_helper(self, d: dict[str, str], tree_s: str) -> None:
         """Init d from tree_s, the text of a copied outline."""
         c = self.c
@@ -711,9 +762,12 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                             break
                     else:
                         g.trace(f"no definition for {abbrev_name}")
+    */
 
     //@+node:felix.20260518221202.25: *3* abbrev: Commands & helpers
     //@+node:felix.20260518221202.26: *4* abbrev._getDynamicList (helper)
+    // Original Python
+    /*
     def _getDynamicList(self, w: QTextMixin, s: str) -> list[str]:
         """Return a list of dynamic abbreviations."""
         if self.globalDynamicAbbrevs:
@@ -726,8 +780,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             items = self.dyna_regex.findall(w.getAllText())
         items = sorted(set([z for z in items if z.startswith(s)]))
         return items
+    /*
 
     //@+node:felix.20260518221202.27: *4* abbrev.dynamicCompletion C-M-/
+    // Original Python
+    /*
     @cmd('dabbrev-completion')
     def dynamicCompletion(self, event: LeoKeyEvent = None) -> None:
         """
@@ -761,8 +818,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             w.setYScrollPosition(ypos)
             c.undoer.afterChangeNodeContents(p, command='dabbrev-completion', bunch=b)
             c.recolor()
+    */
 
     //@+node:felix.20260518221202.28: *4* abbrev.dynamicExpansion M-/ & helper
+    // Original Python
+    /*
     @cmd('dabbrev-expands')
     def dynamicExpansion(self, event: LeoKeyEvent = None) -> None:
         """
@@ -790,8 +850,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         prefix = functools.reduce(g.longestCommonPrefix, aList)
         prefix = prefix.strip()
         self.dynamicExpandHelper(event, prefix, aList, w)
+    */
 
     //@+node:felix.20260518221202.29: *5* abbrev.dynamicExpandHelper
+    // Original Python
+    /*
     def dynamicExpandHelper(
         self,
         event: LeoKeyEvent,
@@ -835,37 +898,41 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             w.setYScrollPosition(ypos)
             c.undoer.afterChangeNodeContents(p, command='dabbrev-expand', bunch=b)
             c.recolor()
+    */
 
     //@+node:felix.20260518221202.30: *4* abbrev.killAllAbbrevs
-    @cmd('abbrev-kill-all')
-    def killAllAbbrevs(self, event: LeoKeyEvent) -> None:
-        """Delete all abbreviations."""
-        self.abbrevs = {}
+    @cmd('abbrev-kill-all', 'Delete all abbreviations.')
+    public killAllAbbrevs(): void {
+        this.abbrevs = {};
+    }
 
     //@+node:felix.20260518221202.31: *4* abbrev.listAbbrevs
-    @cmd('abbrev-list')
-    def listAbbrevs(self, event: LeoKeyEvent = None) -> None:
-        """List all abbreviations."""
-        d = self.abbrevs
-        if not d:
-            return
-        print('')
-        g.es_print(f"Abbreviations for {self.c.shortFileName()}...")
-        for name, s in sorted(d.items()):
-            s = s.replace('\n', '\\n')
-            tail = s.removesuffix('\\n')
-            print(f"{name:>15} {g.truncate(tail, 90)}")
-
+    @cmd('abbrev-list', 'List all abbreviations.')
+    public listAbbrevs(): void {
+        const d = this.abbrevs;
+        if (Object.keys(d).length > 0) {
+            g.es_print('Abbreviations...');
+            const keys = Object.keys(d).sort();
+            for (const name of keys) {
+                const [val, tag] = d[name];
+                const val_display = val.replace('\n', '\\n');
+                const tag_display = tag ? `${tag}: ` : '';
+                g.es_print('', `${tag_display}${name}=${val_display} `);
+            }
+        } else {
+            g.es_print('No present abbreviations');
+        }
+    }
     //@+node:felix.20260518221202.32: *4* abbrev.toggleAbbrevMode
-    @cmd('toggle-abbrev-mode')
-    def toggleAbbrevMode(self, event: LeoKeyEvent = None) -> None:
-        """Toggle abbreviation mode."""
-        k = self.c.k
-        k.abbrevOn = not k.abbrevOn
-        k.keyboardQuit()
-        if not g.unitTesting and not g.app.batchMode:
-            g.es('Abbreviations are ' + ('on' if k.abbrevOn else 'off'))
-
+    @cmd('toggle-abbrev-mode', 'Toggle abbreviation mode.')
+    public toggleAbbrevMode(): void {
+        const k = this.c.k;
+        k.abbrevOn = !k.abbrevOn;
+        k.keyboardQuit?.();
+        if (!g.unitTesting && !g.app.batchMode) {
+            g.es('Abbreviations are ' + (k.abbrevOn ? 'on' : 'off'));
+        }
+    }
     //@-others
 
 }
