@@ -115,24 +115,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         this.in_head = w_name.startsWith('head');
         this.w = w;
 
-        // ORIGINAL PYTHON
-        // ch = self.get_ch(event, stroke)
-        // w = event.w if event else None
-        // if self.expanding or not g.isTextWrapper(w) or w.hasSelection() or not ch.strip():
-        //     return False
-        // w_name = g.app.gui.widget_name(w)
-        // if not w_name.startswith(('body', 'head')):
-        //     return False
-        // s = w.getAllText()
-        // if not s:
-        //     return False
-        // ins = w.getInsertPoint()
-        // prefixes = self.get_prefixes(ins, s)
-        // if not prefixes:
-        //     return False
-        // # Set local ivars.
-        // self.in_head = w_name.startswith('head')
-        // self.w = w
         //@-<< expandAbbrev: prolog >>
 
         // Try to match an abbreviation.
@@ -162,22 +144,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
 
         return false;
-
-        // PYTHON ORIGINAL
-        // for prefix in prefixes:
-        //     word = prefix + ch
-        //     i = ins - len(prefix)
-        //     if expansion := self.tree_abbrevs_d.get(word):
-        //         self.expand_tree(i, ins, word, expansion)
-        //         self.make_all_scripting_substitutions(word)
-        //         self.init_place_holder_search(node_only=False)
-        //         return True
-        //     if expansion := self.abbrevs.get(word):
-        //         self.replace_selection(i, ins, expansion)
-        //         self.make_script_substitutions(word)
-        //         self.init_place_holder_search(node_only=True)
-        //         return True
-        // return False
 
     }
 
@@ -232,131 +198,91 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
         return prefixes;
 
-        // OLD CODE
-        // // New code allows *any* sequence longer than 1 to be an abbreviation.
-        // // Any whitespace stops the search.
-        // // const s = w.getAllText();
-        // // const j = w.getInsertPoint();
-
-        // // LEO-WEB: get all text and insertion point directly from the dom.
-        // const inHeadline = !!g.workspace.outline.headlineFinish;
-        // let s;
-        // let j;
-        // if (inHeadline) {
-        //     s = g.workspace.outline.HEADLINE_INPUT.value;
-        //     j = g.workspace.outline.HEADLINE_INPUT.selectionStart || 0;
-        // } else {
-        //     s = g.workspace.body.getBody();
-        //     j = g.workspace.body.getBodyInsertOffset();
-        // }
-
-        // let i = j - 1;
-        // const prefixes: string[] = [];
-        // // Check for space, tab, or newline before the insertion point.  If found, do not include it in the prefix.
-        // while (i >= 0 && !' \t\n'.includes(s[i])) {
-        //     prefixes.push(s.slice(i, j));
-        //     i -= 1;
-        // }
-        // prefixes.reverse();
-        // if (!prefixes.includes('')) {
-        //     prefixes.push('');
-        // }
-        // return [s, i, j, prefixes];
-
     }
-
-
-    // NEW PYTHON CODE
-    // def get_prefixes(self, ins: int, s: str) -> list[str]:
-    //     """
-    //     Return the prefixes at given insert point.
-
-    //     Any sequence longer than 1 may abbreviation.
-
-    //     Any whitespace stops the search.
-    //     """
-    //     i, prefixes = ins - 1, []
-    //     while len(s) > i >= 0 and s[i] not in ' \t\n':
-    //         prefixes.append(s[i:ins])
-    //         i -= 1
-    //     prefixes = list(reversed(prefixes))
-    //     if '' not in prefixes:
-    //         prefixes.append('')
-    //     return prefixes
 
     //@+node:felix.20260518221202.9: *4* abbrev: expansion
     //@+node:felix.20260518221202.10: *5* abbrev.expand_tree
-    // New Typescript Implementation
+    /**
+     * Paste `expansion` as children of c.p.
+     * This happens *before* any substitutions are made.
+     */
     public async expand_tree(i: number, j: number, word: string, expansion: string): Promise<void> {
-        // TODO
+
+        const c = this.c;
+        const u = c.undoer;
+        const undoType = 'Expand Tree Abbreviation';
+
+        if (c.p.hasChildren()) {
+            g.es_print('tree abbreviations must not have children', { color: 'blue' });
+            return;
+        }
+        if (!c.canPasteOutline(expansion)) {
+            g.es_print(`bad copied outline: ${expansion}`);
+            return;
+        }
+
+        // Begin the undo.
+        u.beforeChangeGroup(c.p, undoType, true);
+        this.replace_selection(i, j, '');
+
+        // Set status flags.
+        const isRoot = c.p.isRoot();
+        const wasHoisted = c.hoistStack.length > 0;
+        const parent = c.p.getParent();
+        const noSiblings = parent && parent.numberOfChildren() === 1;
+        const isFirstChild = parent && parent.firstChild() === c.p;
+        const prevSibling = c.p.moveToBack();
+        const prevSiblingExpanded = prevSibling && prevSibling.isExpanded();
+
+        // Carefully replace the old node with the new node.
+        if (c.canDeleteHeadline()) {
+            if (prevSiblingExpanded) {
+                prevSibling.contract();  // To prevent pasting as last child of prevSibling.
+            }
+            c.deleteOutline("Cut Node");
+            c.pasteOutline(expansion);
+            if (noSiblings) {
+                c.moveOutlineRight();  // Inserted below instead of as child, so move right.
+            }
+            if (isRoot) {
+                c.moveOutlineUp();  // Delete & paste made it second position, so move up.
+            }
+        } else {
+            c.pasteOutline(expansion);
+            c.selectPosition(c.p.moveToBack());
+            c.deleteOutline("Cut Node");
+            if (wasHoisted) {
+                c.selectVisNext();
+            }
+        }
+
+        // Replace the container node with its first child.
+        const child = c.p.copy().moveToFirstChild();
+        if (child) {
+            c.selectPosition(child);
+            c.moveOutlineLeft();
+            c.goToPrevSibling();
+            c.deleteOutline("Cut Node");
+            if (isFirstChild || !isRoot) {
+                c.selectVisNext();
+            }
+        }
+
+        // Restore the previous expansion.
+        if (prevSiblingExpanded) {
+            prevSibling.expand();
+        }
+
+        // End the undo.
+        u.afterChangeGroup(c.p, undoType);
+        c.redraw(c.p);
+
     }
 
-    // Original Python
-    /*
-    def expand_tree(self, i: int, j: int, word: str, expansion: str) -> None:
-        """
-        Paste `expansion` as children of c.p.
-        This happens *before* any substitutions are made.
-        """
-        c = self.c
-        u, undoType = c.undoer, 'Expand Tree Abbreviation'
-        if c.p.hasChildren():
-            g.es_print('tree abbreviations must not have children', color='blue')
-            return
-        if not c.canPasteOutline(expansion):
-            g.es_print(f"bad copied outline: {expansion}")
-            return
-
-        # Begin the undo.
-        u.beforeChangeGroup(c.p, command=undoType, verboseUndoGroup=True)
-        self.replace_selection(i, j, '')
-
-        # Set status flags.
-        isRoot = c.p.isRoot()
-        wasHoisted = len(c.hoistStack) > 0
-        parent = c.p.getParent()
-        noSiblings = parent and parent.numberOfChildren() == 1
-        isFirstChild = parent and parent.firstChild() == c.p
-        prevSibling = c.p.moveToBack()
-        prevSiblingExpanded = prevSibling and prevSibling.isExpanded()
-
-        # Carefully replace the old node with the new node.
-        if c.canDeleteHeadline():
-            if prevSiblingExpanded:
-                prevSibling.contract()  # To prevent pasting as last child of prevSibling.
-            c.deleteOutline(op_name="Cut Node")
-            c.pasteOutline(s=expansion)
-            if noSiblings:
-                c.moveOutlineRight()  # Inserted below instead of as child, so move right.
-            if isRoot:
-                c.moveOutlineUp()  # Delete & paste made it second position, so move up.
-        else:
-            c.pasteOutline(s=expansion)
-            c.selectPosition(c.p.moveToBack())
-            c.deleteOutline(op_name="Cut Node")
-            if wasHoisted:
-                c.selectVisNext()
-
-        # Replace the container node with its first child.
-        child = c.p.copy().moveToFirstChild()
-        if child:
-            c.selectPosition(child)
-            c.moveOutlineLeft()
-            c.goToPrevSibling()
-            c.deleteOutline(op_name="Cut Node")
-            if isFirstChild or (not isRoot):
-                c.selectVisNext()
-
-        # Restore the previous expansion.
-        if prevSiblingExpanded:
-            prevSibling.expand()
-
-        # End the undo.
-        u.afterChangeGroup(c.p, undoType=undoType)
-        c.redraw(c.p)
-
-    */
     //@+node:felix.20260518221202.11: *5* abbrev.init_place_holder_search
+
+
+
     // Original Python
     /* 
     def init_place_holder_search(self, *, node_only: bool) -> None:
@@ -398,9 +324,25 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         else:
             return
 
+        if node_only:
+            # Tell the search command to restore settings on failure.
+            finder.previous_settings = g.Bunch(
+                find_text       = finder.find_text,
+                change_text     = finder.change_text,
+                file_only       = finder.file_only,
+                mark_changes    = finder.mark_changes,
+                mark_finds      = finder.mark_finds,
+                ignore_case     = finder.ignore_case,
+                node_only       = finder.node_only,
+                pattern_match   = finder.pattern_match,
+                search_body     = finder.search_body,
+                search_headline = finder.search_headline,
+                suboutline_only = finder.suboutline_only,
+                whole_word      = finder.whole_word,
+            )  # fmt: skip
+
         # Search!
         c.endEditing()  # No need to re-edit the headline!
-        # g.es_print(f"Searching for {start_pat}...{end_pat}", color='blue')
         self.w.setInsertPoint(0)  # Start search at start.
         finder.interactive_search_helper(settings=settings)
 
