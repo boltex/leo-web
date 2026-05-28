@@ -3,20 +3,9 @@
 //@+<< imports & annotations >>
 //@+node:felix.20260323005130.1: ** << imports & annotations >>
 import { Constants } from "./constants";
-import { LeoGotoNode, LeoSearchSettings, LeoUndoNode } from "./types";
+import { LeoGotoNode, LeoSearchSettings, LeoUndoNode, SearchSettingNames } from "./types";
 import { workspace } from './workspace';
 
-type searchSettingNames = 'entireOutline' |
-    'nodeOnly' |
-    'fileOnly' |
-    'subOutlineOnly' |
-    'ignoreCase' |
-    'markChanges' |
-    'markFinds' |
-    'regExp' |
-    'searchBody' |
-    'searchHeadline' |
-    'wholeWord';
 //@-<< imports & annotations >>
 //@+others
 //@+node:felix.20260323005219.1: ** LogPaneManager
@@ -382,12 +371,12 @@ export class LogPaneManager {
         this._postMessageCallback = callback;
     }
     //@+node:felix.20260323005938.1: *3* setSearchSetting
-    public setSearchSetting(name: searchSettingNames) {
+    public setSearchSetting(name: SearchSettingNames) {
         // Only for checkboxes and radios:
         // If a checkbox, toggle it. if a radio button, set it to true.
 
         // Map scope names to their correct element IDs
-        const scopeIdMap: Partial<Record<searchSettingNames, string>> = {
+        const scopeIdMap: Partial<Record<SearchSettingNames, string>> = {
             entireOutline: 'scope-entire',
             subOutlineOnly: 'scope-suboutline',
             nodeOnly: 'scope-node',
@@ -401,7 +390,7 @@ export class LogPaneManager {
                 element.checked = !element.checked;
                 // Also set in this.searchSettings for immediate UI feedback, and to avoid waiting for the response from LeoWeb to update the UI (since this method is called from the keyboard shortcuts, which should feel responsive).
                 const settingKey = name as keyof LeoSearchSettings;
-                // @ts-ignore - We know this is safe because the searchSettingNames type only includes keys that exist in LeoSearchSettings and are booleans.
+                // @ts-ignore - We know this is safe because the SearchSettingNames type only includes keys that exist in LeoSearchSettings and are booleans.
                 this.searchSettings[settingKey] = element.checked;
             } else if (element.type === 'radio') {
                 element.checked = true;

@@ -30,6 +30,7 @@ import {
     QuickPickOptions,
     ReqRefresh,
     RevealType,
+    SearchSettingNames,
     UnlType
 } from "./types";
 import { StringTextWrapper } from "./core/leoFrame";
@@ -2312,6 +2313,25 @@ export class LeoUI extends NullGui {
             }
         }
     }
+    //@+node:felix.20260528002845.1: *4* newHeadline
+    /**
+     * * Set search setting in the search webview
+     * @param p_id string id of the setting name
+     */
+    public setSearchSetting(p_id: SearchSettingNames): void {
+        workspace.logPane.setSearchSetting(p_id);
+
+        // we need to replace this code from LeoJS to the new leo-web appropriate implementation. 
+        /*
+        if (this._findPanelWebviewExplorerView) {
+            void this._findPanelWebviewExplorerView!.webview.postMessage({ type: 'setSearchSetting', id: p_id });
+        }
+        if (this._findPanelWebviewView) {
+            void this._findPanelWebviewView!.webview.postMessage({ type: 'setSearchSetting', id: p_id });
+        }
+        */
+    }
+
     //@+node:felix.20260410231409.1: *4* loadSearchSettings
     /**
      * * Gets the search settings from Leo, and applies them to the find panel webviews

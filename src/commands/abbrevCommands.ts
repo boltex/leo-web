@@ -10,7 +10,7 @@ import * as g from '../core/leoGlobals';
 import { new_cmd_decorator } from '../core/decorators';
 import { BaseEditCommandsClass } from './baseCommands';
 import { Commands } from '../core/leoCommands';
-import { Position } from '../core/leoNodes';
+import { Position, VNode } from '../core/leoNodes';
 import { StringTextWrapper } from '../core/leoFrame';
 import * as path from 'path';
 import * as os from 'os';
@@ -37,7 +37,7 @@ function cmd(p_name: string, p_doc: string) {
  */
 export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
-    public abbrevs: Record<string, [string, string]>;  // Keys are names, values are (abbrev,tag).
+    public abbrevs: Record<string, string>; // Keys are names, values are abbreviations.
     public dyna_regex: RegExp
     public in_head: boolean;
     public number_regex: RegExp
@@ -65,6 +65,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         this.subst_env = [];  // The scripting environment.
         this.tree_abbrevs_d = {};  // Keys are names, values are (tree,tag).
         this.w = null;
+
     }
 
     //@+node:felix.20260518221202.4: *3* abbrev.expandAbbrev & helpers (entry point)
@@ -74,6 +75,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Return True if the abbreviation was expanded.
      */
     public expandAbbrev(event: any, stroke: KeyboardEvent): false | Promise<boolean> {
+
+        console.log('expandAbbrev called with event:', event, ' and stroke:', stroke);
 
         // Define ins, prefixes, self.in_head and self.w
         // Return if there is nothing to do.
@@ -280,205 +283,281 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     }
 
     //@+node:felix.20260518221202.11: *5* abbrev.init_place_holder_search
+    public init_place_holder_search(node_only: boolean): void {
 
+        const c = this.c;
+        const p = c.p;
+        const finder = c.findCommands;
+        const start_pat = c.abbrev_place_start.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const end_pat = c.abbrev_place_end.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const template_regex = new RegExp(`^.*?${start_pat}.*?${end_pat}`);
+        finder.reverse = false;
 
+        // Define the settings for Leo's find command.
+        const settings = {
+            p: c.p,
+            in_headline: false,
+            find_text: `(${start_pat}.*?${end_pat})`,
+            change_text: '',
+            file_only: true,
+            mark_changes: false,
+            mark_finds: false,
+            ignore_case: true,
+            node_only: node_only,
+            pattern_match: true,
+            search_body: true,
+            search_headline: true,
+            suboutline_only: true,
+            whole_word: false,
+        };
 
-    // Original Python
-    /* 
-    def init_place_holder_search(self, *, node_only: bool) -> None:
-        c = self.c
-        p = c.p
-        finder = c.findCommands
-        start_pat = re.escape(c.abbrev_place_start)
-        end_pat = re.escape(c.abbrev_place_end)
-        template_regex = re.compile(rf"^.*?{start_pat}.*?{end_pat}")
-        finder.reverse = False
+        const find_template = (s: string): boolean => {
+            return g.splitLines(s).some(z => template_regex.test(z));
+        };
 
-        # Define the settings for Leo's find command.
-        settings = g.Bunch(
-            p               = c.p,
-            in_headline     = False,
-            find_text       = rf"({start_pat}.*?{end_pat})",
-            change_text     = '',
-            file_only       = True,
-            mark_changes    = False,
-            mark_finds      = False,
-            ignore_case     = True,
-            node_only       = node_only,
-            pattern_match   = True,
-            search_body     = True,
-            search_headline = True,
-            suboutline_only = True,
-            whole_word      = False,
-        )  # fmt: skip
-        assert settings
+        // Init the search only if <\...\> appears in the expansion.
+        const positions = node_only ? [p] : [...p.self_and_subtree()]
+        let found = false;
+        for (const pos of positions) {
+            if (find_template(pos.h) || find_template(pos.b)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return;
+        }
+        if (node_only) {
+            // Tell the search command to restore settings on failure.
+            finder.previous_settings = {
+                find_text: finder.find_text,
+                change_text: finder.change_text,
+                file_only: finder.file_only,
+                mark_changes: finder.mark_changes,
+                mark_finds: finder.mark_finds,
+                ignore_case: finder.ignore_case,
+                node_only: finder.node_only,
+                pattern_match: finder.pattern_match,
+                search_body: finder.search_body,
+                search_headline: finder.search_headline,
+                suboutline_only: finder.suboutline_only,
+                whole_word: finder.whole_word,
+            };
+        }
 
-        def find_template(s: str) -> bool:
-            return any(template_regex.match(z) for z in g.splitLines(s))
+        // Search!
+        c.endEditing();  // No need to re-edit the headline!
+        this.w?.setInsertPoint(0);  // Start search at start.
+        finder.interactive_search_helper(undefined, undefined, settings);
 
-        # Init the search only if <\...\> appears in the expansion.
-        positions = [p] if node_only else (z for z in p.self_and_subtree())
-        for p in positions:
-            if any(find_template(z) for z in (p.h, p.b)):
-                break
-        else:
-            return
+    }
 
-        if node_only:
-            # Tell the search command to restore settings on failure.
-            finder.previous_settings = g.Bunch(
-                find_text       = finder.find_text,
-                change_text     = finder.change_text,
-                file_only       = finder.file_only,
-                mark_changes    = finder.mark_changes,
-                mark_finds      = finder.mark_finds,
-                ignore_case     = finder.ignore_case,
-                node_only       = finder.node_only,
-                pattern_match   = finder.pattern_match,
-                search_body     = finder.search_body,
-                search_headline = finder.search_headline,
-                suboutline_only = finder.suboutline_only,
-                whole_word      = finder.whole_word,
-            )  # fmt: skip
-
-        # Search!
-        c.endEditing()  # No need to re-edit the headline!
-        self.w.setInsertPoint(0)  # Start search at start.
-        finder.interactive_search_helper(settings=settings)
-
-    */
     //@+node:felix.20260518221202.12: *5* abbrev.replace_selection
-    // Original Python
-    /* 
-    def replace_selection(self, i: int, j: int, s: str) -> None:
-        """Undoably replace w[i:j] by s."""
-        c = self.c
-        p = c.p
-        u = c.undoer
-        w = self.w
+    /**
+     * Undoably replace w[i:j] by s.
+     */
+    public replace_selection(i: number, j: number, s: string): void {
 
-        # Start the undo.
-        bunch = u.beforeChangeNodeContents(p)
+        const c = this.c;
+        const p = c.p;
+        const u = c.undoer;
+        const w = this.w;
 
-        # Make the replacement.
-        w.delete(i, j)
-        w.insert(i, s)
+        if (!w) {
+            return;
+        }
 
-        # Update only body text. Setting p.h here would be wrong.
-        if not self.in_head:
-            p.v.b = w.getAllText()
+        // Start the undo.
+        const bunch = u.beforeChangeNodeContents(p);
 
-        # Complete the undo.
-        u.afterChangeNodeContents(p, command='Abbreviation', bunch=bunch)
+        // Make the replacement.
+        w.delete(i, j);
+        w.insert(i, s);
 
-    */
+        // Update only body text. Setting p.h here would be wrong.
+        if (!this.in_head) {
+            p.v.b = w.getAllText();
+        }
+
+        // Complete the undo.
+        u.afterChangeNodeContents(p, 'Abbreviation', bunch);
+
+    }
     //@+node:felix.20260518221202.13: *4* abbrev: script substitution
     //@+node:felix.20260518221202.14: *5* abbrev.make_all_scripting_substitutions
-    // Original Python
-    /* 
-    def make_all_scripting_substitutions(self, word: str) -> None:
-        """Make scripting substitutions throughout c.p's tree."""
-        c = self.c
-        if not self.scripting_enabled:
-            return
 
-        # Do nothing if {|{... appears nowwhere in c.p's tree.
-        start_pat = re.escape(c.abbrev_subst_start)
-        end_pat = re.escape(c.abbrev_subst_end)
-        substitution_regex = re.compile(rf"^.*?{start_pat}.*?{end_pat}")
+    /**
+     * Make scripting substitutions throughout c.p's tree.
+     */
+    public async make_all_scripting_substitutions(word: string): Promise<void> {
 
-        def find_template(s: str) -> bool:
-            return any(substitution_regex.match(z) for z in g.splitLines(s))
+        const c = this.c;
+        if (!this.scripting_enabled) {
+            return;
+        }
 
-        for p in c.p.self_and_subtree():
-            if any(find_template(z) for z in (p.h, p.b)):
-                break
-        else:
-            return
+        // Do nothing if {|{... appears nowwhere in c.p's tree.
+        const start_pat = c.abbrev_subst_start.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const end_pat = c.abbrev_subst_end.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const substitution_regex = new RegExp(`^.*?${start_pat}.*?${end_pat}`);
 
-        c.abbrev_subst_env['_abr'] = word
-        c.endEditing()  # No need to re-edit the headline!
+        const find_template = (s: string): boolean => {
+            return g.splitLines(s).some(z => substitution_regex.test(z));
+        };
 
-        # A hack to accommodate existing abbreviations: evaluate bodies before headlines.
-        for p in c.p.self_and_subtree():
-            p.b = self._substitution_helper(p.b)
-            p.h = self._substitution_helper(p.h)
+        let found = false;
+        for (const p of c.p.self_and_subtree()) {
+            if (find_template(p.h) || find_template(p.b)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return;
+        }
 
-    */
+        c.abbrev_subst_env['_abr'] = word;
+        c.endEditing();  // No need to re-edit the headline!
+
+        // A hack to accommodate existing abbreviations: evaluate bodies before headlines.
+
+        for (const p of c.p.self_and_subtree()) {
+            p.b = await this._substitution_helper(p.b);
+            p.h = await this._substitution_helper(p.h);
+        }
+
+    }
+
     //@+node:felix.20260518221202.15: *5* abbrev.make_script_substitutions
-    // Original Python
-    /* 
-    def make_script_substitutions(self, word: str) -> None:
-        """
-        Replace word by scripting expansion in p.h or p.b.
-        """
-        c = self.c
-        p = c.p
-        w = self.w
-        if not self.scripting_enabled:
-            return
+    /**
+     * Replace word by scripting expansion in p.h or p.b.
+     */
+    public async make_script_substitutions(word: string): Promise<void> {
+        const c = this.c;
+        const p = c.p;
+        const w = this.w;
+        if (!this.scripting_enabled) {
+            return;
+        }
 
-        c.abbrev_subst_env['_abr'] = word
+        c.abbrev_subst_env['_abr'] = word;
 
-        # Replace the contents only if they have changed!
-        ins = w.getInsertPoint()
-        if self.in_head:
-            c.endEditing()
-            try:
-                contents = p.h
-                new_contents = self._substitution_helper(contents)
-                if new_contents != contents:
-                    p.h = new_contents
-            finally:
-                c.treeWantsFocusNow()
-                c.editHeadline()
-                new_ins = min(ins, len(new_contents))
-                w.setInsertPoint(new_ins)
-        else:
-            contents = p.b
-            new_contents = self._substitution_helper(contents)
-            if new_contents != contents:
-                p.b = new_contents
-                new_ins = min(ins, len(new_contents))
-                p.setSelection(new_ins, len(new_contents))
-                w.setInsertPoint(new_ins)
+        // Replace the contents only if they have changed!
+        const ins = w?.getInsertPoint() || 0;
+        if (this.in_head) {
+            c.endEditing();
+            try {
+                const contents = p.h;
+                const new_contents = await this._substitution_helper(contents);
+                if (new_contents !== contents) {
+                    p.h = new_contents;
+                }
+            } finally {
+                c.treeWantsFocusNow();
+                c.editHeadline();
+                const new_ins = Math.min(ins, p.h.length);
+                w?.setInsertPoint(new_ins);
+            }
+        } else {
+            const contents = p.b;
+            const new_contents = await this._substitution_helper(contents);
+            if (new_contents !== contents) {
+                p.b = new_contents;
+                const new_ins = Math.min(ins, p.b.length);
+                p.setSelection(new_ins, p.b.length);
+                w?.setInsertPoint(new_ins);
+            }
+        }
 
-    */
+    }
+
     //@+node:felix.20260518221202.16: *5* abbrev._substitution_helper
-    // Original Python
-    /* 
-    def _substitution_helper(self, content: str) -> str:
-        """
-        Replace 'word' by the 'definition' in the 'content' string.
-        """
-        c = self.c
-        if c.abbrev_subst_start not in content:
-            return content
-        while c.abbrev_subst_start in content:
-            prefix, rest = content.split(c.abbrev_subst_start, 1)
-            content_list = rest.split(c.abbrev_subst_end, 1)
-            if len(content_list) != 2:
-                break
-            content, rest = content_list
-            try:
-                self.expanding = True
-                c.abbrev_subst_env['x'] = ''
-                exec(content, c.abbrev_subst_env, c.abbrev_subst_env)
-            except NameError:
-                pass  # The script should define the name ???
-            except Exception as e:
-                g.es_print(f"exception evaluating {content!r}: {e}")
-                g.trace(g.callers())
-                g.es_exception()
-            finally:
-                self.expanding = False
-            x = c.abbrev_subst_env.get('x') or ''
-            # Make sure there are no endless expansions.
-            x = x.replace(c.abbrev_subst_start, '').replace(c.abbrev_subst_end, '')
-            content = f"{prefix}{x}{rest}"
-        return content
+    /**
+     * Replace 'word' by the 'definition' in the 'content' string.
+     */
+    public async _substitution_helper(content: string): Promise<string> {
 
-    */
+        const c = this.c;
+        if (!c.abbrev_subst_start || !c.abbrev_subst_end) {
+            return content;
+        }
+        while (content.includes(c.abbrev_subst_start)) {
+            let [prefix, rest] = content.split(c.abbrev_subst_start, 2);
+            const content_list = rest.split(c.abbrev_subst_end, 2);
+            if (content_list.length !== 2) {
+                break;
+            }
+            content = content_list[0];
+            rest = content_list[1];
+
+            let x;
+            let func;
+
+            const tsCompileOptions: typescript.CompilerOptions = {
+                noEmitOnError: true,
+                noImplicitAny: false,
+                target: typescript.ScriptTarget.ES2020,
+                module: typescript.ModuleKind.CommonJS
+            };
+
+            const result = typescript.transpileModule(content, {
+                compilerOptions: tsCompileOptions
+            });
+            const errors: string[] = [];
+
+            if (result.diagnostics && result.diagnostics.length > 0) {
+                // Handle the compilation errors.
+                // For example, you can log them:
+                result.diagnostics.forEach(diagnostic => {
+                    const message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+                    errors.push(message);
+                });
+                g.es(errors.join("\n"));
+                return content; // Print errors and cancel running the script.
+            } else {
+                // The code compiled successfully, you can now proceed to run it.
+                content = result.outputText;
+            }
+
+            try {
+                this.expanding = true;
+                c.abbrev_subst_env['x'] = '';
+                content += '\n'; // Make sure we end the script properly.
+                const scriptWrapper = `return (async () => {
+                    try {
+                        ${content}
+                    } catch (e) { 
+                        g.handleScriptException(c, p, e); 
+                    }
+                })();`;
+
+                func = new Function(
+                    ...Object.keys(c.abbrev_subst_env),
+                    scriptWrapper
+                );
+
+                if (func) {
+                    x = await func(...Object.keys(c.abbrev_subst_env).map(k => c.abbrev_subst_env[k]));
+                } else {
+                    x = "";
+                }
+
+            } catch (e) {
+                g.es_print('exception evaluating', content);
+                g.es_exception(e);
+            } finally {
+                this.expanding = false;
+            }
+            x = x || '';
+            x.replaceAll(c.abbrev_subst_start, '').replaceAll(c.abbrev_subst_end, '');
+            content = `${prefix}${x}${rest}`;
+
+        }
+        return content;
+
+
+    }
+
     //@+node:felix.20260518221202.17: *3* abbrev.finishCreate
     /**
      * AbbrevCommandsClass.finishCreate.
@@ -502,345 +581,460 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         this.reload_settings();
     }
     //@+node:felix.20260518221202.19: *4* abbrev.init_abbrev & helper
-    // Original Python
-    /*
-    def init_abbrev(self) -> None:
-        """
-        Init the user abbreviations from @data global-abbreviations and @data abbreviations nodes.
-        """
-        c = self.c
-        table = (
-            ('global-abbreviations', 'global'),
-            ('abbreviations', 'local'),
-        )
-        for source, tag in table:
-            aList = c.config.getData(source, strip_data=False) or []
-            abbrev, result = [], []
-            for s in aList:
-                if s.startswith('\\:'):
-                    # Continue the previous abbreviation.
-                    abbrev.append(s[2:])
-                else:
-                    # End the previous abbreviation.
-                    if abbrev:
-                        result.append(''.join(abbrev))
-                        abbrev = []
-                    # Start the new abbreviation.
-                    if s.strip():
-                        abbrev.append(s)
-            # End any remaining abbreviation.
-            if abbrev:
-                result.append(''.join(abbrev))
-            for s in sorted(result):
-                self.addAbbrevHelper(s)
 
-    */
+    /**
+     * Init the user abbreviations from @data global-abbreviations and @data abbreviations nodes.
+     */
+    public init_abbrev(): void {
+        const c = this.c;
+        const table = [
+            ['global-abbreviations', 'global'],
+            ['abbreviations', 'local'],
+        ];
+        for (const [source, tag] of table) {
+            const aList = c.config.getData(source, false) || [];
+            const abbrev: string[] = [];
+            const result: string[] = [];
+            for (const s of aList) {
+                if (s.startsWith('\\:')) {
+                    // Continue the previous abbreviation.
+                    abbrev.push(s.slice(2));
+                } else {
+                    // End the previous abbreviation.
+                    if (abbrev.length) {
+                        result.push(abbrev.join(''));
+                        abbrev.length = 0;
+                    }
+                    // Start the new abbreviation.
+                    if (s.trim()) {
+                        abbrev.push(s);
+                    }
+                }
+            }
+            // End any remaining abbreviation.
+            if (abbrev.length) {
+                result.push(abbrev.join(''));
+            }
+            for (const s of result.sort()) {
+                this.addAbbrevHelper(s, tag);
+            }
+        }
+    }
+
     //@+node:felix.20260518221202.20: *5* abbrev.addAbbrevHelper
-    // Original Python
-    /*
-    def addAbbrevHelper(self, s: str, tag: str = '') -> None:
-        """Enter the abbreviation 's' into the self.abbrevs dict."""
-        if not s.strip():
-            return
-        try:
-            d = self.abbrevs
-            data = s.split('=')
-            # Do *not* strip ws so the user can specify ws.
-            name = data[0].replace('\\t', '\t').replace('\\n', '\n')
-            val = '='.join(data[1:])
-            if val.endswith('\n'):
-                val = val[:-1]
-            val = self.number_regex.sub('\n', val).replace('\\\\n', '\\n')
-            old = d.get(name)
-            if old and old != val and not g.unitTesting:
-                g.es_print(f"redefining abbreviation {name}\nfrom {old!r} to {val!r}")
-            d[name] = val
-        except ValueError:
-            g.es_print(f"bad abbreviation: {s}")
-    */
 
+    /**
+     * Enter the abbreviation 's' into the self.abbrevs dict.
+     */
+    public addAbbrevHelper(s: string, tag: string = ''): void {
+        if (!s.trim()) {
+            return;
+        }
+        try {
+            const d = this.abbrevs;
+            const data = s.split('=');
+            // Do *not* strip ws so the user can specify ws.
+            const name = data[0].replace('\\t', '\t').replace('\\n', '\n');
+            let val = data.slice(1).join('=');
+            if (val.endsWith('\n')) {
+                val = val.slice(0, -1);
+            }
+            val = val.replace(this.number_regex, '\n').replace(/\\\\n/g, '\\n');
+            const old = d[name];
+            if (old && old !== val && !g.unitTesting) {
+                g.es_print(`redefining abbreviation ${name}\nfrom ${old} to ${val}`);
+            }
+            d[name] = val;
+        } catch (e) {
+            g.es_print(`bad abbreviation: ${s}`);
+        }
+    }
 
     //@+node:felix.20260518221202.21: *4* abbrev.init_env
-    // Original Python
-    /*
-    def init_env(self) -> None:
-        """
-        Init c.abbrev_subst_env by executing the contents of the
-        @data abbreviations-subst-env node.
-        """
-        c = self.c
-        at = c.atFileCommands
-        if not self.scripting_enabled:
-            return
-        if not c.abbrev_place_start or not c.abbrev_place_end:
-            return
-        aList = self.subst_env
-        script_list = []
-        for z in aList:
-            # Compatibility with original design.
-            if z.startswith('\\:'):
-                script_list.append(z[2:])
-            else:
-                script_list.append(z)
-        script = ''.join(script_list)
-        # Allow Leo directives in @data abbreviations-subst-env trees.
-        # #1674: Avoid unnecessary entries in c.fileCommands.gnxDict.
-        root = c.rootPosition()
-        if root:
-            v = root.v
-        else:
-            # Defensive programming. Probably will never happen.
-            v = leoNodes.VNode(context=c)
-            root = leoNodes.Position(v)
-        # Similar to g.getScript.
-        script = at.stringToString(
-            root=root,
-            s=script,
-            forcePythonSentinels=True,
-            sentinels=False,
-        )
-        script = script.replace("\r\n", "\n")
-        try:
-            exec(script, c.abbrev_subst_env, c.abbrev_subst_env)
-        except Exception:
-            g.es('Error executing @data abbreviations-subst-env')
-            g.es_exception()
-    */
+    /**
+     * Init c.abbrev_subst_env by executing the contents of the @data abbreviations-subst-env node.
+     */
+    public init_env(): void {
+        const c = this.c;
+        const at = c.atFileCommands;
+        if (!this.scripting_enabled) {
+            return;
+        }
+        if (!c.abbrev_place_start || !c.abbrev_place_end) {
+            return;
+        }
+        const aList = this.subst_env;
+        const script_list: string[] = [];
+        for (const z of aList) {
+            // Compatibility with original design.
+            if (z.startsWith('\\:')) {
+                script_list.push(z.slice(2));
+            } else {
+                script_list.push(z);
+            }
+        }
+        let script = script_list.join('');
+        // Allow Leo directives in @data abbreviations-subst-env trees.
+        // #1674: Avoid unnecessary entries in c.fileCommands.gnxDict.
+        let root = c.rootPosition();
+        if (root && root.v) {
+            // pass
+        } else {
+            // Defensive programming. Probably will never happen.
+            const v = new VNode(c);
+            root = new Position(v);
+        }
+        // Similar to g.getScript.
+        at.stringToString(
+            root,
+            script,
+            true, // forcePythonSentinels
+            false, // sentinels
+        ).then(content => {
+            const tsCompileOptions: typescript.CompilerOptions = {
+                noEmitOnError: true,
+                noImplicitAny: false,
+                target: typescript.ScriptTarget.ES2020,
+                module: typescript.ModuleKind.CommonJS
+            };
+
+            const result = typescript.transpileModule(content, {
+                compilerOptions: tsCompileOptions
+            });
+            const errors: string[] = [];
+
+            if (result.diagnostics && result.diagnostics.length > 0) {
+                // Handle the compilation errors.
+                // For example, you can log them:
+                result.diagnostics.forEach(diagnostic => {
+                    const message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+                    errors.push(message);
+                });
+                g.es(errors.join("\n"));
+                return; // Print errors and cancel running the script.
+            } else {
+                // The code compiled successfully, you can now proceed to run it.
+                content = result.outputText;
+            }
+
+            content.replace(/\r\n/g, '\n');
+            let func;
+
+            try {
+                content += '\n'; // Make sure we end the script properly.
+                const scriptWrapper = `return (async () => {
+                    try {
+                        ${content}
+                    } catch (e) { 
+                        g.handleScriptException(c, p, e); 
+                    }
+                })();`;
+
+                func = new Function(
+                    ...Object.keys(c.abbrev_subst_env),
+                    scriptWrapper
+                );
+
+                if (func) {
+                    func(...Object.keys(c.abbrev_subst_env).map(k => c.abbrev_subst_env[k]));
+                } else {
+                    g.es('No content in @data abbreviations-subst-env');
+                }
+
+            } catch (e) {
+                g.es('Error executing @data abbreviations-subst-env');
+                g.es_exception(e);
+            }
+
+        }).catch(error => {
+            console.error('Error in stringToString for @data abbreviations-subst-env:', error);
+        });
+
+
+    }
 
     //@+node:felix.20260518221202.22: *4* abbrev.init_settings
-    // Original Python
-    /*
-    def init_settings(self) -> None:
-        """Called from AbbrevCommands.reload_settings aka reloadSettings."""
-        c = self.c
-        if not c.config:
-            return
-        getBool, getString = c.config.getBool, c.config.getString
+    /**
+     * Called from AbbrevCommands.reload_settings aka reloadSettings.
+     */
+    public init_settings(): void {
+        const c = this.c;
+        if (!c.config) {
+            return;
+        }
+        const getBool = (key: string, defaultValue: boolean = false): boolean => {
+            const value = c.config.getBool(key);
+            return value !== undefined ? value : defaultValue;
+        };
+        const getString = (key: string, defaultValue: string = ''): string => {
+            const value = c.config.getString(key);
+            return value !== undefined ? value : defaultValue;
+        };
 
-        # Local settings. Normally not accessed via c.abbrev_subst_env.
-        self.scripting_enabled = (
-            getBool('scripting-at-script-nodes') or
-            getBool('scripting-abbreviations')
-        )  # fmt: skip
-        self.globalDynamicAbbrevs = getBool('globalDynamicAbbrevs')
-        self.next_placeholder = getString("abbreviations-next-placeholder") or ',,'
+        // Local settings. Normally not accessed via c.abbrev_subst_env.
+        this.scripting_enabled = getBool('scripting-at-script-nodes') || getBool('scripting-abbreviations');
 
-        # Allow @data abbreviations-subst-env *only* in leoSettings.leo or myLeoSettings.leo!
-        key = 'abbreviations-subst-env'
-        if c.config.isLocalSetting(key, 'data'):
-            g.issueSecurityWarning(f"@data {key}")
-            self.subst_env = []
-        else:
-            self.subst_env = c.config.getData(key, strip_data=False)
+        // Allow @data abbreviations-subst-env *only* in leoSettings.leo or myLeoSettings.leo!
+        const key = 'abbreviations-subst-env';
+        if (c.config.isLocalSetting(key, 'data')) {
+            g.issueSecurityWarning(`@data ${key}`);
+            this.subst_env = [];
+        } else {
+            this.subst_env = c.config.getData(key, false) || [];
+        }
 
-        # Inject one ivar.
-        c.k.abbrevOn = getBool('enable-abbreviations', default=False)
+        // Inject one ivar.
+        c.k.abbrevOn = getBool('enable-abbreviations', false);
 
-        # Commander ivars for scripting environments, unit tests, etc.
-        c.abbrev_place_end = getString('abbreviations-place-end') or '|>'
-        c.abbrev_place_start = getString('abbreviations-place-start') or '<|'
-        c.abbrev_subst_env = {'c': c, 'g': g, '_values': {}}  # May be augmented in init_env.
-        c.abbrev_subst_start = getString('abbreviations-subst-start') or '{|{'
-        c.abbrev_subst_end = getString('abbreviations-subst-end') or '}|}'
-    */
+        // Commander ivars for scripting environments, unit tests, etc.
+        c.abbrev_place_end = getString('abbreviations-place-end', '|>');
+        c.abbrev_place_start = getString('abbreviations-place-start', '<|');
+        c.abbrev_subst_env = { 'c': c, 'g': g, '_values': {} };  // May be augmented in init_env.
+        c.abbrev_subst_start = getString('abbreviations-subst-start', '{|{');
+        c.abbrev_subst_end = getString('abbreviations-subst-end', '}|}');
+    }
 
     //@+node:felix.20260518221202.23: *4* abbrev.init_tree_abbrev
-    // Original Python
-    /*
-    def init_tree_abbrev(self) -> None:
-        """Init tree_abbrevs_d from @data tree-abbreviations nodes."""
-        c = self.c
-        #
-        # Careful. This happens early in startup.
-        root = c.rootPosition()
-        if not root:
-            return
-        if not c.p:
-            c.selectPosition(root)
-        if not c.p:
-            return
-        data = c.config.getOutlineData('tree-abbreviations')
-        if data is None:
-            return
-        d: dict[str, str] = {}
-        # #904: data may be a string or a list of two strings.
-        aList = [data] if isinstance(data, str) else data
-        for tree_s in aList:
-            #
-            # Expand the tree so we can traverse it.
-            if not c.canPasteOutline(tree_s):
-                return
-            c.fileCommands.leo_file_encoding = 'utf-8'
-            #
-            # As part of #427, disable all redraws.
-            old_disable = g.app.disable_redraw
-            try:
-                g.app.disable_redraw = True
-                self.init_tree_abbrev_helper(d, tree_s)
-            finally:
-                g.app.disable_redraw = old_disable
-        self.tree_abbrevs_d = d
-    /*
+    /**
+     * Init tree_abbrevs_d from @data tree-abbreviations nodes.
+     */
+    public init_tree_abbrev(): void {
+
+        const c = this.c;
+        // Careful. This happens early in startup.
+        let root = c.rootPosition();
+        if (!root || !root.v) {
+            return;
+        }
+        if (!c.p || !c.p.v) {
+            c.selectPosition(root);
+        }
+        if (!c.p || !c.p.v) {
+            return;
+        }
+        const data = c.config.getOutlineData('tree-abbreviations');
+        if (!data) {
+            return;
+        }
+        const d: Record<string, string> = {};
+        // #904: data may be a string or a list of two strings.
+        const aList = typeof data === 'string' ? [data] : data;
+        for (const tree_s of aList) {
+            // Expand the tree so we can traverse it.
+            if (!c.canPasteOutline(tree_s)) {
+                return;
+            }
+            c.fileCommands.leo_file_encoding = 'utf-8';
+            // As part of #427, disable all redraws.
+            const old_disable = g.app.disable_redraw;
+            try {
+                g.app.disable_redraw = true;
+                this.init_tree_abbrev_helper(d, tree_s);
+            } finally {
+                g.app.disable_redraw = old_disable;
+            }
+        }
+        this.tree_abbrevs_d = d;
+    }
 
     //@+node:felix.20260518221202.24: *5* abbrev.init_tree_abbrev_helper
-    // Original Python
-    /*
-    def init_tree_abbrev_helper(self, d: dict[str, str], tree_s: str) -> None:
-        """Init d from tree_s, the text of a copied outline."""
-        c = self.c
-        hidden_root = c.fileCommands.getPosFromClipboard(tree_s)
-        if not hidden_root:
-            g.trace('no pasted node')
-            return
-        for p in hidden_root.children():
-            for s in g.splitLines(p.b):
-                if s.strip() and not s.startswith('#'):
-                    abbrev_name = s.strip()
-                    # #926: Allow organizer nodes by searching all descendants.
-                    for child in p.subtree():
-                        if child.h.strip() == abbrev_name:
-                            abbrev_s = c.fileCommands.outline_to_clipboard_string(child)
-                            d[abbrev_name] = abbrev_s
-                            break
-                    else:
-                        g.trace(f"no definition for {abbrev_name}")
-    */
+    /**
+     * Init d from tree_s, the text of a copied outline.
+     */
+    public init_tree_abbrev_helper(d: Record<string, string>, tree_s: string): void {
+
+        const c = this.c;
+        const hidden_root = c.fileCommands.getPosFromClipboard(tree_s);
+        if (!hidden_root) {
+            g.trace('no pasted node');
+            return;
+        }
+        for (const p of hidden_root.children()) {
+            for (const s of g.splitLines(p.b)) {
+                if (s.trim() && !s.trim().startsWith('#')) {
+                    const abbrev_name = s.trim();
+                    // #926: Allow organizer nodes by searching all descendants.
+                    let found = false;
+                    for (const child of p.subtree()) {
+                        if (child.h.trim() === abbrev_name) {
+                            const abbrev_s = c.fileCommands.outline_to_clipboard_string(child);
+                            d[abbrev_name] = abbrev_s;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        g.trace(`no definition for ${abbrev_name}`);
+                    }
+                }
+            }
+        }
+    }
 
     //@+node:felix.20260518221202.25: *3* abbrev: Commands & helpers
     //@+node:felix.20260518221202.26: *4* abbrev._getDynamicList (helper)
-    // Original Python
-    /*
-    def _getDynamicList(self, w: QTextMixin, s: str) -> list[str]:
-        """Return a list of dynamic abbreviations."""
-        if self.globalDynamicAbbrevs:
-            # Look in all nodes.h
-            items = []
-            for p in self.c.all_unique_positions():
-                items.extend(self.dyna_regex.findall(p.b))
-        else:
-            # Just look in this node.
-            items = self.dyna_regex.findall(w.getAllText())
-        items = sorted(set([z for z in items if z.startswith(s)]))
-        return items
-    /*
+    /**
+     * Return a list of dynamic abbreviations.
+     */
+    private _getDynamicList(w: StringTextWrapper, s: string): string[] {
+
+        const c = this.c;
+        let items: string[] = [];
+        if (c.config.getBool('global-dynamic-abbreviations', false)) {
+            // Look in all nodes.h
+            for (const p of c.all_unique_positions()) {
+                const text = p.b || '';
+                const matches = text.match(this.dyna_regex);
+                if (matches) {
+                    items.push(...matches);
+                }
+            }
+        } else {
+            // Just look in this node.
+            const text = w.getAllText();
+            const matches = text.match(this.dyna_regex);
+            if (matches) {
+                items.push(...matches);
+            }
+        }
+        items = Array.from(new Set(items.filter(z => z.startsWith(s)))).sort();
+        return items;
+
+    }
 
     //@+node:felix.20260518221202.27: *4* abbrev.dynamicCompletion C-M-/
-    // Original Python
-    /*
-    @cmd('dabbrev-completion')
-    def dynamicCompletion(self, event: LeoKeyEvent = None) -> None:
-        """
-        dabbrev-completion
-        Insert the common prefix of all dynamic abbrev's matching the present word.
-        This corresponds to C-M-/ in Emacs.
-        """
-        c, p = self.c, self.c.p
-        w = event.w if event else None
-        if not g.isTextWrapper(w):
-            return
-        s = w.getAllText()
-        ins = ins1 = w.getInsertPoint()
-        if 0 < ins < len(s) and not g.isWordChar(s[ins]):
-            ins1 -= 1
-        i, j = g.getWord(s, ins1)
-        word = w.get(i, j)
-        aList = self._getDynamicList(w, word)
-        if not aList:
-            return
-        # Bug fix: remove s itself, otherwise we can not extend beyond it.
-        if word in aList and len(aList) > 1:
-            aList.remove(word)
-        prefix = functools.reduce(g.longestCommonPrefix, aList)
-        if prefix.strip():
-            ypos = w.getYScrollPosition()
-            b = c.undoer.beforeChangeNodeContents(p)
-            s = s[:i] + prefix + s[j:]
-            w.setAllText(s)
-            w.setInsertPoint(i + len(prefix))
-            w.setYScrollPosition(ypos)
-            c.undoer.afterChangeNodeContents(p, command='dabbrev-completion', bunch=b)
-            c.recolor()
-    */
+    @cmd('dabbrev-completion', 'Insert the common prefix of all dynamic abbrev\'s matching the present word. This corresponds to C-M-/ in Emacs.')
+    public dynamicCompletion(event?: Event): void {
+        const c = this.c;
+        const p = c.p;
+        const w = this.editWidget();
+        if (!w) {
+            return;
+        }
+        const s = w.getAllText();
+        const ins = w.getInsertPoint();
+        let ins1 = ins;
+        if (ins > 0 && ins < s.length && !g.isWordChar(s[ins])) {
+            ins1 -= 1;
+        }
+        const [i, j] = g.getWord(s, ins1);
+        const word = w.get(i, j);
+        let aList = this._getDynamicList(w, word);
+        if (!aList.length) {
+            return;
+        }
+        // Bug fix: remove s itself, otherwise we can not extend beyond it.
+        if (aList.includes(word) && aList.length > 1) {
+            aList = aList.filter(item => item !== word);
+        }
+        const prefix = aList.length
+            ? aList.reduce((a, b) => g.longestCommonPrefix(a, b))
+            : "";
+        if (prefix.trim()) {
+            const ypos = w.getYScrollPosition();
+            const bunch = c.undoer.beforeChangeNodeContents(p);
+            const new_s = s.slice(0, i) + prefix + s.slice(j);
+            w.setAllText(new_s);
+            w.setInsertPoint(i + prefix.length);
+            w.setYScrollPosition(ypos);
+            c.undoer.afterChangeNodeContents(p, 'dabbrev-completion', bunch);
+            c.recolor();
+        }
+    }
 
     //@+node:felix.20260518221202.28: *4* abbrev.dynamicExpansion M-/ & helper
-    // Original Python
-    /*
-    @cmd('dabbrev-expands')
-    def dynamicExpansion(self, event: LeoKeyEvent = None) -> None:
-        """
-        dabbrev-expands (M-/ in Emacs).
 
-        Inserts the longest common prefix of the word at the cursor. Displays
-        all possible completions if the prefix is the same as the word.
-        """
-        w = event.w if event else None
-        if not g.isTextWrapper(w):
-            return
-        s = w.getAllText()
-        ins = ins1 = w.getInsertPoint()
-        if 0 < ins < len(s) and not g.isWordChar(s[ins]):
-            ins1 -= 1
-        i, j = g.getWord(s, ins1)
-        # This allows the cursor to be placed anywhere in the word.
-        w.setInsertPoint(j)
-        word = w.get(i, j)
-        aList = self._getDynamicList(w, word)
-        if not aList:
-            return
-        if word in aList and len(aList) > 1:
-            aList.remove(word)
-        prefix = functools.reduce(g.longestCommonPrefix, aList)
-        prefix = prefix.strip()
-        self.dynamicExpandHelper(event, prefix, aList, w)
-    */
+    @cmd(
+        'dabbrev-expands',
+        'Inserts the longest common prefix of the word at the cursor. Displays all possible completions if the prefix is the same as the word.'
+    )
+    public async dynamicExpansion(event?: Event): Promise<void> {
+        const w = this.editWidget();
+        if (!w) {
+            return;
+        }
+        const s = w.getAllText();
+        const ins = w.getInsertPoint();
+        let ins1 = ins;
+        if (ins > 0 && ins < s.length && !g.isWordChar(s[ins])) {
+            ins1 -= 1;
+        }
+        const [i, j] = g.getWord(s, ins1);
+        // This allows the cursor to be placed anywhere in the word.
+        w.setInsertPoint(j);
+        const word = w.get(i, j);
+        let aList = this._getDynamicList(w, word);
+        if (!aList.length) {
+            return;
+        }
+        if (aList.includes(word) && aList.length > 1) {
+            aList = aList.filter(item => item !== word);
+        }
+        const prefix = aList.reduce((a, b) => g.longestCommonPrefix(a, b)).trim();
+        return this.dynamicExpandHelper(event, prefix, aList, w);
+    }
 
     //@+node:felix.20260518221202.29: *5* abbrev.dynamicExpandHelper
-    // Original Python
-    /*
-    def dynamicExpandHelper(
-        self,
-        event: LeoKeyEvent,
-        prefix: str = None,
-        aList: list[str] = None,
-        w: QTextMixin = None,
-    ) -> None:
-        """State handler for dabbrev-expands command."""
-        c, k = self.c, self.c.k
-        self.w = w
-        if prefix is None:
-            prefix = ''
-        prefix2 = 'dabbrev-expand: '
-        c.frame.log.deleteTab('Completion')
-        g.es('', '\n'.join(aList or []), tabName='Completion')
-        # Protect only prefix2 so tab completion and backspace to work properly.
-        k.setLabelBlue(prefix2, protect=True)
-        k.setLabelBlue(prefix2 + prefix, protect=False)
-        k.get1Arg(event, handler=self.dynamicExpandHelper1, tabList=aList, prefix=prefix)
+    /**
+     * State handler for dabbrev-expands command.
+     */
+    public dynamicExpandHelper(
+        event: any,
+        prefix?: string,
+        aList?: string[],
+        w?: StringTextWrapper
+    ): Thenable<void> {
 
-    def dynamicExpandHelper1(self, event: LeoKeyEvent) -> None:
-        """Finisher for dabbrev-expands."""
-        c, k = self.c, self.c.k
-        p = c.p
-        c.frame.log.deleteTab('Completion')
-        k.clearState()
-        k.resetLabel()
-        if k.arg:
-            w = self.w
-            s = w.getAllText()
-            ypos = w.getYScrollPosition()
-            b = c.undoer.beforeChangeNodeContents(p)
-            ins = ins1 = w.getInsertPoint()
-            if 0 < ins < len(s) and not g.isWordChar(s[ins]):
-                ins1 -= 1
-            i, j = g.getWord(s, ins1)
-            # word = s[i: j]
-            s = s[:i] + k.arg + s[j:]
-            w.setAllText(s)
-            w.setInsertPoint(i + len(k.arg))
-            w.setYScrollPosition(ypos)
-            c.undoer.afterChangeNodeContents(p, command='dabbrev-expand', bunch=b)
-            c.recolor()
-    */
+        const c = this.c;
+        const k = this.c.k;
+        this.w = w || null;
+        if (!prefix) {
+            prefix = '';
+        }
+        const prefix2 = 'dabbrev-expand: ';
+        g.es('', (aList || []).join('\n'), 'Completion');
+        return g.app.gui.get1Arg({
+            title: 'dabbrev-expand',
+            value: prefix,
+            prompt: 'dabbrev-expand: ',
+        }, aList).then((arg) => {
+            this.dynamicExpandHelper1(arg);
+        });
+    }
+
+    /**
+     * Finisher for dabbrev-expands.
+     */
+    public dynamicExpandHelper1(arg?: string): void {
+        if (arg == null) {
+            return;
+        }
+        // use arg instead of k.arg, and chain up to this method from dynamicExpandHelper using g.app.gui.get1Arg
+        const c = this.c;
+        const p = c.p;
+        if (arg) {
+            const w = this.w;
+            if (!w) {
+                return;
+            }
+            const s = w.getAllText();
+            const ypos = w.getYScrollPosition();
+            const b = c.undoer.beforeChangeNodeContents(p);
+            const ins = w.getInsertPoint();
+            let ins1 = ins;
+            if (ins > 0 && ins < s.length && !g.isWordChar(s[ins])) {
+                ins1 -= 1;
+            }
+            const [i, j] = g.getWord(s, ins1);
+            // word = s[i: j]
+            const new_s = s.slice(0, i) + arg + s.slice(j);
+            w.setAllText(new_s);
+            w.setInsertPoint(i + arg.length);
+            w.setYScrollPosition(ypos);
+            c.undoer.afterChangeNodeContents(p, 'dabbrev-expand', b);
+            c.recolor();
+        }
+    }
 
     //@+node:felix.20260518221202.30: *4* abbrev.killAllAbbrevs
     @cmd('abbrev-kill-all', 'Delete all abbreviations.')
