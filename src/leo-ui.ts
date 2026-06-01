@@ -2099,6 +2099,13 @@ export class LeoUI extends NullGui {
         workspace.logPane.showTab('nav');
     }
     //@+node:felix.20260322235817.1: *3* Search and Replace
+    //@+node:felix.20260601163603.1: *4* doArrow
+    public doArrow(key: "Up" | "Down") {
+        const c = g.app.windowList[this.frameIndex].c;
+        const fc = c.findCommands;
+        fc.do_arrow(key);
+    }
+
     //@+node:felix.20260410231431.1: *4* startSearch
     /**
      * * Opens the find panel and selects all & focuses on the find field.
@@ -2486,12 +2493,10 @@ export class LeoUI extends NullGui {
         const suboutlineOnly = searchSettings.suboutline_only || false;
 
         if (!nodeOnly && !suboutlineOnly && !fileOnly) {
-            find.entire_outline = true;
             if (!w.isChecked()) {
                 w.toggle();
             }
         } else {
-            find.entire_outline = false;
             if (w.isChecked()) {
                 w.toggle();
             }

@@ -429,6 +429,8 @@ export class Constants {
         DELETE_MARKED_NODES: Constants.NAME + ".deleteMarkedNodes",
         MOVE_MARKED_NODES: Constants.NAME + ".moveMarkedNodes",
 
+        FIND_HISTORY_BACK: Constants.NAME + ".findHistoryBack",
+        FIND_HISTORY_FORWARD: Constants.NAME + ".findHistoryForward",
         FIND_QUICK: Constants.NAME + ".findQuick",
         FIND_QUICK_SELECTED: Constants.NAME + ".findQuickSelected",
         FIND_QUICK_TIMELINE: Constants.NAME + ".findQuickTimeline",

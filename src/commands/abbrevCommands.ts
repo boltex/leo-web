@@ -42,6 +42,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     public in_head: boolean;
     public number_regex: RegExp
     public scripting_enabled: boolean;
+    public globalDynamicAbbrevs: boolean; // Whether dynamic abbrevivs are global or local.
     public expanding: boolean; // True: expanding abbreviations.
     public subst_env: string[] = []; // The environment for all substitutions. May be augmented in init_env.
     public tree_abbrevs_d: Record<string, string>  // Keys are names, values are (tree,tag).
@@ -65,6 +66,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         this.subst_env = [];  // The scripting environment.
         this.tree_abbrevs_d = {};  // Keys are names, values are (tree,tag).
         this.w = null;
+        this.globalDynamicAbbrevs = false;  // Whether dynamic abbrevs are global or local.
 
     }
 
@@ -783,6 +785,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
         // Local settings. Normally not accessed via c.abbrev_subst_env.
         this.scripting_enabled = getBool('scripting-at-script-nodes') || getBool('scripting-abbreviations');
+        this.globalDynamicAbbrevs = getBool('global-dynamic-abbreviations');
 
         // Allow @data abbreviations-subst-env *only* in leoSettings.leo or myLeoSettings.leo!
         const key = 'abbreviations-subst-env';
@@ -907,7 +910,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
         const c = this.c;
         let items: string[] = [];
-        if (c.config.getBool('global-dynamic-abbreviations', false)) {
+        if (this.globalDynamicAbbrevs) {
             // Look in all nodes.h
             for (const p of c.all_unique_positions()) {
                 const text = p.b || '';

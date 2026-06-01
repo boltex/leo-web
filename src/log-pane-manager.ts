@@ -307,6 +307,14 @@ export class LogPaneManager {
                 e.preventDefault();
                 this.OPT_BODY.focus();
             }
+            // Support up and down arrow keypresses for back/forward in the search history:
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                workspace.controller.doCommand(Constants.COMMANDS.FIND_HISTORY_BACK);
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                workspace.controller.doCommand(Constants.COMMANDS.FIND_HISTORY_FORWARD);
+            }
 
         });
         this.OPT_BODY.addEventListener('keydown', (e) => {

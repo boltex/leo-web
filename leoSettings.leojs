@@ -468,6 +468,20 @@
               "vh": "@string remove-sentinels-extension = .txt"
             },
             {
+              "gnx": "felix.20260601154219.1",
+              "vh": "Emacs-like commands settings",
+              "children": [
+                {
+                  "gnx": "felix.20260601154219.2",
+                  "vh": "@bool add-ws-to-kill-ring = False"
+                },
+                {
+                  "gnx": "felix.20260601154219.3",
+                  "vh": "@bool global-dynamic-abbreviations = True"
+                }
+              ]
+            },
+            {
               "gnx": "ekr.20110611092035.16482",
               "vh": "Headline commands settings",
               "children": [
@@ -1371,6 +1385,7 @@
     "ekr.20190608085550.1": "The maximum line length allowed by the find-long-lines command.",
     "ekr.20180301060510.1": "The maximum number of lines to show in @data nodes.\n\n0 causes all lines to be shown.\n",
     "ekr.20041119041019.1": "The string to be appended to file names resulting from the Remove Sentinels command.\nIf the value starts with . the extension is appended to the original file name.\nOtherwise, the extension is appended before the file extension.\nExample 1:\n  File name x.y\n  remove_sentinels_extension = _ns\n  Result: x_ns.y\nExample 2:\n  File name x.y\n  remove_sentinels_extension = .txt\n  Result: x.y.txt\n\n",
+    "felix.20260601154219.2": "True: add stuff consisting only of whitespace to the kill ring.",
     "ekr.20041119050749.10": "The format string used when creating the Time/Date string for the Insert Time/Date command.\n\nSee the Python documentation for time.strftime for full details.\n\nExamples:\n1/30\n%m/%d\n\n1/30/03 8:31:02\n%m/%d/%y %H:%M:%S\n\nThu, 30 Jan 2003 16:57:12\n%a, %d %b %Y %H:%M:%S\n",
     "ekr.20160127051552.1": "True: allow stub files to be overwritten\n",
     "ekr.20181018103813.1": "True: use verbose mode.",
