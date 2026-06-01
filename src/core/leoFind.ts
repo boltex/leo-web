@@ -101,7 +101,7 @@ export interface ISettings {
     whole_word: boolean;
     reverse?: boolean;
 }
-type ISettingsKey = keyof ISettings;
+
 type IFindUndoData = {
     end: number | undefined;
     in_headline: boolean;
@@ -182,6 +182,9 @@ export class LeoFind {
     public in_headline: boolean = false;
     public match_obj!: RegExpExecArray | undefined;
     public previous_settings: ISettings | undefined;
+    public prev_searches: ISettings[] = [];  // #4685
+    public prev_searches_i = 0;  // #4685
+
     public reverse: boolean = false;
     public root: Position | undefined; // The start of the search. For suboutline-only.
     public total_links = 0;
@@ -2753,6 +2756,38 @@ export class LeoFind {
     //     k.showStateAndMode()
     //     c.widgetWantsFocusNow(w)
     //     self.do_find_next(settings)
+    //@+node:felix.20260531234145.1: *4* find._remember_settings
+
+    // Original Python 
+    /*
+        def _remember_settings(self, settings: g.Bunch) -> None:
+            """Add the settings to the search history."""
+
+            def equal(b1: g.Bunch, b2: g.Bunch) -> bool:
+                """Return True if the two settings bunches are equivalent."""
+                if sorted(list(b1.keys())) != sorted(list(b2.keys())):
+                    return True  # Defensive.
+                return all(b1.get(z) == b2.get(z) for z in b1.keys())
+
+            # Replace the placeholder text.
+            settings.find_text = settings.find_text.replace('<find pattern here>', '')
+
+            # Don't add empty find patterns to the search history.
+            if not settings.find_text.strip():
+                return
+
+            # Ignore the two state entries: they are usually False anyway.
+            settings.in_headline = settings.reverse = False
+
+            # Remove any previous match.
+            for bunch in self.prev_searches:
+                if equal(settings, bunch):
+                    return
+
+            # Insert the setting at the current place in the list.
+            self.prev_searches_i += 1
+            self.prev_searches.insert(self.prev_searches_i, settings)
+    */
     //@+node:felix.20251213133753.86: *4* find.summarize
     @cmd(
         'summarize',
@@ -4199,6 +4234,65 @@ export class LeoFind {
     // this.escape_handler(event)
     //     else:
     // this.handler(event)
+    //@+node:felix.20260531234509.1: *4* find.do_arrow
+    // * Original Python
+    /*
+        def do_arrow(self, char: str, *, in_minibuffer: bool) -> None:
+            """Handle 'Up' and 'Down' arrows in the minibuffer and the 'Find' Tab/Dialog."""
+            c = self.c
+
+            # Remember the existing settings, as a side effect of calling get_settings.
+            self.ftm.get_settings()
+
+            # Compute the bunch to show.
+            i = self.prev_searches_i
+            n = len(self.prev_searches)
+            if n == 0:
+                return  # Even with the get_Settings() side effect, there may be no previous searches.
+            self.prev_searches_i = (
+                i - 1 if (char == 'Up'   and i - 1 >= 0) else
+                i + 1 if (char == 'Down' and i + 1 < n) else
+                max(0, min(i, n - 1))
+            )  # fmt: skip
+            bunch = self.prev_searches[self.prev_searches_i]
+            find_s, change_s = bunch.find_text, bunch.change_text
+
+            # Show the options in the status area. Like compute_find_options_in_status_area.
+            options = []
+            d = {
+                'whole_word':       'Word',
+                'ignore_case':      'Ig-case',
+                'pattern_match':    'regeXp',
+                'node_only':        'Node',
+                'search_body':      'Body',
+                'search_headline':  'Head',
+                'mark_changes':     'mark-Changes',
+                'mark_finds':       'mark-Finds',
+                'suboutline_only':  'Suboutline',
+                'file_only':        'File',
+            }  # fmt: skip
+            for key in bunch.keys():
+                val = bunch.get(key)
+                if key in self.ivars:
+                    setattr(self, key, val)
+                if val and key in d:
+                    options.append(d.get(key))
+
+            # Update the gui.
+            self.ftm.set_widgets_from_dict(bunch)
+            self.ftm.set_change_text(change_s)
+            self.ftm.set_find_text(find_s)
+            if in_minibuffer:
+                options.append(f"Change: {change_s}")
+                c.k.setLabel('Search: ')
+                c.k.extendLabel(find_s)
+                c.frame.statusLine.put(f"Find: {' '.join(options)}")
+            else:
+                # Like start_search()
+                self.open_find_tab()
+                self.ftm.init_focus()
+
+    */
     //@+node:felix.20251213133753.132: *4* find.updateChange/FindList
     public update_change_list(s: string): void {
         if (!this.changeTextList.includes(s)) {

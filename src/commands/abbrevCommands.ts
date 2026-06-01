@@ -97,17 +97,27 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
         const w_name = g.app.gui.widget_name(w);
 
-        // if (!w_name.startsWith('body') && !w_name.startsWith('head')) {
-        //     return false;
-        // }
+        console.log('Widget name:', w_name);
 
-        const s = w.getAllText();
+        if (!w_name.startsWith('body') && !w_name.startsWith('head')) {
+            return false;
+        }
 
+        // LEO-WEB: get all text and insertion point directly from the dom.
+        const inHeadline = !!g.workspace.outline.headlineFinish;
+        let s;
+        let ins;
+        if (inHeadline) {
+            s = g.workspace.outline.HEADLINE_INPUT.value;
+            ins = g.workspace.outline.HEADLINE_INPUT.selectionStart || 0;
+        } else {
+            s = g.workspace.body.getBody();
+            ins = g.workspace.body.getBodyInsertOffset();
+        }
         if (!s) {
             return false;
         }
 
-        const ins = w.getInsertPoint();
         const prefixes = this.get_prefixes(ins, s);
 
         if (!prefixes || !prefixes.length) {
@@ -790,6 +800,23 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         c.abbrev_place_end = getString('abbreviations-place-end', '|>');
         c.abbrev_place_start = getString('abbreviations-place-start', '<|');
         c.abbrev_subst_env = { 'c': c, 'g': g, '_values': {} };  // May be augmented in init_env.
+        // * Default NODE Modules
+        c.abbrev_subst_env['Buffer'] = Buffer;
+        c.abbrev_subst_env['crypto'] = crypto;
+        c.abbrev_subst_env['os'] = os;
+        c.abbrev_subst_env['path'] = path;
+        c.abbrev_subst_env['process'] = process;
+
+        // * Imported Libraries
+        c.abbrev_subst_env['pako'] = g.pako;
+        c.abbrev_subst_env['showdown'] = g.showdown;
+        c.abbrev_subst_env['dayjs'] = g.dayjs;
+        c.abbrev_subst_env['md5'] = g.md5;
+        c.abbrev_subst_env['csvtojson'] = csv;
+        c.abbrev_subst_env['difflib'] = difflib;
+        c.abbrev_subst_env['elementtree'] = et;
+        c.abbrev_subst_env['ksuid'] = KSUID;
+
         c.abbrev_subst_start = getString('abbreviations-subst-start', '{|{');
         c.abbrev_subst_end = getString('abbreviations-subst-end', '}|}');
     }
@@ -845,7 +872,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
         const c = this.c;
         const hidden_root = c.fileCommands.getPosFromClipboard(tree_s);
-        if (!hidden_root) {
+        if (!hidden_root || !hidden_root.v) {
             g.trace('no pasted node');
             return;
         }
