@@ -142,6 +142,7 @@ export class LeoFind {
         'search_headline',
         'suboutline_only',
         'whole_word',
+
     ];
 
     public ignore_case!: boolean;
@@ -150,7 +151,7 @@ export class LeoFind {
     public pattern_match!: boolean;
     public search_headline!: boolean;
     public search_body!: boolean;
-    public entire_outline!: boolean;
+
     public suboutline_only!: boolean;
     public mark_changes!: boolean;
     public mark_finds!: boolean;
@@ -2758,6 +2759,51 @@ export class LeoFind {
     //     self.do_find_next(settings)
     //@+node:felix.20260531234145.1: *4* find._remember_settings
 
+    /**
+     * Add the settings to the search history.
+     */
+    public _remember_settings(settings: ISettings): void {
+
+        const equal = (b1: ISettings, b2: ISettings): boolean => {
+            const keys1 = Object.keys(b1).sort();
+            const keys2 = Object.keys(b2).sort();
+            if (keys1.length !== keys2.length) {
+                return false; // Defensive.
+            }
+            for (let i = 0; i < keys1.length; i++) {
+                const key = keys1[i];
+                if (b1[key as keyof ISettings] !== b2[key as keyof ISettings]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Replace the placeholder text.
+        settings.find_text = settings.find_text.replace('<find pattern here>', '');
+
+        // Don't add empty find patterns to the search history.
+        if (!settings.find_text.trim()) {
+            return;
+        }
+
+        // Ignore the two state entries: they are usually False anyway.
+        settings.in_headline = false;
+        settings.reverse = false;
+
+        // Remove any previous match.
+        for (const bunch of this.prev_searches) {
+            if (equal(settings, bunch)) {
+                return;
+            }
+        }
+
+        // Insert the setting at the current place in the list.
+        this.prev_searches_i += 1;
+        this.prev_searches.splice(this.prev_searches_i, 0, settings);
+
+    }
+
     // Original Python 
     /*
         def _remember_settings(self, settings: g.Bunch) -> None:
@@ -4235,6 +4281,42 @@ export class LeoFind {
     //     else:
     // this.handler(event)
     //@+node:felix.20260531234509.1: *4* find.do_arrow
+    public do_arrow(char: string): void {
+
+        // Remember the existing settings, as a side effect of calling get_settings.
+        this.ftm.get_settings();
+
+        // Compute the bunch to show.
+        let i = this.prev_searches_i;
+        const n = this.prev_searches.length;
+        if (n === 0) {
+            return; // Even with the get_Settings() side effect, there may be no previous searches.
+        }
+        this.prev_searches_i =
+            char === 'Up' && i - 1 >= 0
+                ? i - 1
+                : char === 'Down' && i + 1 < n
+                    ? i + 1
+                    : Math.max(0, Math.min(i, n - 1)); // fmt: skip
+        const bunch = this.prev_searches[this.prev_searches_i];
+        const find_s = bunch.find_text;
+        const change_s = bunch.change_text;
+
+        for (let key in bunch) {
+            const val = bunch[key as keyof ISettings];
+            if (this.ivars.includes(key as keyof LeoFind)) {
+                (this as any)[key] = val;
+            }
+        }
+
+        // Update the gui.
+        this.ftm.set_widgets_from_dict(bunch);
+        this.ftm.set_change_text(change_s);
+        this.ftm.set_find_text(find_s);
+
+    }
+
+
     // * Original Python
     /*
         def do_arrow(self, char: str, *, in_minibuffer: bool) -> None:
