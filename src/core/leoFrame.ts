@@ -1300,7 +1300,6 @@ export class NullTree {
                 wrapper.setAllText(p.h);
             }
 
-            console.log('TODO: maybe also call g.app.gui.editHeadline(p, selectAll, selection); ???');
             if (selectAll) {
                 wrapper.selectAllText();
             } else if (selection) {

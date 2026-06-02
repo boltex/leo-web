@@ -2341,7 +2341,7 @@ export class LeoUI extends NullGui {
 
     //@+node:felix.20260410231409.1: *4* loadSearchSettings
     /**
-     * * Gets the search settings from Leo, and applies them to the find panel webviews
+     * * Gets the search settings from Leo, and applies them to the find panel webview
      */
     public loadSearchSettings(): void {
 

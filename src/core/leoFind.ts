@@ -85,6 +85,7 @@ function cmd(p_name: string, p_doc: string) {
 export interface ISettings {
     // State...
     in_headline?: boolean;
+    reverse?: boolean;
     // Find/change strings...
     find_text: string;
     change_text: string;
@@ -99,7 +100,6 @@ export interface ISettings {
     search_headline: boolean;
     suboutline_only: boolean;
     whole_word: boolean;
-    reverse?: boolean;
 }
 
 type IFindUndoData = {
@@ -2786,7 +2786,6 @@ export class LeoFind {
         if (!settings.find_text.trim()) {
             return;
         }
-
         // Ignore the two state entries: they are usually False anyway.
         settings.in_headline = false;
         settings.reverse = false;
@@ -4297,7 +4296,7 @@ export class LeoFind {
                 ? i - 1
                 : char === 'Down' && i + 1 < n
                     ? i + 1
-                    : Math.max(0, Math.min(i, n - 1)); // fmt: skip
+                    : Math.max(0, Math.min(i, n - 1));
         const bunch = this.prev_searches[this.prev_searches_i];
         const find_s = bunch.find_text;
         const change_s = bunch.change_text;

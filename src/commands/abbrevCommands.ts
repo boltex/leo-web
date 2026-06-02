@@ -78,8 +78,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      */
     public expandAbbrev(event: any, stroke: KeyboardEvent): false | Promise<boolean> {
 
-        console.log('expandAbbrev called with event:', event, ' and stroke:', stroke);
-
         // Define ins, prefixes, self.in_head and self.w
         // Return if there is nothing to do.
         //@+<< expandAbbrev: prolog >>
@@ -244,10 +242,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         const isRoot = c.p.isRoot();
         const wasHoisted = c.hoistStack.length > 0;
         const parent = c.p.getParent();
-        const noSiblings = parent && parent.numberOfChildren() === 1;
-        const isFirstChild = parent && parent.firstChild() === c.p;
+        const noSiblings = parent && parent.v && parent.numberOfChildren() === 1;
+        const isFirstChild = parent && parent.v && parent.firstChild() === c.p;
         const prevSibling = c.p.moveToBack();
-        const prevSiblingExpanded = prevSibling && prevSibling.isExpanded();
+        const prevSiblingExpanded = prevSibling && prevSibling.v && prevSibling.isExpanded();
 
         // Carefully replace the old node with the new node.
         if (c.canDeleteHeadline()) {
