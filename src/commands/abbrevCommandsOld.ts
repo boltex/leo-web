@@ -1132,6 +1132,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             return;
         }
         try {
+            console.log('Adding abbreviation 1 ', { s, tag });
             const d = this.abbrevs;
             const data = s.split('=');
             // Do *not* strip ws so the user can specify ws.
@@ -1141,6 +1142,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 val = val.slice(0, -1);
             }
             val = val.replace(/\\n/g, '\n');
+            console.log('Adding abbreviation 2 ', { name, val });
+
             let old: string | null = null;
             [old, tag] = d[name] || [null, null];
             if (old && old !== val && !g.unitTesting) {

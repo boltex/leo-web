@@ -128,6 +128,12 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         this.in_head = w_name.startsWith('head');
         this.w = w;
 
+        if (inHeadline === this.in_head) {
+            console.log('in_head correctly set to', this.in_head);
+        } else {
+            console.warn('in_head may be incorrectly set to', this.in_head, 'based on widget name', w_name);
+        }
+
         //@-<< expandAbbrev: prolog >>
 
         // Try to match an abbreviation.
@@ -137,6 +143,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
             const tree_expansion = this.tree_abbrevs_d[word];
             if (tree_expansion) {
+                // Ok there really is an abbreviation to expand.
+                g.app.gui.triggerBodySave();
                 this.expand_tree(i, ins, word, tree_expansion);
                 return this.make_all_scripting_substitutions(word).then(() => {
                     return this.init_place_holder_search(false);
@@ -147,6 +155,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
             const expansion = this.abbrevs[word];
             if (expansion) {
+                // Ok there really is an abbreviation to expand.
+                g.app.gui.triggerBodySave();
                 this.replace_selection(i, ins, expansion);
                 return this.make_script_substitutions(word).then(() => {
                     return this.init_place_holder_search(true);
@@ -356,7 +366,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
 
         // Search!
-        c.endEditing();  // No need to re-edit the headline!
+        // c.endEditing();  // No need to re-edit the headline!
         this.w?.setInsertPoint(0);  // Start search at start.
         finder.interactive_search_helper(undefined, undefined, settings);
 
@@ -367,6 +377,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Undoably replace w[i:j] by s.
      */
     public replace_selection(i: number, j: number, s: string): void {
+
+        console.log(`Replacing selection from ${i} to ${j} with "${s}"`);
 
         const c = this.c;
         const p = c.p;
@@ -384,13 +396,23 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         w.delete(i, j);
         w.insert(i, s);
 
-        // Update only body text. Setting p.h here would be wrong.
+        // Update only body text. Setting p.h here would be wrong. (LEO-WEB Maybe do set headline after all?)
         if (!this.in_head) {
+            console.log('doing body replacement');
             p.v.b = w.getAllText();
+        } else {
+            c.endEditing(); // TEST THIS HERE INSTEAD OF 
+            console.log('doing headline replacement');
+            p.v.h = w.getAllText();
+            console.log('new headline text:', p.v.h, p.h);
+            // const ins = i + s.length;
+            // c.frame.tree.editLabel(p, false, [ins, ins, ins]);
         }
 
+        console.log('headline 1', p.v.h, p.h);
         // Complete the undo.
         u.afterChangeNodeContents(p, 'Abbreviation', bunch);
+        console.log('headline 2', p.v.h, p.h);
 
     }
     //@+node:felix.20260518221202.13: *4* abbrev: script substitution
@@ -427,7 +449,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         }
 
         c.abbrev_subst_env['_abr'] = word;
-        c.endEditing();  // No need to re-edit the headline!
+        // c.endEditing();  // No need to re-edit the headline!
 
         // A hack to accommodate existing abbreviations: evaluate bodies before headlines.
 
@@ -450,12 +472,14 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             return;
         }
 
+        console.log('Making script substitutions for word:', word, "p.h:", p.h);
         c.abbrev_subst_env['_abr'] = word;
 
         // Replace the contents only if they have changed!
         const ins = w?.getInsertPoint() || 0;
         if (this.in_head) {
-            c.endEditing();
+            console.log('doing headline substitution');
+            // c.endEditing();
             try {
                 const contents = p.h;
                 const new_contents = await this._substitution_helper(contents);
@@ -469,6 +493,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 w?.setInsertPoint(new_ins);
             }
         } else {
+            console.log('doing body substitution');
             const contents = p.b;
             const new_contents = await this._substitution_helper(contents);
             if (new_contents !== contents) {
@@ -602,8 +627,8 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             ['abbreviations', 'local'],
         ];
         for (const [source, tag] of table) {
-            const aList = c.config.getData(source, false) || [];
-            const abbrev: string[] = [];
+            const aList = c.config.getData(source, true, false) || [];
+            let abbrev: string[] = [];
             const result: string[] = [];
             for (const s of aList) {
                 if (s.startsWith('\\:')) {
@@ -613,7 +638,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                     // End the previous abbreviation.
                     if (abbrev.length) {
                         result.push(abbrev.join(''));
-                        abbrev.length = 0;
+                        abbrev = [];
                     }
                     // Start the new abbreviation.
                     if (s.trim()) {
@@ -641,23 +666,33 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             return;
         }
         try {
+            console.log('Adding abbreviation 1 ', { s, tag });
             const d = this.abbrevs;
             const data = s.split('=');
             // Do *not* strip ws so the user can specify ws.
-            const name = data[0].replace('\\t', '\t').replace('\\n', '\n');
+            const name = data[0].replace(/\\t/g, '\t').replace(/\\n/g, '\n');
             let val = data.slice(1).join('=');
             if (val.endsWith('\n')) {
                 val = val.slice(0, -1);
             }
-            val = val.replace(this.number_regex, '\n').replace(/\\\\n/g, '\\n');
+
+            // old 
+            val = val.replace(/\\n/g, '\n');
+
+
+            console.log('Adding abbreviation 2 ', { name, val });
+            // new
+            // val = val.replace(this.number_regex, '\n').replace(/\\\\n/g, '\\n');
+
             const old = d[name];
             if (old && old !== val && !g.unitTesting) {
-                g.es_print(`redefining abbreviation ${name}\nfrom ${old} to ${val}`);
+                g.es_print(`redefining abbreviation ${name}\nfrom ${JSON.stringify(old)} to ${JSON.stringify(val)}`);
             }
             d[name] = val;
         } catch (e) {
-            g.es_print(`bad abbreviation: ${s}`);
+            g.es_print(`bad abbreviation: ${s} `);
         }
+
     }
 
     //@+node:felix.20260518221202.21: *4* abbrev.init_env
