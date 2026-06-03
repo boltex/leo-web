@@ -71,7 +71,13 @@ export class Controller {
             // TODO : UNCOMMENT BELOW MAYBE?
             setTimeout(() => {
                 // Select headline if needed after refresh.
-                g.app.gui.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);
+                if (w.sel) {
+                    console.log("--- > Selecting headline after abbrev refresh with sel:", w.sel);
+                    g.app.gui.editHeadline(undefined, false, [w.sel[0], w.sel[1], w.ins]);
+                } else {
+                    console.log(" --- > No selection info available for headline after abbrev refresh. w is ", w);
+                }
+
             }, 0);
         } else {
             g.app.gui.fullRefresh(false, false, Focus.Body, {

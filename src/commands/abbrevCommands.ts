@@ -97,8 +97,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
         const w_name = g.app.gui.widget_name(w);
 
-        console.log('Widget name:', w_name);
-
         if (!w_name.startsWith('body') && !w_name.startsWith('head')) {
             return false;
         }
@@ -129,7 +127,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         this.w = w;
 
         if (inHeadline === this.in_head) {
-            console.log('in_head correctly set to', this.in_head);
+            // 
         } else {
             console.warn('in_head may be incorrectly set to', this.in_head, 'based on widget name', w_name);
         }
@@ -398,22 +396,15 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
         // Update only body text. Setting p.h here would be wrong. (LEO-WEB Maybe do set headline after all?)
         if (!this.in_head) {
-            console.log('doing body replacement');
             p.v.b = w.getAllText();
         } else {
             c.endEditing(); // TEST THIS HERE INSTEAD OF 
-            console.log('doing headline replacement');
             p.v.h = w.getAllText();
-            console.log('new headline text:', p.v.h, p.h);
             // const ins = i + s.length;
             // c.frame.tree.editLabel(p, false, [ins, ins, ins]);
         }
-
-        console.log('headline 1', p.v.h, p.h);
         // Complete the undo.
         u.afterChangeNodeContents(p, 'Abbreviation', bunch);
-        console.log('headline 2', p.v.h, p.h);
-
     }
     //@+node:felix.20260518221202.13: *4* abbrev: script substitution
     //@+node:felix.20260518221202.14: *5* abbrev.make_all_scripting_substitutions
@@ -472,13 +463,11 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             return;
         }
 
-        console.log('Making script substitutions for word:', word, "p.h:", p.h);
         c.abbrev_subst_env['_abr'] = word;
 
         // Replace the contents only if they have changed!
         const ins = w?.getInsertPoint() || 0;
         if (this.in_head) {
-            console.log('doing headline substitution');
             // c.endEditing();
             try {
                 const contents = p.h;
@@ -493,7 +482,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 w?.setInsertPoint(new_ins);
             }
         } else {
-            console.log('doing body substitution');
             const contents = p.b;
             const new_contents = await this._substitution_helper(contents);
             if (new_contents !== contents) {
@@ -510,20 +498,46 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
     /**
      * Replace 'word' by the 'definition' in the 'content' string.
      */
-    public async _substitution_helper(content: string): Promise<string> {
+    public async _substitution_helper(p_content: string): Promise<string> {
 
         const c = this.c;
         if (!c.abbrev_subst_start || !c.abbrev_subst_end) {
-            return content;
+            return p_content;
         }
-        while (content.includes(c.abbrev_subst_start)) {
-            let [prefix, rest] = content.split(c.abbrev_subst_start, 2);
-            const content_list = rest.split(c.abbrev_subst_end, 2);
-            if (content_list.length !== 2) {
+
+        const splitAtFirst = (s: string, sep: string): [string, string] | null => {
+            const i = s.indexOf(sep);
+            if (i < 0) {
+                return null;
+            }
+            return [
+                s.slice(0, i),
+                s.slice(i + sep.length)
+            ];
+        };
+
+        while (p_content.includes(c.abbrev_subst_start)) {
+            // let [prefix, rest] = p_content.split(c.abbrev_subst_start, 2);
+            // const content_list = rest.split(c.abbrev_subst_end, 2);
+            // if (content_list.length !== 2) {
+            //     break;
+            // }
+            // let content = content_list[0];
+            // rest = content_list[1];
+            const first = splitAtFirst(p_content, c.abbrev_subst_start);
+            if (!first) {
                 break;
             }
-            content = content_list[0];
-            rest = content_list[1];
+
+            const [prefix, rest1] = first;
+
+            const second = splitAtFirst(rest1, c.abbrev_subst_end);
+            if (!second) {
+                break;
+            }
+
+            let [content, rest] = second;
+
 
             let x;
             let func;
@@ -556,7 +570,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
 
             try {
                 this.expanding = true;
-                c.abbrev_subst_env['x'] = '';
                 content += '\n'; // Make sure we end the script properly.
                 const scriptWrapper = `return (async () => {
                     try {
@@ -585,10 +598,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             }
             x = x || '';
             x.replaceAll(c.abbrev_subst_start, '').replaceAll(c.abbrev_subst_end, '');
-            content = `${prefix}${x}${rest}`;
+            p_content = `${prefix}${x}${rest}`;
 
         }
-        return content;
+        return p_content;
 
 
     }
@@ -666,7 +679,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             return;
         }
         try {
-            console.log('Adding abbreviation 1 ', { s, tag });
             const d = this.abbrevs;
             const data = s.split('=');
             // Do *not* strip ws so the user can specify ws.
@@ -677,12 +689,9 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             }
 
             // old 
-            val = val.replace(/\\n/g, '\n');
-
-
-            console.log('Adding abbreviation 2 ', { name, val });
+            //val = val.replace(/\\n/g, '\n');
             // new
-            // val = val.replace(this.number_regex, '\n').replace(/\\\\n/g, '\\n');
+            val = val.replace(this.number_regex, '\n').replace(/\\\\n/g, '\\n');
 
             const old = d[name];
             if (old && old !== val && !g.unitTesting) {
@@ -826,7 +835,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             g.issueSecurityWarning(`@data ${key}`);
             this.subst_env = [];
         } else {
-            this.subst_env = c.config.getData(key, false) || [];
+            this.subst_env = c.config.getData(key, true, false) || [];
         }
 
         // Inject one ivar.
