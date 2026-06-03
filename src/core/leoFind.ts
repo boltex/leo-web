@@ -1204,7 +1204,7 @@ export class LeoFind {
             while (!found && !hitBase) {
                 let h = node.h;
                 if (h) {
-                    h = h.split(' ')[0]!;
+                    h = h.trim().split(/\s+/)[0];
                 }
 
                 if (

@@ -563,7 +563,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
 
         function atfile(p: Position): boolean {
             /** return True if p is an @<file> node *of any kind* */
-            const word0 = p.h.split(' ')[0]!;
+            const word0 = p.h.trim().split(/\s+/)[0];
             return (
                 g.app.atFileNames.includes(word0) ||
                 word0 === '@auto' ||
@@ -575,7 +575,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
         while (c.positionExists(p)) {
             if (atfile(p)) {
                 // see if it's a @<file> node of some sort
-                let nodepath = p.h.split(/\s+/, 2).pop() || '';
+                let nodepath = p.h.trim().split(/\s+(.*)/s)[1] || p.h;
                 nodepath = g.os_path_join(path, nodepath);
                 if (!await g.os_path_isdir(nodepath)) {
                     nodepath = g.os_path_dirname(nodepath);
