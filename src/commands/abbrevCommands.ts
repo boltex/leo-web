@@ -381,15 +381,17 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      */
     public replace_selection(i: number, j: number, s: string): void {
 
-        console.log(`Replacing selection from ${i} to ${j} with "${s}"`);
-
         const c = this.c;
         const p = c.p;
         const u = c.undoer;
         const w = this.w;
-
         if (!w) {
             return;
+        }
+
+        if (this.in_head) {
+            const domstring = g.workspace.outline.HEADLINE_INPUT.value;
+            w?.setAllText(domstring);
         }
 
         // Start the undo.
@@ -403,7 +405,6 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         if (!this.in_head) {
             p.v.b = w.getAllText();
         } else {
-            c.endEditing(); // TEST THIS HERE INSTEAD OF 
             p.v.h = w.getAllText();
             // const ins = i + s.length;
             // c.frame.tree.editLabel(p, false, [ins, ins, ins]);
@@ -461,39 +462,61 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
      * Replace word by scripting expansion in p.h or p.b.
      */
     public async make_script_substitutions(word: string): Promise<void> {
+
+        if (!this.scripting_enabled) {
+            return;
+        }
+
         const c = this.c;
         const p = c.p;
         const w = this.w;
-        if (!this.scripting_enabled) {
+
+        if (!w) {
             return;
         }
 
         c.abbrev_subst_env['_abr'] = word;
 
         // Replace the contents only if they have changed!
-        const ins = w?.getInsertPoint() || 0;
+        const ins = w.getInsertPoint() || 0;
+        let new_ins = ins;
         if (this.in_head) {
-            // c.endEditing();
             try {
                 const contents = p.h;
+                const end_text = contents.slice(ins);
                 const new_contents = await this._substitution_helper(contents);
                 if (new_contents !== contents) {
                     p.h = new_contents;
+                    if (new_contents.endsWith(end_text)) {
+                        new_ins = new_contents.length - end_text.length;
+                    } else {
+                        new_ins = Math.min(ins, p.b.length);
+                    }
                 }
             } finally {
-                c.treeWantsFocusNow();
-                c.editHeadline();
-                const new_ins = Math.min(ins, p.h.length);
-                w?.setInsertPoint(new_ins);
+                w.setInsertPoint(new_ins);
             }
         } else {
+            // at this point, insertion point is at end of last 'replace_selection' call inserted,
+            // so lets save all text past that point, to be able to compare after substitution 
+            // and restore insertion point by looking from the end for that text.
             const contents = p.b;
+
+            const end_text = contents.slice(ins);
+
             const new_contents = await this._substitution_helper(contents);
             if (new_contents !== contents) {
                 p.b = new_contents;
-                const new_ins = Math.min(ins, p.b.length);
-                p.setSelection(new_ins, p.b.length);
-                w?.setInsertPoint(new_ins);
+
+                if (new_contents.endsWith(end_text)) {
+                    const new_ins = new_contents.length - end_text.length;
+                    p.setSelection(new_ins, new_contents.length);
+                    w.setInsertPoint(new_ins);
+                } else {
+                    const new_ins = Math.min(ins, p.b.length);
+                    p.setSelection(new_ins, p.b.length);
+                    w.setInsertPoint(new_ins);
+                }
             }
         }
 
