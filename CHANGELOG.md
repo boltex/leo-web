@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.23
+
+- ...
+
 ## 1.0.22
 
 - Added 'Copy UNL to clipboard' to the body and outline context-menus.
