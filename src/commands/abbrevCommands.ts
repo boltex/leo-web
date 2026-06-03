@@ -321,7 +321,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             in_headline: false,
             find_text: `(${start_pat}.*?${end_pat})`,
             change_text: '',
-            file_only: true,
+            file_only: false,
             mark_changes: false,
             mark_finds: false,
             ignore_case: true,
@@ -329,7 +329,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             pattern_match: true,
             search_body: true,
             search_headline: true,
-            suboutline_only: true,
+            suboutline_only: !node_only,
             whole_word: false,
         };
 
@@ -349,7 +349,9 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         if (!found) {
             return;
         }
-        if (node_only) {
+
+        // Experiment with true (always) instead of if (node_only) {... 
+        if (true) {
             // Tell the search command to restore settings on failure.
             finder.previous_settings = {
                 find_text: finder.find_text,
