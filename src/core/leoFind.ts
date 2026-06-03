@@ -276,7 +276,6 @@ export class LeoFind {
      * Return a dict representing all default settings.
      */
     public default_settings(): ISettings {
-        const c = this.c;
         return {
             // State...
             in_headline: false,
@@ -322,7 +321,8 @@ export class LeoFind {
      *     return <appropriate error indication>
      */
     public init_ivars_from_settings(settings: ISettings): void {
-
+        // Init required defaults.
+        this.reverse = false;
         // Init find/change strings.
         this.change_text = settings.change_text;
         this.find_text = settings.find_text;
@@ -1206,7 +1206,6 @@ export class LeoFind {
                 if (h) {
                     h = h.trim().split(/\s+/)[0];
                 }
-
                 if (
                     [
                         '@clean',

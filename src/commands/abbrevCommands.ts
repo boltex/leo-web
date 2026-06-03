@@ -145,6 +145,10 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                 g.app.gui.triggerBodySave();
                 this.expand_tree(i, ins, word, tree_expansion);
                 return this.make_all_scripting_substitutions(word).then(() => {
+                    // Leave focus in body first.
+                    const c = this.c;
+                    const w = c.frame.body.wrapper;
+                    c.set_focus(w);
                     return this.init_place_holder_search(false);
                 }).then(() => {
                     return true;
@@ -367,6 +371,7 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
         // c.endEditing();  // No need to re-edit the headline!
         this.w?.setInsertPoint(0);  // Start search at start.
         finder.interactive_search_helper(undefined, undefined, settings);
+        g.workspace.logPane.showTab('find', true);
 
     }
 
