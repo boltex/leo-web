@@ -1886,7 +1886,7 @@ export class FileCommands {
     }
     //@+node:felix.20251214160339.947: *4* fc: Writing top-level
     //@+node:felix.20251214160339.956: *5* fc.outline_to_clipboard_string
-    public outline_to_clipboard_string(p?: Position): string | undefined {
+    public outline_to_clipboard_string(p?: Position): string {
         // Save
         const tua = this.descendentTnodeUaDictList;
         const vua = this.descendentVnodeUaDictList;

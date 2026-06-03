@@ -1,3 +1,6 @@
+# TEMPORARY (remove this when web branch is about to be merged)
+web/
+
 # Dependencies
 node_modules/
 npm-debug.log*

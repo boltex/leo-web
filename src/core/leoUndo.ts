@@ -636,7 +636,7 @@ export class Undoer {
             return;
         }
         // Set the type & helpers.
-        bunch.kind = 'node';
+        bunch.kind = 'afterChangeNodeContents';
         bunch.undoType = command;
         bunch.undoHelper = u.undoNodeContents;
         bunch.redoHelper = u.redoNodeContents;
@@ -1058,6 +1058,7 @@ export class Undoer {
         const c: Commands = u.c;
         const w: StringTextWrapper = c.frame.body.wrapper;
         const bunch: Bead = u.createCommonBunch(p);
+        bunch.kind = 'beforeChangeNodeContents';
         bunch.oldBody = p.b;
         bunch.oldHead = p.h;
         // #1413: Always restore yScroll if possible.

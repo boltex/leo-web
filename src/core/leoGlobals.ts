@@ -6149,8 +6149,19 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
 
     } else {
         try {
-            // Open this URL in a new Browser tab
-            window.open(url, '_blank');
+            // Need to be in a timeout to get the focus on the new tab when using ctrl+click in the body text.
+            // (In the outline ctrl+click works without the timeout, but it does not work in the body without the timeout.)
+            // Maybe its because in the outline its only mousedown and in the body its a click event?
+            setTimeout(() => {
+                const newTab = window.open(url, '_blank');
+                // Open this URL in a new Browser tab
+                if (newTab) {
+                    newTab.focus();
+                } else {
+                    es(`Unable to open URL: ${url}`);
+                }
+            }, 0);
+
         } catch (e) {
             // pass
         }
