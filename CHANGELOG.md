@@ -5,6 +5,8 @@
 - Added 'Copy UNL to clipboard' to the body and outline context-menus.
 - Added tooltips to the body pane's UNL and URL links.
 - Fixed handleUrlHelper to give focus to the opened browser tab in all circumstances.
+- Fixed abbreviation to match the latest Leo implementation of 6.8.9 which uses F3 instead of ',,' for next placeholder selection.
+- Added find panel 'history' with up/down arrows to access previous/next used find settings.
 
 ## 1.0.21
 
