@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.25
+
+- ...
+
 ## 1.0.24
 
 - Fixed UI freeze that happened when reloading modified opened Leo documents (.leo, .leojs files themselves)
