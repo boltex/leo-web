@@ -342,11 +342,16 @@ export class ExternalFilesController {
         // #1888:
         const val = await this.ask(c, w_path);
         if (['yes', 'yes-all'].includes(val)) {
+
+            // ! RESOLVE "onIdlePromise" BECAUSE revertCommander WILL AWAIT IT AND IT WILL BLOCK !
+            this.resolveOnIdle();
+
             // Do a complete restart of Leo.
             await g.app.loadManager!.revertCommander(c);
             // ! LEO-WEB : FORCE GUI REFRESH AFTER A Change of opened document!
             g.app.gui.fullRefresh(true);
             g.es_print(`reloaded ${w_path}`);
+            g.workspace.dialog.showToast(`Changes to Leo file detected. Reloaded ${g.shortFilename(w_path)}`);
         }
     }
     //@+node:felix.20251214160339.848: *5* efc.idle_check_open_with_file & helper

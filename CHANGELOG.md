@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.24
+
+- Fixed UI freeze that happened when reloading modified opened Leo documents (.leo, .leojs files themselves)
+
 ## 1.0.23
 
 - Removed test tree-abbreviation from default settings.
