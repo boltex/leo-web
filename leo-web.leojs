@@ -280,10 +280,6 @@
               "vh": "@file src/commands/abbrevCommands.ts"
             },
             {
-              "gnx": "felix.20260518220348.1",
-              "vh": "@file src/commands/abbrevCommandsOld.ts"
-            },
-            {
               "gnx": "felix.20251214160853.2",
               "vh": "@file src/commands/baseCommands.ts"
             },
