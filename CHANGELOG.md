@@ -2,7 +2,7 @@
 
 ## 1.0.25
 
-- ...
+- Fixed UI Freeze that happened when loading a leo file with missing external files
 
 ## 1.0.24
 

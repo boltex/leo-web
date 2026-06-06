@@ -860,6 +860,13 @@ export class ExternalFilesController {
         // with open(path, 'rb') as f
         //     s = f.read()
 
+        const w_exists = await g.os_path_exists(p_path);
+        if (!w_exists) {
+            console.warn(`checksum: file does not exist: ${p_path}`);
+            void g.workspace.dialog.showInformationMessage(`Checksum: file does not exist: ${p_path}`);
+            return '';
+        }
+
         const w_uri = g.makeUri(p_path);
         const s = await g.workspace.fs.readFile(w_uri);
 
@@ -997,8 +1004,9 @@ export class ExternalFilesController {
         if (!t) {
             t = await this.get_mtime(p_path);
         }
+        // t will be zero if file doesn't exist, but that should be handled by the caller.
         this._time_d[g.os_path_realpath(p_path)] = t;
-        if (!skip_checksum) {
+        if (t && !skip_checksum) {
             // To prevent false positives when timestamp (not content) is modified by external program
             this.checksum_d[p_path] = await this.checksum(p_path);
         }
