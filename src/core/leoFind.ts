@@ -85,7 +85,7 @@ function cmd(p_name: string, p_doc: string) {
 export interface ISettings {
     // State...
     in_headline?: boolean;
-    p?: Position;
+    reverse?: boolean;
     // Find/change strings...
     find_text: string;
     change_text: string;
@@ -100,10 +100,8 @@ export interface ISettings {
     search_headline: boolean;
     suboutline_only: boolean;
     whole_word: boolean;
-    reverse?: boolean;
-    wrapping?: boolean;
 }
-type ISettingsKey = keyof ISettings;
+
 type IFindUndoData = {
     end: number | undefined;
     in_headline: boolean;
@@ -129,16 +127,31 @@ export class LeoFind {
     // The work "widget".
     public work_s = ''; // p.b or p.c.
     public work_sel!: [number, number, number]; // pos, newpos, insert.
-    //
-    // Options ivars: set by FindTabManager.init.
-    // These *must* be initially None, not False.
+
+    // Options ivars: set by FindTabManager.init: must be None, not False.
+    public ivars = [
+        'change_text',
+        'file_only',
+        'find_text',
+        'ignore_case',
+        'mark_changes',
+        'mark_finds',
+        'node_only',
+        'pattern_match',
+        'search_body',
+        'search_headline',
+        'suboutline_only',
+        'whole_word',
+
+    ];
+
     public ignore_case!: boolean;
     public node_only!: boolean;
     public file_only!: boolean;
     public pattern_match!: boolean;
     public search_headline!: boolean;
     public search_body!: boolean;
-    public entire_outline!: boolean;
+
     public suboutline_only!: boolean;
     public mark_changes!: boolean;
     public mark_finds!: boolean;
@@ -169,8 +182,12 @@ export class LeoFind {
     public find_def_data: any;
     public in_headline: boolean = false;
     public match_obj!: RegExpExecArray | undefined;
+    public previous_settings: ISettings | undefined;
+    public prev_searches: ISettings[] = [];  // #4685
+    public prev_searches_i = 0;  // #4685
+
     public reverse: boolean = false;
-    public root: Position | undefined; // The start of the search, especially for suboutline-only.
+    public root: Position | undefined; // The start of the search. For suboutline-only.
     public total_links = 0;
     //
     // User settings.
@@ -259,11 +276,10 @@ export class LeoFind {
      * Return a dict representing all default settings.
      */
     public default_settings(): ISettings {
-        const c = this.c;
         return {
             // State...
             in_headline: false,
-            p: c.rootPosition()!,
+            reverse: false,
             // Find/change strings...
             find_text: '',
             change_text: '',
@@ -274,12 +290,10 @@ export class LeoFind {
             mark_finds: false,
             node_only: false,
             pattern_match: false,
-            reverse: false,
             search_body: true,
             search_headline: true,
             suboutline_only: false,
             whole_word: false,
-            wrapping: false,
         };
     }
     //@+node:felix.20251213133753.25: *4* find.finishCreate
@@ -307,10 +321,8 @@ export class LeoFind {
      *     return <appropriate error indication>
      */
     public init_ivars_from_settings(settings: ISettings): void {
-        //
         // Init required defaults.
         this.reverse = false;
-        //
         // Init find/change strings.
         this.change_text = settings.change_text;
         this.find_text = settings.find_text;
@@ -326,7 +338,6 @@ export class LeoFind {
         this.search_headline = settings.search_headline;
         this.suboutline_only = settings.suboutline_only;
         this.whole_word = settings.whole_word;
-        // self.wrapping = settings.wrapping
     }
 
     //@+node:felix.20251213133753.27: *4* find.reload_settings
@@ -472,6 +483,12 @@ export class LeoFind {
     private _init_from_dict(settings: { [key: string]: any }): void {
         // The valid ivars and reasonable defaults.
         const valid: { [key: string]: any } = {
+            // New.
+            find_text: '',
+            change_text: '',
+            mark_changes: false,
+            mark_finds: false,
+            // Existing.
             ignore_case: false,
             node_only: false,
             pattern_match: false,
@@ -495,6 +512,9 @@ export class LeoFind {
                 if ([true, false].includes(val)) {
                     // setattr(self, ivar, val);
                     (this as any)[ivar] = val;
+                } else if (typeof val === 'string') {
+                    // setattr(self, ivar, val);
+                    (this as any)[ivar] = val;
                 } else {
                     g.trace(`bad value: ${ivar} = ${val}`);
                     errors += 1;
@@ -507,6 +527,73 @@ export class LeoFind {
         if (errors) {
             g.printObj(Object.keys(valid).sort(), 'valid keys');
         }
+    }
+    //@+node:felix.20260524221933.1: *3* find.interactive_search_helper
+    public interactive_search_helper(
+        dry_run = false,
+        root: Position | undefined = undefined,
+        settings?: ISettings
+    ): void {
+        //@+<< docstring: find.interactive_search >>
+        //@+node:felix.20260524221933.2: *4* << docstring: find.interactive_search >>
+        /*
+        Support interactive find.
+
+        c.findCommands.interactive_search_helper starts an interactive search with
+        the given settings. The settings argument may be either a g.Bunch or a
+        dict.
+
+        Example 1, settings is a g.Bunch:
+
+            c.findCommands.interactive_search_helper(
+                root = c.p,
+                settings = g.Bunch(
+                    find_text = '^(def )',
+                    change_text = '\1',
+                    pattern_match=True,
+                    search_headline=False,
+                    whole_word=False,
+                )
+            )
+
+        Example 2, settings is a python dict:
+
+            c.findCommands.interactive_search_helper(
+                root = c.p,
+                settings = {
+                    'find_text': '^(def )',
+                    'change_text': '\1',
+                    'pattern_match': True,
+                    'search_headline': False,
+                    'whole_word': False,
+                }
+            )
+        */
+        //@-<< docstring: find.interactive_search >>
+        // Merge settings into default settings.
+        const c = this.c;
+        const d: ISettings = this.default_settings();  // A g.bunch
+        if (settings) {
+            Object.assign(d, settings as Partial<ISettings>);
+        }
+        this.ftm.set_widgets_from_dict(d);  // So the *next* find-next will work.
+        this.show_find_options_in_status_area();
+        // #4614: Init these ivars early so check_args won't complain.
+        this.search_body = d['search_body'] || false;
+        this.search_headline = d['search_headline'] || false;
+        this.find_text = d['find_text'] || '';
+        this.reverse = d['reverse'] || false;  // Internal state.
+        if (!this.check_args('find-next')) {
+            return;
+        }
+        if (dry_run) {
+            return;
+        }
+        if (root && root.v) {
+            c.selectPosition(root);
+        }
+
+        this.do_find_next(d);
     }
     //@+node:felix.20251213133753.32: *3* LeoFind.Commands (immediate execution)
     //@+node:felix.20251213133753.33: *4* show-all-tags
@@ -1117,9 +1204,8 @@ export class LeoFind {
             while (!found && !hitBase) {
                 let h = node.h;
                 if (h) {
-                    h = h.split(' ')[0]!;
+                    h = h.trim().split(/\s+/)[0];
                 }
-
                 if (
                     [
                         '@clean',
@@ -2435,7 +2521,7 @@ export class LeoFind {
 
         // TODO : Maybe Send to GOTO PANE ?
         // TODO Test this !
-        g.es(line.trim() + `\n ${unl}::${line_number - 1}`);
+        g.es(found.h.trim() + `\n ${unl}::${line_number - 1}`);
         // log.put(line.strip() + '\n', nodeLink=f"{unl}::{line_number - 1}")  // Local line.
     }
     //@+node:felix.20230212180757.8: *7* find.find_all_matches_in_string
@@ -2670,6 +2756,52 @@ export class LeoFind {
     //     k.showStateAndMode()
     //     c.widgetWantsFocusNow(w)
     //     self.do_find_next(settings)
+    //@+node:felix.20260531234145.1: *4* find._remember_settings
+
+    /**
+     * Add the settings to the search history.
+     */
+    public _remember_settings(settings: ISettings): void {
+
+        const equal = (b1: ISettings, b2: ISettings): boolean => {
+            const keys1 = Object.keys(b1).sort();
+            const keys2 = Object.keys(b2).sort();
+            if (keys1.length !== keys2.length) {
+                return false; // Defensive.
+            }
+            for (let i = 0; i < keys1.length; i++) {
+                const key = keys1[i];
+                if (b1[key as keyof ISettings] !== b2[key as keyof ISettings]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Replace the placeholder text.
+        settings.find_text = settings.find_text.replace('<find pattern here>', '');
+
+        // Don't add empty find patterns to the search history.
+        if (!settings.find_text.trim()) {
+            return;
+        }
+        // Ignore the two state entries: they are usually False anyway.
+        settings.in_headline = false;
+        settings.reverse = false;
+
+        // Remove any previous match.
+        for (const bunch of this.prev_searches) {
+            if (equal(settings, bunch)) {
+                return;
+            }
+        }
+
+        // Insert the setting at the current place in the list.
+        this.prev_searches_i += 1;
+        this.prev_searches.splice(this.prev_searches_i, 0, settings);
+
+    }
+
     //@+node:felix.20251213133753.86: *4* find.summarize
     @cmd(
         'summarize',
@@ -2914,6 +3046,8 @@ export class LeoFind {
     /**
      * The common part of the clone-find commands.
      *
+     * The caller must check the settings.
+     * 
      * Return the number of found nodes.
      */
     private _cf_helper(settings: ISettings, flatten: boolean): number {
@@ -3794,6 +3928,16 @@ export class LeoFind {
     public restore(data: IFindUndoData): void {
         const c = this.c;
         const p = data.p;
+
+
+        // #4688: Restore previous settings.
+        if (this.previous_settings) {
+            this.init_ivars_from_settings(this.previous_settings);
+            this.ftm.set_widgets_from_dict(this.previous_settings);
+            this.previous_settings = undefined;
+        }
+
+
         // c.frame.bringToFront();  // Needed on the Mac
 
         if (!p || !p.__bool__() || !c.positionExists(p)) {
@@ -3881,7 +4025,7 @@ export class LeoFind {
             c.selectPosition(p);
             c.bodyWantsFocus();
             if (showState && c.k && c.k.showStateAndMode) {
-                c.k.showStateAndMode(w); // TODO : ? NEEDED ?
+                c.k.showStateAndMode(); // TODO : ? NEEDED ?
             }
             c.bodyWantsFocusNow();
             w.setSelectionRange(pos, newpos, insert);
@@ -4104,6 +4248,42 @@ export class LeoFind {
     // this.escape_handler(event)
     //     else:
     // this.handler(event)
+    //@+node:felix.20260531234509.1: *4* find.do_arrow
+    public do_arrow(char: string): void {
+
+        // Remember the existing settings, as a side effect of calling get_settings.
+        this.ftm.get_settings();
+
+        // Compute the bunch to show.
+        let i = this.prev_searches_i;
+        const n = this.prev_searches.length;
+        if (n === 0) {
+            return; // Even with the get_Settings() side effect, there may be no previous searches.
+        }
+        this.prev_searches_i =
+            char === 'Up' && i - 1 >= 0
+                ? i - 1
+                : char === 'Down' && i + 1 < n
+                    ? i + 1
+                    : Math.max(0, Math.min(i, n - 1));
+        const bunch = this.prev_searches[this.prev_searches_i];
+        const find_s = bunch.find_text;
+        const change_s = bunch.change_text;
+
+        for (let key in bunch) {
+            const val = bunch[key as keyof ISettings];
+            if (this.ivars.includes(key as keyof LeoFind)) {
+                (this as any)[key] = val;
+            }
+        }
+
+        // Update the gui.
+        this.ftm.set_widgets_from_dict(bunch);
+        this.ftm.set_change_text(change_s);
+        this.ftm.set_find_text(find_s);
+
+    }
+
     //@+node:felix.20251213133753.132: *4* find.updateChange/FindList
     public update_change_list(s: string): void {
         if (!this.changeTextList.includes(s)) {

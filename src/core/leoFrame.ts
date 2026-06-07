@@ -1300,7 +1300,6 @@ export class NullTree {
                 wrapper.setAllText(p.h);
             }
 
-            console.log('TODO: maybe also call g.app.gui.editHeadline(p, selectAll, selection); ???');
             if (selectAll) {
                 wrapper.selectAllText();
             } else if (selection) {
@@ -1561,6 +1560,12 @@ export class StringTextWrapper {
         let sel = this.sel;
         let i;
         let j;
+
+        // Check if sel contains None values (can be set by leoFind.py's 'save' and 'restore' methods).
+        if (sel.length === 2 && (sel[0] == null || sel[1] == null)) {
+            return [0, 0];
+        }
+
         if (sel.length === 2 && sel[0] >= 0 && sel[1] >= 0) {
             [i, j] = sel;
             if (sort && i > j) {
@@ -1622,6 +1627,7 @@ export class StringTextWrapper {
      * StringTextWrapper.
      */
     public setSelectionRange(i: number, j: number, insert?: number): void {
+        // Note: leoFind.py may set those to None. See its 'save' and 'restore' methods.
         this.sel = [i, j];
         this.ins = insert == null ? j : insert;
     }

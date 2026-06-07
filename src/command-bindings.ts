@@ -267,6 +267,8 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
 
         [CMD.NEXT_NODE, () => leoUI.command(LEOCMD.GOTO_NEXT_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
+        [CMD.FIND_HISTORY_BACK, () => leoUI.doArrow("Up")],
+        [CMD.FIND_HISTORY_FORWARD, () => leoUI.doArrow("Down")],
         [CMD.FIND_QUICK, () => leoUI.findQuick()],
         [CMD.FIND_QUICK_SELECTED, () => leoUI.findQuickSelected()],
         [CMD.FIND_QUICK_TIMELINE, () => leoUI.findQuickTimeline()],
@@ -274,6 +276,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.FIND_QUICK_HISTORY, () => leoUI.findQuickHistory()],
         [CMD.FIND_QUICK_MARKED, () => leoUI.findQuickMarked()],
         [CMD.FIND_QUICK_GO_ANYWHERE, () => leoUI.goAnywhere()],
+
 
         [CMD.GOTO_NAV_PREV, () => leoUI.navigateNavEntry(LeoGotoNavKey.prev)],
         [CMD.GOTO_NAV_NEXT, () => leoUI.navigateNavEntry(LeoGotoNavKey.next)],

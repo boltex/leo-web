@@ -1,10 +1,28 @@
 # Change Log
 
+## 1.0.26
+
+- Improved error messages when writing external files. Mirror of Leo's #4732
+
+## 1.0.25
+
+- Fixed UI Freeze that happened when loading a leo file with missing external files
+
+## 1.0.24
+
+- Fixed UI freeze that happened when reloading modified opened Leo documents (.leo, .leojs files themselves)
+
+## 1.0.23
+
+- Removed test tree-abbreviation from default settings.
+
 ## 1.0.22
 
 - Added 'Copy UNL to clipboard' to the body and outline context-menus.
 - Added tooltips to the body pane's UNL and URL links.
 - Fixed handleUrlHelper to give focus to the opened browser tab in all circumstances.
+- Fixed abbreviation to match the latest Leo implementation of 6.8.9 which uses F3 instead of ',,' for next placeholder selection.
+- Added find panel 'history' with up/down arrows to access previous/next used find settings.
 
 ## 1.0.21
 

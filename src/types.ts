@@ -10,6 +10,18 @@ import { Uri } from "./workspace";
 type RClick = any;
 //@-<< imports >>
 //@+others
+//@+node:felix.20260528004221.1: ** SearchSettingNames
+export type SearchSettingNames = 'entireOutline' |
+    'nodeOnly' |
+    'fileOnly' |
+    'subOutlineOnly' |
+    'ignoreCase' |
+    'markChanges' |
+    'markFinds' |
+    'regExp' |
+    'searchBody' |
+    'searchHeadline' |
+    'wholeWord';
 //@+node:felix.20251214225420.1: ** messageOptions
 export interface MessageOptions {
 
