@@ -2,7 +2,7 @@
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
 
-It contains the original Leo documentation adapted to the specificities of Leo-Web, mostly having to do with the UI being a browser of qt, and the implementation (and scripting) language being JavaScript instead of Python.
+It contains the original Leo documentation adapted to the specificities of Leo-Web, mostly having to do with the UI being a browser instead of qt, and the implementation (and scripting) language being JavaScript instead of Python.
 
 ## To start a local server to test and develop the Leo-Web documentation website:
 
