@@ -59,6 +59,7 @@ const config = {
         } : undefined,
         docs: {
           sidebarPath: './sidebars.js',
+          breadcrumbs: false,
         },
         blog: false,
         pages: false,
