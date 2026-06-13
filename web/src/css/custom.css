@@ -27,6 +27,8 @@
 
 /* You can override the default Infima variables here. */
 :root {
+  --ifm-menu-color-background-hover: #ac7b371a;
+
   --outline-bg: #ffffec;
   --ifm-background-color: #fff6f5;
   --ifm-navbar-background-color: #fff6f5;
@@ -47,7 +49,7 @@
   --ifm-footer-title-color: #fff;
   --ifm-footer-color: #fff;
 
-  --ifm-color-primary: #c26b2e;
+  --ifm-color-primary: #cd5602;
   --ifm-color-primary-dark: #af6029;
   --ifm-color-primary-darker: #a55b27;
   --ifm-color-primary-darkest: #884b20;
@@ -105,7 +107,7 @@ html[data-theme="dark"] {
 
   --ifm-footer-background-color: #161616;
 
-  --ifm-color-primary: #b15435;
+  --ifm-color-primary: #df6c45;
   --ifm-color-primary-dark: #9f4c30;
   --ifm-color-primary-darker: #96472d;
   --ifm-color-primary-darkest: #7c3b25;
@@ -131,6 +133,12 @@ html[data-theme="dark"] {
   --custom-home-author-color: #dcdcdc;
 
   --custom-player-after-color: #00000033;
+}
+
+/* Fix navbar by removing box-shadow and adding instead a border bottom */
+.navbar {
+  box-shadow: none;
+  border-bottom: 5px solid var(--resizer-color);
 }
 
 .theme-doc-sidebar-container {
@@ -332,4 +340,12 @@ html[data-theme="dark"] .navbar--github-link:before {
     content: "GitHub";
     background-image: none;
   }
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  background-color: var(--ifm-menu-color-background-hover);
+}
+.menu__link:hover,
+.menu__caret:hover {
+  background: var(--ifm-menu-color-background-hover);
 }

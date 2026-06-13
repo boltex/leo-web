@@ -4,19 +4,37 @@ sidebar_position: 1
 
 # Introduction
 
-LeoJS is a JavaScript implementation of the [Leo Editor](https://leo-editor.github.io/leo-editor/), designed as an extension for [Visual Studio Code](https://code.visualstudio.com/) and [vscodium.com](https://vscodium.com/).
+Leo-Web is a lightweight, browser-based port of the Leo Editor, the iconic outliner and scriptable literate programming environment.
 
-[![Introduction to LeoJS](img/video-button-intro.png#center)](https://www.youtube.com/watch?v=j0eo7SlnnSY)
+👉 Try it now: [https://boltex.github.io/leo-web](https://boltex.github.io/leo-web/)
 
-This 3 minute [Introduction to Leo](https://www.youtube.com/watch?v=j0eo7SlnnSY) video shows basic outline editing, along with external-file generation and read/write operations.
+- Work with Leo outlines without installing anything
+- Script using JavaScript or TypeScript
+- Access local files using the browser File System API
 
+Leo is a fundamentally different way to organize code, notes, and ideas.
+
+> See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
+> or on [github](https://github.com/leo-editor/leo-editor).
 ## Web-Based Development
 
-LeoJS can also be run as a web extension on VSCode for the web. It can edit Leo documents and work with your files directly inside online repositories, such as on GitHub and Azure-Repos: Press the `.` (period key) when browsing a github repo to switch the interface to VSCode for the web, then activate LeoJS from the extension panel.
+Leo-Web uses the browser's File System API. 
 
-[![LeoJS Features Demo](img/video-button-demo.png#center)](https://www.youtube.com/watch?v=M_mKXSbVGdE)
+Due to browser security constraints, access is limited to a user-approved _workspace_ directory. For example:
 
-Watch this [Features Demo](https://www.youtube.com/watch?v=M_mKXSbVGdE) video to see how to access an online repository with VSCode for the web and use LeoJS within it.
+- You can work inside project folders (e.g., C:/MyProject)
+- You cannot access system-level directories or unrestricted root locations. Although access to _subdirectories_ within user folders (e.g., Documents/MyProject) is permitted.
+
+### Browser Constraints
+
+- No absolute file paths (relative paths only)
+- No access to the original Leo's `~/.leo` settings folder
+- No execution of OS shell commands
+- Some keybindings are reserved by the browser (`Ctrl+TAB`, `Ctrl+N` and `Ctrl+T`)
+### User Settings
+
+- `myLeoSettings.leo` or `myLeoSettings.leojs` must be at the root of your chosen workspace
+- UI settings are available via the log pane tab
 
 ## Features
 
@@ -116,7 +134,7 @@ Arrow keys, home/end, page up/down are used for basic navigation. But in order t
 
 ### Goto Anywhere Command
 
-In vscode, the **`Ctrl+P`** shortcut allows you to switch to any project file, but **when the focus is in one of Leo's panels**, the **`Ctrl+P`** keybinding allows you to switch to any node directly by typing (part of) its headline.
+The **`Ctrl+P`** keybinding allows you to switch to any node directly by typing (part of) its headline.
 
 ### Find Panel
 
@@ -139,8 +157,6 @@ Press **`Enter`** to freeze the results and show results **also found in body te
 If you check the **Tag** option, the **Nav** field is then used to find nodes by their tag 🏷 _ua_ (user attribute).
 
 ## Undo Panel
-
-> In LeoJS, the undo functionality is a multi-tiered system that separates structural outline changes from text changes within the body pane.
 
 Use the undo / redo icons above the outline or above the undo pane itself. You can also right-click on an undo step to directly switch to that specific state!
 

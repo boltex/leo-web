@@ -18,14 +18,6 @@ It contains the original Leo documentation adapted to the specificities of Leo-W
 
   `npm run start`
 
-## To build and create the /docs/ folder for the gh-pages branch.
-
-Switch to gh-pages first - pulling devel into gh-pages as needed.
-
-(cd into web and install dependencies first)
-
-`npm run build --no-minify && node copy-build.js`
-
 ## More info
 
 See [Docusaurus](https://docusaurus.io/) and the scripts the package.json file in the /web/folder for more examples.
