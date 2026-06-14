@@ -3,6 +3,7 @@
 ## 1.0.26
 
 - Improved error messages when writing external files. Mirror of Leo's #4732
+- Made Alt+T (Normally _focus-to-tree_) the toggle-active-pane default keybinding because Ctrl+T is reserved in the browser.
 
 ## 1.0.25
 

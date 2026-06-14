@@ -31,36 +31,22 @@ Due to browser security constraints, access is limited to a user-approved _works
 - No access to the original Leo's `~/.leo` settings folder
 - No execution of OS shell commands
 - Some keybindings are reserved by the browser (`Ctrl+TAB`, `Ctrl+N` and `Ctrl+T`)
-### User Settings
-
-- `myLeoSettings.leo` or `myLeoSettings.leojs` must be at the root of your chosen workspace
-- UI settings are available via the log pane tab
-
 ## Features
 
--   UI controls: Available in the explorer view and a standalone sidebar, such as the **Leo Outline**, **body pane**, **opened documents selector** along with a **Log Window**.
--   **Detached Body Panes**, independent of the selected node, can be opened with the 'Open Aside' command.
+-   UI controls: The **Leo Outline**, **body pane**, along with a tabbed **Log Window** containing all other panels.
 -   Keybindings that match those of the Leo editor, including arrow keys behavior for outline keyboard navigation.
 -   **Derived files change detection**. See [External Files](#external-files) below for more details
 -   **Scriptable in Javascript and Typescript**. All commands and scripts have easy access to outline structure via a simple Javascript API
--   **'@button' panel** for [creating your own commands with @buttons](tutorial-basics.md#button-and-command-nodes)
+-   Collapsible top menu `F11` with tabs for opened files, toolbars for common commands and **'@buttons'** for [creating your own commands](tutorial-basics.md#button-and-command-nodes)
 -   **Find panel** that reacts to Leo's typical keybindings like `Ctrl+F`, `F2` and `F3` when focus is in the outline or body pane
 -   **Nav and Tag panel** search controls are integrated in the Find panel
 -   **Undo History panel**, showing all actions and allowing going back, or forward, to any undo states.
 
-![LeoJS UI](img/small-hero-docs-montage.png#center)
+![Leo-Web UI](img/small-hero-docs-montage.png#center)
 
 ## Leo Commands
 
-LeoJS offers an extensive set of commands, accessible through a variety of interfaces — toolbar buttons, dedicated menus, and intuitive keybindings. Those commands are also discoverable via the Visual Studio Code Command Palette with **`Ctrl+Shift+P`**.
-
-### The Minibuffer
-
-For those familiar with Leo, the 'minibuffer' serves as the nerve center for command execution. Access it through **`Alt+X`** and use the complete set of Leo's commands!
-
-### Context-Aware Keybindings
-
-The keybinding architecture is designed to be context-aware. When your focus is within the LeoJS Body or Outline pane, LeoJS-specific keybindings take precedence. Shift your focus outside these panes, and Visual Studio Code's native keybindings resume control.
+Commands are accessible through a variety of interfaces — toolbar buttons, dedicated menus, and intuitive keybindings. Those commands are also discoverable via the Command Palette (_Also called minibuffer_) using **`Alt+X`** or **`Ctrl+Shift+P`**.
 
 ## An Outline Editor
 
@@ -91,7 +77,7 @@ _Move-Outline commands need the `Alt` key modifier only when focus is on body pa
 
 | Changing Focus                  |                                                   |
 | :------------------------------ | :------------------------------------------------ |
-| Toggle focus Outline/Body       | `Ctrl + T`                                        |
+| Toggle focus Outline/Body       | `Alt + T`                                         |
 | Focus on Body (from outline)    | `Tab` &nbsp;&nbsp;_or_&nbsp;&nbsp; `Enter`        |
 
 ## External Files
@@ -107,26 +93,12 @@ Use either of the **Save Leo Document**, **Write File Nodes** or **Write Dirty F
 | @file          |    ✔️     |   ✔️    |    ❌     |     ❌     |
 | @nosent        |    ❌     |   ✔️    |    ✔️     |     ✔️     |
 
-You can also create most of those nodes by using the context menu in vscode's explorer or file editors, and choosing the **Import into LeoJS Outline** command.
+Leo will detect external file changes and update the outline to reflect those changes.
 
-The **Go to Line In LeoJS Outline** command is also available in the editor context menu to find a specific line in the outline. It will offer to import the file if no type of **@file** nodes are found in the outline for that file.
+## User Settings
 
-Leo will detect external file changes, and will ask to either **refresh from disk** or **ignore the changes**. 
-
-See the [LeoJS extension settings](#extension-settings) to decide how and when to refresh and synchronize content when external files are modified:
-
-![External File Change Detected](img/external-files-change-detection.png#center)
-
-## Extension Settings
-
-**Open the command palette `Ctrl+Shift+P` and start typing `LeoJS settings` to access its _welcome & settings_ screen**
-
-> _(Changes are auto-saved to the user's profile after 0.5 seconds)_
-
--   Control the visibility of the outline pane in the explorer view.
--   Decide how and when to refresh and synchronize content when external files are modified.
--   Show additional icons on outline nodes (Move, delete, mark, copy, paste...)
--   Choose to either focus on the body pane, or keep focus in the outline when a node is selected.
+- `myLeoSettings.leo` or `myLeoSettings.leojs` must be at the root of your chosen workspace
+- UI settings are available via the log pane tab
 
 ## Navigating a Leo Document
 
@@ -158,6 +130,7 @@ If you check the **Tag** option, the **Nav** field is then used to find nodes by
 
 ## Undo Panel
 
-Use the undo / redo icons above the outline or above the undo pane itself. You can also right-click on an undo step to directly switch to that specific state!
+You can right-click on an undo step to directly switch to that specific state!
 
 ![Undo pane](img/undo-pane.gif#center)
+
