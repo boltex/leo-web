@@ -4,27 +4,17 @@ sidebar_position: 2
 
 # Leo in 10 Minutes
 
-This page aims to go over the interface, its most important features and terminology, to get you going in a few minutes! **For a quick overview, see the [Introduction to Leo 📺](https://www.youtube.com/watch?v=j0eo7SlnnSY) video.**
+This page aims to go over the interface, its most important features and terminology, to get you going in a few minutes! **For a quick overview, see the [Introduction to Leo 📺](https://www.youtube.com/watch?v=tuM8MvI9g6k) video.**
 
-![LeoJS View](./img/hero-docs-montage.png)\
-_LeoJS UI panels are located in the LeoJS sidebar view (pictured above), and are also mirrored in the Explorer view_
+![Leo-Web View](./img/hero-docs-montage.png)
 
 ## User Interface
-
-As stated above the _LeoJS Outline and UI panels_ are visible in the standalone LeoJS View, but **also in the Explorer View**, below the file explorer:
-
-![Explorer View](./img/explorer-docs-montage.png)\
-_The Leo Outline panel shown in the sidebar's Explorer View_
 
 Leo stores all data in nodes. Nodes have headlines (shown in the outline pane) and body text. The body pane shows the body text of the presently selected node, the node whose headline is selected in the outline pane. Headlines have an icon box indicating a node’s status. 
 
 The **body pane** is a text editor which changes to match the selected node of the Leo outline.
 
 ![Body Pane](./img/body-pane-montage.png)
-
-> 💡 **TIP**\
-> **Detached Body Panes**, are panels like the body pane, but independent of the selected node. They can be opened with the 'Open Aside' command from any node.
-> ![Body Pane](./img/outline-context-montage.png)
 
 Below the outline pane are more panels, such as the **Find** panel to help navigate the outline, the **Documents** panel to manage the currently opened Leo documents, an **undo** pane for a history of past actions, and a **buttons** panel for easy access to your document's scripts.
 
@@ -49,14 +39,6 @@ Using the Nav tab of the _find panel_, (**`Ctrl+Shift+F`** to accesss directly) 
 Press **`Enter`** to freeze the results and show results also found in **body text of any node**. This will add a snowflake icon ❄️ to the **Nav** field.
 
 If you check the **Tag** option, the **Nav** field is then used to find nodes by their tag 🏷 _ua_ (user attribute).
-
-### Leo Documents Panel
-
-Leo documents can be saved in three possible formats: in _XML_ as **.leo** files, in _JSON_ as **.leojs** files, and in database form as _sqlite_ **.db** files.
-
-![Nav Tab Panel](./img/document-panel-montage.png)
-
-This panel shows the currently opened Leo Documents in LeoJS. Select which one is shown by clicking on it, or cycle with `Ctrl+Tab`.
 
 ### Undo Panel
 
@@ -195,9 +177,9 @@ The **@all** directive tells Leo to write the nodes of an **@file tree** to the 
 
 Leo uses outlines for just about *everything*, including configuring Leo:
 
-- **leojsSettings.leojs** contains the LeoJS default **global settings**.
+- **leoSettings.leojs** contains the Leo-Web default **global settings**.
 
-- **~/myLeoSettings.leo** contains your **personal settings**. It will be created  automatically if it doesn't exist when using the *Open myLeoSettings* command. Settings in myLeoSettings.leo override (or add to) the default settings in leojsSettings.leojs.
+- **~/myLeoSettings.leo** contains your **personal settings**. It will be created  automatically if it doesn't exist when using the *Open myLeoSettings* command. Settings in myLeoSettings.leo override (or add to) the default settings in leoSettings.leojs.
 
 - Any other .leo file may also contain **local settings**. Local settings apply only to that file and override all other settings.
 
@@ -209,9 +191,9 @@ For more information, see Leo's [configuration guide](../users-guide/customizing
 
 ## Plugins
 
-The LeoJS internal API is accessible when running scripts, but it is also exposed to other VSCode extensions, thus providing a way for software creators ro write _plugins_ for LeoJS.
+The Leo internal API is accessible when running scripts, but it is also exposed in a way a way for software creators ro write _plugins_ for Leo-Web.
 
-See [Writing Plugins](../advanced-topics/writing-plugins.md) for more information about the LeoJS plugins architecture and the **[extension-sample-leojs repository](https://github.com/boltex/extension-sample-leojs)** for a minimal LeoJS extension example.
+See [Writing Plugins](../advanced-topics/writing-plugins.md) for more information about the Leo-Web plugins architecture.
 
 ## Scripting basics
 
