@@ -43,21 +43,21 @@ export const keybindings: Keybinding[] = [
         find: true,
         enabledFlagsSet: [FLAGS.TREE_OPENED]
     },
-    // {
-    //     command: CMD.SHOW_OUTLINE,
-    //     key: "alt+t",
-    //     body: true,
-    //     find: true
-    // },
     {
         command: CMD.SHOW_OUTLINE,
-        // key: "ctrl+t", // BROWSER MAY INTERCEPT!
-        key: "alt", // ALTERNATE KEYBINDING : ALT+T
+        key: "alt+t",
         body: true,
-        // From the find panel ALT+T will also focus on the outline.
-        // So we set find to true here, even if the command itself does not do anything in the find panel.
-        // (Ctrl+F can be used to go back easily)
         find: true
+    },
+    {
+        command: CMD.SHOW_OUTLINE,
+        key: "ctrl+t", // BROWSER MAY INTERCEPT!
+        body: true
+    },
+    {
+        command: CMD.SHOW_BODY,
+        key: "ctrl+t", // BROWSER MAY INTERCEPT!
+        outline: true
     },
     {
         command: CMD.SHOW_BODY,

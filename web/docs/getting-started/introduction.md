@@ -77,7 +77,7 @@ _Move-Outline commands need the `Alt` key modifier only when focus is on body pa
 
 | Changing Focus                  |                                                   |
 | :------------------------------ | :------------------------------------------------ |
-| Toggle focus Outline/Body       | `Alt + T`                                         |
+| Focus on Outline                | `Alt + T`                                         |
 | Focus on Body (from outline)    | `Tab` &nbsp;&nbsp;_or_&nbsp;&nbsp; `Enter`        |
 
 ## External Files
