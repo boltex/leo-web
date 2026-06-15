@@ -153,7 +153,7 @@ This is a short glossary of important terms in Leo's world. For more information
 
 ### Auto Reload
 
-    To Automatically refresh and synchronize content when external files are modified. This can be set with the **Force reload or ignore changes** setting in the LeoJS welcome/settings screen.
+    To Automatically refresh and synchronize content when external files are modified.
 
 ### Body pane
 
@@ -201,12 +201,6 @@ This is a short glossary of important terms in Leo's world. For more information
 ### Descendant
     An offspring of a node.  That is, a child, grandchild, etc. of a node.
 
-### Detached Body pane
-
-    In LeoJS, a **Detached Body Pane** is an editor panel like the body pane, but independent of the selected node. This can be useful when needing to compare some nodes contents to another.
-    
-    They can be opened with the 'Open Aside' command. That command is also available when right-clicking on a node in the outline via its context menu.
-
 ### Directive
 
     A keyword, preceded by an '@' sign, in body text that controls Leo's
@@ -239,7 +233,7 @@ This is a short glossary of important terms in Leo's world. For more information
 
 ### Go Anywhere
 
-    In LeoJS, the `CTRL+P` keybinding is used to call the **'Go Anywhere'** command to navigate the outline directly to a given node instead of the 'Repeat Complex Command' of the original Leo.
+    In Leo-Web, the `CTRL+P` keybinding is used to call the **'Go Anywhere'** command to navigate the outline directly to a given node instead of the 'Repeat Complex Command' of the original Leo.
 
 ### Gnx (Global Node Index)
 

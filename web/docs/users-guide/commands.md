@@ -8,7 +8,7 @@ This chapter lists almost all of Leo's commands. It starts with a discussion of 
 
 ## Using the minibuffer
 
-Use `Alt-X` to open the minibuffer input box. You use the minibuffer to execute commands by name.
+Use `Alt-X` or `Ctrl-Shift-P` to open the minibuffer input box. You use the minibuffer to execute commands by name.
 
 ![Leo's Minibuffer](./img/minibuffer-sc.png)
 

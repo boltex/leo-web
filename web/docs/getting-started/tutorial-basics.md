@@ -45,13 +45,9 @@ If you check the **Tag** option, the **Nav** field is then used to find nodes by
 There are undo and redo icons above the Leo outline and above the undo pane itself. You can also right-click on an undo step to directly switch to that specific state.
 
 ![Nav Tab Panel](./img/undo-panel-context-montage.png)
+### Top Menu Panel
 
-> 📌 **NOTE**\
-> The undo functionality is a multi-tiered system that separates structural outline changes from text changes within the body pane.
-
-### Buttons Panel
-
-Scripts can be assigned to reusable commands or buttons. Those are displayed in this panel.
+A tabbed document interface for opened leo files along with a command menu abd buttons toolbar can be shown when clicking the 'toggle menu' hamburger button in the top right corner of the screen. This can also be toggled with the `F11` key.
 
 ![Nav Tab Panel](./img/buttons-panel-montage.png)
 
@@ -59,7 +55,7 @@ Scripts can be assigned to reusable commands or buttons. Those are displayed in 
 
 Leo has hundreds of commands, described in [Leo's Command Reference](../users-guide/commands.md)
 
-A curated set of common commands are accessible through the VSCode UI — toolbar buttons, icon menus, and [key bindings](../users-guide/commands.md#key-reference). Those commands are discoverable via the [VSCode Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette). (accessible through `F1` or `Ctrl+Shift+P`)
+A curated set of common commands are accessible through the UI — toolbar buttons, icon menus, and [key bindings](../users-guide/commands.md#key-reference). 
 
 With `Alt+X`, the complete set of commands is discoverable in its entirety through Leo's own command palette: [Leo's minibuffer](../users-guide/commands.md#using-the-minibuffer).
 
@@ -177,9 +173,9 @@ The **@all** directive tells Leo to write the nodes of an **@file tree** to the 
 
 Leo uses outlines for just about *everything*, including configuring Leo:
 
-- **leoSettings.leojs** contains the Leo-Web default **global settings**.
+- An internal **leoSettings.leo** contains the Leo-Web default **global settings**. (use the open leoSettings command to view its contents).
 
-- **~/myLeoSettings.leo** contains your **personal settings**. It will be created  automatically if it doesn't exist when using the *Open myLeoSettings* command. Settings in myLeoSettings.leo override (or add to) the default settings in leoSettings.leojs.
+- **myLeoSettings.leo** contains your **personal settings**. It will be created  automatically at the root of your workspace if it doesn't exist when using the *Open myLeoSettings* command. Settings in myLeoSettings.leo override (or add to) the default settings in leoSettings.leo.
 
 - Any other .leo file may also contain **local settings**. Local settings apply only to that file and override all other settings.
 
@@ -188,12 +184,6 @@ Leo uses outlines for just about *everything*, including configuring Leo:
 ![Settings](./img/settings-sample.png)
 
 For more information, see Leo's [configuration guide](../users-guide/customizing.md).
-
-## Plugins
-
-The Leo internal API is accessible when running scripts, but it is also exposed in a way a way for software creators ro write _plugins_ for Leo-Web.
-
-See [Writing Plugins](../advanced-topics/writing-plugins.md) for more information about the Leo-Web plugins architecture.
 
 ## Scripting basics
 
@@ -251,7 +241,7 @@ For more information, see Leo's [scripting tutorial](tutorial-scripting.md).
 
 ### \@button and @command nodes
 
-**@command nodes** define a command. Running the command runs a script that can be applied to any outline node. That is, p is bound to the presently selected node, *not* the @button node. **@button nodes** work the same way, and also create a button in the **[@button panel](#buttons-panel)**. Pressing that button runs the command. For example, this node defines the print-tree command:
+**@command nodes** define a command. Running the command runs a script that can be applied to any outline node. That is, p is bound to the presently selected node, *not* the @button node. **@button nodes** work the same way, and also create a button in the **[top menu](#top-menu-panel)**. Pressing that button runs the command. For example, this node defines the print-tree command:
 
 First, set a node's headline to: **@command print-tree**
 
@@ -282,8 +272,7 @@ Leo is a full-featured outliner with the following special features:
 
 - Directives control how Leo works.
 - @file and @clean nodes create external files.
-- myLeoSettings.leo specifies your personal settings.
-- Plugins extend Leo.
+- myLeoSettings.leo at the root of your chosen workspace specifies your personal settings.
 
 For programmers:
 

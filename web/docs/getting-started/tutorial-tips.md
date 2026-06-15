@@ -40,6 +40,10 @@ Put your [personal settings](../users-guide/customizing.md#using-settings) in my
 leojsSettings.leojs contains the defaults for all of LeoJS settings, with
 documentation for each.
 
+### Use abbreviations
+
+Leo's abbreviations can correct spelling mistakes, expand to multiple lines or even trees of nodes. Abbreviations can execute scripts and can prompt for values to be substituted within the abbreviation. See the [abbreviations tutorial](tutorial-pim#using-abbreviations-and-templates) for more details.
+
 ## Useful commands and actions
 
 ### The find-quick-selected command
