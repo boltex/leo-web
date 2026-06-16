@@ -10,14 +10,13 @@ This chapter discusses how to customize Leo using the plugins and other means. S
 
 Leo stores options in **@settings trees**, outlines whose headline is `@settings`. When opening a .leo file, Leo looks for `@settings` trees not only in the outline being opened but also in various `leoSettings.leo` files. This scheme allows for the following kinds of settings:
 
-- Per-installation or per-machine settings.
-- Per-user settings.
+- Per-workspace settings.
 - Per-folder settings.
 - Per-file settings.
 
 There are two kinds of settings files:
 
-1. **Default settings files**, named **leoSettings.leo**. Although they can be used in other ways, they typically contain default settings.
+1. **Default settings files**, named **leoSettings.leo**. Visible with the `Open leoSettings` command.
 
 2. **Personal settings files**, named **myLeoSettings.leo**. They provide a way of ensuring that your customized settings are not altered when updating Leo from git or while installing a new version of Leo. `myLeoSettings.leo` will never be part of any Leo distribution, and it will never exist in Leo's repository. This solution is *much* better than trying to update `leoSettings.leo`.
 
@@ -27,11 +26,7 @@ The following sections describe the kinds of nodes in `@settings` trees.
 
 Settings files can be found in the following directories:
 
-- **homeDir**, the `HOME/.leo` directory. HOME is given by Python's HOME environment variable, or by `g.os_path_expanduser('~')` if no HOME environment variable exists.
-
-- **configDir**, Leo's configuration directory: `leo/config`.
-
-- **machineDir**, the `HOME/.leo/MACHINE` directory. MACHINE is given by Python's `HOSTNAME` environment variable, or by Python's `COMPUTERNAME` environment variable if there is no `HOSTNAME` variable, or by the value returned by `socket.gethostname()` if neither environment variable exists.
+- **workspace**, the chosen directory Leo-Web has access. Chosen when first starting up.
 
 - **localDir**, the directory containing the .leo file being loaded.
 
@@ -41,20 +36,16 @@ Leo reports in the Log pane window on startup and when opening .leo files what H
 
 When reading a .leo file, Leo looks for settings in default settings files first, then settings in personal settings files, and finally settings in local settings files.  The exact search order is:
 
-**First**: Default settings files:
+**First**: Default settings files visible with the `open-leo-settings` command, or from the the menu `Settings -> Open leoSettings:`
 
 ```
-configDir/leoSettings.leo
-homeDir/leoSettings.leo
-localDir/leoSettings.leo
+leoSettings.leo
 ```
 
-**Second**: Personal settings files:
+**Second**: Personal settings files at the root of your chosen workspace:
 
 ```
-configDir/myLeoSettings.leo
-homeDir/myLeoSettings.leo
-homeDir/<machine-name>LeoSettings.leo (note capitalization)
+/myleoSettings.leo
 localDir/myLeoSettings.leo
 ```
 
@@ -62,18 +53,12 @@ localDir/myLeoSettings.leo
 
 Settings that appear later in this list override settings that appear earlier in this list.  This happens on a setting-by-setting basis, *not* on a file-by-file basis.  In other words, each individual setting overrides only the *corresponding* setting in previously-read files.  Reading a setting file does *not* reset all previous settings. Note that the same file might appear several times in the search list. Leo detects such duplicate file names and only loads each settings file once. Leo remembers all the settings in settings files and does not reread those settings when reading another .leo file.
 
-**Caution**: This search order offers almost too much flexibility. This can be confusing, even for power users. It's important to choose the "simplest configuration scheme that could possibly work".  Something like:
-
-- Use a single `leoSettings.leo` file for installation-wide defaults.
-- Use a single `myLeoSettings.leo` files for personal defaults.
-- Use local settings sparingly.
-
 > 📌 **NOTE**\
 > it is good style to limit settings placed in `myLeoSettings.leo` to those settings that differ from default settings.
 
 ### Safe rules for local settings
 
-You should use special care when placing default or personal settings files in **local** directories, that is, directories other than homeDir, configDir or machineDir. In particular, the value of localDir can change when Leo reads additional files. This can result in Leo finding new default and personal settings files. The values of these newly-read settings files will, as always, override any previously-read settings.
+You should use special care when placing default or personal settings files in **local** directories, that is, directories other than the chosen workspace. In particular, the value of localDir can change when Leo reads additional files. This can result in Leo finding new default and personal settings files. The values of these newly-read settings files will, as always, override any previously-read settings.
 
 Let us say that a setting is **volatile** if it is different from a default setting. Let us say that settings file A.leo **covers** settings file if B.leo if all volatile settings in B.leo occur in A.leo. 
 
