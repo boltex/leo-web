@@ -296,10 +296,6 @@ Expansion of section names and @others:
 ## Scripting
 
 This section lists the ivars (instance variables), properties, functions and methods most commonly used in Leo scripts.
-
-> 💡 **UI INTERACTIONS**\
-> For LeoJS UI interaction examples, see the **[scripting samples repository](https://github.com/boltex/scripting-samples-leojs)**, along with the [LeoJS features video](https://www.youtube.com/watch?v=M_mKXSbVGdE) to see how to try them directly in your browser.
-
 ### Pre-defined symbols
 The `execute-script` command predefines:
 
@@ -307,7 +303,6 @@ The `execute-script` command predefines:
 **c**      The commander of the present outline.\
 **g**      The leo.core.leoGlobals module.\
 **p**      The presently selected position, c.p.\
-**vscode** The VSCode API.
 </ul>
 
 Common modules such as **crypto**, **os**, **path**, **process** and **child\_process** along with the libraries **SQL**, **JSZip**, **pako**, **showdown**, **dayjs**, **md5**, **csvtojson**, **difflib**, **elementtree** and **ksuid** are also defined as globals when running scripts.
@@ -563,7 +558,7 @@ these when generators are not flexible enough:
 
 ### leo.core.leoGlobals module
 
-For full details, see @file [leoGlobals.ts](https://github.com/boltex/leojs/blob/master/src/core/leoGlobals.ts) in [leojs.leo](https://github.com/boltex/leojs).
+For full details, see @file [leoGlobals.ts](https://github.com/boltex/leo-web/blob/master/src/core/leoGlobals.ts) in [leo-web.leojs](https://github.com/boltex/leo-web).
 
 **g vars**:
 
@@ -622,7 +617,7 @@ const arg = await g.app.gui.get1Arg(
 
 ### Naming conventions in Leo's core
 
-[leojs.leo](https://github.com/boltex/leojs/tree/master) contains all of Leo's core source code.
+[leo-web.leo](https://github.com/boltex/leo-web/tree/master) contains all of Leo's core source code.
 
 Leo's code uses the following conventions throughout:
 
@@ -650,7 +645,7 @@ In more limited contexts, the following conventions apply:
 **stw**:    leoFrame.StringTextWrapper
 </ul>
 
-Names defined in Leo's core are unlikely to change, especially names used outside their defining module. This includes virtually everything in [leoGlobals.ts](https://github.com/boltex/leojs/blob/master/src/core/leoGlobals.ts), and many names in [leoCommands.ts](https://github.com/boltex/leojs/blob/master/src/core/leoCommands.ts) and other files.
+Names defined in Leo's core are unlikely to change, especially names used outside their defining module. This includes virtually everything in [leoGlobals.ts](https://github.com/boltex/leo-web/blob/master/src/core/leoGlobals.ts), and many names in [leoCommands.ts](https://github.com/boltex/leo-web/blob/master/src/core/leoCommands.ts) and other files.
 
 #### Official ivars
 
@@ -778,7 +773,7 @@ Leo uses a model/view/controller architecture.
 
 - Model: The VNode and Position classes in leoNodes.ts.
 
-- View: The gui-independent base classes are in the node "Gui Base Classes". The VSCode-Specific subclasses are in src/leoUI.ts.
+- View: The gui-independent base classes are in the node "Gui Base Classes". The subclasses are in src/leo-ui.ts.
 
 ## Clickable links
 
@@ -788,13 +783,11 @@ Leo syntax colors clickable links in the body pane.
 
 _Example of a clickable link_
 
-The status bar shows the UNL (*Universal Node Locator*) for the currently selected node.
+You can right-click on a headline to get the UNL (*Universal Node Locator*) for any node.
 
 ![Status Bar UNL](img/status-bar-unl.png#center)
 
-If you click the status bar UNL, it will be copied to the clipboard. You can then paste it as needed to make clickable links to that node. Hovering over that status bar UNL provides more options.
-
-In the body pane, similar to an URL, clicking a UNL will take you to its target node, even if the target is in another Leo file!
+In the body pane, similar to an URL, Ctrl+Clicking a UNL will take you to its target node, even if the target is in another Leo file!
 
 > 💡 **TIP**\
 > Gnx-based UNLs won't break even if you move or rename the target node.

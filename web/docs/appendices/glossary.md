@@ -9,7 +9,6 @@ This is a short glossary of important terms in Leo's world. For more information
 
 ## \@
 
-### \@
 
     Starts a doc part. Doc parts continue until an @c
     directive or the end of the body text.
@@ -323,11 +322,6 @@ Leonine refers to Leo’s unique way of organizing data and programs.
 ### Parent
 
     The node that directly contains a node.
-
-### Plugin
-
-    A way to modify and extend Leo without changing Leo's core code.
-    See [Writing plugins](../advanced-topics/writing-plugins.md) and the **[extension-sample-leojs repository](https://github.com/boltex/extension-sample-leojs)** for a minimal LeoJS extension example.
 
 ### Promote
 

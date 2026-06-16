@@ -183,7 +183,7 @@ or [Sphinx](https://www.sphinx-doc.org/en/master/) markup to an **intermediate s
 options, `rst3` will:
 
 - write the intermediate string to an **intermediate file**.
-- ⚠️ **NOT AVAILABLE IN LEOJS:** send the intermediate string to [docutils](https://docutils.sourceforge.io) for conversion to HTML, PDF,
+- ⚠️ **NOT AVAILABLE IN LEO-WEB:** send the intermediate string to [docutils](https://docutils.sourceforge.io) for conversion to HTML, PDF,
   [LaTeX](https://www.latex-project.org/), etc.
 
 **User filters**
@@ -294,7 +294,7 @@ Leo's file formats, `.leo` and `.leojs`, are extensible. The basis for extending
 For the `.leoJS` JSON file format, the uA's are saved as JSON strings in a uA dictionary, where the keys are the vnode's GNX.
 
 > 🚨 **IMPORTANT**\
-> All members of inner dictionaries should be serializable: LeoJS uses Python's Pickle module emulation, or JSON.stringify to encode all values in these dictionaries. It will discard any attributes that can not be pickled. This should not be a major problem to plugins. For example, instead of putting a tnode into these dictionaries, a plugin could put the tnode's gnx (a string) in the dictionary.
+> All members of inner dictionaries should be serializable: Leo-Web uses Python's Pickle module emulation, or JSON.stringify to encode all values in these dictionaries. It will discard any attributes that can not be pickled. This should not be a major problem to plugins. For example, instead of putting a tnode into these dictionaries, a plugin could put the tnode's gnx (a string) in the dictionary.
 
 > 📌 **NOTE**\
 > Leo does *not* pickle members of inner dictionaries whose name (key) starts with str\_. The values of such members should be a Python string. This convention allows strings to appear in .leo files in a more readable format.

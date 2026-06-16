@@ -139,7 +139,7 @@ const config = {
       // announcementBar: {
       //   id: 'leo-web_available',
       //   content:
-      //     'Leo-Web is now available in the VSCode marketplace, and in VSCodium\'s Open VSX Registry!',
+      //     'Leo-Web is now available!
       //   backgroundColor: '#fafbfc',
       //   textColor: '#091E42',
       //   isCloseable: false,

@@ -68,10 +68,6 @@
               "vh": "@auto docs/advanced-topics/scripting-guide.md"
             },
             {
-              "gnx": "felix.20240825210732.1",
-              "vh": "@auto docs/advanced-topics/writing-plugins.md"
-            },
-            {
               "gnx": "felix.20240827000501.1",
               "vh": "@auto docs/advanced-topics/faq.md"
             },

@@ -383,7 +383,7 @@ The command operates on the paragraph containing the insert cursor. If the inser
 - g is the leoGlobals modules.
 - p is c.p, that is, c.currentPosition().
 
-In LeoJS, the _VSCode API_ is also available as **vscode**. Other common modules such as _crypto, os, path, process and child_process_ are also available, along with the following libraries: _SQL, JSZip, pako, showdown, dayjs, md5, csvtojson, difflib, elementtree and ksuid_.
+In Leo-Web, common modules such as _crypto, os, Buffer, process and path_ are available, along with the following libraries: _SQL, JSZip, pako, showdown, dayjs, md5, csvtojson, difflib, elementtree and ksuid_.
 
 **Important**: Body text may contain Leo directives and section references. You can use all of Leo's features to organize scripts that you execute interactively. Section definitions must appear in the node containing the script or in descendant nodes.
 
@@ -399,8 +399,6 @@ Leo preprocesses all scripts by simulating the writing of a external file to a s
 
 Leo supports unlimited undo and redo with the `undo` (Ctrl-Z) and `redo` (Ctrl-Shift-Z) commands. (Some commands are not undoable and clear the undo history) Think of actions that may be undone or redone as a string of beads. A "bead pointer" points to the present bead. Performing an operation creates a new bead after the present bead and removes all following beads. Undoing an operation moves the bead pointer backwards; redoing an operation moves the bead pointer forwards. The `undo` command is disabled when the bead pointer moves in front of the first bead; the `redo` command is disabled when the bead pointer points to the last bead.
 
-> 📌 **NOTE**\
-> In LeoJS, the undo functionality is a multi-tiered system that separates structural outline changes from text changes within the body pane.
 
 ### File commands
 
@@ -599,13 +597,10 @@ A **session** specifies a list of .leo files that Leo opens automatically when L
 - `help-for-creating-external-files`
 
 `open-online-tutorials`\
-    Opens the LeoJS tutorials page at [https://boltex.github.io/leojs/docs/getting-started/tutorial-basics](../getting-started/tutorial-basics.md).
-
-`open-online-videos`\
-    Opens LeoJS video playlist at [https://www.youtube.com/playlist?list=PLLILWxKl5dBXmdSZqhYEBlK_5AQYNW2xa](https://www.youtube.com/playlist?list=PLLILWxKl5dBXmdSZqhYEBlK_5AQYNW2xa).
+    Opens the Leo-Web tutorials page at [https://boltex.github.io/leo-web/docs/getting-started/tutorial-basics](../getting-started/tutorial-basics.md).
 
 `open-users-guide`\
-    Opens the LeoJS Users Guide at [https://boltex.github.io/leojs/docs/users-guide/leomarkup](leomarkup.md).
+    Opens the Leo-Web Users Guide at [https://boltex.github.io/leo-web/docs/users-guide/leomarkup](leomarkup.md).
 
 ### Minibuffer commands
 

@@ -100,7 +100,7 @@ It's even possible to define a context in which abbreviation scripts execute. Se
 
 Leo highlights URLs whenever syntax is coloring is enabled.
 
-`open-url-under-cursor` 🖱️ _Alt+Click_ or _Ctrl-Click_\
+`open-url-under-cursor` 🖱️ _Ctrl-Click_\
  Opens the URL under the cursor.
 
 `open-url`\

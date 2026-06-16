@@ -8,7 +8,7 @@ This chapter tells how to write **Leo scripts**, JavaScript (or TypeScript) code
 
 Predefined symbols, **c**, **g**, and **p** give Leo scripts easy access to all the data in the outline. These symbols also allow Leo scripts to execute any code in Leo's own codebase.
 
-In LeoJS, the _VSCode API_ is also available as **vscode**. Other common modules such as _crypto, os, path, process and child\_process_ are also available, along with the following libraries: _SQL, JSZip, pako, showdown, dayjs, md5, csvtojson, difflib, elementtree and ksuid_.
+In Leo-Web, common modules such as _crypto, os, Buffer, process and path_ are available, along with the following libraries: _SQL, JSZip, pako, showdown, dayjs, md5, csvtojson, difflib, elementtree and ksuid_.
 
 **Positions** and **vnodes** are the foundation of Leo scripting. leo/core/leoNodes.ts defines the corresponding Position and VNode classes. These classes provide access to all outline data and allow Leo scripts to create and change outlines.
 
@@ -81,12 +81,12 @@ The script writes the body text of the presently selected node to ~/leo_output_f
 
 ```javascript
 const fn = g.os_path_finalize_join(g.app.homeDir, 'leo_output_file.txt');
-const fileUri = g.makeVscodeUri(fn);
+const fileUri = g.makeUri(fn);
 const fileContent = Buffer.from(c.p.b, 'utf-8');
 
-await vscode.workspace.fs.writeFile(fileUri, fileContent);
+await g.workspace.fs.writeFile(fileUri, fileContent);
 
-const data = await vscode.workspace.fs.readFile(fileUri);
+const data = await g.workspace.fs.readFile(fileUri);
 
 g.es(Buffer.from(data).toString('utf-8'))
 ```

@@ -348,21 +348,6 @@ export class CommanderHelpCommands {
         }
     }
 
-    //@+node:felix.20251214160853.126: *4* c_help.openLeoVideos
-    @commander_command(
-        'open-online-videos',
-        "Open LeoJS video playlist in a web browser."
-    )
-    public openLeoVideos(this: Commands): void {
-        const url =
-            'https://www.youtube.com/playlist?list=PLLILWxKl5dBXmdSZqhYEBlK_5AQYNW2xa';
-        if (typeof window !== 'undefined' && typeof window.open === 'function') {
-            window.open(url, '_blank', 'noopener,noreferrer');
-        } else {
-            g.es(`Unable to open URL in this environment: ${url}`);
-        }
-    }
-
     //@+node:felix.20251214160853.127: *3* c_help.selectAtSettingsNode
     @commander_command(
         'open-local-settings',

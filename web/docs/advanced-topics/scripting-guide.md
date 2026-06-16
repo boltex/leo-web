@@ -8,9 +8,6 @@ This chapter covers miscellaneous topics related to Leo scripts.
 
 You might call this a FAQ for scripts...
 
-> 💡 **UI INTERACTIONS**\
-> For LeoJS UI interaction examples, see the **[scripting samples repository](https://github.com/boltex/scripting-samples-leojs)**, along with the [LeoJS features video](https://www.youtube.com/watch?v=M_mKXSbVGdE) to see how to try them directly in your browser. (Press the `.` _period key_ when browsing the github repo)
-
 ## \@button example
 
 Here is an example, @button promote-child-bodies:
@@ -43,8 +40,7 @@ This creates a fully undoable promote-child-bodies command.
 You can make `@button` offer sub-menus with `@rclick` nodes.
 
 See [@button and @rclick](../users-guide/customizing.md#rclick) for more
-details, and the [LeoJS scripting samples](https://github.com/boltex/scripting-samples-leojs) 
-for examples of using  **@button** nodes.
+details.
 
 ## Comparing two similar outlines
 
@@ -140,10 +136,14 @@ g.es(g.app.gui.getTextFromClipboard());
 Scripts can invoke various dialogs using the following methods of the g.app.gui object.
 
 ```ts
-//  VSCode Wrapper for showInputBox, or, for showQuickPick if tabList is given:
+//  Wrapper for showInputBox, or, for showQuickPick if tabList is given:
 g.app.get1Arg(
-    options?: vscode.InputBoxOptions | vscode.QuickPickOptions,
-    token?: vscode.CancellationToken,
+    options: {
+        title: string;
+        value: string;
+        prompt: string;
+        placeHolder?: string;
+    },
     tabList?: string[]
 )
 
@@ -244,7 +244,7 @@ The getBool 'default' argument to getBool specifies the value to be returned if 
 
 ## Getting interactive input
 
-The **g.app.gui.get1Arg** method is a Wrapper for VSCode's showInputBox, or, for showQuickPick if tabList is given.
+The **g.app.gui.get1Arg** method will show a 'Quick pick' instead of an 'input box' if tabList is given.
 
 Example 1: get one argument from the user:
 
@@ -308,7 +308,7 @@ Commands created with @command and @button nodes can return values as well.
 
 Plugins and scripts should call u.beforeX and u.afterX methods to describe the operation that is being performed. 
 
-Look at the user's guide [undoing commands](../users-guide/cheatsheet.md#undoing-commands) section for examples, along with the [LeoJS Scripting Samples Repository](https://github.com/boltex/scripting-samples-leojs), which has examples of making your script operations undoable.
+Look at the user's guide [undoing commands](../users-guide/cheatsheet.md#undoing-commands) section for examples.
 
 > 📌 **NOTE**\
 > u is shorthand for c.undoer. Most u.beforeX methods return undoData that the client code merely passes to the corresponding u.afterX method. This data contains the 'before' snapshot. The u.afterX methods then create a bead containing both the 'before' and 'after' snapshots.
@@ -328,16 +328,16 @@ const w = c.frame.body.wrapper; // Leo's body pane.
 
 // Scripts can get or change the context of the body as follows:
 
-w.appendText(s)                     // Append s to end of body text.
-w.delete(i,j=None)                  // Delete characters from i to j.
-w.deleteTextSelection()             // Delete the selected text, if any.
-s = w.get(i,j=None)                 // Return the text from i to j.
-s = w.getAllText                    // Return the entire body text.
-i = w.getInsertPoint()              // Return the location of the cursor.
-s = w.getSelectedText()             // Return the selected text, if any.
-[i,j] = w.getSelectionRange(sort=True)// Return the range of selected text.
-w.setAllText(s)                     // Set the entire body text to s.
-w.setSelectionRange(i,j,insert=None) // Select the text.
+w.appendText(s);                     // Append s to end of body text.
+w.delete(i,j);                  // Delete characters from i to j.
+w.deleteTextSelection();             // Delete the selected text, if any.
+s = w.get(i,j);                 // Return the text from i to j.
+s = w.getAllText();                    // Return the entire body text.
+i = w.getInsertPoint();              // Return the location of the cursor.
+s = w.getSelectedText();             // Return the selected text, if any.
+[i,j] = w.getSelectionRange(sortFlag); // Return the range of selected text. 
+w.setAllText(s);                     // Set the entire body text to s.
+w.setSelectionRange(i,j,insert) // Select the text.
 ```
 
 > 📌 **NOTE**\

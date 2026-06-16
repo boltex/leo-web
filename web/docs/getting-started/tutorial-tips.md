@@ -29,7 +29,7 @@ throughout an outline without altering the structure of @file nodes.
 
 ### Put personal settings myLeoSettings.leo
 
-Put your [personal settings](../users-guide/customizing.md#using-settings) in myLeoSettings.leo, not leoSettings.leo.
+Put your [personal settings](../users-guide/customizing.md#using-settings) in myLeoSettings.leo, at the root of your chosen workspace.
 
 - The leo-settings command opens leoSettings.leo.
 - The my-leo-settings command opens myLeoSettings.leo.
@@ -37,7 +37,7 @@ Put your [personal settings](../users-guide/customizing.md#using-settings) in my
 
 ### Search for settings in leoSettings.leo
 
-leojsSettings.leojs contains the defaults for all of LeoJS settings, with
+leoSettings.leojs contains the defaults for all of LeoJS settings, with
 documentation for each.
 
 ### Use abbreviations
@@ -115,7 +115,9 @@ Here is a common pattern for @file nodes for python files:
 
 ### Use g.handleUnl to select nodes
 
-Leo's status area shows the path from the root node to the selected node. We call such paths **UNLs** (Uniform Node Locators).  Given a UNL, g.handleUnl(unl, c) will select the referenced node.  For example:
+You can right-click a node to copy its **UNL** (Uniform Node Locator).
+
+Given a UNL, g.handleUnl(unl, c) will select the referenced node.  For example:
 
 ```js
 g.handleUnl('unl:gnx://leojsDocs.leojs#felix.20240825232344.32', c);
