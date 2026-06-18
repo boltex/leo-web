@@ -1420,7 +1420,7 @@ body.dragging-secondary .node {
 select.setting-select {
   box-sizing: border-box;
   padding: 0.2rem 0.3rem;
-  margin: 0 0 0.2rem 0.25rem;
+  margin: 0 0 0.2rem 0rem;
   border-radius: 3px;
   border: 1px solid var(--find-border-color);
   background: var(--find-pane-color);
