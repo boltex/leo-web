@@ -6,19 +6,17 @@ sidebar_position: 2
 
 This page aims to go over the interface, its most important features and terminology, to get you going in a few minutes! **For a quick overview, see the [Introduction to Leo 📺](https://www.youtube.com/watch?v=tuM8MvI9g6k) video.**
 
-![Leo-Web View](./img/hero-docs-montage.png)
+![Leo-Web UI](img/leo-web-vertical-menu.png#center)
 
 ## User Interface
 
-Leo stores all data in nodes. Nodes have headlines (shown in the outline pane) and body text. The body pane shows the body text of the presently selected node, the node whose headline is selected in the outline pane. Headlines have an icon box indicating a node’s status. 
+Leo stores all data in nodes. Nodes have headlines (shown in the **outline**) and body text. The body pane shows the body text of the presently selected node, the node whose headline is selected in the outline pane. Headlines have an icon box indicating a node’s status. 
 
 The **body pane** is a text editor which changes to match the selected node of the Leo outline.
 
-![Body Pane](./img/body-pane-montage.png)
+![Tab Menu](./img/tabs.png#center)
 
-Below the outline pane are more panels, such as the **Find** panel to help navigate the outline, the **Documents** panel to manage the currently opened Leo documents, an **undo** pane for a history of past actions, and a **buttons** panel for easy access to your document's scripts.
-
-Finally, a **Log Window** [output channel](https://code.visualstudio.com/api/extension-capabilities/common-capabilities#output-channel) is present at the bottom of the window.
+The third part, the **Log Window** has tabs to select other panels, such as the **Find** panel to help navigate the outline, the **Documents** panel to manage the currently opened Leo documents, an **undo** pane for a history of past actions, and a **buttons** panel for easy access to your document's scripts.
 
 ![Log Window](./img/log-pane.png)
 

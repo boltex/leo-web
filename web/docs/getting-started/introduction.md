@@ -37,12 +37,12 @@ Due to browser security constraints, access is limited to a user-approved _works
 -   Keybindings that match those of the Leo editor, including arrow keys behavior for outline keyboard navigation.
 -   **Derived files change detection**. See [External Files](#external-files) below for more details
 -   **Scriptable in Javascript and Typescript**. All commands and scripts have easy access to outline structure via a simple Javascript API
--   Collapsible top menu `F11` with tabs for opened files, toolbars for common commands and **'@buttons'** for [creating your own commands](tutorial-basics.md#button-and-command-nodes)
+-   **Collapsible top menu** `Shift+F11` with tabs for opened files, toolbars for common commands and **'@buttons'** for [creating your own commands](tutorial-basics.md#button-and-command-nodes)
 -   **Find panel** that reacts to Leo's typical keybindings like `Ctrl+F`, `F2` and `F3` when focus is in the outline or body pane
 -   **Nav and Tag panel** search controls are integrated in the Find panel
 -   **Undo History panel**, showing all actions and allowing going back, or forward, to any undo states.
 
-![Leo-Web UI](img/small-hero-docs-montage.png#center)
+![Leo-Web UI](img/leo-web-hero.png#center)
 
 ## Leo Commands
 
@@ -104,7 +104,7 @@ Leo will detect external file changes and update the outline to reflect those ch
 
 Arrow keys, home/end, page up/down are used for basic navigation. But in order to **find and goto specific nodes directly**, use the methods described below:
 
-### Goto Anywhere Command
+### Go Anywhere Command
 
 The **`Ctrl+P`** keybinding allows you to switch to any node directly by typing (part of) its headline.
 
@@ -132,5 +132,5 @@ If you check the **Tag** option, the **Nav** field is then used to find nodes by
 
 You can right-click on an undo step to directly switch to that specific state!
 
-![Undo pane](img/undo-pane.gif#center)
+![Undo pane](img/undo-pane.png#center)
 
