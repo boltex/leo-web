@@ -785,7 +785,7 @@ _Example of a clickable link_
 
 You can right-click on a headline to get the UNL (*Universal Node Locator*) for any node.
 
-![Status Bar UNL](img/status-bar-unl.png#center)
+![Status Bar UNL](img/unl-clipboard.png#center)
 
 In the body pane, similar to an URL, Ctrl+Clicking a UNL will take you to its target node, even if the target is in another Leo file!
 

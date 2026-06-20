@@ -10,7 +10,7 @@ This chapter lists almost all of Leo's commands. It starts with a discussion of 
 
 Use `Alt-X` or `Ctrl-Shift-P` to open the minibuffer input box. You use the minibuffer to execute commands by name.
 
-![Leo's Minibuffer](./img/minibuffer-sc.png)
+![Leo's Minibuffer](./img/minibuffer.png)
 
 Every Leo command has a **command name**. In this document, keystrokes that invoke a command will be followed by the command name in parentheses. For example, `Ctrl-S (save-file)` saves a Leo file.
 

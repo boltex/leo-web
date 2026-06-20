@@ -6,19 +6,23 @@ sidebar_position: 2
 
 This page aims to go over the interface, its most important features and terminology, to get you going in a few minutes! **For a quick overview, see the [Introduction to Leo 📺](https://www.youtube.com/watch?v=tuM8MvI9g6k) video.**
 
-![Leo-Web UI](img/leo-web-vertical-menu.png#center)
-
 ## User Interface
 
 Leo stores all data in nodes. Nodes have headlines (shown in the **outline**) and body text. The body pane shows the body text of the presently selected node, the node whose headline is selected in the outline pane. Headlines have an icon box indicating a node’s status. 
 
+![Leo-Web UI](img/leo-web-vertical-menu.png#center)
+
 The **body pane** is a text editor which changes to match the selected node of the Leo outline.
+
+![Hover Menu](img/autohide-icons-montage.png#center)
+
+You can change the _main splitter orientation_ to horizontal or vertical along with the _light or dark theme_ with the top-right corner **hover menu**. 
 
 ![Tab Menu](./img/tabs.png#center)
 
-The third part, the **Log Window** has tabs to select other panels, such as the **Find** panel to help navigate the outline, the **Documents** panel to manage the currently opened Leo documents, an **undo** pane for a history of past actions, and a **buttons** panel for easy access to your document's scripts.
+The third part, the **Log Window** has tabs to select other panels, such as the **Find** and **Nav** panels to help navigate the outline, an **undo** pane for a history of past actions, and a **UI** panel for choosing which buttons to show in the **hover menu**.
 
-![Log Window](./img/log-pane.png)
+![Log Window](./img/log-pane-montage.png)
 
 ### Find Panel
 
@@ -32,7 +36,7 @@ Hitting **`F3`** repeatedly will find the subsequent matches. (**`F2`** for prev
 
 Using the Nav tab of the _find panel_, (**`Ctrl+Shift+F`** to accesss directly) you can type your search pattern in the **Nav** field instead to see all results appear below. This will show the headlines as you type.
 
-![Nav Tab Panel](./img/nav-panel-results-montage.png)
+![Nav Tab Panel](./img/nav-pane-montage.png)
 
 Press **`Enter`** to freeze the results and show results also found in **body text of any node**. This will add a snowflake icon ❄️ to the **Nav** field.
 
@@ -42,12 +46,12 @@ If you check the **Tag** option, the **Nav** field is then used to find nodes by
 
 There are undo and redo icons above the Leo outline and above the undo pane itself. You can also right-click on an undo step to directly switch to that specific state.
 
-![Nav Tab Panel](./img/undo-panel-context-montage.png)
+![Nav Tab Panel](./img/undo-pane-montage.png)
 ### Top Menu Panel
 
-A tabbed document interface for opened leo files along with a command menu abd buttons toolbar can be shown when clicking the 'toggle menu' hamburger button in the top right corner of the screen. This can also be toggled with the `F11` key.
+A tabbed document interface for opened leo files along with a command menu abd buttons toolbar can be shown when clicking the 'toggle menu' hamburger button in the top right corner of the screen. This can also be toggled with the `Shift+F11` key.
 
-![Nav Tab Panel](./img/buttons-panel-montage.png)
+![Top Menu](./img/top-menu-crop-montage.png)
 
 ## Commands
 
@@ -57,7 +61,7 @@ A curated set of common commands are accessible through the UI — toolbar butto
 
 With `Alt+X`, the complete set of commands is discoverable in its entirety through Leo's own command palette: [Leo's minibuffer](../users-guide/commands.md#using-the-minibuffer).
 
-![Leo's Minibuffer](./img/minibuffer-list.png)\
+![Leo's Minibuffer](./img/minibuffer-montage.png)\
 _The minibuffer showing all available commands_
 
 > 💡 **TIP**\
@@ -179,7 +183,7 @@ Leo uses outlines for just about *everything*, including configuring Leo:
 
 **Settings nodes** specify settings. These nodes *must* be descendants of an **@settings** node. Moving a settings node out from the @settings tree disables the setting. Headlines start with @ followed by a type, and possibly a value.
 
-![Settings](./img/settings-sample.png)
+![Settings](./img/settings-sample-montage.png)
 
 For more information, see Leo's [configuration guide](../users-guide/customizing.md).
 
