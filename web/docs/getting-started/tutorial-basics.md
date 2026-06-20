@@ -10,15 +10,13 @@ This page aims to go over the interface, its most important features and termino
 
 Leo stores all data in nodes. Nodes have headlines (shown in the **outline**) and body text. The body pane shows the body text of the presently selected node, the node whose headline is selected in the outline pane. Headlines have an icon box indicating a node’s status. 
 
-![Leo-Web UI](img/leo-web-vertical-menu.png#center)
-
 The **body pane** is a text editor which changes to match the selected node of the Leo outline.
 
+![Leo-Web UI](img/leo-web-vertical-menu.png#center)
+
+You can change the _outline-body splitter orientation_ from horizontal to vertical along with the _color theme_ with the top-right corner **hover menu** icons. 
+
 ![Hover Menu](img/autohide-icons-montage.png#center)
-
-You can change the _main splitter orientation_ to horizontal or vertical along with the _light or dark theme_ with the top-right corner **hover menu**. 
-
-![Tab Menu](./img/tabs.png#center)
 
 The third part, the **Log Window** has tabs to select other panels, such as the **Find** and **Nav** panels to help navigate the outline, an **undo** pane for a history of past actions, and a **UI** panel for choosing which buttons to show in the **hover menu**.
 
