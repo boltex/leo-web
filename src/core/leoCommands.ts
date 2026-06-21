@@ -1991,16 +1991,14 @@ export class Commands {
             return;
         }
         s = g.toUnicode(s);
-        const current: Position = c.p;
-        // 1/22/05: Major change: the previous test was: 'if p == current:'
-        // This worked because commands work on the presently selected node.
-        // But setRecentFiles may change a _clone_ of the selected node!
-        if (current && current.__bool__() && p.v.gnx === current.v.gnx) {
+
+        if (c.p && p.v === c.p.v) {
             const w = c.frame.body.wrapper;
             w.setAllText(s);
             v.setSelection(0, 0);
             c.recolor();
         }
+
         // Keep the body text in the VNode up-to-date.
         if (v.b !== s) {
             v.setBodyString(s);
@@ -3546,10 +3544,6 @@ export class Commands {
         if (c.requestLaterRedraw) {
             if (c.enableRedrawFlag) {
                 c.requestLaterRedraw = false;
-                // if ('drawing' in g.app.debug and not g.unitTesting) {
-                //     g.trace('\nDELAYED REDRAW')
-                //     time.sleep(1.0)
-                // }
             }
             c.redraw();
         }
@@ -3584,8 +3578,8 @@ export class Commands {
 
     //@+node:felix.20251214160339.587: *5* c.recolor
     public recolor(): void {
-        // TODO
-        // console.log("TODO: recolor");
+        // Automatic in Leo-Web
+
     }
     //@+node:felix.20251214160339.588: *5* c.widget_name
     public widget_name(widget: StringTextWrapper): string {
@@ -3596,28 +3590,26 @@ export class Commands {
     //@+node:felix.20251214160339.590: *6* c.redraw
     public redraw(p?: Position, instantRefresh?: boolean): void {
         const c: Commands = this;
-
         if (!p || !p.__bool__()) {
             p = c.p;
         }
         if (!p || !p.__bool__()) {
-            p = c.rootPosition();
-        }
-        if (!p || !p.__bool__()) {
             return;
         }
-
         if (!c.positionExists(p)) {
             g.trace(`Invalid position: ${String(p)}`);
             g.trace(g.callers());
-            p = c.rootPosition();
+            return;
         }
-
+        c.requestLaterRedraw = false;
         c.expandAllAncestors(p!);
+        // Fix bug https://bugs.launchpad.net/leo-editor/+bug/1183855
+        //  This looks redundant, but it is probably the only safe fix.
+        c.frame.tree.select(p);
+        c.selectPosition(p);
+        // Clear the redraw request, again.
+        c.requestLaterRedraw = false;
 
-        if (p && p.__bool__()) {
-            c.selectPosition(p);
-        }
         g.app.gui.fullRefresh(instantRefresh ? true : undefined, instantRefresh); // Overkill ?
     }
     //@+node:felix.20251214160339.591: *6* c.redraw_after_icons_changed
@@ -3656,18 +3648,7 @@ export class Commands {
      * Redraw the screen after node p has been selected.
      */
     public redraw_after_select(p: Position): void {
-        const c: Commands = this;
-        let flag: boolean;
-        if (c.enableRedrawFlag) {
-            flag = c.expandAllAncestors(p);
-            if (flag) {
-                //c.frame.tree.redraw_after_select(p);
-                c.redraw();
-                // This is the same as c.frame.tree.full_redraw().
-            }
-        } else {
-            c.requestLaterRedraw = true;
-        }
+        this.redraw(p);
     }
 
     //@+node:felix.20251214160339.596: *6* c.redraw_later
@@ -4361,9 +4342,7 @@ export class Commands {
             p = c.p;
         }
         if (p && p.__bool__()) {
-            // Do not call expandAllAncestors here.
-            c.selectPosition(p);
-            c.redraw_after_select(p);
+            c.redraw(p);
         }
         c.treeFocusHelper(); // This is essential.
     }
