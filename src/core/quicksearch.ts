@@ -32,6 +32,7 @@ export class QuickSearchController {
         [Position, [number, number] | undefined] | undefined
     ][];
 
+    public frozen: boolean; // added to freeze the quicksearch controller when used in nav pane, so that it doesn't update the search results when the user clicks on different nodes in the outline, which would be confusing.
     public fileDirectives: string[];
     public _search_patterns: string[];
     public navText: string;
@@ -63,6 +64,7 @@ export class QuickSearchController {
             '@edit',
         ];
         this._search_patterns = [];
+        this.frozen = false;
         this.navText = '';
         this.showParents = true;
         this.isTag = false; // added concept to combine tag pane functionality

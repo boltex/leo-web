@@ -68,18 +68,17 @@ export class LogPaneManager {
     // Find/Nav state
     public timer: ReturnType<typeof setTimeout> | undefined; // for debouncing sending the settings from this class to LeoWeb
     public dirty = false; // all but nav input
-    public navTextDirty = false; // only nav input
 
     /**
      * * Flag for freezing the nav 'search as you type' headlines (concept from original nav plugin)
      * - Resets when switching to tag, or when clearing the input field.
      * - Sets when pressing Enter with non-empty input field && not tag mode.
      */
-    public frozen = false;
     public navSearchTimer: ReturnType<typeof setTimeout> | undefined; // for debouncing the search-headline while typing if unfrozen
 
     public searchSettings: LeoSearchSettings = {
         // Nav settings
+        frozen: false,
         navText: '',
         isTag: false,
         showParents: true,
@@ -250,7 +249,6 @@ export class LogPaneManager {
 
         this.NAV_TEXT.addEventListener('input', (p_event) => {
             this.searchSettings.navText = this.NAV_TEXT.value;
-            this.navTextDirty = true;
             this.navTextChange(); // DEBOUNCE THIS! Don't process change too fast!
         });
 
@@ -348,16 +346,13 @@ export class LogPaneManager {
         } else {
             if (this.searchSettings.navText.length >= 3 || this.searchSettings.isTag) {
                 this.setFrozen(true);
-                if (this.navTextDirty) {
-                    this.navTextDirty = false;
-                    if (this.timer) {
-                        clearTimeout(this.timer);
-                    }
-                    if (this.navSearchTimer) {
-                        clearTimeout(this.navSearchTimer);
-                    }
-                    this.sendSearchConfig();
+                if (this.timer) {
+                    clearTimeout(this.timer);
                 }
+                if (this.navSearchTimer) {
+                    clearTimeout(this.navSearchTimer);
+                }
+                this.sendSearchConfig();
                 this._postMessageCallback?.({ type: 'leoNavEnter' });
 
             }
@@ -425,6 +420,7 @@ export class LogPaneManager {
         this.searchSettings = settings;
 
         // Nav
+        this.setFrozen(settings.frozen);
         this.NAV_TEXT.value = settings.navText;
         this.IS_TAG.checked = settings.isTag;
         this.SHOW_PARENT.checked = settings.showParents;
@@ -496,6 +492,7 @@ export class LogPaneManager {
         // * Needed Checks
         if (this.searchSettings.navText.length === 0) {
             this.setFrozen(false);
+            this.sendSearchConfig();
             // if tagging but empty: SEND SEARCH LIST-ALL-TAGS COMMAND
             if (this.searchSettings.isTag) {
                 this.resetTagNav();
@@ -505,13 +502,10 @@ export class LogPaneManager {
         if (this.searchSettings.navText === "m" && !this.searchSettings.isTag) {
             // ! Easter Egg: calls 'marked-list', which list all marked nodes !
             this.navSearchTimer = setTimeout(() => {
-                if (this.navTextDirty) {
-                    this.navTextDirty = false;
-                    if (this.navSearchTimer) {
-                        clearTimeout(this.navSearchTimer);
-                    }
-                    this.sendSearchConfig();
+                if (this.navSearchTimer) {
+                    clearTimeout(this.navSearchTimer);
                 }
+                this.sendSearchConfig();
                 this._postMessageCallback?.({ type: 'leoNavMarkedList' });
 
             }, 40); // Shorter delay for this command
@@ -519,19 +513,16 @@ export class LogPaneManager {
         }
 
         // User changed text in nav text input
-        if (this.frozen || this.searchSettings.navText.length < 3) {
+        if (this.searchSettings.frozen || this.searchSettings.navText.length < 3) {
             return; // dont even continue if not long enough or already frozen
         }
 
         // DEBOUNCE .25 to .5 seconds with this.navSearchTimer
         this.navSearchTimer = setTimeout(() => {
-            if (this.navTextDirty) {
-                this.navTextDirty = false;
-                if (this.navSearchTimer) {
-                    clearTimeout(this.navSearchTimer);
-                }
-                this.sendSearchConfig();
+            if (this.navSearchTimer) {
+                clearTimeout(this.navSearchTimer);
             }
+            this.sendSearchConfig();
             this._postMessageCallback?.({ type: 'leoNavTextChange' });
         }, 400); // almost half second
 
@@ -567,10 +558,10 @@ export class LogPaneManager {
     }
     //@+node:felix.20260323005837.1: *3* setFrozen
     public setFrozen(focus: boolean) {
-        this.frozen = focus;
+        this.searchSettings.frozen = focus;
         // TODO : REPLACE THIS WITH A CSS VARIABLE TO AVOID DIRECT DOM MANIPULATION IN THIS CLASS
         if (this.FREEZE) {
-            if (this.frozen) {
+            if (this.searchSettings.frozen) {
                 this.FREEZE.style.display = '';
             } else {
                 this.FREEZE.style.display = 'none';
@@ -580,13 +571,10 @@ export class LogPaneManager {
     //@+node:felix.20260323005828.1: *3* resetTagNav
     public resetTagNav() {
         this.navSearchTimer = setTimeout(() => {
-            if (this.navTextDirty) {
-                this.navTextDirty = false;
-                if (this.navSearchTimer) {
-                    clearTimeout(this.navSearchTimer);
-                }
-                this.sendSearchConfig();
+            if (this.navSearchTimer) {
+                clearTimeout(this.navSearchTimer);
             }
+            this.sendSearchConfig();
             this._postMessageCallback?.({ type: 'leoNavTextChange' });
         }, 250); // quarter second
     }

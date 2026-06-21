@@ -2354,6 +2354,7 @@ export class LeoUI extends NullGui {
         const leoISettings = c.findCommands.ftm.get_settings();
         const w_settings: LeoSearchSettings = {
             // Nav options
+            frozen: scon.frozen,
             navText: scon.navText,
             showParents: scon.showParents,
             isTag: scon.isTag,
@@ -2400,6 +2401,7 @@ export class LeoUI extends NullGui {
         // convert to LeoGuiFindTabManagerSettings
         const searchSettings: LeoGuiFindTabManagerSettings = {
             // Nav settings
+            frozen: p_settings.frozen,
             is_tag: p_settings.isTag,
             nav_text: p_settings.navText,
             show_parents: p_settings.showParents,
@@ -2428,6 +2430,7 @@ export class LeoUI extends NullGui {
 
         // * Try to set the search settings
         // nav settings
+        scon.frozen = searchSettings.frozen;
         scon.navText = searchSettings.nav_text;
         scon.showParents = searchSettings.show_parents;
         scon.isTag = searchSettings.is_tag;

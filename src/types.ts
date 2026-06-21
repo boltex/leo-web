@@ -407,10 +407,11 @@ export const enum LeoSearchScope {
 
 //@+node:felix.20251211000618.16: ** LeoSearchSettings
 /**
- * * Search settings structure for use with the 'find' webview
+ * * Search settings structure for use with the 'find' and 'nav' panels.
  */
 export interface LeoSearchSettings {
     // Nav options
+    frozen: boolean;
     navText: string;
     isTag: boolean;
     showParents: boolean;
@@ -435,6 +436,7 @@ export interface LeoSearchSettings {
  */
 export interface LeoGuiFindTabManagerSettings {
     // Nav options
+    frozen: boolean;
     nav_text: string;
     is_tag: boolean;
     show_parents: boolean;
