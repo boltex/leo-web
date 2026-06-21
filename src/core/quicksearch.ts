@@ -32,7 +32,7 @@ export class QuickSearchController {
         [Position, [number, number] | undefined] | undefined
     ][];
 
-    public frozen: boolean; // added to freeze the quicksearch controller when used in nav pane, so that it doesn't update the search results when the user clicks on different nodes in the outline, which would be confusing.
+    public frozen: boolean;
     public fileDirectives: string[];
     public _search_patterns: string[];
     public navText: string;
