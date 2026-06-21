@@ -516,7 +516,8 @@ export class LeoUI extends NullGui {
         }
         if (this._refreshType.goto) {
             this._refreshType.goto = false;
-            this.refreshGotoPane();
+            // Rebuild the Goto pane elements based on the current outline and search settings
+            workspace.controller.buildGotoElements(); // This also refreshes the goto pane.
         }
         if (this._refreshType.buttons) {
             this._refreshType.buttons = false;
