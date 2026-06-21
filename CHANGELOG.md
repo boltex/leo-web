@@ -4,6 +4,7 @@
 
 - Improved error messages when writing external files. Mirror of Leo's #4732
 - Improved documentation and help commands for the 'Abbreviations' features.
+- Fixed nav pane 'frozen' state and icon persistence across documents.
 
 ## 1.0.25
 
