@@ -37,7 +37,7 @@ Put your [personal settings](../users-guide/customizing.md#using-settings) in my
 
 ### Search for settings in leoSettings.leo
 
-leoSettings.leojs contains the defaults for all of LeoJS settings, with
+leoSettings.leojs contains the defaults for all of Leo-Web settings, with
 documentation for each.
 
 ### Use abbreviations
@@ -71,7 +71,7 @@ to gather nodes throughout an outline.
 
 ### Use Ctrl-P (Goto-Node) to navigate to any node
 
-Unlike the original Leo, in LeoJS, `Ctrl-P` opens an input box with a list of all nodes where you can start to type the headline of the node you want to select, it will restrict the choices as you type.
+Unlike the original Leo, in Leo-Web, `Ctrl-P` opens an input box with a list of all nodes where you can start to type the headline of the node you want to select, it will restrict the choices as you type.
 
 ## Scripting tips
 
@@ -105,7 +105,7 @@ patterns in running code.
 
 ### Use section references sparingly
 
-Use section references only when the exact position of a section within a file matters. 
+Use section references only when the exact position of a section within a file matters.
 
 Here is a common pattern for @file nodes for python files:
 
@@ -117,10 +117,10 @@ Here is a common pattern for @file nodes for python files:
 
 You can right-click a node to copy its **UNL** (Uniform Node Locator).
 
-Given a UNL, g.handleUnl(unl, c) will select the referenced node.  For example:
+Given a UNL, g.handleUnl(unl, c) will select the referenced node. For example:
 
 ```js
-g.handleUnl('unl:gnx://leojsDocs.leojs#felix.20240825232344.32', c);
+g.handleUnl("unl:gnx://leojsDocs.leojs#felix.20240825232344.32", c);
 ```
 
 will select this node in LeojsDocs.leojs.

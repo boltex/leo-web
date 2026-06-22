@@ -2494,7 +2494,7 @@ export class LeoFind {
      */
     private put_link(line: string, line_number: number, v: VNode): void {
         const c = this.c;
-        // const log = c.frame.log // UNAVAILABLE IN LEOJS
+        // const log = c.frame.log // UNAVAILABLE IN Leo-Web
         this.total_links += 1;
         if (this.total_links > 100) {
             return;

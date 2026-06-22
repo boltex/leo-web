@@ -6,7 +6,7 @@ sidebar_position: 1
 
 Leo-Web is a lightweight, browser-based port of the Leo Editor, the iconic outliner and scriptable literate programming environment.
 
-👉 Try it now: [https://boltex.github.io/leo-web](https://boltex.github.io/leo-web/)
+👉 Try it now: <a href="/leo-web" target="leo-web-app"><strong>Open Leo-Web</strong></a>
 
 - Work with Leo outlines without installing anything
 - Script using JavaScript or TypeScript
@@ -16,6 +16,7 @@ Leo is a fundamentally different way to organize code, notes, and ideas.
 
 > See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
 > or on [github](https://github.com/leo-editor/leo-editor).
+
 ## Web-Based Development
 
 Leo-Web uses the browser's File System API. 
@@ -31,6 +32,7 @@ Due to browser security constraints, access is limited to a user-approved _works
 - No access to the original Leo's `~/.leo` settings folder
 - No execution of OS shell commands
 - Some keybindings are reserved by the browser (`Ctrl+TAB`, `Ctrl+N` and `Ctrl+T`)
+
 ## Features
 
 -   UI controls: The **Leo Outline**, **body pane**, along with a tabbed **Log Window** containing all other panels.

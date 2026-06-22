@@ -329,8 +329,7 @@ export class LeoUI extends NullGui {
     //@+node:felix.20260323003442.1: *4* showDocumentation
     public showDocumentation(): void {
         // Open Leo Web documentation URL in new browser tab (for now, github repo)
-        const docUrl = 'https://github.com/boltex/leo-web/#-leo-for-the-web';
-        window.open(docUrl, '_blank');
+        window.open('docs/', '_blank');
     }
     //@+node:felix.20260323003430.1: *4* todo
     public todo(): void {
@@ -3094,7 +3093,7 @@ export class LeoUI extends NullGui {
                     }
 
                 } catch (e: any) {
-                    void workspace.dialog.showInformationMessage("LEOJS: LeoUI clickAtButton Error: " + e.toString());
+                    void workspace.dialog.showInformationMessage("LeoUI clickAtButton Error: " + e.toString());
                 }
 
             } else {
@@ -3238,7 +3237,7 @@ export class LeoUI extends NullGui {
                 g.es_exception(e);
             }
         } else {
-            console.log(`LEOJS : ERROR ${tag}: button ${String(index)} does not exist`);
+            console.log(`ERROR ${tag}: button ${String(index)} does not exist`);
         }
         this.setupRefresh(Focus.NoChange, { buttons: true });
         return this.launchRefresh();

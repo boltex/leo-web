@@ -14,7 +14,6 @@ In Leo-Web, common modules such as _crypto, os, Buffer, process and path_ are av
 
 > 🔍 **Further study**\
 > The [scripting portion](../users-guide/cheatsheet.md#scripting) of [Leo's cheat sheet](../users-guide/cheatsheet.md) contains more information about scripting.\
-> For LeoJS UI interaction examples, see the **[scripting samples repository](https://github.com/boltex/scripting-samples-leojs)**, along with the [LeoJS features video](https://www.youtube.com/watch?v=M_mKXSbVGdE) to see how to try them directly in your browser.
 
 ## Hello World
 

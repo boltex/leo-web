@@ -2,12 +2,11 @@
 
 A lightweight, browser-based port of the Leo Editor, the iconic outliner and scriptable literate programming environment.
 
-👉 Try it now: [https://boltex.github.io/leo-web](https://boltex.github.io/leo-web/)
+👉 Try it now: **[https://boltex.github.io/leo-web](https://boltex.github.io/leo-web/)**
+
+📖 Documentation: **[https://boltex.github.io/leo-web/docs](https://boltex.github.io/leo-web/docs)**
 
 Leo is a fundamentally different way to organize code, notes, and ideas.
-
-> See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
-> or on [github](https://github.com/leo-editor/leo-editor).
 
 ## About
 

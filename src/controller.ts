@@ -1499,7 +1499,7 @@ export class Controller {
             const navList: LeoGoto[] = result.navList;
             if (navList && navList.length) {
                 navList.forEach((goto: LeoGoto) => {
-                    // (from leojs) new LeoGotoNode(this._leoUI, p_goto, result.navOptions!)
+                    // (from leo-web) new LeoGotoNode(this._leoUI, p_goto, result.navOptions!)
                     let leoPaneLabel = "";
                     let leoPaneDescription = "";
                     let leoPaneTooltip = goto.h.trim();

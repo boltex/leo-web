@@ -63,7 +63,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
     //@+node:felix.20260614230854.1: *3* helpForAbbreviations
     @cmd('help-for-abbreviations', "Explains Leo's abbreviations.")
     public helpForAbbreviations(): void {
-        
+
         //@+<< define s >>
         //@+node:felix.20260614230854.2: *4* << define s >> (helpForAbbreviations)
         //@@language md
@@ -290,7 +290,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         let pattern = new RegExp('!<(.*)>!', 'g');
         let m: RegExpExecArray | null;
 
-        // void vscode.window.showInformationMessage("TODO : replaceBindingPatterns");
+        // void workspace.dialog.showInformationMessage("TODO : replaceBindingPatterns");
 
         // while ((m = pattern.exec(s)) !== null) {
         //     let name = m[1];
@@ -325,8 +325,8 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         This help discusses only \@file nodes. For other ways of creating
         external files, see:
 
-            [https://boltex.github.io/leojs/docs/getting-started/tutorial-scripting](https://boltex.github.io/leojs/docs/getting-started/tutorial-scripting) or
-            [https://boltex.github.io/leojs/docs/users-guide/directives](https://boltex.github.io/leojs/docs/users-guide/directives)
+            [<STARTINGURL>/docs/getting-started/tutorial-scripting](<STARTINGURL>/docs/getting-started/tutorial-scripting) or
+            [<STARTINGURL>/docs/users-guide/directives](<STARTINGURL>/docs/users-guide/directives)
 
         Leo creates external files in an unusual way. Please fee free to ask for
         help:
@@ -436,6 +436,11 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         `;
         //@-<< define s >>
         s = s.replace(/\\/g, '');
+
+        // Replace <STARTINGURL> with the actual URL of the users guide page on customizing Leo.
+        // This app is served from domain.com/leo-web/ and the docs are at domain.com/leo-web/docs/
+        s = s.replace(/<STARTINGURL>/g, window.location.origin + window.location.pathname.replace(/\/?$/, '/'));
+
         this.c.putHelpFor(s, "Creating External Files");
     }
     //@+node:felix.20251214160853.477: *3* helpForFindCommands
