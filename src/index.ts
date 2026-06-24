@@ -20,7 +20,7 @@ class LeoWebApp {
 
     constructor() {
 
-        // set the tab to have a name for links from the docs to rever back to this browser tab
+        // set the tab to have a name for links from the docs to revert back to this browser tab
         window.name = 'leo-web-app';
 
         window.addEventListener('load', () => {

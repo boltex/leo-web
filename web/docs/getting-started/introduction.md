@@ -52,11 +52,12 @@ Commands are accessible through a variety of interfaces — toolbar buttons, ded
 
 ## An Outline Editor
 
-Listed here are the most useful commands and their keyboard shortcuts to edit an outline.
+Essential Outline Commands and Keyboard Shortcuts 
+
+>  _These can also be found anytime in **Help → Welcome Screen.**_
 
 | Outline Commands |                                                                  |
 | :--------------- | :--------------------------------------------------------------- |
-| Undo / Redo      | `Ctrl + Z` &nbsp;&nbsp;/&nbsp;&nbsp; `Ctrl + Shift + Z`          |
 | Insert Node      | `Ctrl + I` &nbsp;&nbsp;_or_&nbsp;&nbsp; `Shift + Insert`         |
 | Insert Child     | `Ctrl + Insert`                                                  |
 | Edit Headline    | `Ctrl + H`                                                       |
