@@ -51,17 +51,16 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.SHOW_OUTLINE,
-        key: "ctrl+t", // BROWSER MAY INTERCEPT!
+        key: "ctrl+t", // Browser will intercept if not Web App (PWA) "Standalone" Mode
         body: true
     },
     {
         command: CMD.SHOW_BODY,
-        key: "ctrl+t", // BROWSER MAY INTERCEPT!
+        key: "ctrl+t", // Browser will intercept if not Web App (PWA) "Standalone" Mode
         outline: true
     },
     {
         command: CMD.SHOW_BODY,
-        // key: "ctrl+t", // BROWSER MAY INTERCEPT!
         key: "alt+t", // ALTERNATE KEYBINDING : ALT+T
         outline: true
     },
@@ -108,7 +107,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.TAB_CYCLE_NEXT,
-        key: "ctrl+tab", // Maybe browser will intercept?
+        key: "ctrl+tab", // Browser will intercept if not Web App (PWA) "Standalone" Mode
         mac: "meta+tab",
         outline: true,
         body: true,
@@ -126,7 +125,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.NEW_FILE,
-        key: "ctrl+n", // Maybe browser will intercept?
+        key: "ctrl+n", // Browser will intercept if not Web App (PWA) "Standalone" Mode
         mac: "meta+n",
         outline: true,
         body: true,
@@ -195,7 +194,7 @@ export const keybindings: Keybinding[] = [
     },
     {
         command: CMD.EXTRACT_NAMES,
-        key: "ctrl+shift+n", // Maybe browser will intercept?
+        key: "ctrl+shift+n", // Browser will intercept if not Web App (PWA) "Standalone" Mode
         mac: "meta+shift+n",
         outline: true,
         body: true,

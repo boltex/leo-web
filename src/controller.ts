@@ -1471,6 +1471,11 @@ export class Controller {
 
     //@+node:felix.20260327235321.1: *3* buildGotoElements
     public buildGotoElements(): void {
+        if (!g.app.windowList.length) {
+            workspace.logPane.setGotoNodes([]);
+            return;
+        }
+
         const c = g.app.windowList[g.app.gui.frameIndex].c;
 
         const scon: QuickSearchController = c.quicksearchController;

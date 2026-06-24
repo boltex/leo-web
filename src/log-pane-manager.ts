@@ -593,6 +593,9 @@ export class LogPaneManager {
                 }
             });
         }
+        if (tabName === 'log') {
+            this.LOG_CONTENT.focus();
+        }
         if (oldTab === tabName) {
             return;
         }

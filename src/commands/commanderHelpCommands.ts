@@ -28,7 +28,7 @@ export class CommanderHelpCommands {
         const theCopyright =
             `Copyright 1999-${g.dayjs().year()} by Edward K. Ream and Félix Malboeuf\n` +
             'All Rights Reserved\n' +
-            'Leo, LeoJS and Leo-Web are distributed under the MIT License';
+            'Leo, LeoInteg, LeoJS and Leo-Web are distributed under the MIT License';
         const url = 'https://leo-editor.github.io/leo-editor/'; // unused for now
         const email = 'edreamleo@gmail.com'; // unused for now
         return g.app.gui.runAboutLeoDialog(

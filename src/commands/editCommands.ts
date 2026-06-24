@@ -722,6 +722,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
     //@+node:felix.20251214160853.262: *4* ec.focusTo...
     @cmd('focus-to-body', 'Put the keyboard focus in Leo\'s body pane.')
     public focusToBody(): void {
+        g.workspace.layout.BODY_PANE.focus();
         this.c.bodyWantsFocus();
     }
 
@@ -732,6 +733,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
 
     @cmd('focus-to-tree', 'Put the keyboard focus in Leo\'s outline pane.')
     public focusToTree(): void {
+        g.workspace.layout.OUTLINE_PANE.focus();
         this.c.treeWantsFocus();
     }
     //@+node:felix.20251214160853.263: *3* ec: comment column
