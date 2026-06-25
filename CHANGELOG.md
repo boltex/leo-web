@@ -2,7 +2,7 @@
 
 ## 1.0.27
 
-- ...
+- Fixed broken links in documentation
 
 ## 1.0.26
 
