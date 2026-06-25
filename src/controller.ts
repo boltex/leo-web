@@ -1471,6 +1471,11 @@ export class Controller {
 
     //@+node:felix.20260327235321.1: *3* buildGotoElements
     public buildGotoElements(): void {
+        if (!g.app.windowList.length) {
+            workspace.logPane.setGotoNodes([]);
+            return;
+        }
+
         const c = g.app.windowList[g.app.gui.frameIndex].c;
 
         const scon: QuickSearchController = c.quicksearchController;
@@ -1499,7 +1504,7 @@ export class Controller {
             const navList: LeoGoto[] = result.navList;
             if (navList && navList.length) {
                 navList.forEach((goto: LeoGoto) => {
-                    // (from leojs) new LeoGotoNode(this._leoUI, p_goto, result.navOptions!)
+                    // (from leo-web) new LeoGotoNode(this._leoUI, p_goto, result.navOptions!)
                     let leoPaneLabel = "";
                     let leoPaneDescription = "";
                     let leoPaneTooltip = goto.h.trim();

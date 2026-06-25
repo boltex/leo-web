@@ -2404,7 +2404,7 @@ export class FileCommands {
             this.outputFile += s;
         } else if (typeof this.outputFile === 'number') {
             // fs.writeSync(this.outputFile, s);
-            // ! SHOULD NOT HAPPEN : USING vscode.workspace.fs async methods
+            // ! SHOULD NOT HAPPEN : USING workspace.fs async methods
         } else {
             // g.es('Internal error writing OUTPUT FILE IS UNDEFINED', 'red');
             g.es('Internal error writing OUTPUT FILE IS UNDEFINED');

@@ -273,6 +273,21 @@ export class TopLevelEditCommands {
             }
         }
     }
+    //@+node:felix.20260624202501.1: *3* @g.command('show-node-files')
+    @command(
+        'show-node-files',
+        'Display the headlines of all @<file> nodes containing this node.'
+        )
+    public show_node_files(this: Commands): void {
+        const c: Commands = this;
+        if (c && c.p && c.p.v) {
+            const p = c.p;
+            for(const v of p.v.findAllAncestorAtFileNodes()) {
+                g.es(v.h, {color:'blue'});
+            }
+        }
+    }
+
     //@+node:felix.20251214160853.246: *3* @g.command('show-clone-parents')
     @command(
         'show-clone-parents',
@@ -722,6 +737,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
     //@+node:felix.20251214160853.262: *4* ec.focusTo...
     @cmd('focus-to-body', 'Put the keyboard focus in Leo\'s body pane.')
     public focusToBody(): void {
+        g.workspace.layout.BODY_PANE.focus();
         this.c.bodyWantsFocus();
     }
 
@@ -732,6 +748,7 @@ export class EditCommandsClass extends BaseEditCommandsClass {
 
     @cmd('focus-to-tree', 'Put the keyboard focus in Leo\'s outline pane.')
     public focusToTree(): void {
+        g.workspace.layout.OUTLINE_PANE.focus();
         this.c.treeWantsFocus();
     }
     //@+node:felix.20251214160853.263: *3* ec: comment column

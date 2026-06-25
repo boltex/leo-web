@@ -28,7 +28,7 @@ export class CommanderHelpCommands {
         const theCopyright =
             `Copyright 1999-${g.dayjs().year()} by Edward K. Ream and Félix Malboeuf\n` +
             'All Rights Reserved\n' +
-            'Leo, LeoJS and Leo-Web are distributed under the MIT License';
+            'Leo, LeoInteg, LeoJS and Leo-Web are distributed under the MIT License';
         const url = 'https://leo-editor.github.io/leo-editor/'; // unused for now
         const email = 'edreamleo@gmail.com'; // unused for now
         return g.app.gui.runAboutLeoDialog(
@@ -54,7 +54,7 @@ export class CommanderHelpCommands {
     // )
     // @commander_command('leo-docs-leo', 'Open LeoDocs.leo in a new Leo window.')
     // public leoDocumentation(this: Commands): void {
-    //     void vscode.window.showInformationMessage('TODO : open-leo-docs-leo');
+    //     void workspace.dialog.showInformationMessage('TODO : open-leo-docs-leo');
 
     //     /*     
     //     c = self
@@ -79,7 +79,7 @@ export class CommanderHelpCommands {
     //     'Open quickstart.leo in a new Leo window.'
     // )
     // public leoQuickStart(this: Commands): void {
-    //     void vscode.window.showInformationMessage('TODO : open-quickstart-leo');
+    //     void workspace.dialog.showInformationMessage('TODO : open-quickstart-leo');
 
     //     /* 
     //     c = self
@@ -98,7 +98,7 @@ export class CommanderHelpCommands {
     // @commander_command('leo-cheat-sheet', 'Open leo/doc/cheatSheet.leo')
     // @commander_command('cheat-sheet', 'Open leo/doc/cheatSheet.leo')
     // public openCheatSheet(this: Commands): void {
-    //     void vscode.window.showInformationMessage(
+    //     void workspace.dialog.showInformationMessage(
     //         'TODO : open-cheat-sheet-leo'
     //     );
 
@@ -265,7 +265,11 @@ export class CommanderHelpCommands {
                 'Only nodes that are descendants of the @settings node are read.\n\n' +
                 'Only settings you need to modify should be in this file, do\n' +
                 'not copy large parts of leoSettings here.\n\n' +
-                'For more information see https://leo-editor.github.io/leo-editor/customizing.html';
+                'For more information see <STARTINGURL>docs/users-guide/customizing/';
+
+            // Replace <STARTINGURL> with the actual URL of the users guide page on customizing Leo.
+            // This app is served from domain.com/leo-web/ and the docs are at domain.com/leo-web/docs/
+            nd.b = nd.b.replace('<STARTINGURL>', window.location.origin + window.location.pathname.replace(/\/?$/, '/'));
 
             nd = nd.insertAfter();
             nd.h = '@settings';
@@ -308,10 +312,10 @@ export class CommanderHelpCommands {
     //@+node:felix.20251214160853.123: *4* c_help.leoHome
     @commander_command(
         'open-online-home',
-        "Open the LeoJS Home page in a web browser."
+        "Open the Leo-Web Home page in a web browser."
     )
     public leoHome(this: Commands): void {
-        const url = 'https://boltex.github.io/leojs/';
+        const url = 'docs/';
         if (typeof window !== 'undefined' && typeof window.open === 'function') {
             window.open(url, '_blank', 'noopener,noreferrer');
         } else {
@@ -322,11 +326,10 @@ export class CommanderHelpCommands {
     //@+node:felix.20251214160853.124: *4* c_help.openLeoTutorials
     @commander_command(
         'open-online-tutorials',
-        "Open the LeoJS tutorials page in a web browser."
+        "Open the Leo-Web tutorials page in a web browser."
     )
     public openLeoTutorials(this: Commands): void {
-        const url =
-            'https://boltex.github.io/leojs/docs/getting-started/tutorial-basics';
+        const url = 'docs/getting-started/tutorial-basics';
         if (typeof window !== 'undefined' && typeof window.open === 'function') {
             window.open(url, '_blank', 'noopener,noreferrer');
         } else {
@@ -337,25 +340,10 @@ export class CommanderHelpCommands {
     //@+node:felix.20251214160853.125: *4* c_help.openLeoUsersGuide
     @commander_command(
         'open-users-guide',
-        "Open the LeoJS users guide in a web browser."
+        "Open the Leo-Web users guide in a web browser."
     )
     public openLeoUsersGuide(this: Commands): void {
-        const url = 'https://boltex.github.io/leojs/docs/users-guide/leomarkup';
-        if (typeof window !== 'undefined' && typeof window.open === 'function') {
-            window.open(url, '_blank', 'noopener,noreferrer');
-        } else {
-            g.es(`Unable to open URL in this environment: ${url}`);
-        }
-    }
-
-    //@+node:felix.20251214160853.126: *4* c_help.openLeoVideos
-    @commander_command(
-        'open-online-videos',
-        "Open LeoJS video playlist in a web browser."
-    )
-    public openLeoVideos(this: Commands): void {
-        const url =
-            'https://www.youtube.com/playlist?list=PLLILWxKl5dBXmdSZqhYEBlK_5AQYNW2xa';
+        const url = 'docs/users-guide/leomarkup';
         if (typeof window !== 'undefined' && typeof window.open === 'function') {
             window.open(url, '_blank', 'noopener,noreferrer');
         } else {

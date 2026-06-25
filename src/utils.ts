@@ -228,7 +228,7 @@ export function padNumber2(p_number: number): string {
 //@+node:felix.20251211000427.16: ** convertLeoFiletypes
 /**
  * Convert Leo's internal filetype descriptions array
- * to vscode's option format for open/save dialogs.
+ * to the browser's option format for open/save dialogs.
  */
 export function convertLeoFiletypes(p_filetypes: [string, string][]): { [name: string]: string[] } {
     /*
@@ -335,7 +335,7 @@ export function isAlphaNumeric(str: string): boolean {
 //@+node:felix.20251211000427.21: ** isIconChangedByEdit
 /**
  * * Checks if a node would become dirty if it were to now have body content at all
- * @param p_node LeoNode from vscode's outline
+ * @param p_node Position
  * @param p_newHasBody Flag to signify presence of body content, to be compared with its current state
  * @returns True if it would change the icon with actual body content, false otherwise
  */

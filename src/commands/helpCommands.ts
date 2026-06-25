@@ -60,6 +60,76 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         this.c.putHelpFor(md_s, "Leo's help system");
 
     }
+    //@+node:felix.20260614230854.1: *3* helpForAbbreviations
+    @cmd('help-for-abbreviations', "Explains Leo's abbreviations.")
+    public helpForAbbreviations(): void {
+
+        //@+<< define s >>
+        //@+node:felix.20260614230854.2: *4* << define s >> (helpForAbbreviations)
+        //@@language md
+
+        let s = `\
+
+        # About Abbreviations
+
+        Leo optionally expands abbreviations as you type.
+
+        Abbreviations typically end with something like ";;" so they won't trigger
+        by accident.
+
+        You define abbreviations in @data abbreviations nodes
+        or @data global-abbreviations nodes. Some come predefined
+        in @data global-abbreviations such as date;; and  html;;.
+
+        Abbreviations can simply be shortcuts:
+
+
+            ncn;;=@nocolor
+
+
+        Abbreviations can span multiple lines. Continued lines start with \\:, like
+        this:
+
+
+            form;;=<form action="main_submit" method="get" accept-charset="utf-8">
+            \:<p><input type="submit" value="Continue &rarr;"></p>
+            \:</form>\n
+
+
+        Abbreviations can define templates in which <\|a-field-name\|> denotes a field
+        to be filled in:
+
+
+            input;;=<input type="text/submit/hidden/button"
+            \:name="<|name|>"
+            \:value="" id="<|id|>">\n
+
+
+        Typing "F3" after inserting a template selects the next field.
+
+        Abbreviations can execute **abbreviation scripts**, delimited by {\|{ and
+        }\|}:
+
+
+            date;;={|{import time ; x=time.asctime()}|}
+
+
+        For example, typing **date;;** gives:
+
+            Sun Jun 14 19:51:44 2026
+
+        It's even possible to define a context in which abbreviation scripts execute.
+
+        See leoSettings.leo for full details.
+
+
+        `;
+        //@-<< define s >>
+        s = s.replace(/\\/g, '');
+        this.c.putHelpFor(s, "Abbreviations");
+
+    }
+
     //@+node:felix.20251214160853.470: *3* helpForCommand & helpers
     @cmd('help-for-command', 'Prompts for a command name and prints the help message for that command.')
     public async helpForCommand(): Promise<void> {
@@ -220,7 +290,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         let pattern = new RegExp('!<(.*)>!', 'g');
         let m: RegExpExecArray | null;
 
-        // void vscode.window.showInformationMessage("TODO : replaceBindingPatterns");
+        // void workspace.dialog.showInformationMessage("TODO : replaceBindingPatterns");
 
         // while ((m = pattern.exec(s)) !== null) {
         //     let name = m[1];
@@ -255,8 +325,8 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         This help discusses only \@file nodes. For other ways of creating
         external files, see:
 
-            [https://boltex.github.io/leojs/docs/getting-started/tutorial-scripting](https://boltex.github.io/leojs/docs/getting-started/tutorial-scripting) or
-            [https://boltex.github.io/leojs/docs/users-guide/directives](https://boltex.github.io/leojs/docs/users-guide/directives)
+            [<STARTINGURL>/docs/getting-started/tutorial-scripting](<STARTINGURL>/docs/getting-started/tutorial-scripting) or
+            [<STARTINGURL>/docs/users-guide/directives](<STARTINGURL>/docs/users-guide/directives)
 
         Leo creates external files in an unusual way. Please fee free to ask for
         help:
@@ -366,6 +436,11 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         `;
         //@-<< define s >>
         s = s.replace(/\\/g, '');
+
+        // Replace <STARTINGURL> with the actual URL of the users guide page on customizing Leo.
+        // This app is served from domain.com/leo-web/ and the docs are at domain.com/leo-web/docs/
+        s = s.replace(/<STARTINGURL>/g, window.location.origin + window.location.pathname.replace(/\/?$/, '/'));
+
         this.c.putHelpFor(s, "Creating External Files");
     }
     //@+node:felix.20251214160853.477: *3* helpForFindCommands

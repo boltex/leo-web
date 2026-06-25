@@ -329,8 +329,7 @@ export class LeoUI extends NullGui {
     //@+node:felix.20260323003442.1: *4* showDocumentation
     public showDocumentation(): void {
         // Open Leo Web documentation URL in new browser tab (for now, github repo)
-        const docUrl = 'https://github.com/boltex/leo-web/#-leo-for-the-web';
-        window.open(docUrl, '_blank');
+        window.open('docs/', '_blank');
     }
     //@+node:felix.20260323003430.1: *4* todo
     public todo(): void {
@@ -516,7 +515,8 @@ export class LeoUI extends NullGui {
         }
         if (this._refreshType.goto) {
             this._refreshType.goto = false;
-            this.refreshGotoPane();
+            // Rebuild the Goto pane elements based on the current outline and search settings
+            workspace.controller.buildGotoElements(); // This also refreshes the goto pane.
         }
         if (this._refreshType.buttons) {
             this._refreshType.buttons = false;
@@ -1548,28 +1548,8 @@ export class LeoUI extends NullGui {
     /**
      * * Perform chosen minibuffer command
      */
-    private _doMinibufferCommand(p_picked?: QuickPickItem): Promise<unknown> {
+    private _doMinibufferCommand(p_picked?: QuickPickItem): Thenable<unknown> {
         if (p_picked && p_picked.label) {
-
-            let finalFocus = Focus.NoChange;
-            // Get the current focus (body outline, or other will be noChange)
-            if (workspace.layout.isOutlineFocused()) {
-                finalFocus = Focus.Outline;
-            } else if (workspace.layout.isBodyFocused()) {
-                finalFocus = Focus.Body;
-            }
-
-            // Setup refresh
-            this.setupRefresh(
-                finalFocus,
-                {
-                    tree: true,
-                    body: true,
-                    documents: true,
-                    buttons: true,
-                    states: true
-                }
-            );
 
             this._addToMinibufferHistory(p_picked);
             const c = g.app.windowList[this.frameIndex].c;
@@ -1583,16 +1563,63 @@ export class LeoUI extends NullGui {
 
             const w_commandResult = c.executeMinibufferCommand(w_command);
 
+            // Ok, the command has executed. Now decide where to leave focus.
+            let finalFocus = Focus.NoChange;
+
             if (w_commandResult && w_commandResult.then) {
+
                 // IS A PROMISE so tack-on the launchRefresh to its '.then' chain. 
                 void (w_commandResult as Thenable<unknown>).then((p_result) => {
+                    if (workspace.layout.isOutlineFocused()) {
+                        finalFocus = Focus.Outline;
+                    } else if (workspace.layout.isBodyFocused()) {
+                        finalFocus = Focus.Body;
+                    }
+                    // Setup refresh
+                    this.setupRefresh(
+                        finalFocus,
+                        {
+                            tree: true,
+                            body: true,
+                            documents: true,
+                            goto: true, // May have closed a document, so refresh goto list
+                            buttons: true,
+                            states: true
+                        }
+                    );
                     void this.launchRefresh();
                 });
+
+                return w_commandResult as Thenable<unknown>;
+
             } else {
-                void this.launchRefresh();
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (workspace.layout.isOutlineFocused()) {
+                            finalFocus = Focus.Outline;
+                        } else if (workspace.layout.isBodyFocused()) {
+                            finalFocus = Focus.Body;
+                        }
+                        // Setup refresh
+                        this.setupRefresh(
+                            finalFocus,
+                            {
+                                tree: true,
+                                body: true,
+                                documents: true,
+                                goto: true, // May have closed a document, so refresh goto list
+                                buttons: true,
+                                states: true
+                            }
+                        );
+                        void this.launchRefresh();
+
+                        // We returned the promise which this timeout is resolving,
+                        // so we give back the command's result (if any) to the caller of the minibuffer command.
+                        resolve(w_commandResult);
+                    }, 0);
+                });
             }
-            // In both cases, return the result, or if a promise: the promise itself, not the result.
-            return Promise.resolve(w_commandResult);
 
         } else {
             // Canceled
@@ -2353,6 +2380,7 @@ export class LeoUI extends NullGui {
         const leoISettings = c.findCommands.ftm.get_settings();
         const w_settings: LeoSearchSettings = {
             // Nav options
+            frozen: scon.frozen,
             navText: scon.navText,
             showParents: scon.showParents,
             isTag: scon.isTag,
@@ -2399,6 +2427,7 @@ export class LeoUI extends NullGui {
         // convert to LeoGuiFindTabManagerSettings
         const searchSettings: LeoGuiFindTabManagerSettings = {
             // Nav settings
+            frozen: p_settings.frozen,
             is_tag: p_settings.isTag,
             nav_text: p_settings.navText,
             show_parents: p_settings.showParents,
@@ -2427,6 +2456,7 @@ export class LeoUI extends NullGui {
 
         // * Try to set the search settings
         // nav settings
+        scon.frozen = searchSettings.frozen;
         scon.navText = searchSettings.nav_text;
         scon.showParents = searchSettings.show_parents;
         scon.isTag = searchSettings.is_tag;
@@ -3090,7 +3120,7 @@ export class LeoUI extends NullGui {
                     }
 
                 } catch (e: any) {
-                    void workspace.dialog.showInformationMessage("LEOJS: LeoUI clickAtButton Error: " + e.toString());
+                    void workspace.dialog.showInformationMessage("LeoUI clickAtButton Error: " + e.toString());
                 }
 
             } else {
@@ -3234,7 +3264,7 @@ export class LeoUI extends NullGui {
                 g.es_exception(e);
             }
         } else {
-            console.log(`LEOJS : ERROR ${tag}: button ${String(index)} does not exist`);
+            console.log(`ERROR ${tag}: button ${String(index)} does not exist`);
         }
         this.setupRefresh(Focus.NoChange, { buttons: true });
         return this.launchRefresh();

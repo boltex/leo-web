@@ -20,6 +20,9 @@ class LeoWebApp {
 
     constructor() {
 
+        // set the tab to have a name for links from the docs to revert back to this browser tab
+        window.name = 'leo-web-app';
+
         window.addEventListener('load', () => {
             document.body.classList.add('loaded'); // Sets opacity to 1 (was 0 to prevent FOUC)
             document.documentElement.classList.add('loaded'); // Resets background (was gray to prevent FOUC)
