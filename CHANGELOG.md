@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.29
+
+-- ...
+
 ## 1.0.28
 
 - Fixed logo images
