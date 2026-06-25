@@ -7,6 +7,7 @@
 - Fixed nav pane 'frozen' state and icon persistence across documents.
 - Fixed 'focus-to-...' commands.
 - Added documentation with docusaurus at /docs/.
+- Added show-node-files command as per Leo's #4749
 
 ## 1.0.25
 
