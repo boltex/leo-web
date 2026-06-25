@@ -184,7 +184,7 @@ export class StringFindTabManager {
     }
     public init_focus(): void {
         this.set_entry_focus();
-        // SEND LEO SEARCH CONFIG TO VSCODE AND FOCUS IN FIND PANEL !
+        // SEND LEO SEARCH CONFIG AND FOCUS IN FIND PANEL !
         // TODO : TEST THIS !!
         g.app.gui.startSearch();
         //
@@ -214,6 +214,9 @@ export class StringFindTabManager {
         const c = this.c;
         const finder = c.findCommands;
         const bunch: ISettings = {
+            // State...
+            in_headline: false,
+            reverse: false,
             // Find/change strings...
             find_text: this.find_findbox.text(),
             change_text: this.find_replacebox.text(),

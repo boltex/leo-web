@@ -1420,7 +1420,7 @@ body.dragging-secondary .node {
 select.setting-select {
   box-sizing: border-box;
   padding: 0.2rem 0.3rem;
-  margin: 0 0 0.2rem 0.25rem;
+  margin: 0 0 0.2rem 0rem;
   border-radius: 3px;
   border: 1px solid var(--find-border-color);
   background: var(--find-pane-color);
@@ -1790,6 +1790,9 @@ input[type="checkbox"]:focus-visible:checked::after {
   color: var(--text-color);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   border: 1px solid var(--find-border-color);
+
+  /* Make all content in a modal not user-selectable (except input fields which are always selectable) */
+  user-select: none;
 }
 
 /* Workspace dialog */
@@ -2023,68 +2026,6 @@ mark {
 
 #welcome-dialog-description:empty {
   display: none;
-}
-
-#welcome-dialog-github-logo {
-  display: inline;
-  float: right;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  opacity: 0.65;
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease,
-    filter 160ms ease;
-  transform-origin: center;
-}
-
-#welcome-dialog h2:hover #welcome-dialog-github-logo,
-#welcome-dialog-github-logo:focus-visible {
-  transform: scale(1.15);
-  opacity: 1;
-}
-
-#welcome-dialog-github-logo::before {
-  content: "";
-  position: absolute;
-  inset: 0.7px 0px 0px 0px;
-  background: var(--find-text-color);
-  border-radius: 50%;
-  transform: scale(0);
-  transition: transform 0.1s ease;
-  opacity: 0.2;
-  z-index: -1;
-}
-#welcome-dialog-github-logo::after {
-  content: "★";
-  position: absolute;
-  bottom: -2px;
-  left: 15px;
-  font-size: 18px;
-  color: #f0c800;
-  text-shadow:
-    0 0 1px rgb(5 7 9 / 82%),
-    0 0 2px rgb(154 67 9 / 92%);
-  opacity: 0;
-  transform: scale(0) rotate(-20deg);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
-}
-
-#welcome-dialog-github-logo:hover::before,
-#welcome-dialog-github-logo:focus-visible::before {
-  transform: scale(1.2); /* Make disk slightly larger than icon */
-}
-
-#welcome-dialog h2:hover #welcome-dialog-github-logo::after,
-#welcome-dialog-github-logo:focus-visible::after {
-  opacity: 1;
-  transform: scale(1) rotate(0deg);
-}
-
-#welcome-dialog-github-logo:focus,
-#welcome-dialog-github-logo:focus-visible {
-  outline: none;
 }
 
 #welcome-dialog-bottom {

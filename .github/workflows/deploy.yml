@@ -29,14 +29,27 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: npm run build # Creates  'dist' folder
         env:
           GOOGLE_TAG_ID: ${{ vars.GOOGLE_TAG_ID }} # Pass the Google Tag ID as an environment variable
+
+      # Now build the docusaurus site and prepare it for deployment to GitHub Pages. The 'dist' folder should contain the compiled static files ready for deployment.
+      - name: Build Docusaurus site
+        working-directory: web
+        run: npm ci && npm run build
+        env:
+          DOC_GOOGLE_TAG_ID: ${{ vars.DOC_GOOGLE_TAG_ID }} # Pass the Specific Google Tag ID as an environment variable
+          ALGOLIA_APP_ID: ${{ vars.ALGOLIA_APP_ID }} # Pass Algolia App ID as an environment variable
+          ALGOLIA_API_KEY: ${{ vars.ALGOLIA_API_KEY }} # Pass Algolia API Key as an environment variable
+          ALGOLIA_INDEX_NAME: ${{ vars.ALGOLIA_INDEX_NAME }} # Pass Algolia Index Name as an environment variable
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -350,24 +350,21 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
             return;
         }
 
-        // Experiment with true (always) instead of if (node_only) {... 
-        if (true) {
-            // Tell the search command to restore settings on failure.
-            finder.previous_settings = {
-                find_text: finder.find_text,
-                change_text: finder.change_text,
-                file_only: finder.file_only,
-                mark_changes: finder.mark_changes,
-                mark_finds: finder.mark_finds,
-                ignore_case: finder.ignore_case,
-                node_only: finder.node_only,
-                pattern_match: finder.pattern_match,
-                search_body: finder.search_body,
-                search_headline: finder.search_headline,
-                suboutline_only: finder.suboutline_only,
-                whole_word: finder.whole_word,
-            };
-        }
+        // Tell the search command to restore settings on failure.
+        finder.previous_settings = {
+            find_text: finder.find_text,
+            change_text: finder.change_text,
+            file_only: finder.file_only,
+            mark_changes: finder.mark_changes,
+            mark_finds: finder.mark_finds,
+            ignore_case: finder.ignore_case,
+            node_only: finder.node_only,
+            pattern_match: finder.pattern_match,
+            search_body: finder.search_body,
+            search_headline: finder.search_headline,
+            suboutline_only: finder.suboutline_only,
+            whole_word: finder.whole_word,
+        };
 
         // Search!
         // c.endEditing();  // No need to re-edit the headline!
@@ -492,33 +489,25 @@ export class AbbrevCommandsClass extends BaseEditCommandsClass {
                     if (new_contents.endsWith(end_text)) {
                         new_ins = new_contents.length - end_text.length;
                     } else {
-                        new_ins = Math.min(ins, p.b.length);
+                        new_ins = Math.min(ins, new_contents.length);
                     }
                 }
             } finally {
                 w.setInsertPoint(new_ins);
             }
         } else {
-            // at this point, insertion point is at end of last 'replace_selection' call inserted,
-            // so lets save all text past that point, to be able to compare after substitution 
-            // and restore insertion point by looking from the end for that text.
             const contents = p.b;
-
             const end_text = contents.slice(ins);
-
             const new_contents = await this._substitution_helper(contents);
             if (new_contents !== contents) {
                 p.b = new_contents;
-
                 if (new_contents.endsWith(end_text)) {
-                    const new_ins = new_contents.length - end_text.length;
-                    p.setSelection(new_ins, new_contents.length);
-                    w.setInsertPoint(new_ins);
+                    new_ins = new_contents.length - end_text.length;
                 } else {
-                    const new_ins = Math.min(ins, p.b.length);
-                    p.setSelection(new_ins, p.b.length);
-                    w.setInsertPoint(new_ins);
+                    new_ins = Math.min(ins, new_contents.length);
                 }
+                p.setSelection(new_ins, new_contents.length);
+                w.setInsertPoint(new_ins);
             }
         }
 

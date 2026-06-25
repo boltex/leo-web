@@ -1976,7 +1976,6 @@ export async function write_file_if_changed(
 
 //@+node:felix.20251207215313.95: *3* g.makeUri
 /**
- * * VSCODE compatibility helper method:
  * Builds a valid URI from a typical filename string.
  *
  * @param p_fn String form of fsPath or path
@@ -1992,7 +1991,7 @@ export function relativeDirectory(commander: Commands, importedFilename: string)
     if (!commander.fileName()) {
 
         es_print_unique_message('Imported using absolute path (unsaved outline).\n Save the outline to enable relative paths.');
-        // Make sure the uri starts with a slash instead of the vscode workspace path.
+        // Make sure the uri starts with a slash instead of the workspace path.
         importedFilename = os_path_normslashes(importedFilename);
         const workspacePath = workspaceUri.fsPath.replace(/\\/g, "/");
 
@@ -4774,7 +4773,7 @@ export function os_path_realpath(p_path: string): string {
     // console.log('Todo: better os_path_realpath!');
 
     p_path = p_path; // fixme
-    // p_path = vscode.workspace.fs.realPath(p_path);
+    // p_path = workspace.fs.realPath(p_path);
     // // os.path.normpath does the *reverse* of what we want.
 
     p_path = os_path_normslashes(p_path);
@@ -4807,7 +4806,7 @@ export async function os_path_samefile(
     const w_uri1 = makeUri(fn1);
     const w_uri2 = makeUri(fn2);
 
-    // 2.5 with vscode.Uri :
+    // 2.5 with Uri :
     //  path
     //  fsPath
     //  toString
@@ -4849,7 +4848,7 @@ export async function os_path_samefile(
     }
 
     // 4- with fs.realpath
-    // DOES NOT EXIST IN VSCODE vscode.workspace.fs !
+    // DOES NOT EXIST workspace.fs !
 
     // 5- finalize
     absPath1 = finalize(fn1);
@@ -5623,7 +5622,6 @@ export function computeFileUrl(fn: string, c: Commands, p: Position): string {
             w_path = url;
         }
         // Handle ancestor @path directives.
-        // TODO : MAY HAVE TO USE g.vscodeWorkspaceUri?.fsPath 
         if (c && c.fileName()) {
             const base = c.getPath(p);
             w_path = finalize_join(os_path_dirname(c.fileName()), base, w_path);

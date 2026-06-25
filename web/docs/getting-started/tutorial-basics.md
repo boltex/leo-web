@@ -1,0 +1,282 @@
+---
+sidebar_position: 2
+---
+
+# Leo in 10 Minutes
+
+This page aims to go over the interface, its most important features and terminology, to get you going in a few minutes! **For a quick overview, see the [Introduction to Leo 📺](https://www.youtube.com/watch?v=tuM8MvI9g6k) video.**
+
+## User Interface
+
+Leo stores all data in nodes. Nodes have headlines (shown in the **outline**) and body text. The body pane shows the body text of the presently selected node, the node whose headline is selected in the outline pane. Headlines have an icon box indicating a node’s status. 
+
+The **body pane** is a text editor which changes to match the selected node of the Leo outline.
+
+![Leo-Web UI](img/leo-web-vertical-menu.png#center)
+
+You can change the _outline-body splitter orientation_ from horizontal to vertical along with the _color theme_ with the top-right corner **hover menu** icons. 
+
+![Hover Menu](img/autohide-icons-montage.png#center)
+
+The third part, the **Log Window** has tabs to select other panels, such as the **Find** and **Nav** panels to help navigate the outline, an **undo** pane for a history of past actions, and a **UI** panel for choosing which buttons to show in the **hover menu**.
+
+![Log Window](./img/log-pane-montage.png)
+
+### Find Panel
+
+The Find tab shows the status of Leo’s Find/Replace commands. It can be shown and expanded with the **`Ctrl+F`** shortcut while the focus is in the Leo outline or body pane.
+
+![Find Panel](./img/find-panel-montage.png)
+
+Enter your search pattern directly in the **\<find pattern here\>** field. Press **`Enter`** to find the first match starting from your current position.
+
+Hitting **`F3`** repeatedly will find the subsequent matches. (**`F2`** for previous matches)
+
+Using the Nav tab of the _find panel_, (**`Ctrl+Shift+F`** to accesss directly) you can type your search pattern in the **Nav** field instead to see all results appear below. This will show the headlines as you type.
+
+![Nav Tab Panel](./img/nav-pane-montage.png)
+
+Press **`Enter`** to freeze the results and show results also found in **body text of any node**. This will add a snowflake icon ❄️ to the **Nav** field.
+
+If you check the **Tag** option, the **Nav** field is then used to find nodes by their tag 🏷 _ua_ (user attribute).
+
+### Undo Panel
+
+There are undo and redo icons above the Leo outline and above the undo pane itself. You can also right-click on an undo step to directly switch to that specific state.
+
+![Nav Tab Panel](./img/undo-pane-montage.png)
+### Top Menu Panel
+
+A tabbed document interface for opened leo files along with a command menu abd buttons toolbar can be shown when clicking the 'toggle menu' hamburger button in the top right corner of the screen. This can also be toggled with the `Shift+F11` key.
+
+![Top Menu](./img/top-menu-crop-montage.png)
+
+## Commands
+
+Leo has hundreds of commands, described in [Leo's Command Reference](../users-guide/commands.md)
+
+A curated set of common commands are accessible through the UI — toolbar buttons, icon menus, and [key bindings](../users-guide/commands.md#key-reference). 
+
+With `Alt+X`, the complete set of commands is discoverable in its entirety through Leo's own command palette: [Leo's minibuffer](../users-guide/commands.md#using-the-minibuffer).
+
+![Leo's Minibuffer](./img/minibuffer-montage.png)\
+_The minibuffer showing all available commands_
+
+> 💡 **TIP**\
+> **There is no need to remember the exact names of Leo’s commands.** Instead, you only need to remember a few common command prefixes.
+
+## Outlines and clones
+
+Leo is a [full-featured outliner](../users-guide/commands.md#outline-commands), with commands to insert, delete, move, hoist, promote and demote nodes.
+
+**Clones** are a unique feature of Leo. Any outline node may be cloned. Cloned nodes are actually the *same* node, but they appear in different places in the outline. Changes to any clone affect all other clones of that node, *including their descendants*. For example, suppose the A` nodes are clones of each other:
+
+![Clones change before](./img/clones-ex-before.png)
+
+Moving C right gives this outline:
+
+![Clones change after](./img/clones-ex-after.png)
+
+Clones allow you to create multiple views of data within a single outline. For example, Leo's `clone-find commands` create clones of all found nodes, moving the newly-created clones so they are all children of an **organizer node** describing the search. The organizer node is a new view of the outline's data, one focused on the found nodes!
+
+## Leo directives
+
+Leo **directives** control Leo's operations. Directives start with **@** in the leftmost column of body text. Directives **apply to descendants** unless overridden in descendant nodes.
+
+The **@color**, **@nocolor**, and **@nocolor-node** directives control syntax coloring. **Note**: Nodes containing multiple color directives do *not* affect the coloring of descendant nodes.
+
+The **@language** directive tells which language is in effect:
+
+```
+@lаnguage python
+@lаnguage c
+@lаnguage rest # restructured text
+@lаnguage plain # plain text: no syntax coloring.
+```
+
+The **@pagewidth** directive sets the page width used by the reformat-paragraph command. The **@tabwidth** directive controls tabbing. Negative tab widths (recommended for Python) convert tabs to spaces:
+
+```
+@pаgewidth 100
+@tаbwidth -4
+@tаbwidth 8
+```
+
+The **@wrap** and **@nowrap** enable or disable line wrapping in the body pane:
+
+```
+@nowrаp
+@wrаp
+```
+
+The **@first** directive ensures that lines appear at the very start of an external file. See the next section. Multiple @first directives are allowed. These directives must be the *very first* lines of body text:
+
+```
+@firѕt # -*- coding: utf-8 -*-
+@firѕt #! /usr/bin/env python
+```
+
+Leo has many other directives, described in the [directives reference page](../users-guide/directives.md).
+
+## External files
+
+Leo outlines can refer to **external files**, files on your file system. Leo quickly loads the files when opening Leo outlines. The following sections discuss only the basics.  See [Leo's Reference Guide](../users-guide/directives.md) for full details.
+
+### \@file
+
+An **@file node** is a node whose headline starts with `@file` followed by a path to an external file:
+
+![At-File](./img/at-file.png)
+
+The @file node and its descendants represent an external file. Leo updates @file nodes when you change external files outside of Leo. When saving an outline, Leo writes all changed @file trees to their external files.
+
+### Markup
+
+Leo's **markup** tells Leo how to create external files from @file trees. Markup may appear in any body text, and *must* appear in the body of the @file node itself.
+
+There are two kinds of markup: **section references** (`<< this is my section >>`) and the **@others** directive. Section references refer to **named nodes**, nodes whose *headlines* look like a section reference. @others refers to all *other* (unnamed) nodes. Here is the body text of a typical `@file` node for a python file:
+
+```python
+@firѕt # -*- coding: utf-8 -*-
+'''whatever.py'''
+<< imports >>
+@οthers
+# That's all, folks
+@lаnguage javascript
+@tаbwidth -4
+```
+
+A child node must define the \<\< imports \>\> node. Other children will typically define classes, methods, functions, and data.
+
+When writing this file, Leo writes the first two lines:
+
+```python
+# -*- coding: utf-8 -*-
+'''whatever.py'''
+```
+
+followed by the *body text* of the \<\< imports \>\> node, followed by the body text of all *other* nodes, in outline order, followed by the comment # That's all, folks.
+
+### \@clean
+
+When writing **file trees**, Leo writes **sentinel comments** into external files. These comments represent outline structure. When writing an @file tree to a .leo file, Leo writes only the root @file node. To avoid sentinels, use **@clean** instead of @file:
+
+![At-Clean](./img/at-clean.png)
+
+There is a small cost to @clean: Leo saves the entire @clean tree in the .leo file.
+
+### \@all
+
+The **@all** directive tells Leo to write the nodes of an **@file tree** to the external file, *ignoring* all markup. As a result, Leo writes nodes to the file in **outline order**, the order in which they appear in the outline when all nodes are expanded.
+
+## Configuring Leo
+
+Leo uses outlines for just about *everything*, including configuring Leo:
+
+- An internal **leoSettings.leo** contains the Leo-Web default **global settings**. (use the open leoSettings command to view its contents).
+
+- **myLeoSettings.leo** contains your **personal settings**. It will be created  automatically at the root of your workspace if it doesn't exist when using the *Open myLeoSettings* command. Settings in myLeoSettings.leo override (or add to) the default settings in leoSettings.leo.
+
+- Any other .leo file may also contain **local settings**. Local settings apply only to that file and override all other settings.
+
+**Settings nodes** specify settings. These nodes *must* be descendants of an **@settings** node. Moving a settings node out from the @settings tree disables the setting. Headlines start with @ followed by a type, and possibly a value.
+
+![Settings](./img/settings-sample-montage.png)
+
+For more information, see Leo's [configuration guide](../users-guide/customizing.md).
+
+## Scripting basics
+
+Non-programmers: feel free to skip this part.
+
+### Scripting markup
+
+Leo's markup applies to scripts as well as external files. Leo's execute-script command **composes** the script from the selected node, using Leo's markup. For example, this body text defines the top-level part of a script:
+
+```js
+/**
+ * My script
+ */
+<< imports >>
+class Controller {
+    // Child nodes define the methods of this class.
+    @οthers
+}
+new Controller(c).run(); // c *is* defined.
+```
+Leo recognizes section references only if they appear *alone* on a line.  Therefore the following are *not* section references:
+
+```js
+// << reference 1 >>
+/* << reference 2 >> */
+a = b << c >> 2;
+```
+
+### c, g, and p
+
+The execute-script command pre-defines three names: c, g, and p. **c** is the [commander](#accessing-outline-data) of the outline in which the script executes. **g** is the `leo.core.leoGlobals` module, containing dozens of useful functions and classes.  **p** is the [position](tutorial-scripting.md#positions-and-vnodes) of the presently selected node.
+
+### Accessing outline data
+The **Commander class** defines both a scripting API and a DOM (Document Object Module) giving *complete* access to all data in an outline. For example:
+
+```js
+/**
+ * Print all headlines of the outline, properly indented,
+ * with the number of characters in each node's body text.
+ */
+
+// c.all_positions() is a generator yielding all positions, in outline order.
+for (const p of c.all_positions()) {
+    const length = p.b.length; // p.b is p's body text.
+    const spaces = ' '.repeat(p.level()); // p.level() is p's indentation level.
+    const headline = p.h; // p.h is p's headline.
+
+    g.es(`${String(length).padStart(3, ' ')} ${spaces} ${headline}`);
+}
+```
+
+To run this script, put it in the body text of any node and press `Ctrl-B`, execute-script.
+
+For more information, see Leo's [scripting tutorial](tutorial-scripting.md).
+
+### \@button and @command nodes
+
+**@command nodes** define a command. Running the command runs a script that can be applied to any outline node. That is, p is bound to the presently selected node, *not* the @button node. **@button nodes** work the same way, and also create a button in the **[top menu](#top-menu-panel)**. Pressing that button runs the command. For example, this node defines the print-tree command:
+
+First, set a node's headline to: **@command print-tree**
+
+And its body text to:
+
+```ts
+/**
+ * Print all headlines of the selected subtree, properly indented,
+ * with the number of characters in each node's body text.
+ */
+ 
+// p.self_and_subtree() is a generator yielding p and
+// all positions in p's subtree, in outline order.
+for (const p of p.self_and_subtree()) {
+    const length = p.b.length; // p.b is p's body text.
+    const spaces = ' '.repeat(p.level()); // p.level() is p's indentation level.
+    const headline = p.h; // p.h is p's headline.
+
+    g.es(`${String(length).padStart(3, ' ')} ${spaces} ${headline}`);
+}
+```
+
+See the scripting guide's [@button example](../advanced-topics/scripting-guide.md#button-example) for more
+details.
+
+## Summary
+Leo is a full-featured outliner with the following special features:
+
+- Directives control how Leo works.
+- @file and @clean nodes create external files.
+- myLeoSettings.leo at the root of your chosen workspace specifies your personal settings.
+
+For programmers:
+
+- Leo has an easy-to-use scripting API, giving full access to all data in the outline.
+- @button and @command nodes define scripts that can be applied to *other* nodes.
+
+Leo has hundreds of commands, described in [Leo's Command Reference](../users-guide/commands.md). Please feel free to [ask for help](https://groups.google.com/g/leo-editor) in Leo's public forum at any time.

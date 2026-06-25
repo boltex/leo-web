@@ -13,7 +13,7 @@ import { Position } from "./core/leoNodes";
 /**
  * * Global states service
  * Holds state flags used to restrict command availability and icon visibility
- * Changes UI by changing vscode's context variables
+ * Changes UI by changing workspace's context variables with workspace.setContext.
  */
 export class LeoStates {
 

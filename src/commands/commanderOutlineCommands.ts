@@ -185,7 +185,6 @@ export class CommanderOutlineCommands {
         if (c.canDeleteHeadline()) {
             c.copyOutline();
             c.deleteOutline('Cut Node');
-            // c.recolor();
         }
     }
     //@+node:felix.20251214160853.138: *4* c_oc.pasteOutline
@@ -251,7 +250,6 @@ export class CommanderOutlineCommands {
             c.undoer.afterInsertNode(pasted, 'Paste Node', undoData!);
         }
         c.redraw(pasted);
-        // c.recolor()
         return pasted;
     }
     //@+node:felix.20251214160853.139: *4* c_oc.asyncPasteOutline
@@ -333,7 +331,6 @@ export class CommanderOutlineCommands {
             c.undoer.afterInsertNode(pasted, 'Paste As Clone', undoData);
         }
         c.redraw(pasted);
-        // c.recolor();
         return pasted;
     }
     //@+node:felix.20251214160853.141: *4* c_oc.asyncPasteOutlineRetainingClones
@@ -1019,8 +1016,7 @@ export class CommanderOutlineCommands {
             if (cc) {
                 cc.selectChapterByName('main');
             }
-            c.selectPosition(p);
-            c.redraw_after_select(p);
+            c.redraw(p);
         } else {
             g.blue('no more clones');
         }
@@ -2234,7 +2230,6 @@ export class CommanderOutlineCommands {
             parent.contract();
         }
         c.redraw(p); // redraw selects p
-        // c.recolor()  // Moving can change syntax coloring.
     }
     //@+node:felix.20251214160853.223: *4* c_oc.moveOutlineRight
     @commander_command(
@@ -2274,7 +2269,6 @@ export class CommanderOutlineCommands {
         c.setChanged(); // #2036.
         u.afterMoveNode(p, 'Move Right', undoData);
         c.redraw(p); // redraw selects p
-        // c.recolor()
     }
     //@+node:felix.20251214160853.224: *4* c_oc.moveOutlineUp
     @commander_command(

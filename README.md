@@ -2,14 +2,11 @@
 
 A lightweight, browser-based port of the Leo Editor, the iconic outliner and scriptable literate programming environment.
 
-👉 Try it now: https://boltex.github.io/leo-web/
+👉 Try it now: **[https://boltex.github.io/leo-web](https://boltex.github.io/leo-web/)**
 
-Leo is a fundamentally different way to organize code, notes, and ideas. [📺 Watch the introduction](https://www.youtube.com/watch?v=SYwlfdEukD4)
+📖 Documentation: **[https://boltex.github.io/leo-web/docs](https://boltex.github.io/leo-web/docs)**
 
-> See Leo, the Literate Editor with Outline, at [leo-editor.github.io/leo-editor](https://leo-editor.github.io/leo-editor/)
-> or on [github](https://github.com/leo-editor/leo-editor).
-
-_If you find it useful, please consider [starring it on GitHub](https://github.com/boltex/leo-web "Star it on GitHub")._
+Leo is a fundamentally different way to organize code, notes, and ideas.
 
 ## About
 
@@ -21,9 +18,9 @@ Leo-Web brings the core Leo experience to the browser.
 
 ### File System Access
 
-Leo-Web uses the browser's File System API. Due to browser security constraints, access is limited to a user-approved _workspace_ directory.
+Leo-Web uses the browser's File System API.
 
-For example:
+Due to browser security constraints, access is limited to a user-approved _workspace_ directory. For example:
 
 - You can work inside project folders (e.g., C:/MyProject)
 - You cannot access system-level directories or unrestricted root locations. Although access to _subdirectories_ within user folders (e.g., Documents/MyProject) is permitted.
@@ -32,14 +29,14 @@ For example:
 
 ### Browser Constraints
 
-- No access to the original Leo's `~/.leo` settings folder.
-- No execution of OS shell commands
 - No absolute file paths (relative paths only)
+- No access to the original Leo's `~/.leo` settings folder
+- No execution of OS shell commands
 - Some keybindings are reserved by the browser (`Ctrl+TAB`, `Ctrl+N` and `Ctrl+T`)
 
 ### Settings
 
-- `myLeoSettings.leo` must be at the root of your chosen workspace
+- `myLeoSettings.leo` or `myLeoSettings.leojs` must be at the root of your chosen workspace
 - UI settings are available via the log pane tab
 
 ## Contributing

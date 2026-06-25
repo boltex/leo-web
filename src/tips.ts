@@ -9,9 +9,10 @@ import { TipsEntry } from "./types";
 //@+node:felix.20260419200019.1: ** tips
 export const tips: TipsEntry[] = [
     {
-        title: 'Leo for the Web',
-        // description: 'Keyboard shortcuts for editing and navigating the outline.',
-        description: '',
+
+        title: "Welcome to Leo-Web",
+        description: "The browser-based implementation of Leo — the Literate Editor with Outlines.",
+
         content: `
             <div class="help-column">
                 <ul class="config-col shortcuts">
