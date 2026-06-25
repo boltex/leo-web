@@ -2,11 +2,11 @@
 
 ## 1.0.26
 
-- Improved error messages when writing external files. Mirror of Leo's #4732
+- Added documentation with docusaurus at /docs/.
 - Improved documentation and help commands for the 'Abbreviations' features.
+- Improved error messages when writing external files. Mirror of Leo's #4732
 - Fixed nav pane 'frozen' state and icon persistence across documents.
 - Fixed 'focus-to-...' commands.
-- Added documentation with docusaurus at /docs/.
 - Added show-node-files command as per Leo's #4749
 
 ## 1.0.25
