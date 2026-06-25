@@ -3593,7 +3593,7 @@ export class VNode {
         g.contentModifiedSet.push(this);
     }
 
-    //@+node:felix.20260624202943.1: *4* v.findAllAncetorAtFileNodes
+    //@+node:felix.20260624202943.1: *4* v.findAllAncestorAtFileNodes
     /**
      * Return a list of all @<file> nodes containing this VNode.
      *
