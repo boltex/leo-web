@@ -63,6 +63,27 @@ if (fs.existsSync(sourceSearchDir)) {
     console.log('No search directory found, skipping copy.');
 }
 
+// Fourth, if there is an img directory in build, copy it to dist/img
+const sourceImgDir = path.join(sourceDir, 'img');
+const targetImgDir = path.join(targetDir, 'img');
+
+if (fs.existsSync(sourceImgDir)) {
+    // create the target img directory if it doesn't exist
+    if (!fs.existsSync(targetImgDir)) {
+        fs.mkdirSync(targetImgDir);
+    }
+    fs.copy(sourceImgDir, targetImgDir, function (err) {
+        if (err) {
+            console.error('Error copying img:', err);
+            process.exit(1);
+        }
+        console.log('Img directory copied successfully!');
+    });
+
+} else {
+    console.log('No img directory found, skipping copy.');
+}
+
 // Lastly, if they exist, copy those two xml files: opensearch.xml and sitemap.xml
 const filesToCopy = ['opensearch.xml', 'sitemap.xml'];
 filesToCopy.forEach(file => {
