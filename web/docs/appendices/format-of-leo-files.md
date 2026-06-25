@@ -183,5 +183,4 @@ Here are the XML elements that may appear in .leo files:
     The t attribute of \<v> elements refer to this tx attribute.
     sss is the body text encoded with the usual XML escapes.
 
-    Plugins and scripts may add attributes to \<v> and \<t>
-    elements. See [Writing plugins](../advanced-topics/writing-plugins.md) for details.
+    Plugins and scripts may add attributes to \<v> and \<t> elements.
