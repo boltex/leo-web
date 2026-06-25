@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.28
+
+- ...
+
 ## 1.0.27
 
 - Fixed broken links in documentation
