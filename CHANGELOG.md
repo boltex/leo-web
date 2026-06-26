@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.31
+
+- Fixed markdown writer to preserve titles that start with '!'.
+
 ## 1.0.30
 
 - Fixed external file outline refresh upon change detection
