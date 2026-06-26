@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.30
+
+- Fixed external file outline refresh upon change detection
+
 ## 1.0.29
 
 -- Fixed css references
