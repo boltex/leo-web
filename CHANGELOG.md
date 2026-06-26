@@ -2,7 +2,7 @@
 
 ## 1.0.30
 
--- ...
+- Fixed external file outline refresh upon change detection
 
 ## 1.0.29
 
