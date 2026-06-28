@@ -11,7 +11,7 @@ export const tips: TipsEntry[] = [
     {
 
         title: "Welcome to Leo-Web",
-        description: "The browser-based implementation of Leo — the Literate Editor with Outlines.",
+        description: "The browser-based Leonine Editor with Outlines.",
 
         content: `
             <div class="help-column">

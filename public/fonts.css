@@ -1,0 +1,86 @@
+@font-face {
+  font-display: swap;
+  font-family: "Carlito";
+  font-style: normal;
+  font-weight: 400;
+  src: url("carlito-v4-latin-regular.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "Carlito";
+  font-style: italic;
+  font-weight: 400;
+  src: url("carlito-v4-latin-italic.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "Carlito";
+  font-style: normal;
+  font-weight: 700;
+  src: url("carlito-v4-latin-700.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "Carlito";
+  font-style: italic;
+  font-weight: 700;
+  src: url("carlito-v4-latin-700italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  src: url("jetbrains-mono-v24-latin-regular.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "JetBrains Mono";
+  font-style: italic;
+  font-weight: 400;
+  src: url("jetbrains-mono-v24-latin-italic.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 700;
+  src: url("jetbrains-mono-v24-latin-700.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "JetBrains Mono";
+  font-style: italic;
+  font-weight: 700;
+  src: url("jetbrains-mono-v24-latin-700italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  src: url("inter-v20-latin-regular.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 400;
+  src: url("inter-v20-latin-italic.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  src: url("inter-v20-latin-700.woff2") format("woff2");
+}
+@font-face {
+  font-display: swap;
+  font-family: "Inter";
+  font-style: italic;
+  font-weight: 700;
+  src: url("inter-v20-latin-700italic.woff2") format("woff2");
+}
