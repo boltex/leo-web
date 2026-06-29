@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.33
+
+- ...
+
 ## 1.0.32
 
 - Made fonts uniform across all OSes.
