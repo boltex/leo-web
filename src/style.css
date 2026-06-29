@@ -24,6 +24,9 @@
   --menu-caret-color: #666;
   --menu-border-color: #ccc;
   --menu-box-shadow-color: rgba(0, 0, 0, 0.2);
+  --font-ui: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-title: "Carlito", sans-serif;
 
   /* vertical layout (default) */
   --main-direction: row;
@@ -53,7 +56,6 @@
   --body-pane-transition: unset;
   --find-pane-transition: unset;
   /* Top Bar Menu */
-  --menu-font-family: sans-serif;
   --menu-display: none;
   --buttons-display: flex;
   /* body pane wrap */
@@ -276,7 +278,7 @@ body {
   background: var(--menu-bg-color);
   border-bottom: 1px solid var(--menu-border-color);
   padding: 0;
-  font-family: var(--menu-font-family);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
   user-select: none;
   overflow: hidden;
@@ -354,7 +356,7 @@ body {
 /* Top Menu */
 #top-menu {
   display: flex;
-  font-family: var(--menu-font-family);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
   height: 26px;
   flex-shrink: 0;
@@ -394,7 +396,7 @@ body {
 }
 
 .submenu {
-  font-family: var(--menu-font-family);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
   display: none;
   flex-direction: column;
@@ -551,7 +553,7 @@ body {
 }
 
 .button-label {
-  font-family: var(--menu-font-family);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
   line-height: 1rem;
   vertical-align: text-top;
@@ -809,7 +811,7 @@ body.dragging-cross {
   padding-top: 6px;
   overflow-x: hidden;
   overflow-y: auto;
-  font-family: sans-serif;
+  font-family: var(--font-ui);
   user-select: none;
 }
 
@@ -914,6 +916,8 @@ body.dragging-secondary .node {
 }
 
 .caret {
+  /* The caret is a small triangle that indicates whether a node is expanded or collapsed. */
+  font-family: var(--font-ui);
   grid-column: 1;
   display: inline-block;
   width: 32px;
@@ -1009,9 +1013,8 @@ body.dragging-secondary .node {
   min-height: 0;
   background-color: var(--body-pane-color);
   overflow-y: auto;
-  font-family:
-    "Consolas", "Monaco", "Lucida Console", "DejaVu Sans Mono",
-    "Liberation Mono", monospace;
+  font-family: var(--font-mono);
+  font-variant-ligatures: none;
   white-space: var(--body-pane-wrap);
   transition: var(--body-pane-transition);
 }
@@ -1196,7 +1199,7 @@ body.dragging-secondary .node {
   display: flex;
   flex-direction: column;
   scrollbar-gutter: stable;
-  font-family: sans-serif;
+  font-family: var(--font-ui);
   padding: 0.1rem 0 0 0;
   min-height: 0;
   background-color: var(--find-pane-color);
@@ -1425,7 +1428,7 @@ select.setting-select {
   border: 1px solid var(--find-border-color);
   background: var(--find-pane-color);
   color: var(--find-text-color);
-  font-family: sans-serif;
+  font-family: var(--font-ui);
 }
 
 .config-title {
@@ -1526,7 +1529,7 @@ select.setting-select {
   border: 1px solid var(--find-border-color);
   background: transparent;
   color: var(--find-text-color);
-  font-family: sans-serif;
+  font-family: var(--font-ui);
 }
 
 #find-input::placeholder,
@@ -1707,7 +1710,7 @@ input[type="checkbox"]:focus-visible:checked::after {
 .context-menu {
   position: absolute;
   display: none;
-  font-family: sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
   background: var(--find-pane-color);
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
@@ -1748,7 +1751,7 @@ input[type="checkbox"]:focus-visible:checked::after {
     transform 180ms ease;
   z-index: 2000;
   text-align: center;
-  font-family: sans-serif;
+  font-family: var(--font-ui);
   font-size: 13px;
   white-space: pre-wrap;
   user-select: none;
@@ -1760,8 +1763,9 @@ input[type="checkbox"]:focus-visible:checked::after {
   pointer-events: auto;
 }
 
-/* Modal Dialog */
+/* Modal Dialogs */
 .modal {
+  font-family: var(--font-title);
   position: fixed;
   inset: 0; /* full-screen */
   background: rgba(0, 0, 0, 0.35); /* backdrop */
@@ -1775,6 +1779,10 @@ input[type="checkbox"]:focus-visible:checked::after {
   outline: none;
 }
 
+.modal input {
+  font-family: var(--font-ui);
+}
+
 .modal-content {
   position: relative;
   max-width: 520px;
@@ -1782,11 +1790,6 @@ input[type="checkbox"]:focus-visible:checked::after {
   padding: 16px 20px;
   border-radius: 8px;
   background: var(--body-pane-color);
-
-  /* background: hsl(from var(--body-pane-color) h s l / 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); */
-
   color: var(--text-color);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   border: 1px solid var(--find-border-color);
@@ -1798,7 +1801,6 @@ input[type="checkbox"]:focus-visible:checked::after {
 /* Workspace dialog */
 #message-dialog {
   display: var(--message-dialog-display);
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 #message-dialog .modal-content #modal-dialog-btn-container {
@@ -1824,7 +1826,6 @@ input[type="checkbox"]:focus-visible:checked::after {
 /* Input dialog */
 #input-dialog {
   display: var(--input-dialog-display);
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 #input-dialog .input-dialog-container {
@@ -1863,7 +1864,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   color: var(--text-color);
   cursor: pointer;
   flex-shrink: 0; /* keep button width tight */
-  font-weight: 600;
+  font-weight: 700;
 }
 
 #input-dialog-btn:hover {
@@ -1878,7 +1879,6 @@ input[type="checkbox"]:focus-visible:checked::after {
 /* QuickPick dialog */
 #quickpick-dialog {
   display: var(--quickpick-dialog-display);
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 #quickpick-dialog .modal-content {
@@ -1904,7 +1904,7 @@ input[type="checkbox"]:focus-visible:checked::after {
 
 #quickpick-dialog-input:focus {
   outline: none;
-  border-bottom-color: var(--find-selection);
+  border-color: var(--find-selection);
 }
 
 .quick-pick-list {
@@ -1957,7 +1957,7 @@ input[type="checkbox"]:focus-visible:checked::after {
 mark {
   background-color: var(--find-selection);
   color: var(--body-pane-color);
-  font-weight: 600;
+  font-weight: 700;
   padding: 0;
   border-radius: 2px;
 }
@@ -1980,7 +1980,6 @@ mark {
 /* Tips dialog */
 #welcome-dialog {
   display: var(--welcome-dialog-display);
-  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   user-select: none;
 }
 
@@ -1995,10 +1994,6 @@ mark {
 
 #welcome-dialog h2 {
   margin: 0 0 8px 0;
-}
-#welcome-dialog a {
-  color: inherit;
-  text-decoration: none;
 }
 
 #welcome-dialog .modal-content button {
@@ -2032,7 +2027,9 @@ mark {
   text-align: center;
 }
 
-.subtitle {
+.subtitle,
+.kbd-spacer {
+  font-family: var(--font-ui);
   color: var(--find-text-color);
 }
 
@@ -2054,10 +2051,11 @@ mark {
 }
 
 .shortcuts kbd {
+  font-family: monospace;
+  /* font-family: var(--font-mono); */
   display: inline-block;
   padding: 0.1rem 0.4rem;
   margin: 0 0.2rem;
-  font-family: monospace;
   font-size: 0.9em;
   line-height: 1.4;
   color: var(--text-color);

@@ -38,7 +38,13 @@
                     background-color: transparent;
                 }
             </style>
+            <!-- Preload a few fonts to avoid FOUT (Flash of Unstyled Text) when starting the app. -->
+            <link rel="preload" href="carlito-v4-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+            <link rel="preload" href="inter-v20-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+            <link rel="preload" href="inter-v20-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+            <!-- Rest of the CSS files are loaded normally. -->
             <link rel="stylesheet" href="leoicons.css">
+            <link rel="stylesheet" href="fonts.css">
             <link rel="manifest" href="manifest.webmanifest">
             <link rel="icon" href="favicon.ico" sizes="32x32">
             <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -402,7 +408,7 @@
                     Show welcome page on startup
                 </label>
             </div>
-            <button type="button" id="welcome-dialog-btn" class="modal-dialog-btn">Ok</button>
+            <button type="button" id="welcome-dialog-btn" class="modal-dialog-btn" title="Close">Ok</button>
         </div>
     </div>
 

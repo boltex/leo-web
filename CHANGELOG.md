@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.32
+
+- Made fonts uniform across all OSes.
+- Made some fonts 'pre-load' to prevent flash of unstyled content.
+
 ## 1.0.31
 
 - Fixed markdown writer to preserve titles that start with '!'.
