@@ -382,6 +382,9 @@ export class LeoUI extends NullGui {
     public put_help(c: Commands, s: string, short_title: string): void {
         s = g.dedent(s.trimEnd());
         s = workspace.showdownConverter.makeHtml(s);
+
+        // TODO : Maybe reuse the tips/welcome dialog for this!
+
         utils.showHtmlInNewTab(s, short_title);
     }
     //@+node:felix.20260323002920.1: *3* Log Pane
