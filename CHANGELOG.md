@@ -2,7 +2,7 @@
 
 ## 1.0.33
 
-- ...
+- Fixed links and text for help commands along with their popup window styling and appearance.
 
 ## 1.0.32
 

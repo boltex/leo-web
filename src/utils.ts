@@ -64,15 +64,17 @@ export function safeLocalStorageSet(key: string, value: string | undefined): voi
 
 //@+node:felix.20260226215039.1: ** showHtmlInNewTab
 export function showHtmlInNewTab(htmlContent: string, title: string) {
-    const newWindow = window.open('', '_blank');
+    const newWindow = window.open('', '_blank', "popup");
     if (newWindow) {
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/?$/, '/');
 
         // Check current theme and set colors accordingly
         const isDark = workspace.layout.currentTheme === 'dark';
-        const bodyBg = isDark ? '#1e1e2e' : '#fff';
+        const bodyBg = isDark ? '#1e1e2e' : '#ffffec';
         const bodyColor = isDark ? '#cdd6f4' : '#222';
-        const preBg = isDark ? '#2a2536' : '#f5f5f5';
-        const linkColor = isDark ? '#929bda' : '#0b5ed7';
+        const preBg = isDark ? '#2a2536' : '#fff6f5';
+        const linkColor = isDark ? '#929bda' : '#5178ab';
+        const separatorColor = isDark ? '#454a6e' : '#cae1ff';
 
         // TODO : REPLACE write WITH THIS TECHNIQUE:
         /*
@@ -84,7 +86,13 @@ export function showHtmlInNewTab(htmlContent: string, title: string) {
         `;
 
         newWin.document.body.innerHTML = `<h1>Hello</h1>`;
+
+        newWin.redraw(); // To force the browser to re-render the new window's content 
         */
+
+        const hero = '<img src="' + baseUrl + 'leoapp.png" alt="logo" style="margin:0 12px 0 0;display:inline-block;float:left;vertical-align:middle;">';
+
+        htmlContent = htmlContent.replace(/<h1/, `${hero}<h1`); // There may be attributes in the h1 tag, so we can't just replace <h1>.
 
         newWindow.document.open();
         newWindow.document.write(`
@@ -95,49 +103,83 @@ export function showHtmlInNewTab(htmlContent: string, title: string) {
             <title>${title}</title>
             <style>
                 body {
-                font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                            "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                font-size: 16px;
-                line-height: 1.55;
-                padding: 1.25rem;
-                color: ${bodyColor};
-                background: ${bodyBg};
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                                "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                    font-size: 16px;
+                    line-height: 1.55;
+                    padding: 1.25rem;
+                    color: ${bodyColor};
+                    background: ${bodyBg};
                 }
 
-                h1, h2, h3, h4 {
-                margin-top: 1.4em;
+                h1 {
+                    margin-top: 0;
+                    line-height: 1;
+                }
+
+                h2, h3, h4 {
+                    margin-top: 1.4em;
                 }
 
                 pre, code {
-                font-family: ui-monospace, SFMono-Regular, Consolas,
-                            "Liberation Mono", Menlo, monospace;
+                    font-family: ui-monospace, SFMono-Regular, Consolas,
+                                "Liberation Mono", Menlo, monospace;
                 }
 
                 pre {
-                background: ${preBg};
-                padding: 0.75rem;
-                border-radius: 4px;
-                overflow-x: auto;
+                    background: ${preBg};
+                    padding: 0.75rem;
+                    border-radius: 4px;
+                    overflow-x: auto;
                 }
 
                 a {
-                color: ${linkColor};
-                text-decoration: none;
+                    color: ${linkColor};
+                    text-decoration: none;
                 }
 
                 a:hover {
-                text-decoration: underline;
+                    text-decoration: underline;
                 }
+
+                .footer {
+                    margin-top:2rem;
+                    padding-top:0.9rem;
+                    border-top:5px solid ${separatorColor};
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:0.9rem;
+                    align-items:center;
+                    font-size:0.95rem;
+                }
+                .footer-link {
+                    display:inline-flex;
+                    align-items:center;
+                    gap:0.35rem;
+                }
+
+                .bullet {
+                    opacity:0.45;
+                }
+
             </style>
             </head>
             <body>
             ${htmlContent}
+            <div class="footer">
+                <a href="${baseUrl}docs" target="_blank" title="Open LeoWeb documentation">📘 Documentation</a>
+                <span class="bullet">•</span>
+                <a href="${baseUrl}docs/advanced-topics/faq" target="_blank" title="Read frequently asked questions">❓ FAQ</a>
+                <span class="bullet">•</span>
+                <a href="https://groups.google.com/forum/#!forum/leo-editor" target="_blank" title="Join the Leo community forum">💬 Community Forum</a>
+            </div>
             </body>
             </html>
-            `);
+        `);
         newWindow.document.close();
         newWindow.focus();
     }
+
 }
 
 //@+node:felix.20260226215651.1: ** showTextDocument
