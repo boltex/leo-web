@@ -327,8 +327,8 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         This help discusses only \@file nodes. For other ways of creating
         external files, see:
 
-        [<STARTINGURL>/docs/getting-started/tutorial-scripting](<STARTINGURL>/docs/getting-started/tutorial-scripting) or
-        [<STARTINGURL>/docs/users-guide/directives](<STARTINGURL>/docs/users-guide/directives)
+        [<STARTINGURL>docs/getting-started/tutorial-scripting](<STARTINGURL>docs/getting-started/tutorial-scripting) or
+        [<STARTINGURL>docs/users-guide/directives](<STARTINGURL>docs/users-guide/directives)
 
         Leo creates external files in an unusual way. Please fee free to ask for
         help:

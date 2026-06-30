@@ -63,44 +63,38 @@ export function safeLocalStorageSet(key: string, value: string | undefined): voi
 }
 
 //@+node:felix.20260226215039.1: ** showHtmlInNewTab
-export function showHtmlInNewTab(htmlContent: string, title: string) {
-    const newWindow = window.open('', '_blank', "popup");
-    if (newWindow) {
-        const baseUrl = window.location.origin + window.location.pathname.replace(/\/?$/, '/');
+export function showHtmlInNewTab(htmlContent: string, title: string): void {
 
-        // Check current theme and set colors accordingly
-        const isDark = workspace.layout.currentTheme === 'dark';
-        const bodyBg = isDark ? '#1e1e2e' : '#ffffec';
-        const bodyColor = isDark ? '#cdd6f4' : '#222';
-        const preBg = isDark ? '#2a2536' : '#fff6f5';
-        const linkColor = isDark ? '#929bda' : '#5178ab';
-        const separatorColor = isDark ? '#454a6e' : '#cae1ff';
+    const newWindow = window.open('', '_blank', 'popup');
 
-        // TODO : REPLACE write WITH THIS TECHNIQUE:
-        /*
-        const newWin = window.open('', '_blank');
+    if (!newWindow) {
+        return;
+    }
 
-        newWin.document.head.innerHTML = `
-        <title>My Doc</title>
-        <link rel="icon" href="/my-icon.png">
-        `;
+    const baseUrl = window.location.origin + window.location.pathname.replace(/\/?$/, '/');
 
-        newWin.document.body.innerHTML = `<h1>Hello</h1>`;
+    const isDark = workspace.layout.currentTheme === 'dark';
+    const bodyBg = isDark ? '#1e1e2e' : '#ffffec';
+    const bodyColor = isDark ? '#cdd6f4' : '#222';
+    const preBg = isDark ? '#2a2536' : '#fff6f5';
+    const linkColor = isDark ? '#929bda' : '#5178ab';
+    const separatorColor = isDark ? '#454a6e' : '#cae1ff';
+    const buttonBg = isDark ? '#706a7a' : '#eee';
+    const buttonHoverBg = isDark ? '#5a4f6a' : '#ddd';
 
-        newWin.redraw(); // To force the browser to re-render the new window's content 
-        */
+    const hero =
+        `<img src="${baseUrl}leoapp.png" alt="logo" class="hero">`;
 
-        const hero = '<img src="' + baseUrl + 'leoapp.png" alt="logo" style="margin:0 12px 0 0;display:inline-block;float:left;vertical-align:middle;">';
+    htmlContent = htmlContent.replace(/<h1/, `${hero}<h1`);
 
-        htmlContent = htmlContent.replace(/<h1/, `${hero}<h1`); // There may be attributes in the h1 tag, so we can't just replace <h1>.
+    newWindow.document.title = title;
 
-        newWindow.document.open();
-        newWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
+    newWindow.document.head.innerHTML = `
             <meta charset="utf-8">
             <title>${title}</title>
+            <link rel="icon" href="${baseUrl}favicon.ico" sizes="32x32">
+            <link rel="icon" href="${baseUrl}icon.svg" type="image/svg+xml">
+            <link rel="apple-touch-icon" href="${baseUrl}apple-touch-icon.png">
             <style>
                 body {
                     font-family: system-ui, -apple-system, BlinkMacSystemFont,
@@ -119,6 +113,13 @@ export function showHtmlInNewTab(htmlContent: string, title: string) {
 
                 h2, h3, h4 {
                     margin-top: 1.4em;
+                }
+
+                .hero {
+                    margin: 0 12px 0 0;
+                    display: inline-block;
+                    float: left;
+                    vertical-align: middle;
                 }
 
                 pre, code {
@@ -143,44 +144,57 @@ export function showHtmlInNewTab(htmlContent: string, title: string) {
                 }
 
                 .footer {
-                    margin-top:2rem;
-                    padding-top:0.9rem;
-                    border-top:5px solid ${separatorColor};
-                    display:flex;
-                    flex-wrap:wrap;
-                    gap:0.9rem;
-                    align-items:center;
-                    font-size:0.95rem;
+                    margin-top: 2rem;
+                    padding-top: 0.9rem;
+                    border-top: 5px solid ${separatorColor};
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.9rem;
+                    align-items: center;
+                    font-size: 0.95rem;
                 }
+
                 .footer-link {
-                    display:inline-flex;
-                    align-items:center;
-                    gap:0.35rem;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35rem;
                 }
 
                 .bullet {
-                    opacity:0.45;
+                    opacity: 0.45;
                 }
-
+                .close-button {
+                    position: fixed;
+                    top: 16px;
+                    right: 16px;
+                    padding: 0.5rem 1rem;
+                    border-radius: 4px;
+                    background-color: ${buttonBg};
+                    color: ${bodyColor};
+                    border: none;
+                    cursor: pointer;
+                }
+                .close-button:hover {
+                    background-color: ${buttonHoverBg};
+                }
             </style>
-            </head>
-            <body>
-            ${htmlContent}
-            <div class="footer">
-                <a href="${baseUrl}docs" target="_blank" title="Open LeoWeb documentation">📘 Documentation</a>
-                <span class="bullet">•</span>
-                <a href="${baseUrl}docs/advanced-topics/faq" target="_blank" title="Read frequently asked questions">❓ FAQ</a>
-                <span class="bullet">•</span>
-                <a href="https://groups.google.com/forum/#!forum/leo-editor" target="_blank" title="Join the Leo community forum">💬 Community Forum</a>
-            </div>
-            </body>
-            </html>
-        `);
-        newWindow.document.close();
-        newWindow.focus();
-    }
+        `;
 
+    newWindow.document.body.innerHTML = `
+    ${htmlContent}
+    <div class="footer">
+      <a href="${baseUrl}docs" target="_blank" title="Open LeoWeb documentation">📘 Documentation</a>
+      <span class="bullet">•</span>
+      <a href="${baseUrl}docs/advanced-topics/faq" target="_blank" title="Read frequently asked questions">❓ FAQ</a>
+      <span class="bullet">•</span>
+      <a href="https://groups.google.com/forum/#!forum/leo-editor" target="_blank" title="Join the Leo community forum">💬 Community Forum</a>
+      <button class="close-button" onclick="window.close()">Close</button>
+    </div>
+  `;
+
+    newWindow.focus();
 }
+
 
 //@+node:felix.20260226215651.1: ** showTextDocument
 export function showTextDocument(uri: Uri): void {
