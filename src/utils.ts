@@ -65,7 +65,17 @@ export function safeLocalStorageSet(key: string, value: string | undefined): voi
 //@+node:felix.20260226215039.1: ** showHtmlInNewTab
 export function showHtmlInNewTab(htmlContent: string, title: string): void {
 
-    const newWindow = window.open('', '_blank', 'popup');
+    const width = 780;
+    const height = 900;
+
+    // Calculate the position to center it on the screen
+    const left = (window.screen.width / 2) - (width / 2);
+    const top = (window.screen.height / 2) - (height / 2);
+
+    // Put it all together
+    const popupFeatures = `popup,width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`;
+
+    const newWindow = window.open('', '_blank', popupFeatures);
 
     if (!newWindow) {
         return;
@@ -81,6 +91,7 @@ export function showHtmlInNewTab(htmlContent: string, title: string): void {
     const separatorColor = isDark ? '#454a6e' : '#cae1ff';
     const buttonBg = isDark ? '#706a7a' : '#eee';
     const buttonHoverBg = isDark ? '#5a4f6a' : '#ddd';
+    const scrollbarHoverColor = isDark ? '#3a3f5e' : '#dfecff';
 
     const hero =
         `<img src="${baseUrl}leoapp.png" alt="logo" class="hero">`;
@@ -104,6 +115,30 @@ export function showHtmlInNewTab(htmlContent: string, title: string): void {
                     padding: 1.25rem;
                     color: ${bodyColor};
                     background: ${bodyBg};
+                }
+
+
+                * {
+                scrollbar-color: ${separatorColor} transparent;
+                }
+
+                ::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+                }
+
+                ::-webkit-scrollbar-track {
+                background: transparent;
+                border-radius: 5px;
+                }
+
+                ::-webkit-scrollbar-thumb {
+                background-color: ${separatorColor};
+                border-radius: 5px;
+                }
+
+                ::-webkit-scrollbar-thumb:hover {
+                background-color: ${scrollbarHoverColor};
                 }
 
                 h1 {
