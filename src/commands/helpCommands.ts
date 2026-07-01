@@ -12,6 +12,8 @@ import { BaseEditCommandsClass } from './baseCommands';
 import { Constants } from '../constants';
 import { Position } from '../core/leoNodes';
 import { QuickPickItem } from '../types';
+import { keybindings } from "../keybindings";
+
 //@-<< helpCommands imports & annotations >>
 
 //@+others
@@ -37,7 +39,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         //@@language md
 
         const md_s = `\
-        #Welcome to Leo\'s help system.
+        # Welcome to Leo\'s help system
 
         To learn about **Alt-X** commands, type:
 
@@ -111,7 +113,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         }\|}:
 
 
-            date;;={|{import time ; x=time.asctime()}|}
+            date;;={|{return new Date().toString().slice(0,24)}|}
 
 
         For example, typing **date;;** gives:
@@ -120,7 +122,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
         It's even possible to define a context in which abbreviation scripts execute.
 
-        See leoSettings.leo for full details.
+        See leoSettings.leo with the **Open leoSettings** command for full details.
 
 
         `;
@@ -325,13 +327,13 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         This help discusses only \@file nodes. For other ways of creating
         external files, see:
 
-            [<STARTINGURL>/docs/getting-started/tutorial-scripting](<STARTINGURL>/docs/getting-started/tutorial-scripting) or
-            [<STARTINGURL>/docs/users-guide/directives](<STARTINGURL>/docs/users-guide/directives)
+        [<STARTINGURL>docs/getting-started/tutorial-scripting](<STARTINGURL>docs/getting-started/tutorial-scripting) or
+        [<STARTINGURL>docs/users-guide/directives](<STARTINGURL>docs/users-guide/directives)
 
         Leo creates external files in an unusual way. Please fee free to ask for
         help:
 
-            https://groups.google.com/forum/#!forum/leo-editor
+        [https://groups.google.com/forum/#!forum/leo-editor](https://groups.google.com/forum/#!forum/leo-editor)
 
         ## Overview
 
@@ -496,6 +498,40 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         //@-<< define s >>
         this.c.putHelpFor(s, "Finding & Replacing Text");
     }
+    //@+node:felix.20260628234111.1: *3* helpForKeystroke
+    // TODO and uncomment below when we implement keybindings in Leo-Web
+    // @cmd('help-for-keystroke', 'Prompts for any key and prints the bindings for that key.')
+    public helpForKeystroke(): void {
+
+        // Original PYthon code:
+        /*
+        c, k = self.c, self.c.k
+        state_name = 'help-for-keystroke'
+        state = k.getState(state_name)
+        if state == 0:
+            k.setLabelBlue('Enter any key: ')
+            k.setState(state_name, 1, self.helpForKeystroke)
+            c.minibufferWantsFocus()
+        else:
+            d = k.bindingsDict
+            k.clearState()
+            result = []
+            for bi in d.get(event.stroke, []):  # a list of BindingInfo objects.
+                pane, cmd = bi.pane, bi.commandName
+                result.append(cmd if pane == 'all' else f"{pane}: {cmd}")
+            s = f"{event.stroke.s}: {','.join(result)}"
+            k.showStateAndMode()
+            c.frame.putStatusLine(s, bg='blue', fg='white')
+            c.bodyWantsFocus()
+        */
+
+        // Instead, in Leo-Web, we can parse the keybindings dictionary to populate a quick pick
+        // list of keybindings and their associated commands. This will allow the user to 
+        // select a keybinding and see its associated command(s) in a more user-friendly manner.
+
+
+    }
+
     //@+node:felix.20251214160853.480: *3* helpForMinibuffer
     @cmd('help-for-minibuffer', 'Print a messages telling you how to get started with Leo.')
     public helpForMinibuffer(): void {
@@ -509,7 +545,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
         The mini-buffer is intended to be like the Emacs buffer:
 
-        (default shortcut: Alt-x) Puts the focus in the minibuffer. Type a
+        (default shortcut: Alt-x) Puts the focus in the minibuffer. Type part of a
         full command name, then hit <Return> to execute the command. 
 
         Use the help-for-command command to see documentation for a particular command.
@@ -545,9 +581,6 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
         -   Use utility classes and function in the leo.core.leoGlobals module.
         -   Execute any code in Leo\'s own code base.
 
-        *Tip*: use Alt-1 (toggle-autocompleter) and Alt-2 (toggle-calltips) as
-        aids to memory and to speed typing.
-
         ## Predefined symbols
 
         The execute-script command predefines three variables:
@@ -567,16 +600,6 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
             c.user_dict     a temporary dict for use of scripts and plugins.
             c.redraw()
             c.positionExists(p)
-
-        Here is a partial list of the **official ivars** of any commander c:
-
-        -   c.frame The frame containing the log,body,tree, etc. c.frame.body The
-        -   body pane. c.frame.body.widget The gui widget for the body pane.
-        -   c.frame.body.wrapper The high level interface for the body widget.
-        -   c.frame.iconBar The icon bar. c.frame.log The log pane.
-        -   c.frame.log.widget The gui widget for the log pane.
-        -   c.frame.log.wrapper The high-level interface for the log pane.
-        -   c.frame.tree The tree pane.
 
         ## VNode class
 
@@ -695,13 +718,10 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
 
             g.app
             g.app.gui
-            g.app.windowlist
+            g.app.windowList
             g.unitTesting
             g.user_dict  # a temporary dict for use of scripts and plugins.
 
-        **g decorator**:
-
-            @g.command(command-name)
 
         **g functions** (the most interesting: there are many more in
         leoGlobals.py):

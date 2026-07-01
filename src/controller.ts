@@ -22,7 +22,7 @@ import { tips } from "./tips";
 //@+node:felix.20260322215901.1: ** Controller
 export class Controller {
 
-    private _commands: Record<string, (...args: any[]) => any> = {};
+    private _bindedCommands: Record<string, (...args: any[]) => any> = {};
 
     // Unused for now, but we can use this regex to detect URLs in the future if we want to add link-clicking functionality in the body pane or elsewhere.
     private urlRegex = /\b(?:(?:https?|ftp):\/\/|file:\/\/\/?|mailto:)[^\s<]+/gi; // http(s)/ftp with '://', file with // or ///, and mailto: without '//'
@@ -48,13 +48,13 @@ export class Controller {
     //@+node:felix.20260322222042.1: *3* setCommands
     public setCommands(commands: [string, (...args: any[]) => any][]) {
         for (const [name, func] of commands) {
-            this._commands[name] = func;
+            this._bindedCommands[name] = func;
         }
     }
     //@+node:felix.20260322222039.1: *3* doCommand
     public doCommand(commandName: string, ...args: any[]): any {
         workspace.menu.closeAllSubmenus();
-        const command = this._commands[commandName];
+        const command = this._bindedCommands[commandName];
         if (command) {
             return command(...args);
         } else {

@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.0.33
+
+- Fixed links and text for help commands along with their popup window styling and appearance.
+- Fixed dark theme menu and context-menu disabled item colors.
+
 ## 1.0.32
 
 - Made fonts uniform across all OSes.
