@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.35
+
+- ...
+
 ## 1.0.34
 
 - Fixed mouse menu-closing event detection when clicking on the menu bar itself.
