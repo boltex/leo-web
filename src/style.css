@@ -13,7 +13,7 @@
   --ancestor-bg: #eef5ff;
   --hover-bg: #dfecff;
   --focus-outline: #0000ff;
-  --text-color: #000000;
+  --text-color: #000;
   --caret-dim-color: #888;
   --find-text-color: #444;
   --find-placeholder-color: #888;
@@ -21,9 +21,10 @@
   --find-selection: #0078d7;
   --menu-bg-color: #eee;
   --menu-color: #000;
+  --menu-disabled-color: #888;
   --menu-caret-color: #666;
   --menu-border-color: #ccc;
-  --menu-box-shadow-color: rgba(0, 0, 0, 0.2);
+  --menu-box-shadow-color: rgba(0, 0, 0, 0.25);
   --font-ui: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-title: "Carlito", sans-serif;
@@ -171,11 +172,12 @@
   --find-placeholder-color: #5a699e;
   --find-border-color: #81889e;
   --find-selection: #3c54ce;
-  --menu-bg-color: #706a7a;
+  --menu-bg-color: #373e53;
   --menu-color: #cdd6f4;
+  --menu-disabled-color: #8c9db7;
   --menu-caret-color: #999;
-  --menu-border-color: #5c5485;
-  --menu-box-shadow-color: rgba(246, 150, 255, 0.247);
+  --menu-border-color: #505257;
+  --menu-box-shadow-color: rgba(0, 0, 0, 0.34);
 }
 
 [data-layout="horizontal"] {
@@ -455,18 +457,19 @@ body {
 }
 
 .menu-label {
+  color: var(--menu-color);
   flex-grow: 1;
 }
 
 .menu-shortcut {
   margin-left: 16px;
   font-size: 0.75rem;
-  color: var(--menu-caret-color);
+  color: var(--menu-disabled-color);
   opacity: 0.8;
 }
 
 .menu-item.has-sub::after {
-  content: "▶";
+  content: "▶"; /* That content is a menu-caret */
   font-size: 0.7rem;
   margin-left: 8px;
   color: var(--menu-caret-color);
@@ -477,14 +480,13 @@ body {
 }
 
 .menu-item.disabled {
-  opacity: 0.4;
+  /* opacity: 0.4; */ /* No need to make less opaque, disabled menu item colors are already dimmer */
   cursor: default;
   pointer-events: none;
 }
 
-.menu-item.disabled .menu-label,
-.menu-item.disabled .menu-shortcut {
-  color: var(--find-placeholder-color);
+.menu-item.disabled .menu-label {
+  color: var(--menu-disabled-color);
 }
 
 #toolbar {
@@ -1082,6 +1084,7 @@ body.dragging-secondary .node {
   height: 32px;
   border-radius: 50%;
   background: var(--resizer-color);
+  /* Use text-color instead of menu-color because those float over text */
   color: var(--text-color);
   border: 2px solid var(--text-color);
   cursor: pointer;
