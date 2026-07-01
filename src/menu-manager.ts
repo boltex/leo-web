@@ -560,7 +560,7 @@ export class MenuManager {
         this.UNDO_MENU.style.display = "none";
         this.AT_BUTTON_MENU.style.display = "none";
         const target = e.target as Element;
-        if (!target.closest('.menu')) {
+        if (!target.closest('.menu') || target.id === 'top-menu') {
             this.closeAllSubmenus();
             this.activeTopMenu = null;
         }
