@@ -312,12 +312,12 @@ export class CommanderHelpCommands {
     //@+node:felix.20251214160853.123: *4* c_help.leoHome
     @commander_command(
         'open-online-home',
-        "Open the Leo-Web Home page in a web browser."
+        "Open the Leo-Web documentation page."
     )
     public leoHome(this: Commands): void {
         const url = 'docs/';
         if (typeof window !== 'undefined' && typeof window.open === 'function') {
-            window.open(url, '_blank', 'noopener,noreferrer');
+            window.open(url, '_blank');
         } else {
             g.es(`Unable to open URL in this environment: ${url}`);
         }
@@ -326,12 +326,12 @@ export class CommanderHelpCommands {
     //@+node:felix.20251214160853.124: *4* c_help.openLeoTutorials
     @commander_command(
         'open-online-tutorials',
-        "Open the Leo-Web tutorials page in a web browser."
+        "Open the Leo-Web tutorials page."
     )
     public openLeoTutorials(this: Commands): void {
         const url = 'docs/getting-started/tutorial-basics';
         if (typeof window !== 'undefined' && typeof window.open === 'function') {
-            window.open(url, '_blank', 'noopener,noreferrer');
+            window.open(url, '_blank');
         } else {
             g.es(`Unable to open URL in this environment: ${url}`);
         }
@@ -340,12 +340,12 @@ export class CommanderHelpCommands {
     //@+node:felix.20251214160853.125: *4* c_help.openLeoUsersGuide
     @commander_command(
         'open-users-guide',
-        "Open the Leo-Web users guide in a web browser."
+        "Open the Leo-Web users guide."
     )
     public openLeoUsersGuide(this: Commands): void {
         const url = 'docs/users-guide/leomarkup';
         if (typeof window !== 'undefined' && typeof window.open === 'function') {
-            window.open(url, '_blank', 'noopener,noreferrer');
+            window.open(url, '_blank');
         } else {
             g.es(`Unable to open URL in this environment: ${url}`);
         }
