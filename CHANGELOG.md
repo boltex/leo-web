@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.36
+
+- ...
+
 ## 1.0.35
 
 - Improved welcome screen styling and include a link to the documentation.
