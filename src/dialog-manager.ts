@@ -926,7 +926,7 @@ export class DialogManager {
         this.WELCOME_DIALOG_BTN.onclick = tipsCallback;
 
         this.WELCOME_DIALOG_TITLE.textContent = options.title;
-        this.WELCOME_DIALOG_DESCRIPTION.textContent = options.description ?? '';
+        this.WELCOME_DIALOG_DESCRIPTION.innerHTML = options.description ?? '';
         this.WELCOME_DIALOG_CONTENT.innerHTML = options.content ?? '';
 
         // Set checkbox to current config preference
