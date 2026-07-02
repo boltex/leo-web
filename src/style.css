@@ -1853,7 +1853,8 @@ input[type="checkbox"]:focus-visible:checked::after {
 
 #input-dialog-input:focus,
 #input-dialog-btn:focus,
-.modal-dialog-btn:focus {
+.modal-dialog-btn:focus,
+.leo-web-doc-link:focus {
   outline: 2px solid var(--find-selection);
   border-color: var(--find-selection);
   outline-offset: -1px;
@@ -2020,6 +2021,26 @@ mark {
   margin-top: 10px;
   margin-bottom: 12px;
   color: var(--find-text-color);
+}
+
+#welcome-dialog .leo-web-doc-link {
+  display: table;
+  margin-top: 10px;
+  color: var(--body-link-color);
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 2px;
+  border-radius: 3px;
+  outline-offset: 3px;
+}
+
+#welcome-dialog .leo-web-doc-link:hover {
+  text-decoration: underline;
+}
+
+.underlined {
+  border-bottom: 1px solid var(--menu-border-color);
 }
 
 #welcome-dialog-description:empty {

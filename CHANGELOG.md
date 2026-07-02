@@ -2,7 +2,7 @@
 
 ## 1.0.35
 
-- ...
+- Improved welcome screen styling and include a link to the documentation.
 
 ## 1.0.34
 
