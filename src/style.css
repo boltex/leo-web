@@ -1071,7 +1071,7 @@ body.dragging-secondary .node {
   top: 0;
   right: 0;
   width: 200px;
-  height: 40px;
+  height: 80px; /* Matches the top-menu height so that hover-out works correctly */
   z-index: 999;
 }
 
