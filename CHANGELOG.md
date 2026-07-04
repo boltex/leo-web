@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.37
+
+- ...
+
 ## 1.0.36
 
 - Added dedicated 'Documentation' button.
