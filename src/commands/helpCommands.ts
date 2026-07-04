@@ -12,7 +12,6 @@ import { BaseEditCommandsClass } from './baseCommands';
 import { Constants } from '../constants';
 import { Position } from '../core/leoNodes';
 import { QuickPickItem } from '../types';
-import { keybindings } from "../keybindings";
 
 //@-<< helpCommands imports & annotations >>
 
@@ -50,7 +49,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
             <Alt-X>help-
 
         For Leo commands, type:
-
+ 
             <Alt-X>help-for-command<Enter>
             <a Leo command name><Enter>
 
