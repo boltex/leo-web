@@ -264,6 +264,10 @@
                             <input id="show-theme-toggle" type="checkbox" name="config-option" checked />
                             Dark/Light Theme
                         </label>
+                        <label for="show-docs">
+                            <input id="show-docs" type="checkbox" name="config-option" checked />
+                            Documentation
+                        </label>
                         <label for="show-node-icons">
                             <input id="show-node-icons" type="checkbox" name="config-option" checked />
                             Node Icons
@@ -289,6 +293,10 @@
     <div id="button-container">
         <button type="button" tabindex="-1" id="menu-toggle" class="action-button" aria-label="Show menu"
             title="Show menu (Shift+F11)"><span id="menu-icon">&#8801;</span></button>
+
+        <button type="button" tabindex="-1" id="docs-btn" class="action-button" aria-label="Show documentation"
+            title="Show documentation (F1)"><span id="docs-icon">📘</span></button>
+
         <button type="button" tabindex="-1" id="theme-toggle" class="action-button"
             aria-label="Toggle dark/light mode"><span id="theme-icon">🌓</span></button>
         <button type="button" tabindex="-1" id="layout-toggle" class="action-button"

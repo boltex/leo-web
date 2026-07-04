@@ -11,14 +11,7 @@ export const tips: TipsEntry[] = [
     {
 
         title: "Welcome to Leo-Web",
-        description: `
-        The browser-based Leonine Editor with Outlines.
-        <a class="leo-web-doc-link" href="https://boltex.github.io/leo-web/docs" target="_blank">
-            Read the documentation ↗
-        </a>
-        `,
-
-        // "The browser-based Leonine Editor with Outlines.",
+        description: "The browser-based Leonine Editor with Outlines.",
 
         content: `
             <div class="help-column">

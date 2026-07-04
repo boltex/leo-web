@@ -18,6 +18,13 @@ const FLAGS = Constants.CONTEXT_FLAGS;
 //@+node:felix.20260323140231.1: ** Keybindings
 export const keybindings: Keybinding[] = [
     {
+        command: CMD.DOCUMENTATION,
+        key: "f1",
+        outline: true,
+        body: true,
+        find: true
+    },
+    {
         command: CMD.EXECUTE,
         key: "ctrl+b",
         mac: "meta+b",

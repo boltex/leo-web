@@ -1071,7 +1071,7 @@ body.dragging-secondary .node {
   top: 0;
   right: 0;
   width: 200px;
-  height: 40px;
+  height: 80px; /* Matches the top-menu height so that hover-out works correctly */
   z-index: 999;
 }
 
@@ -1997,7 +1997,7 @@ mark {
 }
 
 #welcome-dialog h2 {
-  margin: 0 0 8px 0;
+  margin: 0 0 10px 0;
 }
 
 #welcome-dialog .modal-content button {
@@ -2018,29 +2018,8 @@ mark {
 }
 
 #welcome-dialog-description {
-  margin-top: 10px;
-  margin-bottom: 12px;
+  margin: 0 0 10px 0;
   color: var(--find-text-color);
-}
-
-#welcome-dialog .leo-web-doc-link {
-  display: table;
-  margin-top: 10px;
-  color: var(--body-link-color);
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 0.9em;
-  margin-left: 2px;
-  border-radius: 3px;
-  outline-offset: 3px;
-}
-
-#welcome-dialog .leo-web-doc-link:hover {
-  text-decoration: underline;
-}
-
-.underlined {
-  border-bottom: 1px solid var(--menu-border-color);
 }
 
 #welcome-dialog-description:empty {

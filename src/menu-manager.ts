@@ -29,6 +29,7 @@ export class MenuManager {
     public TOP_BAR: HTMLElement;
     public TOP_MENU: HTMLElement;
     public MENU_TOGGLE: HTMLElement;
+    public DOCUMENTATION_BTN: HTMLElement;
     public TOP_BAR_TOGGLE: HTMLElement;
     public DOCUMENT_TABS: HTMLElement;
 
@@ -61,6 +62,7 @@ export class MenuManager {
     public SHOW_HOIST_DEHOIST: HTMLInputElement;
     public SHOW_LAYOUT_ORIENTATION: HTMLInputElement;
     public SHOW_THEME_TOGGLE: HTMLInputElement;
+    public SHOW_DOCS: HTMLInputElement;
     public SHOW_NODE_ICONS: HTMLInputElement;
     public SHOW_WELCOME_AT_STARTUP: HTMLInputElement;
 
@@ -86,6 +88,7 @@ export class MenuManager {
         this.TOP_BAR = document.getElementById("top-bar")!;
         this.TOP_MENU = document.getElementById("top-menu")!;
         this.MENU_TOGGLE = document.getElementById('menu-toggle')!;
+        this.DOCUMENTATION_BTN = document.getElementById('docs-btn')!;
         this.TOP_BAR_TOGGLE = document.getElementById("top-bar-toggle")!;
         this.DOCUMENT_TABS = document.getElementById("document-tabs")!;
 
@@ -115,6 +118,7 @@ export class MenuManager {
         this.SHOW_HOIST_DEHOIST = document.getElementById('show-hoist-dehoist')! as HTMLInputElement;
         this.SHOW_LAYOUT_ORIENTATION = document.getElementById('show-layout-orientation')! as HTMLInputElement;
         this.SHOW_THEME_TOGGLE = document.getElementById('show-theme-toggle')! as HTMLInputElement;
+        this.SHOW_DOCS = document.getElementById('show-docs')! as HTMLInputElement;
         this.SHOW_NODE_ICONS = document.getElementById('show-node-icons')! as HTMLInputElement;
         this.SHOW_WELCOME_AT_STARTUP = document.getElementById('show-welcome')! as HTMLInputElement;
 
@@ -752,6 +756,7 @@ export class MenuManager {
         this.toggleButtonVisibility(this.HOIST_BTN, this.DEHOIST_BTN, this.SHOW_HOIST_DEHOIST.checked && !noOpenedDocuments);
         this.toggleButtonVisibility(this.LAYOUT_TOGGLE, null, this.SHOW_LAYOUT_ORIENTATION.checked);  // show even when no documents opened.
         this.toggleButtonVisibility(this.THEME_TOGGLE, null, this.SHOW_THEME_TOGGLE.checked); // show even when no documents opened.
+        this.toggleButtonVisibility(this.DOCUMENTATION_BTN, null, this.SHOW_DOCS.checked); // show even when no documents opened.
         let visibleButtonCount = 0; // Count visible buttons to adjust trigger area width
         if (this.SHOW_PREV_NEXT_MARK.checked && hasMarked) {
             visibleButtonCount += 2;
@@ -769,6 +774,9 @@ export class MenuManager {
             visibleButtonCount += 1;
         }
         if (this.SHOW_THEME_TOGGLE.checked) {
+            visibleButtonCount += 1;
+        }
+        if (this.SHOW_DOCS.checked) {
             visibleButtonCount += 1;
         }
         this.TRIGGER_AREA.style.width = ((visibleButtonCount * 40) + 10) + 'px';

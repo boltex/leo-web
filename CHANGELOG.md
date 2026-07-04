@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.0.36
+
+- Added dedicated 'Documentation' button.
+- Improved 'welcome' screen.
+- Fixed hidden-top-right-menu trigger area to match height of top-menu.
+- Fixed documentation's search input box styling.
+
 ## 1.0.35
 
 - Improved welcome screen styling and include a link to the documentation.
@@ -24,19 +31,19 @@
 
 ## 1.0.30
 
-- Fixed external file outline refresh upon change detection
+- Fixed external file outline refresh upon change detection.
 
 ## 1.0.29
 
--- Fixed css references
+-- Fixed css references.
 
 ## 1.0.28
 
-- Fixed logo images
+- Fixed logo images.
 
 ## 1.0.27
 
-- Fixed broken links in documentation
+- Fixed broken links in documentation.
 
 ## 1.0.26
 
@@ -49,11 +56,11 @@
 
 ## 1.0.25
 
-- Fixed UI Freeze that happened when loading a leo file with missing external files
+- Fixed UI Freeze that happened when loading a leo file with missing external files.
 
 ## 1.0.24
 
-- Fixed UI freeze that happened when reloading modified opened Leo documents (.leo, .leojs files themselves)
+- Fixed UI freeze that happened when reloading modified opened Leo documents (.leo, .leojs files themselves).
 
 ## 1.0.23
 
@@ -76,17 +83,17 @@
 
 ## 1.0.20
 
-- Fixed Java importer as per Leo's #4471
+- Fixed Java importer as per Leo's #4471.
 
 ## 1.0.19
 
 - Improved system clipboard permissions handling and messaging.
-- Fixed backslashes in replacement strings, as per Leo's #4660
+- Fixed backslashes in replacement strings, as per Leo's #4660.
 
 ## 1.0.18
 
 - Added select-chapter and select-chapter-main buttons visible only if the outline actually contains @chapter nodes.
-- Fixed cff command as per Leo's #4640
+- Fixed cff command as per Leo's #4640.
 - Added quick-find buttons to the NAV pane.
 
 ## 1.0.17

@@ -251,6 +251,7 @@ export class Controller {
         menu.TOGGLE_MARK_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.MARK) });
         menu.NEXT_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_NEXT_MARKED) });
         menu.PREV_MARKED_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.GOTO_PREV_MARKED) });
+        menu.DOCUMENTATION_BTN.addEventListener('click', () => { workspace.controller.doCommand(Constants.COMMANDS.DOCUMENTATION) });
 
         // * Interface Only Actions *
         menu.THEME_TOGGLE.addEventListener('click', this.handleThemeToggleClick);
@@ -303,6 +304,7 @@ export class Controller {
         menu.SHOW_HOIST_DEHOIST.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_LAYOUT_ORIENTATION.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_THEME_TOGGLE.addEventListener('change', this.refreshButtonVisibility);
+        menu.SHOW_DOCS.addEventListener('change', this.refreshButtonVisibility);
         menu.SHOW_NODE_ICONS.addEventListener('change', workspace.outline.updateNodeIcons);
     }
     //@+node:felix.20260322221812.1: *4* refreshButtonVisibility
@@ -1247,6 +1249,7 @@ export class Controller {
             showHoistDehoist: menu.SHOW_HOIST_DEHOIST.checked,
             showLayoutOrientation: menu.SHOW_LAYOUT_ORIENTATION.checked,
             showThemeToggle: menu.SHOW_THEME_TOGGLE.checked,
+            showDocumentation: menu.SHOW_DOCS.checked,
             showNodeIcons: menu.SHOW_NODE_ICONS.checked,
             // Find-pane options
             findWholeWord: logPane.OPT_WHOLE.checked,
@@ -1275,6 +1278,7 @@ export class Controller {
                 menu.SHOW_HOIST_DEHOIST.checked = prefs.showHoistDehoist ?? false;
                 menu.SHOW_LAYOUT_ORIENTATION.checked = prefs.showLayoutOrientation ?? true;
                 menu.SHOW_THEME_TOGGLE.checked = prefs.showThemeToggle ?? true;
+                menu.SHOW_DOCS.checked = prefs.showDocumentation ?? true;
                 menu.SHOW_NODE_ICONS.checked = prefs.showNodeIcons ?? true;
                 menu.SHOW_WELCOME_AT_STARTUP.checked = prefs.showWelcomeAtStartup ?? true;
                 // Find-pane options

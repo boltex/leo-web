@@ -107,6 +107,6 @@
     }
   ],
   "tnodes": {
-    "felix.20240816220939.1": "@pagewidth 70\n@tabwidth -4\n\nThese are the sources for the Leo-Web users guide.\n\nThey contain markdown to be used with docusaurus or other web documentation frameworks. See:\n\n    https://docusaurus.io/\n\nTo generate these docs:\n\n    `cd web`\n    To run a develepment server\n    `npm run start`\n    To build\n    `npm run build`\n"
+    "felix.20240816220939.1": "@pagewidth 70\n@tabwidth -4\n\nThese are the sources for the Leo-Web users guide.\n\nThey contain markdown to be used with docusaurus or other web documentation frameworks. See:\n\n    https://docusaurus.io/\n\nTo generate these docs:\n\n    `cd web`\n\n    To run a development server\n    `npm run start`\n    \n    To build\n    `npm run build`\n"
   }
 }
