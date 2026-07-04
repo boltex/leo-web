@@ -48,7 +48,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
 
         [CMD.ABOUT_LEO, () => leoUI.command(LEOCMD.ABOUT_LEO, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.WELCOME_SCREEN, () => leoUI.command(LEOCMD.WELCOME_SCREEN, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
-        [CMD.DOCUMENTATION, () => leoUI.showDocumentation()],
+        [CMD.DOCUMENTATION, () => leoUI.command(LEOCMD.DOCUMENTATION, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.TOGGLE_MENU, () => leoUI.toggleMenu()],
         [CMD.UNL_TO_CLIPBOARD, () => leoUI.unlToClipboard()],
 

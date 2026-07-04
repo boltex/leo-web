@@ -572,6 +572,7 @@ export class Constants {
 
         ABOUT_LEO: "about-leo",
         WELCOME_SCREEN: "welcome",
+        DOCUMENTATION: "open-online-home",
 
         // * File Commands
         // NEW: 'new', // newLeoFile used instead

@@ -326,11 +326,6 @@ export class LeoUI extends NullGui {
     public toggleMenu(): void {
         workspace.menu.toggleMenu();
     }
-    //@+node:felix.20260323003442.1: *4* showDocumentation
-    public showDocumentation(): void {
-        // Open Leo Web documentation URL in new browser tab (for now, github repo)
-        window.open('docs/', '_blank');
-    }
     //@+node:felix.20260323003430.1: *4* todo
     public todo(): void {
         workspace.dialog.showInformationMessage("TODO: Not yet implemented.");

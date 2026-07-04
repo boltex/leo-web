@@ -49,7 +49,7 @@ export class HelpCommandsClass extends BaseEditCommandsClass {
             <Alt-X>help-
 
         For Leo commands, type:
- 
+         
             <Alt-X>help-for-command<Enter>
             <a Leo command name><Enter>
 
