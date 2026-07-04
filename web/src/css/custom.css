@@ -93,6 +93,8 @@
 
   --ifm-table-stripe-background: rgba(0, 0, 0, 0.03);
   --ifm-table-background: transparent;
+
+  --find-pane-color: #f9f9f9;
 }
 
 html[data-theme="dark"] {
@@ -132,6 +134,8 @@ html[data-theme="dark"] {
   --custom-home-author-color: #dcdcdc;
 
   --custom-player-after-color: #00000033;
+
+  --find-pane-color: #23202e;
 }
 
 /* Fix navbar by removing box-shadow and adding instead a border bottom */
@@ -298,6 +302,12 @@ img[src*="#author"] {
 
 .DocSearch-Button-Keys {
   display: none !important;
+}
+
+.DocSearch-Button:active,
+.DocSearch-Button:focus,
+.DocSearch-Button:hover {
+  background: var(--find-pane-color) !important;
 }
 
 @media screen and (min-width: 997px) {

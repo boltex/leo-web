@@ -197,6 +197,24 @@ const config = {
 
       // See https://dashboard.algolia.com/account/application/new/configure?plan=v8.5-docsearch 
 
+      // For testing, fill up the following with your own Algolia credentials and uncomment the block below.
+      // Remember to use 'build' and 'serve' to test the search functionality locally, as 'start' will not work with Algolia.
+      // Delete and uncomment real settings below when done.
+
+      // algolia: {
+      //   appId: "",
+      //   apiKey: "",
+      //   indexName: "",
+      //   contextualSearch: false,
+      //   searchParameters: {},
+      //   searchPagePath: false,// 'search',
+      //   insights: false,
+      //   replaceSearchResultPathname: {
+      //     from: 'https://boltex.github.io/leo-web/', // Replace with your production domain
+      //     to: 'http://localhost:3000',     // Replace with your local server URL
+      //   },
+      // }
+
       algolia: process.env.ALGOLIA_APP_ID && process.env.ALGOLIA_API_KEY && process.env.ALGOLIA_INDEX_NAME ? {
         // The application ID provided by Algolia
         appId: process.env.ALGOLIA_APP_ID,
