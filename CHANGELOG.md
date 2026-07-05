@@ -39,7 +39,7 @@
 
 ## 1.0.29
 
--- Fixed css references.
+- Fixed css references.
 
 ## 1.0.28
 
