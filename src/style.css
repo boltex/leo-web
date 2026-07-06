@@ -4,10 +4,10 @@
 /*@+node:felix.20260321142048.1: ** CSS Variables & State*/
 :root {
   /* light theme (default) */
-  --background-color: #ffffec;
-  --body-pane-color: #fff6f5;
+  --main-container-bg: #ffffec;
+  --body-pane-bg: #fff6f5;
   --body-link-color: #5178ab;
-  --find-pane-color: #f9f9f9;
+  --log-pane-bg: #f9f9f9;
   --resizer-color: #cae1ff;
   --selected-bg: #cae1ff;
   --ancestor-bg: #eef5ff;
@@ -20,7 +20,7 @@
   --find-border-color: #a0a0a0;
   --find-selection: #0078d7;
   --menu-bg-color: #eee;
-  --menu-color: #000;
+  --menu-text-color: #000;
   --menu-disabled-color: #888;
   --menu-caret-color: #666;
   --menu-border-color: #ccc;
@@ -157,10 +157,10 @@
 }
 
 [data-theme="dark"] {
-  --background-color: #1e1e2e;
-  --body-pane-color: #2a2536;
+  --main-container-bg: #1e1e2e;
+  --body-pane-bg: #2a2536;
   --body-link-color: #929bda;
-  --find-pane-color: #23202e;
+  --log-pane-bg: #23202e;
   --resizer-color: #454a6e;
   --selected-bg: #454a6e;
   --ancestor-bg: #2d3250;
@@ -173,7 +173,7 @@
   --find-border-color: #81889e;
   --find-selection: #3c54ce;
   --menu-bg-color: #373e53;
-  --menu-color: #cdd6f4;
+  --menu-text-color: #cdd6f4;
   --menu-disabled-color: #8c9db7;
   --menu-caret-color: #999;
   --menu-border-color: #505257;
@@ -182,30 +182,30 @@
 
 /* Custom theme based on 17th-century scientific folio look and feel */
 [data-theme="principia"] {
-  --background-color: #f6f1e3;
-  --body-pane-color: #1c1a17;
+  --main-container-bg: #f6f1e3;
+  --body-pane-bg: #f3e7db;
   --body-link-color: #6b2a1f;
-  --find-pane-color: #23202e;
+  --log-pane-bg: #23202e;
   --resizer-color: #8c7a58;
-  --selected-bg: #cae1ff;
-  --ancestor-bg: #eef5ff;
-  --hover-bg: #dfecff;
-  --focus-outline: #0000ff;
+  --selected-bg: #f4edcd;
+  --ancestor-bg: #f3efe2;
+  --hover-bg: #e8e4d3;
+  --focus-outline: #b0906c;
   --text-color: #000;
   --caret-dim-color: #888;
   --find-text-color: #444;
   --find-placeholder-color: #888;
   --find-border-color: #a0a0a0;
-  --find-selection: #0078d7;
-  --menu-bg-color: #eee;
-  --menu-color: #000;
-  --menu-disabled-color: #888;
-  --menu-caret-color: #666;
-  --menu-border-color: #ccc;
+  --find-selection: #d79e00;
+  --menu-bg-color: #ebe2ca;
+  --menu-text-color: #423931;
+  --menu-disabled-color: #999388;
+  --menu-caret-color: #77665f;
+  --menu-border-color: #ccbdb7;
   --menu-box-shadow-color: rgba(0, 0, 0, 0.25);
-  --font-ui: "Inter", sans-serif;
+  --font-ui: "Inter", serif;
   --font-mono: "JetBrains Mono", monospace;
-  --font-title: "Carlito", sans-serif;
+  --font-title: "Carlito", serif;
 }
 
 [data-layout="horizontal"] {
@@ -339,7 +339,7 @@ body {
   align-items: center;
   padding: 4px 8px;
   background: var(--menu-bg-color);
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   border: 1px solid var(--menu-border-color);
   border-bottom: none;
   border-radius: 4px 4px 0 0;
@@ -365,7 +365,7 @@ body {
   margin-left: 8px;
   position: relative;
   border-radius: 50%;
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   background-color: var(--resizer-color);
 }
 
@@ -395,7 +395,7 @@ body {
 
 #top-bar-toggle {
   margin-left: auto;
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   font-size: 24px;
   height: 100%;
   width: 46px;
@@ -419,7 +419,7 @@ body {
 
 .menu {
   background: var(--menu-bg-color);
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   position: relative;
   z-index: 10;
   user-select: none;
@@ -432,7 +432,7 @@ body {
   flex-direction: column;
   position: absolute;
   background: var(--menu-bg-color);
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   border: 1px solid var(--menu-border-color);
   min-width: 160px;
   box-shadow: 0 2px 6px var(--menu-box-shadow-color);
@@ -485,7 +485,7 @@ body {
 }
 
 .menu-label {
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   flex-grow: 1;
 }
 
@@ -548,7 +548,7 @@ body {
 .at-button,
 .icon-button {
   flex-shrink: 0;
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   font-size: 0.875rem;
   padding: 5px 10px;
   background: var(--menu-bg-color);
@@ -706,7 +706,7 @@ body {
   flex-grow: 1;
   overflow: hidden;
   flex-direction: var(--main-direction);
-  background-color: var(--background-color);
+  background-color: var(--main-container-bg);
   color: var(--text-color);
   transition: var(--body-transition);
 }
@@ -1041,7 +1041,7 @@ body.dragging-secondary .node {
   flex: 1;
   padding: 0.5rem 0 0 0.5rem;
   min-height: 0;
-  background-color: var(--body-pane-color);
+  background-color: var(--body-pane-bg);
   overflow-y: auto;
   font-family: var(--font-mono);
   font-variant-ligatures: none;
@@ -1233,7 +1233,7 @@ body.dragging-secondary .node {
   font-family: var(--font-ui);
   padding: 0.1rem 0 0 0;
   min-height: 0;
-  background-color: var(--find-pane-color);
+  background-color: var(--log-pane-bg);
   position: relative;
   transition: var(--find-pane-transition);
   container-type: inline-size;
@@ -1371,13 +1371,13 @@ body.dragging-secondary .node {
 
 .nav-button:hover {
   transform: translateY(-1px);
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   background-color: var(--hover-bg);
 }
 
 .nav-button:active {
   transform: translateY(1px);
-  color: var(--menu-color);
+  color: var(--menu-text-color);
   background-color: var(--selected-bg);
 }
 
@@ -1457,7 +1457,7 @@ select.setting-select {
   margin: 0 0 0.2rem 0rem;
   border-radius: 3px;
   border: 1px solid var(--find-border-color);
-  background: var(--find-pane-color);
+  background: var(--log-pane-bg);
   color: var(--find-text-color);
   font-family: var(--font-ui);
 }
@@ -1594,7 +1594,7 @@ input[type="checkbox"] {
   height: 20px;
   border: 1px solid var(--find-border-color);
   border-radius: 3px;
-  background-color: var(--find-pane-color);
+  background-color: var(--log-pane-bg);
   position: relative;
 }
 
@@ -1616,7 +1616,7 @@ input[type="radio"] {
   height: 20px;
   border: 1px solid var(--find-border-color);
   border-radius: 50%;
-  background-color: var(--find-pane-color);
+  background-color: var(--log-pane-bg);
   position: relative;
 }
 
@@ -1743,7 +1743,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   display: none;
   font-family: var(--font-ui);
   font-size: 0.85rem;
-  background: var(--find-pane-color);
+  background: var(--log-pane-bg);
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   z-index: 1000;
@@ -1770,7 +1770,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   top: 16px;
   left: 50%;
   transform: translateX(-50%) translateY(-10px);
-  background: var(--body-pane-color);
+  background: var(--body-pane-bg);
   color: var(--find-text-color);
   padding: 8px 12px;
   border-radius: 6px;
@@ -1810,7 +1810,8 @@ input[type="checkbox"]:focus-visible:checked::after {
   outline: none;
 }
 
-.modal input {
+.modal input,
+.modal button {
   font-family: var(--font-ui);
 }
 
@@ -1820,7 +1821,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   width: calc(100% - 48px);
   padding: 16px 20px;
   border-radius: 8px;
-  background: var(--body-pane-color);
+  background: var(--body-pane-bg);
   color: var(--text-color);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   border: 1px solid var(--find-border-color);
@@ -1924,7 +1925,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   padding: 12px 16px;
   border: none;
   border: 1px solid var(--find-border-color);
-  background: var(--body-pane-color);
+  background: var(--body-pane-bg);
   color: var(--text-color);
   font-size: 14px;
   box-sizing: border-box;
@@ -1988,7 +1989,7 @@ input[type="checkbox"]:focus-visible:checked::after {
 /* mark element is used in quick list to mark the matched text */
 mark {
   background-color: var(--find-selection);
-  color: var(--body-pane-color);
+  color: var(--body-pane-bg);
   font-weight: 700;
   padding: 0;
   border-radius: 2px;
