@@ -180,6 +180,34 @@
   --menu-box-shadow-color: rgba(0, 0, 0, 0.34);
 }
 
+/* Custom theme based on 17th-century scientific folio look and feel */
+[data-theme="principia"] {
+  --background-color: #f6f1e3;
+  --body-pane-color: #1c1a17;
+  --body-link-color: #6b2a1f;
+  --find-pane-color: #23202e;
+  --resizer-color: #8c7a58;
+  --selected-bg: #cae1ff;
+  --ancestor-bg: #eef5ff;
+  --hover-bg: #dfecff;
+  --focus-outline: #0000ff;
+  --text-color: #000;
+  --caret-dim-color: #888;
+  --find-text-color: #444;
+  --find-placeholder-color: #888;
+  --find-border-color: #a0a0a0;
+  --find-selection: #0078d7;
+  --menu-bg-color: #eee;
+  --menu-color: #000;
+  --menu-disabled-color: #888;
+  --menu-caret-color: #666;
+  --menu-border-color: #ccc;
+  --menu-box-shadow-color: rgba(0, 0, 0, 0.25);
+  --font-ui: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-title: "Carlito", sans-serif;
+}
+
 [data-layout="horizontal"] {
   --main-direction: column;
   --main-resizer-width: 100%;
@@ -2154,7 +2182,8 @@ mark {
   }
 }
 
-[data-theme="light"] {
+[data-theme="light"],
+[data-theme="principia"] {
   .token.comment,
   .token.prolog,
   .token.doctype,

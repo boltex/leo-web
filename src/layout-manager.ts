@@ -192,6 +192,9 @@ export class LayoutManager {
     public applyTheme(theme: string) {
         this.currentTheme = theme;
         this.HTML_ELEMENT.setAttribute('data-theme', theme);
+
+        // Note: if a CUSTOM THEME is set, then the following will default to the light theme,
+        // but the custom theme will still be applied. No problem here, just a note for clarity.
         workspace.menu.THEME_TOGGLE.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
         workspace.menu.THEME_ICON.innerHTML = theme === 'dark' ? '🌙' : '☀️';
     }
