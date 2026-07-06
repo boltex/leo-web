@@ -185,16 +185,16 @@
   --main-container-bg: #f6f1e3;
   --body-pane-bg: #f3e7db;
   --body-link-color: #6b2a1f;
-  --log-pane-bg: #23202e;
-  --resizer-color: #8c7a58;
+  --log-pane-bg: #d3cdb8;
+  --resizer-color: #c5b08b;
   --selected-bg: #f4edcd;
   --ancestor-bg: #f3efe2;
-  --hover-bg: #e8e4d3;
+  --hover-bg: #d8d2b5;
   --focus-outline: #b0906c;
-  --text-color: #000;
-  --caret-dim-color: #888;
-  --find-text-color: #444;
-  --find-placeholder-color: #888;
+  --text-color: #302523;
+  --caret-dim-color: #8f827d;
+  --find-text-color: #564b3e;
+  --find-placeholder-color: #8a8276;
   --find-border-color: #a0a0a0;
   --find-selection: #d79e00;
   --menu-bg-color: #ebe2ca;
@@ -203,9 +203,9 @@
   --menu-caret-color: #77665f;
   --menu-border-color: #ccbdb7;
   --menu-box-shadow-color: rgba(0, 0, 0, 0.25);
-  --font-ui: "Inter", serif;
-  --font-mono: "JetBrains Mono", monospace;
-  --font-title: "Carlito", serif;
+  --font-ui: "EB Garamond", serif;
+  --font-mono: "Alegreya", monospace;
+  --font-title: "Cormorant Garamond", serif;
 }
 
 [data-layout="horizontal"] {
