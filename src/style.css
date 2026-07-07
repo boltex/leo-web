@@ -5,7 +5,10 @@
 :root {
   /* light theme (default) */
   --main-container-bg: #ffffec;
+  --outline-pane-bg: inherit;
+  --outline-pane-bg-image: none;
   --body-pane-bg: #fff6f5;
+  --body-pane-bg-image: none;
   --body-link-color: #5178ab;
   --log-pane-bg: #f9f9f9;
   --resizer-color: #cae1ff;
@@ -184,20 +187,30 @@
 [data-theme="principia"] {
   --main-container-bg: #f6f1e3;
   --body-pane-bg: #f3e7db;
+  --body-pane-bg-image: linear-gradient(
+    90deg,
+    rgba(70, 45, 20, 0.18) 0%,
+    rgba(255, 248, 220, 0.28) 10%,
+    rgba(255, 255, 245, 0.38) 50%,
+    rgba(255, 248, 220, 0.19) 80%,
+    rgba(70, 45, 20, 0.09) 100%
+  );
+  --outline-pane-bg: inherit;
+  --outline-pane-bg-image: none;
   --body-link-color: #6b2a1f;
-  --log-pane-bg: #d3cdb8;
-  --resizer-color: #c5b08b;
-  --selected-bg: #f4edcd;
-  --ancestor-bg: #f3efe2;
+  --log-pane-bg: #e3ddc7;
+  --resizer-color: #dbcdb5;
+  --selected-bg: #eddead;
+  --ancestor-bg: #f7ebc5;
   --hover-bg: #d8d2b5;
-  --focus-outline: #b0906c;
+  --focus-outline: #a34848;
   --text-color: #302523;
   --caret-dim-color: #8f827d;
   --find-text-color: #564b3e;
   --find-placeholder-color: #8a8276;
   --find-border-color: #a0a0a0;
-  --find-selection: #d79e00;
-  --menu-bg-color: #ebe2ca;
+  --find-selection: #b4575b;
+  --menu-bg-color: #f5eacf;
   --menu-text-color: #423931;
   --menu-disabled-color: #999388;
   --menu-caret-color: #77665f;
@@ -205,7 +218,8 @@
   --menu-box-shadow-color: rgba(0, 0, 0, 0.25);
   --font-ui: "EB Garamond", serif;
   --font-mono: "Alegreya", monospace;
-  --font-title: "Cormorant Garamond", serif;
+  /* --font-title: "Cormorant Garamond", serif; */
+  --font-title: "Cinzel", serif;
 }
 
 [data-layout="horizontal"] {
@@ -836,6 +850,8 @@ body.dragging-cross {
 
 /*@+node:felix.20260321142128.1: ** Outline Pane*/
 #outline-pane {
+  background-color: var(--outline-pane-bg);
+  background-image: var(--outline-pane-bg-image);
   position: relative;
   white-space: nowrap;
   padding-top: 6px;
@@ -1042,6 +1058,7 @@ body.dragging-secondary .node {
   padding: 0.5rem 0 0 0.5rem;
   min-height: 0;
   background-color: var(--body-pane-bg);
+  background-image: var(--body-pane-bg-image);
   overflow-y: auto;
   font-family: var(--font-mono);
   font-variant-ligatures: none;
@@ -1770,7 +1787,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   top: 16px;
   left: 50%;
   transform: translateX(-50%) translateY(-10px);
-  background: var(--body-pane-bg);
+  background-color: var(--body-pane-bg);
   color: var(--find-text-color);
   padding: 8px 12px;
   border-radius: 6px;
@@ -1821,7 +1838,7 @@ input[type="checkbox"]:focus-visible:checked::after {
   width: calc(100% - 48px);
   padding: 16px 20px;
   border-radius: 8px;
-  background: var(--body-pane-bg);
+  background-color: var(--body-pane-bg);
   color: var(--text-color);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   border: 1px solid var(--find-border-color);
@@ -1846,13 +1863,13 @@ input[type="checkbox"]:focus-visible:checked::after {
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--find-border-color);
-  background: var(--resizer-color);
+  background-color: var(--resizer-color);
   color: var(--text-color);
   cursor: pointer;
 }
 
 #message-dialog .modal-content button:hover {
-  background: var(--hover-bg);
+  background-color: var(--hover-bg);
 }
 
 /* Input dialog */
@@ -2183,8 +2200,7 @@ mark {
   }
 }
 
-[data-theme="light"],
-[data-theme="principia"] {
+[data-theme="light"] {
   .token.comment,
   .token.prolog,
   .token.doctype,
@@ -2225,8 +2241,6 @@ mark {
   .language-css .token.string,
   .style .token.string {
     color: #9a6e3a;
-    /* This background color was intended by the author of this theme. */
-    background: hsla(0, 0%, 100%, 0.5);
   }
 
   .token.atrule,
@@ -2265,6 +2279,76 @@ mark {
     text-decoration: underline;
     cursor: pointer;
   }
+}
+
+[data-theme="principia"] {
+  --syntax-ink: #3d2f24;
+  --syntax-muted: #7a6a58;
+  --syntax-red: #7b3a2d;
+  --syntax-green: #4d5f37;
+  --syntax-blue: #3f4f76;
+  --syntax-ochre: #8b6428;
+}
+[data-theme="principia"] {
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: var(--syntax-muted);
+    font-style: italic;
+  }
+
+  .token.keyword,
+  .token.atrule,
+  .token.attr-value {
+    color: var(--syntax-blue);
+    font-weight: 600;
+  }
+
+  .token.string,
+  .token.char,
+  .token.selector,
+  .token.attr-name,
+  .token.builtin,
+  .token.inserted {
+    color: var(--syntax-green);
+    font-style: italic;
+  }
+
+  .token.number,
+  .token.boolean,
+  .token.constant,
+  .token.symbol,
+  .token.property,
+  .token.tag,
+  .token.deleted {
+    color: var(--syntax-red);
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .style .token.string {
+    color: var(--syntax-ochre);
+  }
+
+  .token.function,
+  .token.class-name {
+    color: var(--syntax-ink);
+    font-weight: 700;
+  }
+
+  .token.regex,
+  .token.important,
+  .token.variable {
+    color: var(--syntax-ochre);
+  }
+}
+[data-theme="principia"] code,
+[data-theme="principia"] pre,
+[data-theme="principia"] .token {
+  text-shadow: 0 0 1px rgba(45, 32, 20, 0.35);
 }
 
 /* ### COMMON TO ALL THEMES ### */
