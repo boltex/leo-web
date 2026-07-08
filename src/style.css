@@ -235,15 +235,15 @@
 
 /* Custom theme based on 17th-century scientific folio look and feel */
 [data-theme="principia"] {
-  --main-container-bg: #f6f1e3;
+  --main-container-bg: #f6efe3;
   --body-pane-bg: #f3e7db;
   --body-pane-bg-image: linear-gradient(
     90deg,
     rgba(70, 45, 20, 0.18) 0%,
-    rgba(255, 248, 220, 0.28) 10%,
-    rgba(255, 255, 245, 0.38) 50%,
-    rgba(255, 248, 220, 0.19) 80%,
-    rgba(70, 45, 20, 0.09) 100%
+    rgba(255, 248, 220, 0.25) 10%,
+    rgba(255, 255, 245, 0.35) 50%,
+    rgba(255, 248, 220, 0.15) 80%,
+    rgba(70, 45, 20, 0.08) 100%
   );
   --outline-pane-bg: inherit;
   --outline-pane-bg-image: none;
