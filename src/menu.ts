@@ -421,8 +421,7 @@ export const menuData: MenuEntry[] = [
             { label: "Equal Sized Panes", command: CMD.EQUAL_SIZED_PANES },
             { label: "Horizontal Window Layout", command: CMD.HORIZONTAL_LAYOUT },
             { label: "Vertical Window Layout", command: CMD.VERTICAL_LAYOUT },
-            { label: "Light Theme", command: CMD.LIGHT_THEME },
-            { label: "Dark Theme", command: CMD.DARK_THEME },
+            { label: "Choose Color Theme", command: CMD.COLOR_THEME },
         ],
     },
     {

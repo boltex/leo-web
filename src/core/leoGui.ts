@@ -485,6 +485,10 @@ export class LeoGui {
             );
         }
     }
+    //@+node:felix.20260709194731.1: *4* chooseTheme
+    public chooseTheme(): void {
+        // 
+    }
     //@+node:felix.20251213133753.244: *4* LeoGui.put_help
     public put_help(c: Commands, s: string, short_title: string): void {
         // pass

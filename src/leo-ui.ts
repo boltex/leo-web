@@ -310,9 +310,65 @@ export class LeoUI extends NullGui {
         return { "line": line, "col": col, "index": i };
     }
     //@+node:felix.20260323004032.1: *3* GUI Commands
+    //@+node:felix.20260709194546.1: *4* chooseTheme
+
+    public async chooseTheme(): Promise<void> {
+        const currentTheme = workspace.layout.currentTheme;
+        // First offer the choices
+        const w_choices: QuickPickItem[] = [
+            {
+                label: 'Light Theme',
+                picked: currentTheme === 'light'
+            },
+            {
+                label: 'Dark Theme',
+                picked: currentTheme === 'dark'
+            },
+            {
+                label: 'Solarized Light',
+                picked: currentTheme === 'solarized-light'
+            },
+            {
+                label: 'Monokai',
+                picked: currentTheme === 'monokai'
+            },
+            {
+                label: 'Principia',
+                picked: currentTheme === 'principia'
+            },
+            {
+                label: 'Synthwave 84',
+                picked: currentTheme === 'synthwave-84'
+            }
+        ];
+        const w_picked = await workspace.dialog.showQuickPick(w_choices, {
+            placeHolder: "Select Color Theme",
+        });
+
+        if (w_picked) {
+            this.setTheme(w_picked.label);
+        }
+    }
+
     //@+node:felix.20260323003609.1: *4* setTheme
     public setTheme(theme: string): void {
-        workspace.layout.applyTheme(theme);
+        theme = theme.toLowerCase();
+        let properTheme = 'light'; // default to light if unknown
+
+        // Temporary mapping of theme names to proper theme identifiers
+        if (theme.includes('dark')) {
+            properTheme = 'dark';
+        } else if (theme.includes('solarized')) {
+            properTheme = 'solarized-light';
+        } else if (theme.includes('monokai')) {
+            properTheme = 'monokai';
+        } else if (theme.includes('principia')) {
+            properTheme = 'principia';
+        } else if (theme.includes('synthwave')) {
+            properTheme = 'synthwave-84';
+        }
+
+        workspace.layout.applyTheme(properTheme);
     }
     //@+node:felix.20260410232626.1: *4* applyLayout
     public applyLayout(orientation: string): void {

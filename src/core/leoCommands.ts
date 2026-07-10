@@ -887,6 +887,12 @@ export class Commands {
 
     }
 
+    //@+node:felix.20260709193112.1: *3* @cmd colorTheme
+    @cmd('color-theme', 'Choose GUI Color Theme.')
+    public colorTheme(): void {
+        return g.app.gui.chooseTheme();
+    }
+
     //@+node:felix.20251214160339.456: *3* c.API
     // These methods are a fundamental, unchanging, part of Leo's API.
 

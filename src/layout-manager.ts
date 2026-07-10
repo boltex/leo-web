@@ -193,10 +193,33 @@ export class LayoutManager {
         this.currentTheme = theme;
         this.HTML_ELEMENT.setAttribute('data-theme', theme);
 
-        // Note: if a CUSTOM THEME is set, then the following will default to the light theme,
-        // but the custom theme will still be applied. No problem here, just a note for clarity.
-        workspace.menu.THEME_TOGGLE.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
-        workspace.menu.THEME_ICON.innerHTML = theme === 'dark' ? '🌙' : '☀️';
+        switch (theme) {
+            case 'dark':
+                workspace.menu.THEME_TOGGLE.title = 'Switch to solarized theme';
+                workspace.menu.THEME_ICON.innerHTML = '🌙';
+                break;
+            case 'solarized-light':
+                workspace.menu.THEME_TOGGLE.title = 'Switch to monokai theme';
+                workspace.menu.THEME_ICON.innerHTML = '💡';
+                break;
+            case 'monokai':
+                workspace.menu.THEME_TOGGLE.title = 'Switch to principia theme';
+                workspace.menu.THEME_ICON.innerHTML = '🎨';
+                break;
+            case 'principia':
+                workspace.menu.THEME_TOGGLE.title = 'Switch to synthwave-84 theme';
+                workspace.menu.THEME_ICON.innerHTML = '✒️';
+                break;
+            case 'synthwave-84':
+                workspace.menu.THEME_TOGGLE.title = 'Switch to light theme';
+                workspace.menu.THEME_ICON.innerHTML = '🌌';
+                break;
+            default: // same as light theme
+                workspace.menu.THEME_TOGGLE.title = 'Switch to dark theme';
+                workspace.menu.THEME_ICON.innerHTML = '☀️';
+                break;
+        }
+
     }
     //@+node:felix.20260322230908.1: *3* applyLayout
     public applyLayout(layout: string) {
@@ -279,14 +302,37 @@ export class LayoutManager {
     }
     //@+node:felix.20260322230817.1: *3* toggleTheme
     public toggleTheme() {
-        this.HTML_ELEMENT.setAttribute('data-transition', 'true');
-        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.HTML_ELEMENT.setAttribute('data-transition', 'true'); // Set once before first use to prevent FOUC.
+        // const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+
+        // * Instead cycle through the themes in the order: light -> dark -> custom -> light
+        let newTheme: string;
+        if (this.currentTheme === 'light') {
+            newTheme = 'dark';
+        } else if (this.currentTheme === 'dark') {
+            newTheme = 'solarized-light';
+        }
+        else if (this.currentTheme === 'solarized-light') {
+            newTheme = 'monokai';
+        }
+        else if (this.currentTheme === 'monokai') {
+            newTheme = 'principia';
+        }
+        else if (this.currentTheme === 'principia') {
+            newTheme = 'synthwave-84';
+        }
+        else if (this.currentTheme === 'synthwave-84') {
+            newTheme = 'light';
+        }
+        else {
+            newTheme = 'light';
+        }
         this.applyTheme(newTheme);
         workspace.outline.renderTree(); // Re-render to update inverted icon colors
     }
     //@+node:felix.20260322230813.1: *3* toggleLayout
     public toggleLayout() {
-        this.HTML_ELEMENT.setAttribute('data-transition', 'true');
+        this.HTML_ELEMENT.setAttribute('data-transition', 'true'); // Set once before first use to prevent FOUC.
         const newLayout = this.currentLayout === 'vertical' ? 'horizontal' : 'vertical';
         this.applyLayout(newLayout);
         workspace.outline.renderTree();
