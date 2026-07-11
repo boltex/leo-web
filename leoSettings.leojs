@@ -152,6 +152,30 @@
       "vh": "@settings",
       "children": [
         {
+          "gnx": "felix.20260711150059.1",
+          "vh": "@menuat file after",
+          "children": [
+            {
+              "gnx": "felix.20260711150059.2",
+              "vh": "@menu Test leoSettings",
+              "children": [
+                {
+                  "gnx": "felix.20260711150059.3",
+                  "vh": "@item do-nothing"
+                },
+                {
+                  "gnx": "felix.20260711150059.4",
+                  "vh": "@item -"
+                },
+                {
+                  "gnx": "felix.20260711150059.5",
+                  "vh": "@item about-leo"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "gnx": "felix.20260411220658.1",
           "vh": "Abbreviations",
           "children": [

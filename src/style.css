@@ -450,6 +450,18 @@ body {
   background: var(--selected-bg);
 }
 
+.menu-item.separator {
+  border-top: 1px solid var(--menu-border-color);
+  margin: 0;
+  padding: 0 !important;
+}
+.menu-item.separator .menu-label {
+  display: none;
+}
+.menu-item.separator:hover {
+  background: var(--menu-bg-color);
+}
+
 .context-menu-separator {
   border-top: 1px solid var(--menu-border-color);
   margin: 0;

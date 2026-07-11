@@ -272,6 +272,7 @@ export class MenuManager {
             });
 
             if (entry.entries) {
+                // is a submenu, so we ignore the command and add a submenu indicator
                 if (level > 0) item.classList.add("has-sub");
                 const sub = this.buildMenu(entry.entries, level + 1);
                 if (level === 0) {
@@ -344,7 +345,8 @@ export class MenuManager {
                     // Has a condition so save the DOM element reference for later updates
                     entry.domElementRef = item;
                 }
-
+            } else if (entry.label === "-") {
+                item.classList.add("separator");
             }
 
             if (level === 0) {

@@ -4,12 +4,12 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, Focus, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, Focus, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, MenuEntry, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
-import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
+import { bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
 import { toolbarButtons } from "./toolbar-buttons";
 import { keybindings } from "./keybindings";
 import { QuickSearchController } from "./core/quicksearch";
@@ -29,7 +29,7 @@ export class Controller {
 
     private _lastUndoBeadIndex: number | null = null; // To track the last right-clicked undo bead index for showing context menu options
     private _lastAtButton: LeoButton | null = null; // To track the last right-clicked at-button for context menu actions
-    private _baseMenu = menuData; // Store the base menu structure for refreshing purposes
+
 
     // Goto Nodes Variables
     public nodeList: LeoGotoNode[] = [];
@@ -614,18 +614,23 @@ export class Controller {
 
     //@+node:felix.20260710192742.1: *4* refreshMenu
     public generateMenuFromSettings(): void {
-        //console.log("Refreshing menu...");
 
-        // * For now, we will just rebuild the menu from the base menu structure.
-        // * In the future, we can modify this to generate the menu based on user settings.
+        // Check if any commanders are opened.
+        // If a commander is opened: use its config's menu settings to generate the menu.
+        // if not, use g.app.config's menu
 
-        // Let's make a copy of the base menu to modify
-        const modifiedMenu = JSON.parse(JSON.stringify(this._baseMenu));
+        const hasOpenedDocuments = g.app.windowList.length > 0;
+        let modifiedMenu: MenuEntry[] = []
 
-        // Here you can modify the modifiedMenu based on user settings.
-        // This will mostly simply be adding items to the menu for now.
+        if (hasOpenedDocuments) {
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            modifiedMenu = c.config.getMenusList();
+        } else {
+            // Should not happen because a new empty document is created if 
+            // no recent document is opened, but just in case, use the global config's menu.
+            modifiedMenu = g.app.config.getMenusList();
+        }
 
-        // After modifications, rebuild the menu
         workspace.menu.buildMenu(modifiedMenu);
 
     }

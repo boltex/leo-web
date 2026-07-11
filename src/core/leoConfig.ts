@@ -2,6 +2,7 @@
 //@+node:felix.20251214160339.701: * @file src/core/leoConfig.ts
 //@+<< imports >>
 //@+node:felix.20251214160339.702: ** << imports >>
+import { MenuEntry } from '../types';
 import { Commands } from './leoCommands';
 import * as g from './leoGlobals';
 import { Position, VNode } from './leoNodes';
@@ -108,7 +109,7 @@ export class ParserBaseClass {
             int: this.doInt,
             ints: this.doInts,
             float: this.doFloat,
-            menus: this.doMenus, // New in 4.4.4
+            menus: this.doMenus, // New in 4.4.4 NOT USED IN leo-web
             menuat: this.doMenuat,
             popup: this.doPopup, // New in 4.4.8
             mode: this.doMode, // New in 4.4b1.
@@ -571,28 +572,84 @@ export class ParserBaseClass {
      * Handle @menuat setting.
      */
     public doMenuat(p: Position, kind: string, name: string, val: any): void {
-        // TODO ?
-        /* 
-        if g.app.config.menusList:
+        // TODO !
+        console.log('doMenuat is not implemented yet', p.h);
+        console.log('kind:', kind, 'name:', name, 'val:', val);
+        console.log('local', this.localFlag, 'menusList:', g.app.config.menusList);
+
+        // Unlike the original python, our menus are a different type. As we insert the menu items in the original menu,
+        // we will need to convert the menu items to our MenuEntry type. This is a complex operation and will require a
+        // detailed understanding of the original menu structure and how it maps to our MenuEntry type.
+
+        // Notably, we will not support the 'cut' nor 'copy' modes, as they are not relevant to our implementation.
+        // We will also not support the 'clipboard' source, as we do not have a clipboard in our implementation.
+
+        if (g.app.config.menusList) {
             // get the patch fragment
-            patch: List[Any] = []
-            if p.hasChildren():
-                // self.doMenus(p.copy().firstChild(),kind,name,val,storeIn=patch)
-                self.doItems(p.copy(), patch)
+            const patch: MenuEntry[] = [];
+            if (p.hasChildren()) {
+
+                // doItems should recursively convert the children of p into MenuEntry objects and add them to patch.
+                this.doItems(p.copy(), patch); // patch is modified in place
+
+            }
             // setup
+            const parts = name.split(' ');
+            if (parts.length !== 3) {
+                parts.push('subtree'); // This should always be the case, but we will add it just in case.
+            }
+            let [targetPath, mode, source] = parts;
+            if (!targetPath.startsWith('/')) {
+                targetPath = '/' + targetPath;
+            }
+            const is_local = this.localFlag;
+            let mlist: MenuEntry[];
+
+            if (is_local) {
+                mlist = [...g.app.config.menusList]; // Make a copy of the menusList
+                this.c.config.set(null, 'menus', 'menus', mlist);
+            } else {
+                mlist = g.app.config.menusList;
+            }
+
+            const ans = this.patchMenuTree(mlist, targetPath);
+            if (ans) {
+                // todo
+            } else {
+                console.error("ERROR: didn't find menu path " + targetPath);
+            }
+
+        } else if (g.app.inBridge) {
+            // Not an error.
+        } else {
+            console.error("ERROR: @menuat found but no menu tree to patch");
+        }
+
+        /* # Original Python (We will not be using this exact code, but it gives an idea of what needs to be done)
+        if g.app.config.menusList:
+            # get the patch fragment
+            patch: list[Any] = []
+            if p.hasChildren():
+                self.doItems(p.copy(), patch)
+            # setup
             parts = name.split()
             if len(parts) != 3:
                 parts.append('subtree')
             targetPath, mode, source = parts
             if not targetPath.startswith('/'):
                 targetPath = '/' + targetPath
-            ans = self.patchMenuTree(g.app.config.menusList, targetPath)
+            is_local = 'leosettings' not in self.c.mFileName.lower()
+            if is_local:
+                mlist = g.app.config.menusList[:]
+                self.c.config.set(None, 'menus', 'menus', mlist)
+            else:
+                mlist = g.app.config.menusList
+            ans = self.patchMenuTree(mlist, targetPath)
             if ans:
-                // pylint: disable=unpacking-non-sequence
                 list_, idx = ans
                 if mode not in ('copy', 'cut'):
                     if source != 'clipboard':
-                        use = patch  // [0][1]
+                        use = patch  # [0][1]
                     else:
                         if isinstance(self.clipBoard, list):
                             use = self.clipBoard
@@ -614,15 +671,14 @@ export class ParserBaseClass {
                     del list_[idx]
                 elif mode == 'copy':
                     self.clipBoard = list_[idx]
-                else:  // append
+                else:  # append
                     list_.extend(use)
             else:
                 g.es_print("ERROR: didn't find menu path " + targetPath)
         elif g.app.inBridge:
-            pass  // #48: Not an error.
+            pass  # #48: Not an error.
         else:
             g.es_print("ERROR: @menuat found but no menu tree to patch")
-
         */
     }
 
@@ -662,8 +718,14 @@ export class ParserBaseClass {
     }
 
     //@+node:felix.20251214160339.730: *5* pbc.patchMenuTree
-    public patchMenuTree(orig: any[], targetPath: string, path = ''): any {
-        // TODO ?
+    public patchMenuTree(
+        orig: MenuEntry[],
+        targetPath: string,
+        path = ''
+    ): [MenuEntry[], number] | undefined {
+
+        // TODO !
+
         /* 
         kind: str
         val: Any
@@ -689,7 +751,9 @@ export class ParserBaseClass {
     }
     //@+node:felix.20251214160339.731: *4* pbc.doMenus & helper
     public doMenus(p: Position, kind: string, name: string, val: any): void {
-        // TODO ?
+
+        // ! Skipped in leo-web. We use a different menu system.
+
         /* 
         
         c = self.c
@@ -728,8 +792,12 @@ export class ParserBaseClass {
 
     //@+node:felix.20251214160339.732: *5* pbc.doItems
     public doItems(p: Position, aList: any[]): void {
+        // Recursively convert the children of p into MenuEntry objects
+
+
+
         // TODO
-        /* 
+        /* # Original Python (We will not be using this exact code, but it gives an idea of what needs to be done)
         p = p.copy()
         after = p.nodeAfterTree()
         p.moveToThreadNext()
@@ -1761,7 +1829,7 @@ export class GlobalConfigManager {
     public defaultFontFamily: string | undefined;
     public enabledPluginsFileName: string | undefined;
     public enabledPluginsString: string;
-    public menusList: string[];
+    public menusList: MenuEntry[];
     public menusFileName: string;
     public modeCommandsDict: g.SettingsDict;
     public panes: any;
@@ -2774,8 +2842,8 @@ export class LocalConfigManager {
     /**
      * Return the list of entries for the @menus tree.
      */
-    public getMenusList(): string[] {
-        const aList: string[] | undefined = this.get('menus', 'menus');
+    public getMenusList(): MenuEntry[] {
+        const aList: MenuEntry[] | undefined = this.get('menus', 'menus');
         // aList is typically empty.
         return aList || g.app.config.menusList;
     }

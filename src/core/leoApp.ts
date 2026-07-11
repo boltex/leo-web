@@ -66,6 +66,7 @@ import { SessionManager, TopLevelSessionsCommands } from './leoSessions';
 import { BaseWriter } from '../writers/basewriter';
 import * as leoPlugins from './leoPlugins';
 import leoSettings from '../../leoSettings.leojs';
+import { menuData } from '../menu';
 
 //@-<< imports >>
 //@+others
@@ -2671,7 +2672,7 @@ export class LoadManager {
         const t1 = process.hrtime();
 
         g.app.disable_redraw = true;
-        await lm.doPrePluginsInit();
+        await lm.doPrePluginsInit(); // This instanciates the LeoUI class.
 
         //Compute the signon after initing the gui.
         g.app.computeSignon();
@@ -2867,7 +2868,10 @@ export class LoadManager {
         const verbose: boolean = !script;
 
         // Init the app.
-        await lm.initApp();
+        await lm.initApp();  // This instanciates g.app.config.
+
+        // Copy of the base menu of the application. This is used to create the menu of each commander.
+        g.app.config.menusList = JSON.parse(JSON.stringify(menuData));
 
         await g.app.setGlobalDb();
 
