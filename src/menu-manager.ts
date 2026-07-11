@@ -239,6 +239,11 @@ export class MenuManager {
     public buildMenu(entries: MenuEntry[], level = 0) {
         const menu = level === 0 ? this.TOP_MENU : document.createElement("div");
 
+        if (level === 0) {
+            menu.replaceChildren(); // Clear existing top menu items
+        }
+
+        // If top menu, will simply re-set the class name to "menu", otherwise add "submenu" for submenus.
         menu.className = "menu" + (level > 0 ? " submenu" : "");
 
         for (const entry of entries) {

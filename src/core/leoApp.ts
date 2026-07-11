@@ -2697,7 +2697,6 @@ export class LoadManager {
         const ok = await lm.doPostPluginsInit(); // loads recent, or, new untitled.
         g.app.makeAllBindings();
 
-
         if (!ok) {
             // --screen-shot causes an immediate exit.
             if (g.app.debug.includes('shutdown') || g.app.debug.includes('startup')) {

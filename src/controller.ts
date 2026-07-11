@@ -29,6 +29,7 @@ export class Controller {
 
     private _lastUndoBeadIndex: number | null = null; // To track the last right-clicked undo bead index for showing context menu options
     private _lastAtButton: LeoButton | null = null; // To track the last right-clicked at-button for context menu actions
+    private _baseMenu = menuData; // Store the base menu structure for refreshing purposes
 
     // Goto Nodes Variables
     public nodeList: LeoGotoNode[] = [];
@@ -36,7 +37,6 @@ export class Controller {
     public isSelected = false;
 
     constructor() {
-        workspace.menu.buildMenu(menuData);
         workspace.menu.buildIconButtons(toolbarButtons);
         workspace.menu.buildBodyContextMenu(bodyPaneContextMenuData);
         workspace.menu.buildOutlineContextMenu(outlinePaneContextMenuData);
@@ -609,6 +609,24 @@ export class Controller {
             }
         });
         workspace.layout.updateCollapseAllPosition();
+
+    }
+
+    //@+node:felix.20260710192742.1: *4* refreshMenu
+    public generateMenuFromSettings(): void {
+        //console.log("Refreshing menu...");
+
+        // * For now, we will just rebuild the menu from the base menu structure.
+        // * In the future, we can modify this to generate the menu based on user settings.
+
+        // Let's make a copy of the base menu to modify
+        const modifiedMenu = JSON.parse(JSON.stringify(this._baseMenu));
+
+        // Here you can modify the modifiedMenu based on user settings.
+        // This will mostly simply be adding items to the menu for now.
+
+        // After modifications, rebuild the menu
+        workspace.menu.buildMenu(modifiedMenu);
 
     }
 
