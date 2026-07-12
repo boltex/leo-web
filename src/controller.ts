@@ -30,7 +30,6 @@ export class Controller {
     private _lastUndoBeadIndex: number | null = null; // To track the last right-clicked undo bead index for showing context menu options
     private _lastAtButton: LeoButton | null = null; // To track the last right-clicked at-button for context menu actions
 
-
     // Goto Nodes Variables
     public nodeList: LeoGotoNode[] = [];
     public selectedNodeIndex: number = 0;
@@ -964,7 +963,7 @@ export class Controller {
                 targetKey = keybind.win;
             }
 
-            if ((targetCode && targetCode.toLowerCase() === codeString) || (!targetCode && targetKey.toLowerCase() === keyString)) {
+            if ((targetCode && targetCode.toLowerCase() === codeString) || (targetKey.toLowerCase() === keyString)) {
 
                 // First check for enabledFlagsSet and enabledFlagsClear to determine
                 // if the command should run based on the current state of the application.
