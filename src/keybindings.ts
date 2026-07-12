@@ -36,6 +36,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MINIBUFFER,
         key: "alt+x",
+        code: "alt+keyx", // Use physical key code so macOS Option key remapping (≈) doesn't break matching
         outline: true,
         body: true,
         find: true,
@@ -53,6 +54,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SHOW_OUTLINE,
         key: "alt+t",
+        code: "alt+keyt", // macOS Option remap fix
         body: true,
         find: true
     },
@@ -69,11 +71,13 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SHOW_BODY,
         key: "alt+t", // ALTERNATE KEYBINDING : ALT+T
+        code: "alt+keyt", // macOS Option remap fix
         outline: true
     },
     {
         command: CMD.SHOW_BODY,
         key: "alt+d",
+        code: "alt+keyd", // macOS Option remap fix
         outline: true,
         find: true,
     },
@@ -167,6 +171,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.CONTRACT_ALL,
         key: "alt+-",
+        code: "alt+minus", // macOS Option remap fix
         outline: true,
         body: true,
         find: true,
@@ -303,6 +308,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SORT_SIBLINGS,
         key: "alt+a",
+        code: "alt+keya", // macOS Option remap fix
         outline: true,
         body: true,
         find: true,
@@ -510,6 +516,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.GOTO_GLOBAL_LINE,
         key: "alt+g",
+        code: "alt+keyg", // macOS Option remap fix
         outline: true,
         body: true,
         find: true,
@@ -667,6 +674,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.GOTO_NEXT_CLONE,
         key: "alt+n",
+        code: "alt+keyn", // macOS Option remap fix
         outline: true,
         body: true,
         find: true,
