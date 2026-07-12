@@ -656,6 +656,20 @@ export class SettingsDict extends Map<string, any> {
     //     """Suitable for g.printObj"""
     //     return f"{g.dictToString(self.d)}\n{str(self)}\n"
 
+    public override set(key: string, value: any): this {
+        if (this._name === 'lm.globalSettingsDict' && key === 'menus') {
+            console.log('in SettingsDict.set: menus', value.val.length, this.has(key) ? this.get(key) : 'no key');
+        }
+
+        super.set(key, value);
+
+        if (this._name === 'lm.globalSettingsDict' && key === 'menus') {
+
+            console.log(this.has(key) ? this.get(key) : 'no key');
+        }
+        return this;
+    }
+
     // = () : trick for toString as per https://stackoverflow.com/a/35361695/920301
     public override toString = (): string => {
         return `<SettingsDict name:${this._name} `;
@@ -665,19 +679,20 @@ export class SettingsDict extends Map<string, any> {
     public copy(name?: string): SettingsDict {
         // The result is a g.SettingsDict.
         // return copy.deepcopy(self)
-        const newDict = new SettingsDict(this._name);
+        const newDict = new SettingsDict(name ?? this._name);
         for (const p_key of this.keys()) {
+            const gs = this.get(p_key);
             newDict.set(
                 p_key,
                 new GeneralSetting({
-                    kind: this.get(p_key).kind,
-                    encoding: this.get(p_key).encoding,
-                    ivar: this.get(p_key).ivar,
-                    source: this.get(p_key).source,
-                    val: this.get(p_key).val,
-                    path: this.get(p_key).path,
-                    tag: this.get(p_key).tag,
-                    unl: this.get(p_key).unl,
+                    kind: gs.kind,
+                    encoding: gs.encoding,
+                    ivar: gs.ivar,
+                    source: gs.source,
+                    val: deepCloneVal(gs.val),
+                    path: gs.path,
+                    tag: gs.tag,
+                    unl: gs.unl,
                 })
             );
         }
@@ -3945,6 +3960,18 @@ export function es_print_unique_message(message: string, color?: string): boolea
 }
 
 //@+node:felix.20251207215313.202: ** g.Miscellaneous
+//@+node:felix.20260711215744.1: *3* g.deepCloneVal
+export function deepCloneVal<T>(value: T): T {
+    try {
+        return structuredClone(value);
+    } catch {
+        try {
+            return JSON.parse(JSON.stringify(value)) as T;
+        } catch {
+            return value;
+        }
+    }
+}
 //@+node:felix.20251207215313.203: *3* g.IDDialog
 export function IDDialog(): Thenable<string> {
     return workspaceInstance.dialog.showInputDialog({

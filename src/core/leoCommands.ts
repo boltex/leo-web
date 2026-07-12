@@ -376,7 +376,7 @@ export class Commands {
     /**
      * Instantiate c.config from previous settings.
      */
-    public initSettings(previousSettings: any): void {
+    public initSettings(previousSettings?: PreviousSettings): void {
         const c: Commands = this;
         c.config = new LocalConfigManager(c, previousSettings);
         // g.app.config.setIvarsFromSettings(c); // Removed in https://github.com/leo-editor/leo-editor/pull/2681

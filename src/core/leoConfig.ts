@@ -2,7 +2,9 @@
 //@+node:felix.20251214160339.701: * @file src/core/leoConfig.ts
 //@+<< imports >>
 //@+node:felix.20251214160339.702: ** << imports >>
+import { menuData } from '../menu';
 import { MenuEntry } from '../types';
+import { PreviousSettings } from './leoApp';
 import { Commands } from './leoCommands';
 import * as g from './leoGlobals';
 import { Position, VNode } from './leoNodes';
@@ -16,9 +18,10 @@ import { RClick, build_rclick_tree } from './mod_scripting';
  */
 export class ParserBaseClass {
     public c: Commands;
-    public clipBoard: any[];
-    // True if this is the .leo file being opened,
-    // as opposed to myLeoSettings.leo or leoSettings.leo.
+    public clipBoard: MenuEntry[] | MenuEntry = [];
+
+    // True if this is the .leo file being opened, as opposed to myLeoSettings.leo
+    // or leoSettings.leo, wich would be applied to global settings.
     public localFlag: boolean;
 
     public shortcutsDict: g.SettingsDict;
@@ -34,7 +37,6 @@ export class ParserBaseClass {
             val: any
         ) => any;
     };
-    public debug_count: number;
 
     //@+<< ParserBaseClass data >>
     //@+node:felix.20251214160339.704: *3* << ParserBaseClass data >>
@@ -86,7 +88,6 @@ export class ParserBaseClass {
      */
     constructor(c: Commands, localFlag: boolean) {
         this.c = c;
-        this.clipBoard = [];
         // True if this is the .leo file being opened,
         // as opposed to myLeoSettings.leo or leoSettings.leo.
         this.localFlag = localFlag;
@@ -121,7 +122,6 @@ export class ParserBaseClass {
             string: this.doString,
             strings: this.doStrings,
         };
-        this.debug_count = 0;
     }
 
     //@+node:felix.20251214160339.706: *3* pbc.computeModeName
@@ -572,31 +572,22 @@ export class ParserBaseClass {
      * Handle @menuat setting.
      */
     public doMenuat(p: Position, kind: string, name: string, val: any): void {
-        // TODO !
-        console.log('doMenuat is not implemented yet', p.h);
-        console.log('kind:', kind, 'name:', name, 'val:', val);
-        console.log('local', this.localFlag, 'menusList:', g.app.config.menusList);
 
         // Unlike the original python, our menus are a different type. As we insert the menu items in the original menu,
         // we will need to convert the menu items to our MenuEntry type. This is a complex operation and will require a
         // detailed understanding of the original menu structure and how it maps to our MenuEntry type.
 
-        // Notably, we will not support the 'cut' nor 'copy' modes, as they are not relevant to our implementation.
-        // We will also not support the 'clipboard' source, as we do not have a clipboard in our implementation.
-
         if (g.app.config.menusList) {
             // get the patch fragment
             const patch: MenuEntry[] = [];
             if (p.hasChildren()) {
-
                 // doItems should recursively convert the children of p into MenuEntry objects and add them to patch.
                 this.doItems(p.copy(), patch); // patch is modified in place
-
             }
             // setup
             const parts = name.split(' ');
             if (parts.length !== 3) {
-                parts.push('subtree'); // This should always be the case, but we will add it just in case.
+                parts.push('subtree');
             }
             let [targetPath, mode, source] = parts;
             if (!targetPath.startsWith('/')) {
@@ -606,15 +597,50 @@ export class ParserBaseClass {
             let mlist: MenuEntry[];
 
             if (is_local) {
-                mlist = [...g.app.config.menusList]; // Make a copy of the menusList
-                this.c.config.set(null, 'menus', 'menus', mlist);
+                // Make a copy of the GLOBAL menusList
+                mlist = JSON.parse(JSON.stringify(g.app.config.menusList));
+                this.c.config.set(null, 'menus', 'menus', mlist); // Set in local Config.
             } else {
                 mlist = g.app.config.menusList;
             }
-
+            let use: MenuEntry[] = patch; // Default to using the patch fragment
             const ans = this.patchMenuTree(mlist, targetPath);
             if (ans) {
-                // todo
+
+                let [list_, idx] = ans;
+                if (!['copy', 'cut'].includes(mode)) {
+                    if (source !== 'clipboard') {
+                        use = patch; // [0][1]
+                    } else {
+                        if (Array.isArray(this.clipBoard)) {
+                            use = this.clipBoard;
+                        } else {
+                            use = [this.clipBoard];
+                        }
+                    }
+                }
+                if (mode === 'replace') {
+                    list_[idx] = use.shift()!;
+                    while (use.length > 0) {
+                        idx += 1;
+                        list_.splice(idx, 0, use.shift()!);
+                    }
+                } else if (mode === 'before') {
+                    while (use.length > 0) {
+                        list_.splice(idx, 0, use.pop()!);
+                    }
+                } else if (mode === 'after') {
+                    while (use.length > 0) {
+                        list_.splice(idx + 1, 0, use.pop()!);
+                    }
+                } else if (mode === 'cut') {
+                    this.clipBoard = list_[idx];
+                    list_.splice(idx, 1);
+                } else if (mode === 'copy') {
+                    this.clipBoard = list_[idx];
+                } else { // append
+                    list_.push(...use);
+                }
             } else {
                 console.error("ERROR: didn't find menu path " + targetPath);
             }
@@ -625,61 +651,6 @@ export class ParserBaseClass {
             console.error("ERROR: @menuat found but no menu tree to patch");
         }
 
-        /* # Original Python (We will not be using this exact code, but it gives an idea of what needs to be done)
-        if g.app.config.menusList:
-            # get the patch fragment
-            patch: list[Any] = []
-            if p.hasChildren():
-                self.doItems(p.copy(), patch)
-            # setup
-            parts = name.split()
-            if len(parts) != 3:
-                parts.append('subtree')
-            targetPath, mode, source = parts
-            if not targetPath.startswith('/'):
-                targetPath = '/' + targetPath
-            is_local = 'leosettings' not in self.c.mFileName.lower()
-            if is_local:
-                mlist = g.app.config.menusList[:]
-                self.c.config.set(None, 'menus', 'menus', mlist)
-            else:
-                mlist = g.app.config.menusList
-            ans = self.patchMenuTree(mlist, targetPath)
-            if ans:
-                list_, idx = ans
-                if mode not in ('copy', 'cut'):
-                    if source != 'clipboard':
-                        use = patch  # [0][1]
-                    else:
-                        if isinstance(self.clipBoard, list):
-                            use = self.clipBoard
-                        else:
-                            use = [self.clipBoard]
-                if mode == 'replace':
-                    list_[idx] = use.pop(0)
-                    while use:
-                        idx += 1
-                        list_.insert(idx, use.pop(0))
-                elif mode == 'before':
-                    while use:
-                        list_.insert(idx, use.pop())
-                elif mode == 'after':
-                    while use:
-                        list_.insert(idx + 1, use.pop())
-                elif mode == 'cut':
-                    self.clipBoard = list_[idx]
-                    del list_[idx]
-                elif mode == 'copy':
-                    self.clipBoard = list_[idx]
-                else:  # append
-                    list_.extend(use)
-            else:
-                g.es_print("ERROR: didn't find menu path " + targetPath)
-        elif g.app.inBridge:
-            pass  # #48: Not an error.
-        else:
-            g.es_print("ERROR: @menuat found but no menu tree to patch")
-        */
     }
 
     //@+node:felix.20251214160339.728: *5* pbc.getName
@@ -689,6 +660,7 @@ export class ParserBaseClass {
         }
         val = val.split('\n', 1)[0]!; // keep first
 
+        // # Original Python code:
         // for i in "*.-& \t\n":
         //     val = val.replace(i, '')
 
@@ -723,45 +695,50 @@ export class ParserBaseClass {
         targetPath: string,
         path = ''
     ): [MenuEntry[], number] | undefined {
-
-        // TODO !
-
-        /* 
-        kind: str
-        val: Any
-        val2: Any
-        for n, z in enumerate(orig):
-            kind, val, val2 = z
-            if kind == '@item':
-                name = self.getName(val, val2)
-                curPath = path + '/' + name
-                if curPath == targetPath:
-                    return orig, n
-            else:
-                name = self.getName(kind.replace('@menu ', ''))
-                curPath = path + '/' + name
-                if curPath == targetPath:
-                    return orig, n
-                ans = self.patchMenuTree(val, targetPath, path=path + '/' + name)
-                if ans:
-                    return ans
-
-        */
+        let val: any;
+        let val2: any;
+        for (let n = 0; n < orig.length; n++) {
+            const z = orig[n];
+            if (z.entries == null) { // an item
+                val = z.command;
+                val2 = z.label;
+                const name = this.getName(val, val2);
+                const curPath = path + '/' + name;
+                if (curPath === targetPath) {
+                    return [orig, n];
+                }
+            } else { // a menu
+                const name = this.getName(z.label);
+                const curPath = path + '/' + name;
+                if (curPath === targetPath) {
+                    return [orig, n];
+                }
+                const ans = this.patchMenuTree(z.entries, targetPath, path + '/' + name);
+                if (ans) {
+                    return ans;
+                }
+            }
+        }
         return undefined;
     }
     //@+node:felix.20251214160339.731: *4* pbc.doMenus & helper
     public doMenus(p: Position, kind: string, name: string, val: any): void {
 
         // ! Skipped in leo-web. We use a different menu system.
+        if (this.localFlag) {
+            // Copy of the base menu of the application. This is used to create the menu of each commander.
+            // SKIPPING not suported in leo-web
+        } else {
+            g.app.config.menusList = JSON.parse(JSON.stringify(menuData));
+            console.log('Ok, added the base menu to g.app.config.menusList');
+        }
 
-        /* 
-        
+        /* # Original Python code
         c = self.c
         p = p.copy()
         aList: List[Any] = []  # This entire logic is mysterious, and likely buggy.
         after = p.nodeAfterTree()
         while p and p != after:
-            self.debug_count += 1
             h = p.h
             if g.match_word(h, 0, '@menu'):
                 name = h[len('@menu') :].strip()
@@ -788,48 +765,63 @@ export class ParserBaseClass {
             g.app.config.menusFileName = name
 
         */
+
     }
 
     //@+node:felix.20251214160339.732: *5* pbc.doItems
-    public doItems(p: Position, aList: any[]): void {
+    public doItems(p: Position, aList: MenuEntry[]): void {
         // Recursively convert the children of p into MenuEntry objects
 
+        p = p.copy();
+        const after = p.nodeAfterTree();
+        p.moveToThreadNext();
+        while (p && p.__bool__() && !p.__eq__(after)) {
+            const h = p.h;
+            let body: string | undefined;
+            let isBreak = false;
+            for (const tag of ['@menu', '@item', '@ifplatform']) {
+                if (g.match_word(h, 0, tag)) {
+                    const itemName = h.substring(tag.length).trim();
+                    if (itemName) {
+                        const lines = g.splitLines(p.b).filter((z) => {
+                            return z.trim() && !z.trim().startsWith('#');
+                        });
+                        // Only the first body line is significant.
+                        // This allows following comment lines.
+                        body = lines.length ? lines[0].trim() : '';
+                        if (tag === '@menu') {
+                            const aList2: MenuEntry[] = [];
+                            this.doItems(p, aList2);
+                            aList.push(
+                                {
+                                    label: itemName,
+                                    entries: aList2,
+                                }
+                            );
+                            p.moveToNodeAfterTree();
+                            isBreak = true;
+                            break;
+                        } else {
+                            aList.push(
+                                {
+                                    label: body ? body.replace('&', '') : itemName, // Beautified first line of body, or itemName if no body.
+                                    command: itemName === '-' ? undefined : itemName, // If itemName is '-', this is a separator.
+                                }
+                            );
+                            p.moveToThreadNext();
+                            isBreak = true;
+                            break;
+                        }
 
+                    }
+                }
+            }
+            if (!isBreak) {
+                p.moveToThreadNext();
+            }
 
-        // TODO
-        /* # Original Python (We will not be using this exact code, but it gives an idea of what needs to be done)
-        p = p.copy()
-        after = p.nodeAfterTree()
-        p.moveToThreadNext()
-        while p and p != after:
-            self.debug_count += 1
-            h = p.h
-            for tag in ('@menu', '@item', '@ifplatform'):
-                if g.match_word(h, 0, tag):
-                    itemName = h[len(tag) :].strip()
-                    if itemName:
-                        lines = [z for z in g.splitLines(p.b) if
-                            z.strip() and not z.strip().startswith('#')]
-                        # Only the first body line is significant.
-                        # This allows following comment lines.
-                        body = lines[0].strip() if lines else ''
-                        if tag == '@menu':
-                            aList2: List[Any] = []  # Huh?
-                            kind = f"{tag} {itemName}"
-                            self.doItems(p, aList2)  # Huh?
-                            aList.append((kind, aList2, body),)  # #848: Body was None.
-                            p.moveToNodeAfterTree()
-                            break
-                        else:
-                            kind = tag
-                            head = itemName
-                            # We must not clean non-unicode characters!
-                            aList.append((kind, head, body),)
-                            p.moveToThreadNext()
-                            break
-            else:
-                p.moveToThreadNext()
-         */
+        }
+
     }
 
     //@+node:felix.20251214160339.733: *4* pbc.doMode
@@ -2250,6 +2242,8 @@ export class GlobalConfigManager {
      */
     public getMenusList(): any[] {
         const aList = this.get('menus', 'menus');
+        console.log('SHOULD BE EMPTY gcm.getMenusList: aList', aList);
+        console.log(this)
         // aList is typically empty.
         return aList || g.app.config.menusList;
     }
@@ -2364,13 +2358,13 @@ export class LocalConfigManager {
 
     //@+others
     //@+node:felix.20251214160339.797: *3* c.config.ctor
-    constructor(c: Commands, previousSettings?: LocalConfigManager) {
+    constructor(c: Commands, previousSettings?: PreviousSettings) {
         this.c = c;
 
         const lm = g.app.loadManager!;
         if (previousSettings) {
-            this.settingsDict = previousSettings.settingsDict;
-            this.shortcutsDict = previousSettings.shortcutsDict;
+            this.settingsDict = previousSettings.settingsDict!;
+            this.shortcutsDict = previousSettings.shortcutsDict!;
             g.assert(
                 this.settingsDict instanceof g.SettingsDict,
                 JSON.stringify(this.settingsDict, null, 4)
@@ -3092,6 +3086,9 @@ export class LocalConfigManager {
     ): void {
         const c = this.c;
 
+        console.log(`Setting ${name} in ${c.mFileName}`);
+        console.log('val', val);
+
         // Note: when kind is 'shortcut', name is a command name.
         let key: string = g.app.config.munge(name)!;
         let d = this.settingsDict;
@@ -3222,6 +3219,7 @@ export class SettingsTreeParser extends ParserBaseClass {
             if (f) {
                 try {
                     const result = await Promise.resolve(f.bind(this)(p, kind, name!, val));
+                    return result;
                 } catch (exception) {
                     g.es_exception(exception);
                 }

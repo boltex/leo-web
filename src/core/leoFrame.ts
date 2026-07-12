@@ -127,6 +127,12 @@ export class LeoFrame {
         const c = this.c;
         if (!this.gui.isNullGui) {
             g.app.windowList.push(this);
+
+            console.log('finishCreate frame loop all total:', g.app.windowList.length);
+            for (const com of g.app.windowList) {
+                console.log('xxxxxxxxxxxxxxxxxxxxx', com.c.config.getMenusList().length, com.c.shortFileName());
+            }
+            console.log('in  finishCreate globalSettingsDict,menus: ', g.app.loadManager?.globalSettingsDict?.get('menus'));
         } else {
             // console.log("Finished Creating Null Gui's frame");
         }

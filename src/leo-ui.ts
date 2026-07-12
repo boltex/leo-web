@@ -39,7 +39,7 @@ import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
 import { Selection } from "./cursor-position";
 import { makeAllBindings } from "./command-bindings";
-import { menuData, bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
+import { bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
 import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
 import { QuickSearchController } from "./core/quicksearch";
@@ -501,7 +501,8 @@ export class LeoUI extends NullGui {
         menu.updateMarkedButtonStates(states.leoHasMarked);
         menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        menu.refreshMenu(menuData);
+
+        menu.refreshMenu(c.config.getMenusList());
         menu.refreshIconButtons(toolbarButtons);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
@@ -530,7 +531,9 @@ export class LeoUI extends NullGui {
         this._refreshOutline(RevealType.NoReveal);
         const menu = workspace.menu;
         menu.updateButtonVisibility(false, false, true);
-        menu.refreshMenu(menuData);
+
+        workspace.controller.generateMenuFromSettings();
+
         menu.refreshIconButtons(toolbarButtons);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);

@@ -152,30 +152,6 @@
       "vh": "@settings",
       "children": [
         {
-          "gnx": "felix.20260711150059.1",
-          "vh": "@menuat file after",
-          "children": [
-            {
-              "gnx": "felix.20260711150059.2",
-              "vh": "@menu Test leoSettings",
-              "children": [
-                {
-                  "gnx": "felix.20260711150059.3",
-                  "vh": "@item do-nothing"
-                },
-                {
-                  "gnx": "felix.20260711150059.4",
-                  "vh": "@item -"
-                },
-                {
-                  "gnx": "felix.20260711150059.5",
-                  "vh": "@item about-leo"
-                }
-              ]
-            }
-          ]
-        },
-        {
           "gnx": "felix.20260411220658.1",
           "vh": "Abbreviations",
           "children": [
@@ -1006,6 +982,16 @@
             {
               "gnx": "ekr.20041119034357.31",
               "vh": "@int tab-width = -4"
+            }
+          ]
+        },
+        {
+          "gnx": "felix.20260711210812.1",
+          "vh": "Menus",
+          "children": [
+            {
+              "gnx": "felix.20260711210814.1",
+              "vh": "@menus"
             }
           ]
         },

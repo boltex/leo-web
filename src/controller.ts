@@ -58,7 +58,19 @@ export class Controller {
         if (command) {
             return command(...args);
         } else {
-            console.warn(`Command not found: ${commandName}`);
+            // Could be a valid @command 
+            // g.app.gui.command(LEOCMD.EXECUTE_SCRIPT, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })
+
+            const hasOpenedDocuments = g.app.windowList.length > 0;
+
+            if (hasOpenedDocuments) {
+                const c = g.app.windowList[g.app.gui.frameIndex].c;
+                const result = c.doCommandByName(commandName);
+                g.app.gui.fullRefresh(true, false);
+                return result;
+            } else {
+                console.warn(`Command not found: ${commandName}`);
+            }
         }
     }
     //@+node:felix.20260414231550.1: *3* refreshAbbrev

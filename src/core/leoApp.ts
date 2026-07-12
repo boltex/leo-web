@@ -66,7 +66,6 @@ import { SessionManager, TopLevelSessionsCommands } from './leoSessions';
 import { BaseWriter } from '../writers/basewriter';
 import * as leoPlugins from './leoPlugins';
 import leoSettings from '../../leoSettings.leojs';
-import { menuData } from '../menu';
 
 //@-<< imports >>
 //@+others
@@ -1676,7 +1675,7 @@ export class LeoApp {
      */
     public newCommander(
         fileName: string,
-        gui?: LeoGui,
+        gui?: LeoGui | undefined,
         previousSettings?: PreviousSettings,
         relativeFileName?: string
     ): Commands {
@@ -2212,6 +2211,15 @@ export class LoadManager {
 
         [shortcuts_d2, settings_d2] = await lm.createSettingsDicts(c, localFlag);
 
+
+        // console.log('loop all total in computeLocalSettings:', c.shortFileName(), g.app.windowList.length, "g.app.config.getMenusList: ", g.app.config.getMenusList().length);
+
+        // for (const com of g.app.windowList) {
+        //     console.log('---------------- computeLocalSettings 1', com.c.config.getMenusList().length, com.c.shortFileName());
+        // }
+        // console.log('globalSettingsDict menus is :', g.app.loadManager?.globalSettingsDict?.get('menus')?.val.length);
+
+
         if (!bindings_d) {
             // #1766: unit tests.
             [settings_d, bindings_d] = lm.createDefaultSettingsDicts();
@@ -2235,6 +2243,11 @@ export class LoadManager {
             // TODO support shortcuts needed?
             // bindings_d = lm.mergeShortcutsDicts(c, bindings_d, shortcuts_d2, localFlag);
         }
+
+        // for (const com of g.app.windowList) {
+        //     console.log('---------------- computeLocalSettings 2', com.c.config.getMenusList().length, com.c.shortFileName());
+        // }
+        // console.log('globalSettingsDict menus is :', g.app.loadManager?.globalSettingsDict?.get('menus')?.val.length);
 
         return [settings_d, bindings_d];
     }
@@ -2298,7 +2311,7 @@ export class LoadManager {
                 g.app.preReadFlag = false;
             }
             // Merge the settings from c into *copies* of the global dicts.
-
+            console.log('getPreviousSettings---------------------------', c?.shortFileName());
             [d1, d2] = await lm.computeLocalSettings(
                 c!,
                 lm.globalSettingsDict,
@@ -2631,26 +2644,6 @@ export class LoadManager {
         lm.globalSettingsDict = settings_d;
         lm.globalBindingsDict = bindings_d;
 
-        // ! LEO-WEB : THEMES NOT NEEDED !
-        /* 
-        // Add settings from --theme or @string theme-name files.
-        // This must be done *after* reading myLeoSettings.leo.
-        lm.theme_path = lm.computeThemeFilePath()
-
-        if lm.theme_path
-            lm.theme_c = lm.openSettingsFile(lm.theme_path)
-            if lm.theme_c
-                // Merge theme_c's settings into globalSettingsDict.
-                settings_d, junk_shortcuts_d = lm.computeLocalSettings(
-                    lm.theme_c, settings_d, bindings_d, localFlag=False)
-                lm.globalSettingsDict = settings_d
-                // Set global var used by the StyleSheetManager.
-                g.app.theme_directory = g.os_path_dirname(lm.theme_path)
-
-                if trace
-                    g.trace('g.app.theme_directory', g.app.theme_directory)
-        */
-
         // Clear the cache entries for the commanders.
         // This allows this method to be called outside the startup logic.
         for (let c of commanders) {
@@ -2869,9 +2862,6 @@ export class LoadManager {
 
         // Init the app.
         await lm.initApp();  // This instanciates g.app.config.
-
-        // Copy of the base menu of the application. This is used to create the menu of each commander.
-        g.app.config.menusList = JSON.parse(JSON.stringify(menuData));
 
         await g.app.setGlobalDb();
 
