@@ -4,12 +4,12 @@
 //@+node:felix.20260322215550.1: ** << imports >>
 import { Position } from "./core/leoNodes";
 import * as g from './core/leoGlobals';
-import { ConfigSetting, FlatRowLeo, Focus, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, TGotoTypes } from "./types";
+import { ConfigSetting, FlatRowLeo, Focus, LeoButton, LeoGoto, LeoGotoNavKey, LeoGotoNode, LeoUndoNode, MenuEntry, TGotoTypes } from "./types";
 import * as utils from './utils';
 
 import { workspace } from "./workspace";
 import { Constants } from "./constants";
-import { bodyPaneContextMenuData, menuData, outlinePaneContextMenuData } from "./menu";
+import { bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
 import { toolbarButtons } from "./toolbar-buttons";
 import { keybindings } from "./keybindings";
 import { QuickSearchController } from "./core/quicksearch";
@@ -36,7 +36,6 @@ export class Controller {
     public isSelected = false;
 
     constructor() {
-        workspace.menu.buildMenu(menuData);
         workspace.menu.buildIconButtons(toolbarButtons);
         workspace.menu.buildBodyContextMenu(bodyPaneContextMenuData);
         workspace.menu.buildOutlineContextMenu(outlinePaneContextMenuData);
@@ -58,7 +57,19 @@ export class Controller {
         if (command) {
             return command(...args);
         } else {
-            console.warn(`Command not found: ${commandName}`);
+            // Could be a valid @command 
+            // g.app.gui.command(LEOCMD.EXECUTE_SCRIPT, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })
+
+            const hasOpenedDocuments = g.app.windowList.length > 0;
+
+            if (hasOpenedDocuments) {
+                const c = g.app.windowList[g.app.gui.frameIndex].c;
+                const result = c.doCommandByName(commandName);
+                g.app.gui.fullRefresh(true, false);
+                return result;
+            } else {
+                console.warn(`Command not found: ${commandName}`);
+            }
         }
     }
     //@+node:felix.20260414231550.1: *3* refreshAbbrev
@@ -612,6 +623,29 @@ export class Controller {
 
     }
 
+    //@+node:felix.20260710192742.1: *4* refreshMenu
+    public generateMenuFromSettings(): void {
+
+        // Check if any commanders are opened.
+        // If a commander is opened: use its config's menu settings to generate the menu.
+        // if not, use g.app.config's menu
+
+        const hasOpenedDocuments = g.app.windowList.length > 0;
+        let modifiedMenu: MenuEntry[] = []
+
+        if (hasOpenedDocuments) {
+            // The frame has the menu directly, so we can use it to generate the menu.
+            modifiedMenu = g.app.windowList[g.app.gui.frameIndex].menu;
+        } else {
+            // Should not happen because a new empty document is created if 
+            // no recent document is opened, but just in case, use the global config's menu.
+            modifiedMenu = g.app.config.getMenusList();
+        }
+
+        workspace.menu.buildMenu(modifiedMenu);
+
+    }
+
     //@-others
     //@+node:felix.20260322222433.1: *3* Event Handlers
     //@+others
@@ -929,7 +963,7 @@ export class Controller {
                 targetKey = keybind.win;
             }
 
-            if ((targetCode && targetCode.toLowerCase() === codeString) || (!targetCode && targetKey.toLowerCase() === keyString)) {
+            if ((targetCode && targetCode.toLowerCase() === codeString) || (targetKey.toLowerCase() === keyString)) {
 
                 // First check for enabledFlagsSet and enabledFlagsClear to determine
                 // if the command should run based on the current state of the application.

@@ -36,6 +36,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MINIBUFFER,
         key: "alt+x",
+        mac: "alt+≈", // on MacOS, holding Option (Alt) accesses special characters
         outline: true,
         body: true,
         find: true,
@@ -53,6 +54,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SHOW_OUTLINE,
         key: "alt+t",
+        mac: "alt+†", // on MacOS, holding Option (Alt) accesses special characters
         body: true,
         find: true
     },
@@ -69,11 +71,13 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SHOW_BODY,
         key: "alt+t", // ALTERNATE KEYBINDING : ALT+T
+        mac: "alt+†", // on MacOS, holding Option (Alt) accesses special characters
         outline: true
     },
     {
         command: CMD.SHOW_BODY,
         key: "alt+d",
+        mac: "alt+∂", // on MacOS, holding Option (Alt) accesses special characters
         outline: true,
         find: true,
     },
@@ -303,6 +307,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SORT_SIBLINGS,
         key: "alt+a",
+        mac: "alt+å", // on MacOS, holding Option (Alt) accesses special characters
         outline: true,
         body: true,
         find: true,
@@ -510,6 +515,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.GOTO_GLOBAL_LINE,
         key: "alt+g",
+        mac: "alt+©", // On MacOS, holding Option (Alt) accesses special characters
         outline: true,
         body: true,
         find: true,
@@ -667,6 +673,8 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.GOTO_NEXT_CLONE,
         key: "alt+n",
+        // mac: "alt+˜", // on MacOS, alt+n is a "Dead Key" (Accent Modifier)
+        code: "alt+keyn", // Has priority over key when specified.
         outline: true,
         body: true,
         find: true,

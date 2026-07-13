@@ -39,7 +39,7 @@ import { debounce, DebouncedFunc } from "lodash";
 import { Config } from "./config";
 import { Selection } from "./cursor-position";
 import { makeAllBindings } from "./command-bindings";
-import { menuData, bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
+import { bodyPaneContextMenuData, outlinePaneContextMenuData } from "./menu";
 import { StringFindTabManager } from "./core/findTabManager";
 import { LeoFind } from "./core/leoFind";
 import { QuickSearchController } from "./core/quicksearch";
@@ -501,7 +501,8 @@ export class LeoUI extends NullGui {
         menu.updateMarkedButtonStates(states.leoHasMarked);
         menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
-        menu.refreshMenu(menuData);
+
+        menu.refreshMenu(c.frame.menu);
         menu.refreshIconButtons(toolbarButtons);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
@@ -518,7 +519,7 @@ export class LeoUI extends NullGui {
         }
         if (this._refreshType.buttons) {
             this._refreshType.buttons = false;
-            this.refreshButtonsPane();
+            this.refreshMenuAndButtons();
         }
     }
     //@+node:felix.20260410224126.3: *4* _setupNoOpenedLeoDocument
@@ -530,12 +531,14 @@ export class LeoUI extends NullGui {
         this._refreshOutline(RevealType.NoReveal);
         const menu = workspace.menu;
         menu.updateButtonVisibility(false, false, true);
-        menu.refreshMenu(menuData);
+
+        workspace.controller.generateMenuFromSettings();
+
         menu.refreshIconButtons(toolbarButtons);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
         this.refreshDocumentsPane();
-        this.refreshButtonsPane();
+        this.refreshMenuAndButtons();
         this.refreshUndoPane();
         // Empty body pane
         workspace.body.setBody('', false);
@@ -876,6 +879,10 @@ export class LeoUI extends NullGui {
      */
     public fullRefresh(keepFocus?: boolean, instantRefresh?: boolean, finalFocus?: Focus, refreshType?: ReqRefresh): void {
 
+        if (!this.leoStates.leoWebStartupDone) {
+            return;
+        }
+
         if (keepFocus) {
             this.finalFocus = Focus.NoChange;
         }
@@ -963,9 +970,10 @@ export class LeoUI extends NullGui {
     public refreshGotoPane(): void {
         workspace.logPane.refreshGotoPane();
     }
-    //@+node:felix.20260410223244.1: *4* refreshButtonsPane
-    public refreshButtonsPane(): void {
+    //@+node:felix.20260410223244.1: *4* refreshMenuAndButtons
+    public refreshMenuAndButtons(): void {
         workspace.controller.refreshAtButtons();
+        workspace.controller.generateMenuFromSettings();
     }
     //@+node:felix.20260410225744.1: *3* Body Pane Management
     //@+node:felix.20260323002042.1: *4* _tryApplyNodeToBody

@@ -239,6 +239,11 @@ export class MenuManager {
     public buildMenu(entries: MenuEntry[], level = 0) {
         const menu = level === 0 ? this.TOP_MENU : document.createElement("div");
 
+        if (level === 0) {
+            menu.replaceChildren(); // Clear existing top menu items
+        }
+
+        // If top menu, will simply re-set the class name to "menu", otherwise add "submenu" for submenus.
         menu.className = "menu" + (level > 0 ? " submenu" : "");
 
         for (const entry of entries) {
@@ -267,6 +272,7 @@ export class MenuManager {
             });
 
             if (entry.entries) {
+                // is a submenu, so we ignore the command and add a submenu indicator
                 if (level > 0) item.classList.add("has-sub");
                 const sub = this.buildMenu(entry.entries, level + 1);
                 if (level === 0) {
@@ -339,7 +345,8 @@ export class MenuManager {
                     // Has a condition so save the DOM element reference for later updates
                     entry.domElementRef = item;
                 }
-
+            } else if (entry.label === "-") {
+                item.classList.add("separator");
             }
 
             if (level === 0) {
@@ -582,6 +589,14 @@ export class MenuManager {
             this.BUTTON_CONTAINER.classList.add('hidden');
         } else {
             this.BUTTON_CONTAINER.classList.remove('hidden');
+            // Send a fake mouseleave event to this.BUTTON_CONTAINER
+            const mouseLeaveEvent = new MouseEvent('mouseleave', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            this.BUTTON_CONTAINER.dispatchEvent(mouseLeaveEvent);
+
             // Set focus on last focused element
             workspace.layout.restoreLastFocusedElement();
         }

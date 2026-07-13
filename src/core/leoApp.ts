@@ -1675,7 +1675,7 @@ export class LeoApp {
      */
     public newCommander(
         fileName: string,
-        gui?: LeoGui,
+        gui?: LeoGui | undefined,
         previousSettings?: PreviousSettings,
         relativeFileName?: string
     ): Commands {
@@ -2297,7 +2297,6 @@ export class LoadManager {
                 g.app.preReadFlag = false;
             }
             // Merge the settings from c into *copies* of the global dicts.
-
             [d1, d2] = await lm.computeLocalSettings(
                 c!,
                 lm.globalSettingsDict,
@@ -2630,26 +2629,6 @@ export class LoadManager {
         lm.globalSettingsDict = settings_d;
         lm.globalBindingsDict = bindings_d;
 
-        // ! LEO-WEB : THEMES NOT NEEDED !
-        /* 
-        // Add settings from --theme or @string theme-name files.
-        // This must be done *after* reading myLeoSettings.leo.
-        lm.theme_path = lm.computeThemeFilePath()
-
-        if lm.theme_path
-            lm.theme_c = lm.openSettingsFile(lm.theme_path)
-            if lm.theme_c
-                // Merge theme_c's settings into globalSettingsDict.
-                settings_d, junk_shortcuts_d = lm.computeLocalSettings(
-                    lm.theme_c, settings_d, bindings_d, localFlag=False)
-                lm.globalSettingsDict = settings_d
-                // Set global var used by the StyleSheetManager.
-                g.app.theme_directory = g.os_path_dirname(lm.theme_path)
-
-                if trace
-                    g.trace('g.app.theme_directory', g.app.theme_directory)
-        */
-
         // Clear the cache entries for the commanders.
         // This allows this method to be called outside the startup logic.
         for (let c of commanders) {
@@ -2671,7 +2650,7 @@ export class LoadManager {
         const t1 = process.hrtime();
 
         g.app.disable_redraw = true;
-        await lm.doPrePluginsInit();
+        await lm.doPrePluginsInit(); // This instanciates the LeoUI class.
 
         //Compute the signon after initing the gui.
         g.app.computeSignon();
@@ -2696,7 +2675,6 @@ export class LoadManager {
         const t4 = process.hrtime();
         const ok = await lm.doPostPluginsInit(); // loads recent, or, new untitled.
         g.app.makeAllBindings();
-
 
         if (!ok) {
             // --screen-shot causes an immediate exit.
@@ -2868,7 +2846,7 @@ export class LoadManager {
         const verbose: boolean = !script;
 
         // Init the app.
-        await lm.initApp();
+        await lm.initApp();  // This instanciates g.app.config.
 
         await g.app.setGlobalDb();
 
@@ -3393,6 +3371,15 @@ export class LoadManager {
         // c.frame.tree.initAfterLoad();
         // c.initAfterLoad();
         // lm.createMenu(c, c.fileName())
+
+        c.frame.menu = JSON.parse(JSON.stringify(c.config.getMenusList()))
+
+        const lm = g.app.loadManager!;
+        lm.globalSettingsDict.delete('menus');
+
+        // This left the "g.es('over-riding setting:', name, 'from', w_path);" message!
+        //c.config.set(null, 'menus', 'menus', null); 
+        c.config.settingsDict.delete('menus'); // This fixed it, but it is not clear why.
 
         // chapterController.finishCreate must be called after the first real redraw
         // because it requires a valid value for c.rootPosition().
