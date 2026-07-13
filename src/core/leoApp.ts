@@ -2211,15 +2211,6 @@ export class LoadManager {
 
         [shortcuts_d2, settings_d2] = await lm.createSettingsDicts(c, localFlag);
 
-
-        // console.log('loop all total in computeLocalSettings:', c.shortFileName(), g.app.windowList.length, "g.app.config.getMenusList: ", g.app.config.getMenusList().length);
-
-        // for (const com of g.app.windowList) {
-        //     console.log('---------------- computeLocalSettings 1', com.c.config.getMenusList().length, com.c.shortFileName());
-        // }
-        // console.log('globalSettingsDict menus is :', g.app.loadManager?.globalSettingsDict?.get('menus')?.val.length);
-
-
         if (!bindings_d) {
             // #1766: unit tests.
             [settings_d, bindings_d] = lm.createDefaultSettingsDicts();
@@ -2243,11 +2234,6 @@ export class LoadManager {
             // TODO support shortcuts needed?
             // bindings_d = lm.mergeShortcutsDicts(c, bindings_d, shortcuts_d2, localFlag);
         }
-
-        // for (const com of g.app.windowList) {
-        //     console.log('---------------- computeLocalSettings 2', com.c.config.getMenusList().length, com.c.shortFileName());
-        // }
-        // console.log('globalSettingsDict menus is :', g.app.loadManager?.globalSettingsDict?.get('menus')?.val.length);
 
         return [settings_d, bindings_d];
     }
@@ -2311,7 +2297,6 @@ export class LoadManager {
                 g.app.preReadFlag = false;
             }
             // Merge the settings from c into *copies* of the global dicts.
-            console.log('getPreviousSettings---------------------------', c?.shortFileName());
             [d1, d2] = await lm.computeLocalSettings(
                 c!,
                 lm.globalSettingsDict,
@@ -3386,6 +3371,15 @@ export class LoadManager {
         // c.frame.tree.initAfterLoad();
         // c.initAfterLoad();
         // lm.createMenu(c, c.fileName())
+
+        c.frame.menu = JSON.parse(JSON.stringify(c.config.getMenusList()))
+
+        const lm = g.app.loadManager!;
+        lm.globalSettingsDict.delete('menus');
+
+        // This left the "g.es('over-riding setting:', name, 'from', w_path);" message!
+        //c.config.set(null, 'menus', 'menus', null); 
+        c.config.settingsDict.delete('menus'); // This fixed it, but it is not clear why.
 
         // chapterController.finishCreate must be called after the first real redraw
         // because it requires a valid value for c.rootPosition().

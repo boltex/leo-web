@@ -14,6 +14,7 @@ import { Position, VNode } from './leoNodes';
 import { Chapter } from './leoChapters';
 import { StringFindTabManager } from './findTabManager';
 import { RClick, ScriptingController, build_rclick_tree } from './mod_scripting';
+import { MenuEntry } from '../types';
 
 //@-<< imports >>
 //@+<< leoFrame command decorators >>
@@ -43,6 +44,7 @@ export class LeoFrame {
     public title: string;
     public gui: LeoGui;
     public iconBar: NullIconBarClass;
+    public menu: MenuEntry[];
     public initComplete = false;
     public isNullFrame = false;
     public toggle_unl_view = false;
@@ -75,6 +77,7 @@ export class LeoFrame {
         this.startupWindow = false;
         this.iconBar = new NullIconBarClass(c, undefined);
         this.initComplete = true;
+        this.menu = []; // Will be filled in.
         this.isNullFrame = true;
 
         this.tree = new NullTree(this);
@@ -127,14 +130,6 @@ export class LeoFrame {
         const c = this.c;
         if (!this.gui.isNullGui) {
             g.app.windowList.push(this);
-
-            console.log('finishCreate frame loop all total:', g.app.windowList.length);
-            for (const com of g.app.windowList) {
-                console.log('xxxxxxxxxxxxxxxxxxxxx', com.c.config.getMenusList().length, com.c.shortFileName());
-            }
-            console.log('in  finishCreate globalSettingsDict,menus: ', g.app.loadManager?.globalSettingsDict?.get('menus'));
-        } else {
-            // console.log("Finished Creating Null Gui's frame");
         }
         const ftm = new StringFindTabManager(c);
         c.findCommands.ftm = ftm;

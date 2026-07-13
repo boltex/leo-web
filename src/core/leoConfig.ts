@@ -597,9 +597,13 @@ export class ParserBaseClass {
             let mlist: MenuEntry[];
 
             if (is_local) {
-                // Make a copy of the GLOBAL menusList
-                mlist = JSON.parse(JSON.stringify(g.app.config.menusList));
-                this.c.config.set(null, 'menus', 'menus', mlist); // Set in local Config.
+
+                mlist = this.c.config.getMenusList(); // returns local menu if it exist, otherwise global.
+                // if is global, (first @menuat found), start fresh with a copy of the global menu list.
+                if (mlist === g.app.config.menusList) {
+                    mlist = JSON.parse(JSON.stringify(g.app.config.menusList));
+                }
+                this.c.config.set(null, 'menus', 'menus', mlist);
             } else {
                 mlist = g.app.config.menusList;
             }
@@ -725,12 +729,18 @@ export class ParserBaseClass {
     public doMenus(p: Position, kind: string, name: string, val: any): void {
 
         // ! Skipped in leo-web. We use a different menu system.
+
         if (this.localFlag) {
             // Copy of the base menu of the application. This is used to create the menu of each commander.
             // SKIPPING not suported in leo-web
         } else {
             g.app.config.menusList = JSON.parse(JSON.stringify(menuData));
-            console.log('Ok, added the base menu to g.app.config.menusList');
+            const c = this.c;
+            if (c) {
+                g.app.config.menusFileName = c.shortFileName();
+            } else {
+                g.app.config.menusFileName = '<no settings file>';
+            }
         }
 
         /* # Original Python code
@@ -2242,8 +2252,6 @@ export class GlobalConfigManager {
      */
     public getMenusList(): any[] {
         const aList = this.get('menus', 'menus');
-        console.log('SHOULD BE EMPTY gcm.getMenusList: aList', aList);
-        console.log(this)
         // aList is typically empty.
         return aList || g.app.config.menusList;
     }
@@ -3085,9 +3093,6 @@ export class LocalConfigManager {
         warn = true
     ): void {
         const c = this.c;
-
-        console.log(`Setting ${name} in ${c.mFileName}`);
-        console.log('val', val);
 
         // Note: when kind is 'shortcut', name is a command name.
         let key: string = g.app.config.munge(name)!;

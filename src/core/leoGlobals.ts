@@ -657,22 +657,13 @@ export class SettingsDict extends Map<string, any> {
     //     return f"{g.dictToString(self.d)}\n{str(self)}\n"
 
     public override set(key: string, value: any): this {
-        if (this._name === 'lm.globalSettingsDict' && key === 'menus') {
-            console.log('in SettingsDict.set: menus', value.val.length, this.has(key) ? this.get(key) : 'no key');
-        }
-
         super.set(key, value);
-
-        if (this._name === 'lm.globalSettingsDict' && key === 'menus') {
-
-            console.log(this.has(key) ? this.get(key) : 'no key');
-        }
         return this;
     }
 
     // = () : trick for toString as per https://stackoverflow.com/a/35361695/920301
     public override toString = (): string => {
-        return `<SettingsDict name:${this._name} `;
+        return `<SettingsDict name:${this._name}>`;
     };
 
     //@+node:felix.20251207215313.37: *4* td.copy

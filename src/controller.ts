@@ -634,8 +634,8 @@ export class Controller {
         let modifiedMenu: MenuEntry[] = []
 
         if (hasOpenedDocuments) {
-            const c = g.app.windowList[g.app.gui.frameIndex].c;
-            modifiedMenu = c.config.getMenusList();
+            // The frame has the menu directly, so we can use it to generate the menu.
+            modifiedMenu = g.app.windowList[g.app.gui.frameIndex].menu;
         } else {
             // Should not happen because a new empty document is created if 
             // no recent document is opened, but just in case, use the global config's menu.

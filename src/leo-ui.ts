@@ -502,7 +502,7 @@ export class LeoUI extends NullGui {
         menu.updateHoistButtonStates(!states.leoRoot, states.leoCanDehoist);
         menu.updateHistoryButtonStates(states.leoCanGoBack, states.leoCanGoNext);
 
-        menu.refreshMenu(c.config.getMenusList());
+        menu.refreshMenu(c.frame.menu);
         menu.refreshIconButtons(toolbarButtons);
         menu.refreshBodyContextMenu(bodyPaneContextMenuData);
         menu.refreshOutlineContextMenu(outlinePaneContextMenuData);
