@@ -3,6 +3,7 @@
 ## 1.0.39
 
 - Added menu customization with @menuat nodes within @settings nodes, in either local files, or myLeoSettings to affect all.
+- Fixed keybindings using 'alt' such as 'alt-x' for macOS platform.
 
 ## 1.0.38
 
