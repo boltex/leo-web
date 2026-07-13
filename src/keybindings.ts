@@ -673,7 +673,8 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.GOTO_NEXT_CLONE,
         key: "alt+n",
-        mac: "alt+˜", // on MacOS, holding Option (Alt) accesses special characters
+        // mac: "alt+˜", // on MacOS, alt+n is a "Dead Key" (Accent Modifier)
+        code: "alt+keyn", // Has priority over key when specified.
         outline: true,
         body: true,
         find: true,
