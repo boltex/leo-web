@@ -589,6 +589,14 @@ export class MenuManager {
             this.BUTTON_CONTAINER.classList.add('hidden');
         } else {
             this.BUTTON_CONTAINER.classList.remove('hidden');
+            // Send a fake mouseleave event to this.BUTTON_CONTAINER
+            const mouseLeaveEvent = new MouseEvent('mouseleave', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            this.BUTTON_CONTAINER.dispatchEvent(mouseLeaveEvent);
+
             // Set focus on last focused element
             workspace.layout.restoreLastFocusedElement();
         }
