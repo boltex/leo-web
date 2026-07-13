@@ -11,5 +11,16 @@ declare global {
      */
     interface Thenable<T> extends PromiseLike<T> { }
 
+    // Use the native Map generic directly
+    type KeyboardLayoutMapLike = Map<string, string>;
+
+    interface NavigatorKeyboardLike {
+        getLayoutMap(): Promise<KeyboardLayoutMapLike>;
+    }
+
+    interface Navigator {
+        keyboard?: NavigatorKeyboardLike;
+    }
+
 }
 //@-leo
