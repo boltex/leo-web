@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.40
+
+- ...
+
 ## 1.0.39
 
 - Added menu customization with @menuat nodes within @settings nodes, in either local files, or myLeoSettings to affect all.
