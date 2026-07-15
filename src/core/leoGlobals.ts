@@ -3742,7 +3742,7 @@ export function es(...args: any[]): void {
             // const color = lastArg.color;
             args.pop();
             // TODO : Use color in some way, e.g. by passing it to app.gui.addLogPaneEntry.
-            console.log('EMIT STRING: Color argument detected:', lastArg.color);
+            // console.log('EMIT STRING: Color argument detected:', lastArg.color);
         }
     }
 
@@ -3765,10 +3765,7 @@ export function es(...args: any[]): void {
 
     if (app && app.gui) {
         // Make sure the log pane is visible with 'show Log Pane' command (Leo-Web only)
-        if (app.inScript && !app.hasScriptShownlog) {
-            app.gui.showLogPane();
-            app.hasScriptShownlog = true;
-        }
+        app.gui.showLogPane();
         app.gui.addLogPaneEntry(s);
     } else {
         logBuffer.push(s);

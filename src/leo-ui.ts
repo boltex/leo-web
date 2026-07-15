@@ -385,7 +385,7 @@ export class LeoUI extends NullGui {
     //@+node:felix.20260323002920.1: *3* Log Pane
     //@+node:felix.20260409231833.1: *4* showLogPane
     public showLogPane(p_focus?: boolean): void {
-        workspace.logPane.showTab('log');
+        workspace.logPane.showTab('log', p_focus);
     }
     //@+node:felix.20260409231826.1: *4* addLogPaneEntry
     public override addLogPaneEntry(p_message: string): void {
