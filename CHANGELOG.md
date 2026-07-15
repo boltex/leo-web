@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.41
+
+- ...
+
 ## 1.0.40
 
 - Fixed specific problematic 'alt+n' keybinding for macOS when Colemak keyboard layout is used.
