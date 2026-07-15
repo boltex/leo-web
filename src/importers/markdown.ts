@@ -23,6 +23,7 @@ export class Markdown_Importer extends Importer {
     // Regular expression patterns.
     public md_hash_pattern: RegExp = /^(#+)\s*(.+)\s*\n/;
     public md_pattern_table: RegExp[] = [/^(=+)\n/, /^(-+)\n/];
+    public md_noheader_pattern: RegExp = /^\s*<!--\s*leo-noheader level=(\d+)\s+headline=(.*?)\s*-->\s*\n?$/;
 
     constructor(c: Commands) {
         super(c);
@@ -49,8 +50,12 @@ export class Markdown_Importer extends Importer {
             const line: string = lines[i]!;
             const top: Position = this.stack[this.stack.length - 1]!;
             let [level, name]: [number | null, string | null] = this.is_hash(line);
+            let marker = this.is_noheader_marker(line);
             if (skip > 0) {
                 skip -= 1;
+            } else if (!in_code && marker) {
+                const [marker_level, marker_name] = marker;
+                this.make_noheader_node(marker_level, marker_name);
             } else if (!in_code && this.lookahead_underline(i)) {
                 level = lines[i + 1]!.startsWith('=') ? 1 : 2;
                 this.make_markdown_node(level, line);
@@ -94,6 +99,19 @@ export class Markdown_Importer extends Importer {
         }
         return [null, null];
     }
+    //@+node:felix.20260713211148.1: *4* md_i.is_noheader_marker
+    /**
+     * Return level, name if line is a Leo noheader marker.
+     */
+    public is_noheader_marker(line: string): [number, string] | null {
+        const m: RegExpMatchArray | null = line.match(this.md_noheader_pattern);
+        if (m != null) {
+            const level: number = parseInt(m[1]!);
+            const name: string = decodeURIComponent(m[2]!);
+            return [level, name];
+        }
+        return null;
+    }
     //@+node:felix.20251214160933.70: *4* md_i.is_underline
     /**
      * True if line is all '-' or '=' characters.
@@ -133,6 +151,15 @@ export class Markdown_Importer extends Importer {
         child.h = '!Declarations';
         lines_dict[child.v.gnx] = [line];
         this.stack.push(child);
+    }
+    //@+node:felix.20260713211205.1: *4* md_i.make_noheader_node
+    /**
+     * Create a node represented by a Leo noheader HTML comment.
+     */
+    public make_noheader_node(level: number, name: string): Position {
+        const child: Position = this.make_markdown_node(level, name);
+        this.lines_dict[child.v.gnx]!.push('@noheader\n');
+        return child;
     }
     //@+node:felix.20251214160933.73: *4* md_i.make_markdown_node
     /**

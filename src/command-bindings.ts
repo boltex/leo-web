@@ -75,7 +75,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.SELECT_ALL_TEXT, () => leoUI.command(LEOCMD.SELECT_ALL_TEXT, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
 
         [CMD.SHOW_OUTLINE, () => leoUI.showOutline()], // Also focuses on outline
-        [CMD.SHOW_LOG, () => leoUI.showLogPane()],
+        [CMD.SHOW_LOG, () => leoUI.showLogPane(true)], // Also focuses on log
         [CMD.SHOW_BODY, () => leoUI.showBody()], // Also focuses on body
         [CMD.EXECUTE, () => leoUI.command(LEOCMD.EXECUTE_SCRIPT, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
 

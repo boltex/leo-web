@@ -3742,7 +3742,7 @@ export function es(...args: any[]): void {
             // const color = lastArg.color;
             args.pop();
             // TODO : Use color in some way, e.g. by passing it to app.gui.addLogPaneEntry.
-            console.log('EMIT STRING: Color argument detected:', lastArg.color);
+            // console.log('EMIT STRING: Color argument detected:', lastArg.color);
         }
     }
 
@@ -3765,10 +3765,7 @@ export function es(...args: any[]): void {
 
     if (app && app.gui) {
         // Make sure the log pane is visible with 'show Log Pane' command (Leo-Web only)
-        if (app.inScript && !app.hasScriptShownlog) {
-            app.gui.showLogPane();
-            app.hasScriptShownlog = true;
-        }
+        app.gui.showLogPane();
         app.gui.addLogPaneEntry(s);
     } else {
         logBuffer.push(s);
@@ -6151,7 +6148,7 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
     } else if (['', 'file'].includes(parsed.protocol.replace(':', ''))) {
 
         // TODO : check if unquote_path is needed !
-        const unquote_path = unquoteUrl(leo_path);
+        const unquote_path = unquote(leo_path);
         if (await os_path_exists(leo_path)) {
 
             // It'S a file in the workspace
@@ -6539,11 +6536,21 @@ export async function openUrlHelper(c: Commands, url?: string): Promise<string |
     return undefined;
 
 }
-//@+node:felix.20251207215313.302: *3* g.unquoteUrl
+//@+node:felix.20260713205008.1: *3* g.quote
+/**
+ * g.quote mimics the safe='' argument of urllib.parse.quote in Python.
+ */
+export function quote(value: string): string {
+    return encodeURIComponent(value).replace(
+        /[!'()*]/g,
+        (char: string) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`
+    );
+}
+//@+node:felix.20251207215313.302: *3* g.unquote
 /**
  * Replace escaped characters (especially %20, by their equivalent).
  */
-export function unquoteUrl(url: string): string {
+export function unquote(url: string): string {
 
     // return urllib.parse.unquote(url);
 

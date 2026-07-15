@@ -677,7 +677,6 @@ export class Commands {
         // This does not prevent zombie windows if the script puts up a dialog...
         try {
             c.inCommand = false;
-            g.app.hasScriptShownlog = false; // Reset this flag. (Leo-Web only)
             g.app.inScript = true;
             (g.inScript as boolean) = g.app.inScript; // g.inScript is a synonym for g.app.inScript.
 
