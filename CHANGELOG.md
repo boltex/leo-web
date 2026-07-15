@@ -3,6 +3,7 @@
 ## 1.0.40
 
 - Fixed specific problematic 'alt+n' keybinding for macOS when Colemak keyboard layout is used.
+- Fixed @auto-md / @auto-markdown handling of @noheader nodes - From original Leo's #4787 by Alexander Przemysław Kamiński
 
 ## 1.0.39
 
