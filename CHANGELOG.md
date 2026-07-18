@@ -3,6 +3,7 @@
 ## 1.0.41
 
 - Fixed "detect binary files" as per Leo's PR 4793.
+- Added more abbreviations and settings related menu commands.
 
 ## 1.0.40
 
