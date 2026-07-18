@@ -291,6 +291,7 @@ export const menuData: MenuEntry[] = [
             { label: "Replace", command: CMD.REPLACE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+=" },
             { label: "Replace Then Find", command: CMD.REPLACE_THEN_FIND, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+-" },
             { label: "Replace All", command: CMD.REPLACE_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "Show-Find-Options", command: CMD.SHOW_FIND_OPTIONS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
             { label: "-" },
             {
                 label: "Clone-Find Commands",
@@ -323,7 +324,23 @@ export const menuData: MenuEntry[] = [
         entries: [
             { label: "Open LeoSettings", command: CMD.OPEN_LEO_SETTINGS },
             { label: "Open myLeoSettings", command: CMD.OPEN_MY_LEO_SETTINGS },
+            { label: "Select Local @setting tree", command: CMD.OPEN_LOCAL_SETTINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "-" },
+            {
+                label: "Abbreviations", entries: [
+                    { label: "Toggle Abbrev Mode", command: CMD.TOGGLE_ABBREV_MODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Abbrev-List", command: CMD.ABBREV_LIST, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Abbrev-Kill-All", command: CMD.ABBREV_KILL_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                ]
+            },
             { label: "Reload Settings", command: CMD.RELOAD_SETTINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            {
+                label: "Show Settings", entries: [
+                    { label: "Show Bindings", command: CMD.SHOW_BINDINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Show Commands", command: CMD.SHOW_COMMANDS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Show Settings", command: CMD.SHOW_SETTINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                ]
+            },
             { label: "Change LeoID", command: CMD.SET_LEO_ID },
         ],
     },
