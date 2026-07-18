@@ -593,7 +593,7 @@ export class LogPaneManager {
                 }
             });
         }
-        if (tabName === 'log') {
+        if (tabName === 'log' && focusInFirstInput) {
             this.LOG_CONTENT.focus();
         }
         if (oldTab === tabName) {

@@ -12,6 +12,30 @@ import { Keybinding } from "./types";
 // because we dont want to have to wait for flags, and the commands
 // themselves do check for the necessary flags before executing.
 
+//@+node:felix.20260713191424.1: ** macOS alt+n fix
+// Use navigator.keyboard to check for keyboard layout and 'n' mapping.
+
+// (not available on safari nor firefox) Use navigator.keyboard.getLayoutMap() to check for keyboard layout and 'n' mapping.
+let computedNCode = 'alt+keyn';
+// @ts-ignore Not always true for all browsers, so we check for existence first!
+if (navigator.keyboard && navigator.keyboard.getLayoutMap) {
+    navigator.keyboard.getLayoutMap().then((layoutMap) => {
+        for (const [code, key] of layoutMap) {
+            if (key === 'n') {
+                computedNCode = 'alt+' + code.toLowerCase();
+                break;
+            }
+        }
+        // Ok, we have the computedNCode, now we can update the keybinding for GOTO_NEXT_CLONE
+        for (const keybinding of keybindings) {
+            if (keybinding.command === Constants.COMMANDS.GOTO_NEXT_CLONE) {
+                keybinding.code = computedNCode;
+                break;
+            }
+        }
+    });
+}
+
 //@+node:felix.20260323140223.1: ** Constants
 const CMD = Constants.COMMANDS;
 const FLAGS = Constants.CONTEXT_FLAGS;
@@ -36,6 +60,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.MINIBUFFER,
         key: "alt+x",
+        mac: "alt+≈", // on MacOS, holding Option (Alt) accesses special characters
         outline: true,
         body: true,
         find: true,
@@ -53,6 +78,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SHOW_OUTLINE,
         key: "alt+t",
+        mac: "alt+†", // on MacOS, holding Option (Alt) accesses special characters
         body: true,
         find: true
     },
@@ -69,11 +95,13 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SHOW_BODY,
         key: "alt+t", // ALTERNATE KEYBINDING : ALT+T
+        mac: "alt+†", // on MacOS, holding Option (Alt) accesses special characters
         outline: true
     },
     {
         command: CMD.SHOW_BODY,
         key: "alt+d",
+        mac: "alt+∂", // on MacOS, holding Option (Alt) accesses special characters
         outline: true,
         find: true,
     },
@@ -303,6 +331,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.SORT_SIBLINGS,
         key: "alt+a",
+        mac: "alt+å", // on MacOS, holding Option (Alt) accesses special characters
         outline: true,
         body: true,
         find: true,
@@ -510,6 +539,7 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.GOTO_GLOBAL_LINE,
         key: "alt+g",
+        mac: "alt+©", // On MacOS, holding Option (Alt) accesses special characters
         outline: true,
         body: true,
         find: true,
@@ -667,6 +697,8 @@ export const keybindings: Keybinding[] = [
     {
         command: CMD.GOTO_NEXT_CLONE,
         key: "alt+n",
+        // mac: "alt+˜", // on MacOS, alt+n is a "Dead Key" (Accent Modifier)
+        code: computedNCode, // Has priority over key when specified.
         outline: true,
         body: true,
         find: true,

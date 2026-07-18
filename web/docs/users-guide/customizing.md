@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+toc_max_heading_level: 4
 ---
 
 # Customizing Leo
@@ -113,6 +114,7 @@ Complex settings nodes have headlines of the form `@<type> description`:
 | **@commands**          | Child @command nodes create global buttons.                         |
 | **@command-history**   | Body is a list of commands pre-loaded into history list.            |
 | **@data**              | Body is a list of strings, one per line.                            |
+| **@menuat**            | Child @menu and @item nodes modify menu trees of the top menu.      |
 | **@recentfiles**       | Body is a list of file paths.                                       |
 
 Complex nodes specify settings in their body text.
@@ -134,6 +136,49 @@ The body text contains a list of commands, one per line, to be preloaded into Le
 
 The body text contains a list of strings, one per line. Lines starting with `#` are ignored.
 
+#### \@menuat
+
+`@menuat` modifies the top menu tree. This allows settings in `myLeoSettings.leo` or directly in `@settings` nodes of your leo files to change menus.
+
+`@menuat` should occur in an `@settings` tree. Its children are `@menu` and `@item` nodes.
+
+The `@menuat` setting has two or three parameters in its headline:
+
+```text
+@menuat <path> <action> [clipboard]
+```
+
+The `path` argument specifies a **target** in the menu tree or modified by earlier `@menuat` settings. The path takes this form:
+
+```text
+/entry1/entry2/entry3
+```
+
+Each entry is the **cleaned** name of a menu or item. A cleaned name contains only the letters `a` through `z` and the digits `0` through `9`, with uppercase letters converted to lowercase.
+
+For example:
+
+```text
+Outline->Move->Move Down
+```
+
+is specified as:
+
+```text
+/outline/move/movedown
+```
+
+The `action` argument specifies how the menu tree is modified. Five actions are available:
+
+* **before**: Insert items and submenus immediately before the target.
+* **after**: Insert items and submenus immediately after the target.
+* **append**: Append items and submenus to the end of the target menu or item.
+* **cut**: Remove the target from the menu tree and save it to an internal clipboard.
+* **copy**: Copy the target to an internal clipboard. Descendants of the `@menuat` setting are ignored.
+
+The **cut** and **copy** actions ignore descendants of the `@menuat` setting.
+
+The optional `clipboard` argument modifies the **before**, **after**, and **append** actions. By default, these actions insert the menus and items supplied as descendants of the `@menuat` setting. When `clipboard` is specified as the source, the contents of the internal clipboard from a previous **cut** or **copy** action are used instead.
 #### \@rclick
 
 For each `@button` node, Leo adds sub-menu items for:

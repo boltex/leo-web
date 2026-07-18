@@ -249,9 +249,16 @@ export class Constants {
         PASTE_TEXT: Constants.NAME + ".pasteText",
         SELECT_ALL_TEXT: Constants.NAME + ".selectAllText",
 
+        SHOW_BINDINGS: Constants.NAME + ".showBindings",
+        SHOW_COMMANDS: Constants.NAME + ".showCommands",
+        SHOW_SETTINGS: Constants.NAME + ".showSettings",
+        OPEN_LOCAL_SETTINGS: Constants.NAME + ".openLocalSettings",
         OPEN_LEO_SETTINGS: Constants.NAME + ".openLeoSettings",
         OPEN_MY_LEO_SETTINGS: Constants.NAME + ".openMyLeoSettings",
         RELOAD_SETTINGS: Constants.NAME + ".reloadSettings",
+        TOGGLE_ABBREV_MODE: Constants.NAME + ".toggleAbbrevMode",
+        ABBREV_LIST: Constants.NAME + ".abbrevList",
+        ABBREV_KILL_ALL: Constants.NAME + ".abbrevKillAll",
 
         // Window/UI
         TOGGLE_MENU: Constants.NAME + ".toggleMenu",
@@ -428,6 +435,7 @@ export class Constants {
         DELETE_MARKED_NODES: Constants.NAME + ".deleteMarkedNodes",
         MOVE_MARKED_NODES: Constants.NAME + ".moveMarkedNodes",
 
+        SHOW_FIND_OPTIONS: Constants.NAME + ".showFindOptions",
         FIND_HISTORY_BACK: Constants.NAME + ".findHistoryBack",
         FIND_HISTORY_FORWARD: Constants.NAME + ".findHistoryForward",
         FIND_QUICK: Constants.NAME + ".findQuick",
@@ -579,9 +587,17 @@ export class Constants {
         WRITE_AT_FILE_NODES: 'write-at-file-nodes',
         WRITE_DIRTY_AT_FILE_NODES: 'write-dirty-at-file-nodes',
         REVERT: 'revert',
+
+        SHOW_BINDINGS: 'show-bindings',
+        SHOW_COMMANDS: 'show-commands',
+        SHOW_SETTINGS: 'show-settings',
+        OPEN_LOCAL_SETTINGS: 'open-local-settings',
         OPEN_LEO_SETTINGS: 'open-leo-settings',
         OPEN_MY_LEO_SETTINGS: 'open-my-leo-settings',
         RELOAD_SETTINGS: 'reload-settings',
+        TOGGLE_ABBREV_MODE: 'toggle-abbrev-mode',
+        ABBREV_LIST: 'abbrev-list',
+        ABBREV_KILL_ALL: 'abbrev-kill-all',
 
         // * More Commands
         GOTO_GLOBAL_LINE: "goto-global-line",
@@ -636,6 +652,7 @@ export class Constants {
         RE_SEARCH_BACKWARD: "re-search-backward",
         WORD_SEARCH: "word-search",
         WORD_SEARCH_BACKWARD: "word-search-backward",
+        SHOW_FIND_OPTIONS: "show-find-options",
 
         TAG_NODE: "tag-node",
         TAG_CHILDREN: "tag-children",

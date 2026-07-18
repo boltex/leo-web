@@ -376,7 +376,7 @@ export class Commands {
     /**
      * Instantiate c.config from previous settings.
      */
-    public initSettings(previousSettings: any): void {
+    public initSettings(previousSettings?: PreviousSettings): void {
         const c: Commands = this;
         c.config = new LocalConfigManager(c, previousSettings);
         // g.app.config.setIvarsFromSettings(c); // Removed in https://github.com/leo-editor/leo-editor/pull/2681
@@ -677,7 +677,6 @@ export class Commands {
         // This does not prevent zombie windows if the script puts up a dialog...
         try {
             c.inCommand = false;
-            g.app.hasScriptShownlog = false; // Reset this flag. (Leo-Web only)
             g.app.inScript = true;
             (g.inScript as boolean) = g.app.inScript; // g.inScript is a synonym for g.app.inScript.
 
@@ -1698,11 +1697,11 @@ export class Commands {
      * Return true if a position exists in c's tree
      */
     public positionExists(
-        p: Position,
+        p?: Position,
         root?: Position,
         trace?: boolean
     ): boolean {
-        if (!p.__bool__() || !p.v) {
+        if (!p || !p.__bool__() || !p.v) {
             return false;
         }
 
@@ -3603,8 +3602,8 @@ export class Commands {
             return;
         }
         if (!c.positionExists(p)) {
-            g.trace(`Invalid position: ${String(p)}`);
-            g.trace(g.callers());
+            g.trace(`Invalid position: ${String(p)} in ${c.shortFileName()}\n${g.callers(10)}`);
+            c.setCurrentPosition(c.rootPosition()!);
             return;
         }
         c.requestLaterRedraw = false;

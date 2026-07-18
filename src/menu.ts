@@ -61,9 +61,12 @@ export const menuData: MenuEntry[] = [
         label: "File",
         entries: [
             { label: "Choose New Workspace...", command: CMD.CHOOSE_NEW_WORKSPACE },
+            { label: "-" },
             { label: "New", command: CMD.NEW_FILE },
             { label: "Open-File", command: CMD.OPEN_FILE, keyboardShortcut: "Ctrl+O" },
+            { label: "-" },
             { label: "Recent Files", command: CMD.RECENT_FILES },
+            { label: "-" },
             { label: "Save...", command: CMD.SAVE_FILE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+S" },
             { label: "Save As...", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.SAVE_AS_FILE },
             { label: "Save As .leojs (JSON)...", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.SAVE_AS_LEOJS },
@@ -74,10 +77,12 @@ export const menuData: MenuEntry[] = [
                     FLAGS.TREE_TITLED
                 ]
             },
+            { label: "-" },
             {
                 label: "Read/Write Files",
                 entries: [
                     { label: "Read-File-Into-Node", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.READ_FILE_INTO_NODE },
+                    { label: "-" },
                     { label: "Write-File-From-Node", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.WRITE_FILE_FROM_NODE },
                     { label: "Write @<file> Nodes", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.WRITE_AT_FILE_NODES, keyboardShortcut: "Ctrl+Shift+W" },
                     { label: "Write Dirty @<file> Nodes", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.WRITE_DIRTY_AT_FILE_NODES, keyboardShortcut: "Ctrl+Shift+Q" },
@@ -96,7 +101,6 @@ export const menuData: MenuEntry[] = [
                     { label: "Weave", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.WEAVE },
                 ],
             },
-
         ],
     },
     {
@@ -104,11 +108,12 @@ export const menuData: MenuEntry[] = [
         entries: [
             { label: "Undo", command: CMD.UNDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_UNDO], keyboardShortcut: "Ctrl+Z" },
             { label: "Redo", command: CMD.REDO, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_REDO], keyboardShortcut: "Ctrl+SHIFT+Z" },
+            { label: "-" },
             { label: "Cut", command: CMD.CUT_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+X" },
             { label: "Copy", command: CMD.COPY_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+C" },
             { label: "Paste", command: CMD.PASTE_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+V" },
             { label: "Select All", command: CMD.SELECT_ALL_TEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+A" },
-            //
+            { label: "-" },
             {
                 label: "Edit Headline", entries: [
                     { label: "Capitalize-Headline", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.CAPITALIZE_HEADLINE },
@@ -120,6 +125,7 @@ export const menuData: MenuEntry[] = [
             {
                 label: "Edit Text", entries: [
                     { label: "Backward-Delete-Char", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BACKWARD_DELETE_CHAR, keyboardShortcut: "Backspace" },
+                    { label: "-" },
                     {
                         label: "Align Text", entries: [
                             { label: "Center-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.CENTER_LINE },
@@ -177,8 +183,10 @@ export const menuData: MenuEntry[] = [
                                     { label: "Back-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BACK_PARAGRAPH },
                                     { label: "Back-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BACK_SENTENCE },
                                     { label: "Back-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BACK_WORD, keyboardShortcut: "Ctrl+Left" },
+                                    { label: "-" },
                                     { label: "Beginning-Of-Buffer", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BEGINNING_OF_BUFFER, keyboardShortcut: "Home" },
                                     { label: "Beginning-Of-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BEGINNING_OF_LINE, keyboardShortcut: "Ctrl+Home" },
+                                    { label: "-" },
                                     { label: "Previous-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.PREVIOUS_LINE, keyboardShortcut: "Up" },
                                 ],
                             },
@@ -188,8 +196,10 @@ export const menuData: MenuEntry[] = [
                                     { label: "Back-Paragraph-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BACK_PARAGRAPH_EXTEND_SELECTION },
                                     { label: "Back-Sentence-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BACK_SENTENCE_EXTEND_SELECTION },
                                     { label: "Back-Word-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BACK_WORD_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Left" },
+                                    { label: "-" },
                                     { label: "Beginning-Of-Buffer-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BEGINNING_OF_BUFFER_EXTEND_SELECTION, keyboardShortcut: "Shift+Home" },
                                     { label: "Beginning-Of-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.BEGINNING_OF_LINE_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Home" },
+                                    { label: "-" },
                                     { label: "Previous-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.PREVIOUS_LINE_EXTEND_SELECTION, keyboardShortcut: "Shift+Up" },
                                 ],
                             },
@@ -205,10 +215,12 @@ export const menuData: MenuEntry[] = [
                                 label: "Cursor Forward", entries: [
                                     { label: "End-Of-Buffer", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.END_OF_BUFFER, keyboardShortcut: "End" },
                                     { label: "End-Of-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.END_OF_LINE, keyboardShortcut: "Ctrl+End" },
+                                    { label: "-" },
                                     { label: "Forward-Char", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_CHAR, keyboardShortcut: "Right" },
                                     { label: "Forward-Paragraph", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_PARAGRAPH },
                                     { label: "Forward-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_SENTENCE },
                                     { label: "Forward-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_WORD, keyboardShortcut: "Ctrl+Right" },
+                                    { label: "-" },
                                     { label: "Next-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.NEXT_LINE, keyboardShortcut: "Down" },
                                 ],
                             },
@@ -216,10 +228,12 @@ export const menuData: MenuEntry[] = [
                                 label: "Cursor Forward Extend Selection", entries: [
                                     { label: "End-Of-Buffer-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.END_OF_BUFFER_EXTEND_SELECTION, keyboardShortcut: "Shift+End" },
                                     { label: "End-Of-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.END_OF_LINE_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+End" },
+                                    { label: "-" },
                                     { label: "Forward-Char-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_CHAR_EXTEND_SELECTION, keyboardShortcut: "Shift+Right" },
                                     { label: "Forward-Paragraph-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_PARAGRAPH_EXTEND_SELECTION },
                                     { label: "Forward-Sentence-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_SENTENCE_EXTEND_SELECTION },
                                     { label: "Forward-Word-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.FORWARD_WORD_EXTEND_SELECTION, keyboardShortcut: "Ctrl+Shift+Right" },
+                                    { label: "-" },
                                     { label: "Next-Line-Extend-Selection", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.NEXT_LINE_EXTEND_SELECTION, keyboardShortcut: "Shift+Down" },
                                 ],
                             },
@@ -235,12 +249,14 @@ export const menuData: MenuEntry[] = [
                         label: "Yank/Kill Text", entries: [
                             { label: "Rectangle-Kill", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.RECTANGLE_KILL },
                             { label: "Rectangle-Yank", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.RECTANGLE_YANK },
+                            { label: "-" },
                             { label: "Kill-Line", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.KILL_LINE, keyboardShortcut: "Ctrl+K" },
                             { label: "Kill-Region", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.KILL_REGION },
                             { label: "Kill-Region-Save", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.KILL_REGION_SAVE },
                             { label: "Kill-Sentence", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.KILL_SENTENCE },
                             { label: "Kill-Ws", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.KILL_WS, },
                             { label: "Kill-Word", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.KILL_WORD, keyboardShortcut: "Ctrl+Backspace" },
+                            { label: "-" },
                             { label: "Yank", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.YANK, keyboardShortcut: "Ctrl+Y" },
                             { label: "Yank-Pop", enabledFlagsSet: [FLAGS.TREE_OPENED], command: CMD.YANK_POP, keyboardShortcut: "Alt+Y" },
                         ]
@@ -267,6 +283,7 @@ export const menuData: MenuEntry[] = [
         label: "Search",
         entries: [
             { label: "Help for Find Commands", command: CMD.HELP_FOR_FIND_COMMANDS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "-" },
             { label: "Goto Global Line", command: CMD.GOTO_GLOBAL_LINE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+G" },
             { label: "Start Search", command: CMD.START_SEARCH, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+F" },
             { label: "Find Next", command: CMD.FIND_NEXT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "F3" },
@@ -274,6 +291,8 @@ export const menuData: MenuEntry[] = [
             { label: "Replace", command: CMD.REPLACE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+=" },
             { label: "Replace Then Find", command: CMD.REPLACE_THEN_FIND, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+-" },
             { label: "Replace All", command: CMD.REPLACE_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "Show-Find-Options", command: CMD.SHOW_FIND_OPTIONS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "-" },
             {
                 label: "Clone-Find Commands",
                 entries: [
@@ -290,6 +309,7 @@ export const menuData: MenuEntry[] = [
                     { label: "Set Find-Everywhere", command: CMD.SET_FIND_EVERYWHERE_OPTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+Ctrl+E" },
                     { label: "Set Find-Node-Only", command: CMD.SET_FIND_NODE_ONLY_OPTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+Ctrl+N" },
                     { label: "Set Find-Suboutline-Only", command: CMD.SET_FIND_SUBOUTLINE_ONLY_OPTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+Ctrl+S" },
+                    { label: "-" },
                     { label: "Toggle Ignore-Case", command: CMD.TOGGLE_FIND_IGNORE_CASE_OPTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+Ctrl+I" },
                     { label: "Toggle Mark-Changes", command: CMD.TOGGLE_FIND_MARK_CHANGES_OPTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+Ctrl+C" },
                     { label: "Toggle Mark-Finds", command: CMD.TOGGLE_FIND_MARK_FINDS_OPTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+Ctrl+F" },
@@ -304,7 +324,23 @@ export const menuData: MenuEntry[] = [
         entries: [
             { label: "Open LeoSettings", command: CMD.OPEN_LEO_SETTINGS },
             { label: "Open myLeoSettings", command: CMD.OPEN_MY_LEO_SETTINGS },
+            { label: "Select Local @setting tree", command: CMD.OPEN_LOCAL_SETTINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "-" },
+            {
+                label: "Abbreviations", entries: [
+                    { label: "Toggle Abbrev Mode", command: CMD.TOGGLE_ABBREV_MODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Abbrev-List", command: CMD.ABBREV_LIST, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Abbrev-Kill-All", command: CMD.ABBREV_KILL_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                ]
+            },
             { label: "Reload Settings", command: CMD.RELOAD_SETTINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            {
+                label: "Show Settings", entries: [
+                    { label: "Show Bindings", command: CMD.SHOW_BINDINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Show Commands", command: CMD.SHOW_COMMANDS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                    { label: "Show Settings", command: CMD.SHOW_SETTINGS, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+                ]
+            },
             { label: "Change LeoID", command: CMD.SET_LEO_ID },
         ],
     },
@@ -315,12 +351,15 @@ export const menuData: MenuEntry[] = [
             { label: "Delete-Node", command: CMD.DELETE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Delete" },
             { label: "Insert-Node", command: CMD.INSERT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+I, Shift+Insert" },
             { label: "Insert-Child", command: CMD.INSERT_CHILD_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Insert" },
+            { label: "-" },
             { label: "Cut-Node", command: CMD.CUT_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+X" },
             { label: "Copy-Node", command: CMD.COPY_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+C" },
             { label: "Paste-Node", command: CMD.PASTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Ctrl+Shift+V" },
             { label: "Paste Node As Clone", command: CMD.PASTE_CLONE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED] },
+            { label: "-" },
             { label: "Demote Siblings", command: CMD.DEMOTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_DEMOTE], keyboardShortcut: "Ctrl+]" },
             { label: "Promote Children", command: CMD.PROMOTE_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_PROMOTE], keyboardShortcut: "Ctrl+[" },
+            { label: "-" },
             { label: "Refresh From Disk", command: CMD.REFRESH_FROM_DISK_SELECTION, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.NODE_ATFILE] },
             {
                 label: "Expand/Contract Nodes", entries: [
@@ -329,12 +368,12 @@ export const menuData: MenuEntry[] = [
                     { label: "Contract-Node", command: CMD.CONTRACT_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_EXPANDED], keyboardShortcut: "Alt+[" },
                     { label: "Contract-Parent", command: CMD.CONTRACT_PARENT, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_HAS_PARENT] },
                     { label: "Contract-Or-Go-Left", command: CMD.CONTRACT_OR_GO_LEFT, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_EXPANDED_OR_HAS_PARENT], keyboardShortcut: "Left, Alt+Left" },
-                    //
+                    { label: "-" },
                     { label: "Expand-Prev-Level", command: CMD.EXPAND_PREV_LEVEL, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_EXPANDED] },
                     { label: "Expand-Next-Level", command: CMD.EXPAND_NEXT_LEVEL, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_CHILD] },
                     { label: "Expand-And-Go-Right", command: CMD.EXPAND_AND_GO_RIGHT, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Right, Alt+Right" },
                     { label: "Expand-Or-Go-Right", command: CMD.EXPAND_OR_GO_RIGHT, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_CHILD] },
-                    //
+                    { label: "-" },
                     { label: "Expand-To-Level-1", command: CMD.EXPAND_TO_LEVEL_1, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Expand-To-Level-2", command: CMD.EXPAND_TO_LEVEL_2, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Expand-To-Level-3", command: CMD.EXPAND_TO_LEVEL_3, enabledFlagsSet: [FLAGS.TREE_OPENED] },
@@ -343,7 +382,7 @@ export const menuData: MenuEntry[] = [
                     { label: "Expand-To-Level-6", command: CMD.EXPAND_TO_LEVEL_6, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Expand-To-Level-7", command: CMD.EXPAND_TO_LEVEL_7, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Expand-To-Level-8", command: CMD.EXPAND_TO_LEVEL_8, enabledFlagsSet: [FLAGS.TREE_OPENED] },
-                    //
+                    { label: "-" },
                     { label: "Expand-All", command: CMD.EXPAND_ALL, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Expand-Node", command: CMD.EXPAND_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.SELECTED_CHILD], enabledFlagsClear: [FLAGS.SELECTED_EXPANDED], keyboardShortcut: "Alt+]" },
                 ]
@@ -354,7 +393,7 @@ export const menuData: MenuEntry[] = [
                     { label: "Goto-First-Node", command: CMD.GOTO_FIRST_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Goto-First-Visible", command: CMD.GOTO_FIRST_VISIBLE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+Home" },
                     { label: "Goto-First-Sibling", command: CMD.GOTO_FIRST_SIBLING, enabledFlagsSet: [FLAGS.TREE_OPENED] },
-                    //
+                    { label: "-" },
                     { label: "Goto-Next-Changed", command: CMD.GOTO_NEXT_CHANGED, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CHANGED] },
                     { label: "Goto-Next-Clone", command: CMD.GOTO_NEXT_CLONE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+N" },
                     { label: "Goto-Next-Marked", command: CMD.GOTO_NEXT_MARKED, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_HAS_MARKED] },
@@ -362,14 +401,14 @@ export const menuData: MenuEntry[] = [
                     { label: "Goto-Next-Sibling", command: CMD.GOTO_NEXT_SIBLING, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Goto-Next-Visible", command: CMD.GOTO_NEXT_VISIBLE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Down, Alt+Down" },
                     { label: "Go-Forward", command: CMD.GO_FORWARD, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_NEXT] },
-                    //
+                    { label: "-" },
                     { label: "Goto-Parent", command: CMD.GOTO_PARENT, enabledFlagsSet: [FLAGS.TREE_OPENED] },
-                    //
+                    { label: "-" },
                     { label: "Goto-Prev-Node", command: CMD.GOTO_PREV_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Goto-Prev-Sibling", command: CMD.GOTO_PREV_SIBLING, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Goto-Prev-Visible", command: CMD.GOTO_PREV_VISIBLE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Up, Alt+Up" },
                     { label: "Go-Back", command: CMD.GO_BACK, enabledFlagsSet: [FLAGS.TREE_OPENED, FLAGS.LEO_CAN_BACK] },
-                    //
+                    { label: "-" },
                     { label: "Goto-Last-Node", command: CMD.GOTO_LAST_NODE, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Goto-Last-Sibling", command: CMD.GOTO_LAST_SIBLING, enabledFlagsSet: [FLAGS.TREE_OPENED] },
                     { label: "Goto-Last-Visible", command: CMD.GOTO_LAST_VISIBLE, enabledFlagsSet: [FLAGS.TREE_OPENED], keyboardShortcut: "Alt+End" },

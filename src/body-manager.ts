@@ -67,7 +67,7 @@ Prism.hooks.add('before-tokenize', (env) => {
         },
         // All other recognized Leo directives
         'leo-directive': {
-            pattern: /^[ \t]*(?:@others|@all)(?=[ \t]|$)|^(?:@encoding|@ignore|@lineending|@path|@pagewidth|@tabwidth|@color|@killcolor|@nocolor|@nocolor-node|@first|@last|@section-delims|@wrap|@nowrap)(?=[ \t]|$)/m,
+            pattern: /^[ \t]*(?:@others|@all)(?=[ \t]|$)|^(?:@encoding|@ignore|@noheader|@lineending|@path|@pagewidth|@tabwidth|@color|@killcolor|@nocolor|@nocolor-node|@first|@last|@section-delims|@wrap|@nowrap)(?=[ \t]|$)/m,
             alias: 'keyword'
         },
         // Leo UNL: unl:gnx://...#<gnx>  (must be before leo-unl-headline)

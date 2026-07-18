@@ -204,7 +204,7 @@ Within @settings trees:
     @bool, @buttons, @color, @commands\
     @directory, @encoding\
     @history-list, @int\
-    @menus, @menu, @menuat, @item
+    @menuat, @menu, @item
 </ul>
 
 ## External files (@\<file> nodes)

@@ -986,6 +986,16 @@
           ]
         },
         {
+          "gnx": "felix.20260711210812.1",
+          "vh": "Menus",
+          "children": [
+            {
+              "gnx": "felix.20260711210814.1",
+              "vh": "@menus"
+            }
+          ]
+        },
+        {
           "gnx": "felix.20230927160655.1",
           "vh": "Plugins",
           "children": [

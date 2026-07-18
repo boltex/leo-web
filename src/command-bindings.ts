@@ -74,7 +74,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
         [CMD.SELECT_ALL_TEXT, () => leoUI.command(LEOCMD.SELECT_ALL_TEXT, { refreshType: REFRESH_NODE_BODY, finalFocus: Focus.Body })],
 
         [CMD.SHOW_OUTLINE, () => leoUI.showOutline()], // Also focuses on outline
-        [CMD.SHOW_LOG, () => leoUI.showLogPane()],
+        [CMD.SHOW_LOG, () => leoUI.showLogPane(true)], // Also focuses on log
         [CMD.SHOW_BODY, () => leoUI.showBody()], // Also focuses on body
         [CMD.EXECUTE, () => leoUI.command(LEOCMD.EXECUTE_SCRIPT, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
 
@@ -85,9 +85,19 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
 
         [CMD.MINIBUFFER, (p_commandName?: string) => leoUI.minibuffer(p_commandName)], // Is referenced in package.json
         [CMD.SET_LEO_ID, () => leoUI.setLeoIDCommand()],
+
+        // TODO: implement some sort of show bindings command. Maybe something similar tho the show commands command, but with a list of all the key bindings and their associated commands.
+        // [CMD.SHOW_BINDINGS, () => leoUI.command(LEOCMD.SHOW_BINDINGS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+
+        [CMD.SHOW_COMMANDS, () => leoUI.command(LEOCMD.SHOW_COMMANDS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.SHOW_SETTINGS, () => leoUI.command(LEOCMD.SHOW_SETTINGS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.OPEN_LOCAL_SETTINGS, () => leoUI.command(LEOCMD.OPEN_LOCAL_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
         [CMD.OPEN_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
         [CMD.OPEN_MY_LEO_SETTINGS, () => leoUI.command(LEOCMD.OPEN_MY_LEO_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
         [CMD.RELOAD_SETTINGS, () => leoUI.command(LEOCMD.RELOAD_SETTINGS, { refreshType: REFRESH_ALL, finalFocus: Focus.NoChange })],
+        [CMD.TOGGLE_ABBREV_MODE, () => leoUI.command(LEOCMD.TOGGLE_ABBREV_MODE, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.ABBREV_LIST, () => leoUI.command(LEOCMD.ABBREV_LIST, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
+        [CMD.ABBREV_KILL_ALL, () => leoUI.command(LEOCMD.ABBREV_KILL_ALL, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
 
         [CMD.HANDLE_UNL, (p_arg: { unl: string }) => leoUI.handleUnl(p_arg)],
 
@@ -266,6 +276,7 @@ export function makeAllBindings(leoUI: LeoUI, controller: Controller): void {
 
         [CMD.NEXT_NODE, () => leoUI.command(LEOCMD.GOTO_NEXT_HISTORY, { refreshType: REFRESH_TREE_BODY, finalFocus: Focus.NoChange })],
 
+        [CMD.SHOW_FIND_OPTIONS, () => leoUI.command(LEOCMD.SHOW_FIND_OPTIONS, { refreshType: NO_REFRESH, finalFocus: Focus.NoChange })],
         [CMD.FIND_HISTORY_BACK, () => leoUI.doArrow("Up")],
         [CMD.FIND_HISTORY_FORWARD, () => leoUI.doArrow("Down")],
         [CMD.FIND_QUICK, () => leoUI.findQuick()],

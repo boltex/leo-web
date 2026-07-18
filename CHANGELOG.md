@@ -1,8 +1,19 @@
 # Change Log
 
+## 1.0.41
+
+- Fixed "detect binary files" as per Leo's PR 4793.
+- Added more abbreviations and settings related menu commands.
+
+## 1.0.40
+
+- Fixed specific problematic 'alt+n' keybinding for macOS when Colemak keyboard layout is used.
+- Fixed @auto-md / @auto-markdown handling of @noheader nodes - From original Leo's #4787 by Alexander Przemysław Kamiński
+
 ## 1.0.39
 
-- ...
+- Added menu customization with @menuat nodes within @settings nodes, in either local files, or myLeoSettings to affect all.
+- Fixed keybindings using 'alt' such as 'alt-x' for macOS platform.
 
 ## 1.0.38
 

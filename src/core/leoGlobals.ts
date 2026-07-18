@@ -10,6 +10,7 @@ import { workspace as workspaceInstance } from '../workspace';
 import * as utils from '../utils';
 import * as os from 'os';
 import * as path from 'path';
+import binaryExtensions from 'binary-extensions';
 import * as showdownObj from "showdown";
 import * as pakoObj from 'pako';
 import * as md5Obj from 'md5';
@@ -46,6 +47,7 @@ export const workspace = workspaceInstance; // To expose the workspace to the re
 
 /** For accessing files in the current workspace */
 export let workspaceUri: Uri;
+export const binary_file_extensions: readonly string[] = binaryExtensions;
 export let pako: typeof pakoObj = pakoObj;
 export let showdown: typeof showdownObj = showdownObj;
 export let dayjs: typeof dayjsObj = dayjsObj;
@@ -656,28 +658,34 @@ export class SettingsDict extends Map<string, any> {
     //     """Suitable for g.printObj"""
     //     return f"{g.dictToString(self.d)}\n{str(self)}\n"
 
+    public override set(key: string, value: any): this {
+        super.set(key, value);
+        return this;
+    }
+
     // = () : trick for toString as per https://stackoverflow.com/a/35361695/920301
     public override toString = (): string => {
-        return `<SettingsDict name:${this._name} `;
+        return `<SettingsDict name:${this._name}>`;
     };
 
     //@+node:felix.20251207215313.37: *4* td.copy
     public copy(name?: string): SettingsDict {
         // The result is a g.SettingsDict.
         // return copy.deepcopy(self)
-        const newDict = new SettingsDict(this._name);
+        const newDict = new SettingsDict(name ?? this._name);
         for (const p_key of this.keys()) {
+            const gs = this.get(p_key);
             newDict.set(
                 p_key,
                 new GeneralSetting({
-                    kind: this.get(p_key).kind,
-                    encoding: this.get(p_key).encoding,
-                    ivar: this.get(p_key).ivar,
-                    source: this.get(p_key).source,
-                    val: this.get(p_key).val,
-                    path: this.get(p_key).path,
-                    tag: this.get(p_key).tag,
-                    unl: this.get(p_key).unl,
+                    kind: gs.kind,
+                    encoding: gs.encoding,
+                    ivar: gs.ivar,
+                    source: gs.source,
+                    val: deepCloneVal(gs.val),
+                    path: gs.path,
+                    tag: gs.tag,
+                    unl: gs.unl,
                 })
             );
         }
@@ -1617,35 +1625,14 @@ export function fullPath(
 //     return f and isinstance(f, io.BufferedIOBase)
 
 // }
-export async function is_binary_external_file(
+export function is_binary_external_file(
     fileName: string
-): Promise<boolean> {
-    try {
-        // with open(fileName, 'rb') as f:
-        //     s = f.read(1024)  // bytes, in Python 3.
-        const w_readUri = makeUri(fileName);
-        const readData = await workspaceInstance.fs.readFile(w_readUri);
-        const s = readData.slice(0, 1024);
-        return is_binary_string(s);
-        // except IOError:
-        //     return False
-    } catch (exception) {
-        es_exception(exception);
+): boolean {
+    if (!fileName) {
         return false;
     }
-}
-export function is_binary_string(s: Uint8Array): boolean {
-    // http://stackoverflow.com/questions/898669
-    // aList is a list of all non-binary characters.
-    // aList = [7, 8, 9, 10, 12, 13, 27] + list(range(0x20, 0x100))
-    for (let i = 0; i < s.length; i++) {
-        const byte = s[i]!;
-        if ((byte < 0x20 || byte > 0xFF) && // Check for non-ASCII and extended ASCII range
-            ![0x07, 0x08, 0x09, 0x0A, 0x0C, 0x0D, 0x1B].includes(byte)) { // Exclude specific control characters
-            return true; // Binary byte found
-        }
-    }
-    return false; // No binary bytes found
+    const [_root, ext] = os_path_splitext(fileName);
+    return binary_file_extensions.includes(ext);
 }
 //@+node:felix.20251207215313.83: *3* g.makeAllNonExistentDirectories
 /**
@@ -3736,7 +3723,7 @@ export function es(...args: any[]): void {
             // const color = lastArg.color;
             args.pop();
             // TODO : Use color in some way, e.g. by passing it to app.gui.addLogPaneEntry.
-            console.log('EMIT STRING: Color argument detected:', lastArg.color);
+            // console.log('EMIT STRING: Color argument detected:', lastArg.color);
         }
     }
 
@@ -3759,10 +3746,7 @@ export function es(...args: any[]): void {
 
     if (app && app.gui) {
         // Make sure the log pane is visible with 'show Log Pane' command (Leo-Web only)
-        if (app.inScript && !app.hasScriptShownlog) {
-            app.gui.showLogPane();
-            app.hasScriptShownlog = true;
-        }
+        app.gui.showLogPane();
         app.gui.addLogPaneEntry(s);
     } else {
         logBuffer.push(s);
@@ -3945,6 +3929,18 @@ export function es_print_unique_message(message: string, color?: string): boolea
 }
 
 //@+node:felix.20251207215313.202: ** g.Miscellaneous
+//@+node:felix.20260711215744.1: *3* g.deepCloneVal
+export function deepCloneVal<T>(value: T): T {
+    try {
+        return structuredClone(value);
+    } catch {
+        try {
+            return JSON.parse(JSON.stringify(value)) as T;
+        } catch {
+            return value;
+        }
+    }
+}
 //@+node:felix.20251207215313.203: *3* g.IDDialog
 export function IDDialog(): Thenable<string> {
     return workspaceInstance.dialog.showInputDialog({
@@ -6133,7 +6129,7 @@ export async function handleUrlHelper(url: string, c: Commands, p: Position): Pr
     } else if (['', 'file'].includes(parsed.protocol.replace(':', ''))) {
 
         // TODO : check if unquote_path is needed !
-        const unquote_path = unquoteUrl(leo_path);
+        const unquote_path = unquote(leo_path);
         if (await os_path_exists(leo_path)) {
 
             // It'S a file in the workspace
@@ -6521,11 +6517,21 @@ export async function openUrlHelper(c: Commands, url?: string): Promise<string |
     return undefined;
 
 }
-//@+node:felix.20251207215313.302: *3* g.unquoteUrl
+//@+node:felix.20260713205008.1: *3* g.quote
+/**
+ * g.quote mimics the safe='' argument of urllib.parse.quote in Python.
+ */
+export function quote(value: string): string {
+    return encodeURIComponent(value).replace(
+        /[!'()*]/g,
+        (char: string) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`
+    );
+}
+//@+node:felix.20251207215313.302: *3* g.unquote
 /**
  * Replace escaped characters (especially %20, by their equivalent).
  */
-export function unquoteUrl(url: string): string {
+export function unquote(url: string): string {
 
     // return urllib.parse.unquote(url);
 
