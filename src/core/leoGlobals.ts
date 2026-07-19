@@ -1678,7 +1678,7 @@ export function openWithFileName(
     gui?: LeoGui,
     skipSaveSession?: boolean
 ): Promise<Commands | undefined> {
-    return app.loadManager!.loadLocalFile(fileName, gui, old_c, skipSaveSession);
+    return app.loadManager!.openWithFileName(fileName, gui, old_c, skipSaveSession);
 }
 //@+node:felix.20251207215313.85: *3* g.readFileIntoString
 /**

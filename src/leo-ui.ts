@@ -2830,7 +2830,7 @@ export class LeoUI extends NullGui {
             }
             if (fileName && g.app.loadManager) {
                 await utils.setContext(Constants.CONTEXT_FLAGS.LEO_OPENING_FILE, true);
-                const commander = await g.app.loadManager.loadLocalFile(fileName, this);
+                const commander = await g.app.loadManager.openWithFileName(fileName, this);
                 if (!commander) {
                     void workspace.dialog.showInformationMessage('can not open:' + '"' + fileName + '"');
                     return Promise.resolve();
