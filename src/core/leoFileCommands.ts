@@ -1530,13 +1530,6 @@ export class FileCommands {
     }
     //@+node:felix.20251214160339.932: *4* fc: Read Utils
     // Methods common to both the sax and non-sax code.
-    //@+node:felix.20251214160339.933: *5* fc.archivedPositionToPosition
-    /**
-     * Convert an archived position (a string) to a position.
-     */
-    public archivedPositionToPosition(s: string): Position | undefined {
-        return this.c.archivedPositionToPosition(s);
-    }
     //@+node:felix.20251214160339.934: *5* fc.getDescendentAttributes
     /**
      * s is a list of gnx's, separated by commas from a <v> or <t> element.
@@ -1789,7 +1782,7 @@ export class FileCommands {
         }
 
         if (str_pos !== undefined) {
-            current = this.archivedPositionToPosition(str_pos);
+            current = c.archivedPositionToPosition(str_pos);
         }
 
         if (!c.positionExists(current)) {  // #4789.

@@ -205,7 +205,6 @@ export class Commands {
     public mRelativeFileName: string = '';
 
     public orphan_at_file_nodes: string[] = []; // List of orphaned nodes for c.raise_error_dialogs. (headers)
-    public wrappedFileName: string | undefined = undefined; // The name of the wrapped file, for wrapper commanders, set by LM.initWrapperLeoFile
 
     //@+node:felix.20251214160339.417: *4* c.initOptionsIvars
     // Init Commander ivars corresponding to user options.
@@ -2053,13 +2052,12 @@ export class Commands {
                 c._currentPosition = p.copy();
             }
         } else {
+            const message = `Invalid position: ${p.toString()} in ${c.shortFileName()}\n${g.callers(10)}`;
             if (g.unitTesting) {
-                // New in Leo 6.7.4: *Do* raise an exception.
-                throw new Error(`Invalid position: ${p.toString()}`);
+                throw new Error(message);
             }
             c._currentPosition = c.rootPosition();
-            g.trace(`Invalid position`, p.toString(), c.toString());
-            g.trace(g.callers());
+            g.trace(message);
         }
     }
 
@@ -2273,7 +2271,7 @@ export class Commands {
         // Check consistency of parent and children arrays.
         // very nodes gets visited, so a strong test need only check consistency
         // between p and its parent, not between p and its children.
-        const parent_v: VNode = p._parentVnode()!;
+        const parent_v: VNode = p._parentVnode();
         const n: number = p.childIndex();
         if (!_assert(parent_v.children[n] === p.v)) {
             g.trace('parent_v.children[n] != p.v');

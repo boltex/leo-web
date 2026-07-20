@@ -275,12 +275,12 @@ export class CommanderFileCommands {
         // frame.resizePanesToRatio(frame.ratio, frame.secondary_ratio)
         // Resize the _new_ frame.
         // c.frame.createFirstTreeNode()
-        lm.createMenu(c);
+
         lm.finishOpen(c);
         //g.app.writeWaitingLog(c);
         g.doHook('new', { old_c: old_c, c: c, new_c: c });
 
-        // ! mod_scripting ORIGINALLY INIT ON open2 or new HOOK IN LEO !
+        // * In Leo, this was done in mod_scripting using 'hook' mechanism on 'open2' and 'new' events.
         c.theScriptingController = new ScriptingController(c);
         await c.theScriptingController.createAllButtons();
 
@@ -314,77 +314,6 @@ export class CommanderFileCommands {
     ): Promise<unknown> {
         const c: Commands = this;
 
-        //@+others // Defines open_completer function.
-        //@+node:felix.20251214160853.80: *5* function: open_completer
-        async function open_completer(
-            p_c: Commands,
-            closeFlag: boolean,
-            fileName?: string
-        ): Promise<unknown> {
-
-            // FIX SLASHES AND CAPITALIZE DRIVE LETTERS TO EMULATE PYTHON OPEN FILE DIALOG RESULT
-            if (fileName) {
-                fileName = g.os_path_fix_drive(fileName);
-                fileName = g.os_path_normslashes(fileName);
-            }
-
-            p_c.bringToFront();
-            p_c.init_error_dialogs();
-
-            let ok: any = false;
-
-            // ! THIS METHOD VOLUNTARILY DIFFERENT THAN LEO'S PYTHON CODE
-
-            let q_result = Promise.resolve();
-            if (fileName) {
-                if (g.app.loadManager!.isLeoFile(fileName)) {
-                    const c2 = await g.openWithFileName(fileName, p_c, c.gui);
-                    if (c2) {
-                        // c2.k.makeAllBindings(); // ? needed ?
-
-                        // Fix #579: Key bindings don't take for commands defined in plugins.
-                        await g.chdir(fileName);
-                        g.setGlobalOpenDir(fileName);
-                    }
-                    if (c2 && closeFlag) {
-                        await g.app.destroyWindow(p_c.frame);
-                        // ! Need to remove here in leo-web !
-                        let index = g.app.windowList.indexOf(p_c.frame, 0);
-                        if (index > -1) {
-                            g.app.windowList.splice(index, 1);
-                        }
-
-                        // Set UI document's pane and outline proper refresh selected index!
-
-                        index = g.app.windowList.indexOf(c2.frame);
-                        if (index >= 0) {
-                            g.app.gui.frameIndex = index;
-                        }
-                    }
-                } else {
-                    // Create an @file node for files containing Leo sentinels.
-                    const w_looksDerived = await p_c.looksLikeDerivedFile(
-                        fileName
-                    );
-                    if (w_looksDerived) {
-                        ok = await p_c.importCommands.importDerivedFiles(
-                            p_c.p,
-                            [fileName],
-                            'Open'
-                        );
-                    } else {
-                        // otherwise, create an @edit node.
-                        ok = p_c.createNodeFromExternalFile(fileName);
-                    }
-                }
-            }
-            await p_c.raise_error_dialogs('write');
-            await g.app.runAlreadyOpenDialog(p_c);
-
-            return q_result;
-        }
-        //@-others
-
         // ! THIS METHOD VOLUNTARILY DIFFERENT THAN LEO'S PYTHON CODE
         // Close the window if this command completes successfully?
         let closeFlag: boolean =
@@ -412,7 +341,8 @@ export class CommanderFileCommands {
         }
 
         if (fileName) {
-            return open_completer(c, closeFlag, fileName);
+            return g.openWithFileName(fileName, c);
+            // return open_completer(c, closeFlag, fileName);
         }
         // Equivalent to legacy code.
         fileName = await g.app.gui.runOpenFileDialog(
@@ -421,7 +351,8 @@ export class CommanderFileCommands {
             table,
         );
 
-        return open_completer(c, closeFlag, fileName);
+        // return open_completer(c, closeFlag, fileName);
+        return g.openWithFileName(fileName, c);
     }
     //@+node:felix.20251214160853.81: *4* c_file.refreshFromDisk
     // refresh_pattern = re.compile(r'^(@[\w-]+)')

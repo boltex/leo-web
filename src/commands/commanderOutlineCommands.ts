@@ -2092,7 +2092,7 @@ export class CommanderOutlineCommands {
             next.moveToNext();
         }
         c.endEditing();
-        const parent_v: VNode = p._parentVnode()!;
+        const parent_v: VNode = p._parentVnode();
         const n: number = p.childIndex();
         const followingSibs: VNode[] = parent_v.children.slice(n + 1);
         // Remove the moved nodes from the parent's children.
@@ -2516,7 +2516,7 @@ export class CommanderOutlineCommands {
         if (reverse) {
             undoType = 'Reverse ' + undoType;
         }
-        const parent_v: VNode = p._parentVnode()!;
+        const parent_v: VNode = p._parentVnode();
         const oldChildren: VNode[] = [...parent_v.children];
         const newChildren: VNode[] = [...parent_v.children];
         if (key === undefined) {

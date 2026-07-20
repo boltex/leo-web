@@ -1589,7 +1589,7 @@ export class Undoer {
     public redoDemote(): void {
         const u: Undoer = this;
         const c: Commands = u.c;
-        const parent_v: VNode = u.p!._parentVnode()!;
+        const parent_v: VNode = u.p!._parentVnode();
         const n: number = u.p!.childIndex();
 
         // Move the demoted nodes from the old parent to the new parent.
@@ -1812,7 +1812,7 @@ export class Undoer {
     public redoPromote(): void {
         const u: Undoer = this;
         const c: Commands = u.c;
-        const parent_v: VNode = u.p!._parentVnode()!;
+        const parent_v: VNode = u.p!._parentVnode();
         // Add the children to parent_v's children.
         let n: number = u.p!.childIndex() + 1;
         const old_children: VNode[] = [...parent_v.children];
@@ -1845,7 +1845,7 @@ export class Undoer {
         if (u.sortChildren) {
             p.v.children = [...u.newChildren];
         } else {
-            const parent_v = p._parentVnode()!;
+            const parent_v = p._parentVnode();
             parent_v.children = [...u.newChildren];
             // Only the child index of new position changes!
             for (var _i = 0; _i < parent_v.children.length; _i++) {
@@ -2087,7 +2087,7 @@ export class Undoer {
     public undoDemote(): void {
         const u: Undoer = this;
         const c: Commands = u.c;
-        const parent_v: VNode = u.p!._parentVnode()!;
+        const parent_v: VNode = u.p!._parentVnode();
         let n: number = u.followingSibs.length;
         // Remove the demoted nodes from p's children.
         u.p!.v.children = u.p!.v.children.slice(0, -n);
@@ -2301,7 +2301,7 @@ export class Undoer {
     public undoPromote(): void {
         const u: Undoer = this;
         const c: Commands = u.c;
-        const parent_v: VNode = u.p!._parentVnode()!; // The parent of the all the *promoted* nodes.
+        const parent_v: VNode = u.p!._parentVnode(); // The parent of the all the *promoted* nodes.
         // Remove the promoted nodes from parent_v's children.
         let n: number = u.p!.childIndex() + 1;
         // Adjust the old parents children
@@ -2421,7 +2421,7 @@ export class Undoer {
         if (u.sortChildren) {
             p.v.children = [...u.oldChildren];
         } else {
-            const parent_v = p._parentVnode()!;
+            const parent_v = p._parentVnode();
             parent_v.children = [...u.oldChildren];
             // Only the child index of new position changes!
             for (var _i = 0; _i < parent_v.children.length; _i++) {
