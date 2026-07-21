@@ -1789,7 +1789,7 @@ export class FileCommands {
             current = c.rootPosition()!;
         }
         // current will not be undefined because of the previous check.
-        c.setCurrentPosition(current!);
+        c.p = current!;
     }
     //@+node:felix.20251214160339.942: *3* fc: Writing
     //@+node:felix.20251214160339.943: *4* fc: Writing save*

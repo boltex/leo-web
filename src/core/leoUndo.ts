@@ -1607,7 +1607,7 @@ export class Undoer {
             v.parents.push(u.p!.v);
         }
         u.p!.setDirty();
-        c.setCurrentPosition(u.p!);
+        c.p = u.p!;
     }
     //@+node:felix.20251214160339.1955: *4* u.redoGroup
     /**
@@ -1835,7 +1835,7 @@ export class Undoer {
             child.parents.push(parent_v);
         }
         u.p!.setDirty();
-        c.setCurrentPosition(u.p!);
+        c.p = u.p!;
     }
     //@+node:felix.20251214160339.1963: *4* u.redoSort
     public redoSort(): void {
@@ -1857,7 +1857,7 @@ export class Undoer {
             }
         }
         p.setAllAncestorAtFileNodesDirty();
-        c.setCurrentPosition(p);
+        c.p = p;
     }
     //@+node:felix.20251214160339.1964: *4* u.redoTree
     /**
@@ -2105,7 +2105,7 @@ export class Undoer {
             sib.parents.push(parent_v);
         }
         u.p!.setAllAncestorAtFileNodesDirty();
-        c.setCurrentPosition(u.p!);
+        c.p = u.p!;
     }
     //@+node:felix.20251214160339.1979: *4* u.undoGroup
     /**
@@ -2328,7 +2328,7 @@ export class Undoer {
             child.parents.push(u.p!.v);
         }
         u.p!.setAllAncestorAtFileNodesDirty();
-        c.setCurrentPosition(u.p!);
+        c.p = u.p!;
     }
     //@+node:felix.20251214160339.1987: *4* u.undoRedoText
     /**
@@ -2433,7 +2433,7 @@ export class Undoer {
             }
         }
         p.setAllAncestorAtFileNodesDirty();
-        c.setCurrentPosition(p);
+        c.p = p;
     }
     //@+node:felix.20251214160339.1991: *4* u.undoTree
     /**
@@ -2463,15 +2463,7 @@ export class Undoer {
         // Redraw and recolor.
         // c.frame.body.updateEditors();  // New in Leo 4.4.8.
 
-        //
-        // Set the new position.
-        if (0) {
-            // Don't do this: it interferes with selection ranges.
-            // This strange code forces a recomputation of the root position.
-            c.selectPosition(c.p);
-        } else {
-            c.setCurrentPosition(c.p);
-        }
+        // PR #4809. c.p has already been set.
         //
         // # 1451. *Always* set the changed bit.
         // Redrawing *must* be done here before setting u.undoing to false.

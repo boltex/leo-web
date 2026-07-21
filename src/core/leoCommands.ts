@@ -1931,6 +1931,11 @@ export class Commands {
         return c.currentPosition()!;
     }
 
+    public set p(p: Position) {
+        const c: Commands = this;
+        c.setCurrentPosition(p);
+    }
+
     //@+node:felix.20251214160339.499: *4* c.Setters
     //@+node:felix.20251214160339.500: *5* c.appendStringToBody
     public appendStringToBody(p: Position, s: string): void {
@@ -2060,9 +2065,6 @@ export class Commands {
             g.trace(message);
         }
     }
-
-    // * For compatibility with old scripts.
-    // setCurrentVnode = setCurrentPosition
 
     //@+node:felix.20251214160339.508: *5* c.setHeadString
     /**
@@ -3595,7 +3597,7 @@ export class Commands {
         }
         if (!c.positionExists(p)) {
             g.trace(`Invalid position: ${String(p)} in ${c.shortFileName()}\n${g.callers(10)}`);
-            c.setCurrentPosition(c.rootPosition()!);
+            c.p = c.rootPosition()!;
             return;
         }
         c.requestLaterRedraw = false;
@@ -4329,7 +4331,7 @@ export class Commands {
 
         c.frame.tree.select(p);
 
-        c.setCurrentPosition(p);
+        c.p = p;
     }
 
     //@+node:felix.20251214160339.644: *5* c.treeSelectHelper

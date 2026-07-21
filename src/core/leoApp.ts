@@ -3144,8 +3144,7 @@ export class LoadManager {
             const c = await this.openWithFileNameHelper(file_name, gui, old_c, skipSaveSession);
             if (c) {
                 if (!c.positionExists(c.p)) {
-                    // c.p = c.rootPosition()!; // illegal, c.p is a getter, so we must use setCurrentPosition instead
-                    c.setCurrentPosition(c.rootPosition()!);
+                    c.p = c.rootPosition()!;
                 }
                 return c;
             }
