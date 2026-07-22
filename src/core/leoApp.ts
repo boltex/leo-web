@@ -3360,6 +3360,10 @@ export class LoadManager {
         }
 
         g.doHook("open1", { old_c: null, c: c, new_c: c, fileName: fn });
+
+        // * In Leo, this was done in mod_scripting using 'hook' mechanism on 'open2' and 'new' events.
+        c.theScriptingController = new ScriptingController(c);
+        await c.theScriptingController.createAllButtons();
         g.doHook("open2", { old_c: old_c, c: c, new_c: c, fileName: fn });
 
         // Finish.
@@ -3474,6 +3478,10 @@ export class LoadManager {
         c.mFileName = '';  // #3546: Do *not* automatically save the .leo file.
         c.frame.title = c.computeTabTitle();
         c.frame.setTitle(c.frame.title);
+
+        // * In Leo, this was done in mod_scripting using 'hook' mechanism on 'open2' and 'new' events.
+        c.theScriptingController = new ScriptingController(c);
+        await c.theScriptingController.createAllButtons();
 
         g.doHook("open2", { old_c, c, new_c: c, fileName: fn });
         // Finish.

@@ -305,6 +305,10 @@ export class CommanderFileCommands {
     }
     //@+node:felix.20251214160853.79: *4* c_file.open_outline
     @commander_command(
+        'open-file',
+        'Open a Leo window containing the contents of a .leo file.'
+    )
+    @commander_command(
         'open-outline',
         'Open a Leo window containing the contents of a .leo file.'
     )
