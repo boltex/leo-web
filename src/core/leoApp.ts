@@ -3160,6 +3160,7 @@ export class LoadManager {
         // lm = self
         // Create the menu as late as possible so it can use user commands.
         if (!g.doHook("menu1", { c: c, p: c.p, v: c.p })) {
+            // Important: Make a deep copy of the menu to avoid mutating the original menu structure when we modify it for display.
             c.frame.menu = JSON.parse(JSON.stringify(c.config.getMenusList()))
             g.doHook("menu2", { c: c, p: c.p, v: c.p });
             g.doHook("after-create-leo-frame", { c: c });

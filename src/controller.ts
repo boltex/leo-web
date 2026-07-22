@@ -637,9 +637,10 @@ export class Controller {
             // The frame has the menu directly, so we can use it to generate the menu.
             modifiedMenu = g.app.windowList[g.app.gui.frameIndex].menu;
         } else {
-            // Should not happen because a new empty document is created if 
-            // no recent document is opened, but just in case, use the global config's menu.
-            modifiedMenu = g.app.config.getMenusList();
+            // This can happen when the user closes the last document, and we want to keep the menu in sync with the config's menu settings.
+
+            // Important: Make a deep copy of the menu to avoid mutating the original menu structure when we modify it for display.
+            modifiedMenu = JSON.parse(JSON.stringify(g.app.config.getMenusList()));
         }
 
         workspace.menu.buildMenu(modifiedMenu);
@@ -894,15 +895,19 @@ export class Controller {
             return;
         }
         // Was a Single Printable Character, so check for abbrev expansion.
-        const c = g.app.windowList[g.app.gui.frameIndex].c;
-        if (c.k.abbrevOn) {
-            const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
-            if (abbrevPromise) {
-                e.preventDefault(); // Prevent the typing from doing anything!
-                abbrevPromise.then((expanded) => {
-                    this.refreshAbbrev();
-                    return;
-                });
+        if (
+            g.app.windowList.length
+        ) {
+            const c = g.app.windowList[g.app.gui.frameIndex].c;
+            if (c.k.abbrevOn) {
+                const abbrevPromise = c.abbrevCommands.expandAbbrev(e, e)
+                if (abbrevPromise) {
+                    e.preventDefault(); // Prevent the typing from doing anything!
+                    abbrevPromise.then((expanded) => {
+                        this.refreshAbbrev();
+                        return;
+                    });
+                }
             }
         }
     }
