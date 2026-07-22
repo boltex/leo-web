@@ -2,7 +2,9 @@
 
 ## 1.0.42
 
-- ...
+- Fixed menu handling.
+- Implemented Leo's PR for #4789
+- Added c.p setter.
 
 ## 1.0.41
 
