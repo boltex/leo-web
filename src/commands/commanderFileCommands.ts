@@ -317,46 +317,24 @@ export class CommanderFileCommands {
         p_uri?: Uri
     ): Promise<unknown> {
         const c: Commands = this;
-
-        // ! THIS METHOD VOLUNTARILY DIFFERENT THAN LEO'S PYTHON CODE
-        // Close the window if this command completes successfully?
-        let closeFlag: boolean =
-            c.frame.startupWindow &&
-            // The window was open on startup
-            !c.changed &&
-            !c.fileName() &&
-            !c.frame.saved &&
-            // The window has never been changed
-            g.app.numberOfUntitledWindows === 1;
-        // Only one untitled window has ever been opened
-
-        let table: [string, string][] = [
+        let filetypes: [string, string][] = [
             ['Leo files', '*.leojs *.leo *.db'],
             ['Python files', '*.py'],
             ['All files', '*'],
         ];
-        // maybe from c.k.
-        let fileName: string = c.k?.givenArgs?.join('');
-
+        let fileName: string | undefined;
         // override with given argument
-
         if (p_uri && p_uri.fsPath && p_uri.fsPath.trim()) {
             fileName = p_uri.fsPath;
-        }
-
-        if (fileName) {
-            return g.openWithFileName(fileName, c);
-            // return open_completer(c, closeFlag, fileName);
+            if (fileName) {
+                return g.openWithFileName(fileName, c);
+            }
         }
         // Equivalent to legacy code.
-        fileName = await g.app.gui.runOpenFileDialog(
-            c,
-            'Open',
-            table,
-        );
-
-        // return open_completer(c, closeFlag, fileName);
-        return g.openWithFileName(fileName, c);
+        fileName = await g.app.gui.runOpenFileDialog(c, 'Open', filetypes,);
+        if (fileName) {
+            return g.openWithFileName(fileName, c);
+        }
     }
     //@+node:felix.20251214160853.81: *4* c_file.refreshFromDisk
     // refresh_pattern = re.compile(r'^(@[\w-]+)')
