@@ -1531,7 +1531,7 @@ export async function createHiddenCommander(
         const exists = await os_path_exists(fn);
         if (app.loadManager!.isLeoFile(fn) && exists) {
             const lm = app.loadManager!;
-            const c = lm.openFileByName(fn, app.nullGui);
+            const c = await lm.openWithFileName(fn, app.nullGui);
             return c;
         }
     } catch (e) {
@@ -1678,7 +1678,7 @@ export function openWithFileName(
     gui?: LeoGui,
     skipSaveSession?: boolean
 ): Promise<Commands | undefined> {
-    return app.loadManager!.loadLocalFile(fileName, gui, old_c, skipSaveSession);
+    return app.loadManager!.openWithFileName(fileName, gui, old_c, skipSaveSession);
 }
 //@+node:felix.20251207215313.85: *3* g.readFileIntoString
 /**
