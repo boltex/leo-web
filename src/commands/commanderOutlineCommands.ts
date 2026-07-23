@@ -1418,7 +1418,7 @@ export class CommanderOutlineCommands {
         } else {
             p.contract();
         }
-        c.setCurrentPosition(p);
+        c.p = p;
         c.redraw(); // redraw selects p
         // c.frame.clearStatusLine()
         // c.frame.putStatusLine("De-Hoist: " + p.h)
@@ -1490,7 +1490,7 @@ export class CommanderOutlineCommands {
             return clone; // For mod_labels and chapters plugins.
         }
         clone.doDelete();
-        c.setCurrentPosition(p);
+        c.p = p;
         return undefined;
     }
     //@+node:felix.20251214160853.199: *4* c_oc.cloneToAtSpot
@@ -1541,7 +1541,7 @@ export class CommanderOutlineCommands {
             c.redraw(clone);
         } else {
             clone.doDelete();
-            c.setCurrentPosition(p);
+            c.p = p;
         }
     }
     //@+node:felix.20251214160853.200: *4* c_oc.cloneToLastNode
@@ -2092,7 +2092,7 @@ export class CommanderOutlineCommands {
             next.moveToNext();
         }
         c.endEditing();
-        const parent_v: VNode = p._parentVnode()!;
+        const parent_v: VNode = p._parentVnode();
         const n: number = p.childIndex();
         const followingSibs: VNode[] = parent_v.children.slice(n + 1);
         // Remove the moved nodes from the parent's children.
@@ -2516,7 +2516,7 @@ export class CommanderOutlineCommands {
         if (reverse) {
             undoType = 'Reverse ' + undoType;
         }
-        const parent_v: VNode = p._parentVnode()!;
+        const parent_v: VNode = p._parentVnode();
         const oldChildren: VNode[] = [...parent_v.children];
         const newChildren: VNode[] = [...parent_v.children];
         if (key === undefined) {

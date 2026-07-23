@@ -2,7 +2,9 @@
 
 ## 1.0.42
 
-- ...
+- Fixed menu handling when closing all opened documents.
+- Implemented Leo's PR #4795 which fixes file new & open procedures.
+- Added c.p setter.
 
 ## 1.0.41
 
