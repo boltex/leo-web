@@ -143,6 +143,9 @@ export class BodyManager {
 
     private _sentinel: HTMLElement | null = null;
 
+    public typingTimer: ReturnType<typeof setTimeout> | null = null;
+    public TYPING_DELAY = 300; // Time in ms to wait before re-rendering the shadow or other text effects after user input. This is to avoid performance issues when typing quickly.
+
     public HTML_ELEMENT: HTMLElement;
 
     constructor() {
@@ -428,6 +431,17 @@ export class BodyManager {
 
         BODY_PANE.addEventListener('input', (e) => {
             if (this._probingRect) return;
+            if (!this._bodyPane.classList.contains('is-typing')) {
+                this._bodyPane.classList.add('is-typing');
+            }
+            if (this.typingTimer) {
+                clearTimeout(this.typingTimer);
+            }
+            this.typingTimer = setTimeout(() => {
+                this._bodyPane.classList.remove('is-typing');
+                this.typingTimer = null;
+            }, this.TYPING_DELAY);
+
             this._lineStartsDirty = true;
             this._ensureSentinel();
             callback();
