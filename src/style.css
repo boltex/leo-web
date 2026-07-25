@@ -2696,6 +2696,11 @@ mark {
   font-size: 1.25rem;
   line-height: 0.85;
 }
+/* margins similar to an old renaissance print book */
+[data-theme="principia"] .body-pane {
+  padding-left: 6%;
+  padding-right: 6%;
+}
 
 /* ### COMMON TO ALL THEMES ### */
 
