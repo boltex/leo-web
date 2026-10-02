@@ -2,7 +2,7 @@
 
 ## 1.0.43
 
-- ...
+- Implemented fix for rust importer matching Leo's original PR # 4981
 
 ## 1.0.42
 
