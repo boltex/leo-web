@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.44
+
+- ...
+
 ## 1.0.43
 
 - Implemented fix for rust importer matching Leo's original PR # 4981
