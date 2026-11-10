@@ -1968,7 +1968,7 @@ export class FileCommands {
     public async write_Leo_file(fileName: string): Promise<boolean> {
         const c: Commands = this.c;
         const fc: FileCommands = this;
-        await g.app.recentFilesManager.writeRecentFilesFile(c);
+        g.app.recentFilesManager.writeRecentFilesFile(c);
         await fc.writeAllAtFileNodes();
         if (g.app.externalFilesController) {
             await g.app.externalFilesController.onIdlePromise;
