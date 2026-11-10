@@ -3517,6 +3517,10 @@ export class LoadManager {
         if (is_leo && exists) {
             c = await this.openExistingLeoFile(file_name, gui, old_c);
             if (c) {
+                if (!skipSaveSession) {
+                    g.app.saveSession(); // IN LEO-WEB: Save sessions here to skip saving session on program exit.
+                    g.app.global_cacher.commit(); // Save the latest state of the cache.
+                }
                 return c;
             }
         }
