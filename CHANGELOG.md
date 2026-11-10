@@ -2,7 +2,7 @@
 
 ## 1.0.44
 
-- ...
+- Recent files list updates itself upon opening a file, instead of only on saving anc closing a file.
 
 ## 1.0.43
 
