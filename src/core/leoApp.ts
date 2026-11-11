@@ -1317,7 +1317,7 @@ export class LeoApp {
 
         // Make sure .leoRecentFiles.txt is written.
         // ! IN LEO-WEB : make sure .leoRecentFiles.txt is written on open and save file instead.
-        // await g.app.recentFilesManager.writeRecentFilesFile(c);
+        // g.app.recentFilesManager.writeRecentFilesFile(c);
 
         if (c.changed && !finish_quit) {
             c.promptingForClose = true;
@@ -3517,6 +3517,12 @@ export class LoadManager {
         if (is_leo && exists) {
             c = await this.openExistingLeoFile(file_name, gui, old_c);
             if (c) {
+                if (!skipSaveSession) {
+                    g.app.recentFilesManager.updateRecentFiles(c.fileName());
+                    g.app.recentFilesManager.writeRecentFilesFile(c);
+                    g.app.saveSession(); // IN LEO-WEB: Save sessions here to skip saving session on program exit.
+                    g.app.global_cacher.commit(); // Save the latest state of the cache.
+                }
                 return c;
             }
         }
@@ -3524,6 +3530,8 @@ export class LoadManager {
             c = await this.openExternalFile(file_name, gui, old_c);
             if (c) {
                 if (!skipSaveSession) {
+                    g.app.recentFilesManager.updateRecentFiles(c.fileName());
+                    g.app.recentFilesManager.writeRecentFilesFile(c);
                     g.app.saveSession(); // IN LEO-WEB: Save sessions here to skip saving session on program exit.
                     g.app.global_cacher.commit(); // Save the latest state of the cache.
                 }
@@ -3671,7 +3679,7 @@ export class RecentFilesManager {
                     this.updateRecentFiles(w_path);
                 }
             }
-            await this.writeRecentFilesFile(c);
+            this.writeRecentFilesFile(c);
         }
 
     }
@@ -3679,7 +3687,7 @@ export class RecentFilesManager {
     /**
      * Rewrite recent files based on c.config.getData('path-demangle')
      */
-    public async demangleRecentFiles(c: Commands, data: string[]): Promise<void> {
+    public demangleRecentFiles(c: Commands, data: string[]): void {
 
         const changes: [string, string][] = [];
         let replace: string | null = null;
@@ -3713,13 +3721,13 @@ export class RecentFilesManager {
             this.updateRecentFiles(t);
         }
 
-        await this.writeRecentFilesFile(c);
+        this.writeRecentFilesFile(c);
     }
     //@+node:felix.20251214160339.131: *3* rf.clearRecentFiles
     /**
      * Clear the recent files list, then add the present file.
      */
-    public async clearRecentFiles(c: Commands): Promise<void> {
+    public clearRecentFiles(c: Commands): void {
 
         let rf: this = this;
         // let menu: Menu = c.frame.menu;
@@ -3746,7 +3754,7 @@ export class RecentFilesManager {
         // u.afterClearRecentFiles(bunch);
 
         /* Write the file immediately... */
-        await rf.writeRecentFilesFile(c);
+        rf.writeRecentFilesFile(c);
 
         /* Clearing recent files completed. Terminating protocol... */
         /* Recent files purged. Commencing data write... */
@@ -3904,7 +3912,6 @@ export class RecentFilesManager {
     //@+node:felix.20251214160339.138: *4* rf.readRecentFilesFile
     public async readRecentFilesFile(): Promise<boolean> {
         let lines: string[] | undefined;
-
         const fileContents = utils.safeLocalStorageGet('leoRecentFiles');
         lines = fileContents?.split('\n');
         if (lines && lines.length && this.sanitize(lines[0]) === 'readonly') {
@@ -3943,7 +3950,7 @@ export class RecentFilesManager {
     /**
      * Sort the recent files list.
      */
-    public async sortRecentFiles(c: Commands): Promise<void> {
+    public sortRecentFiles(c: Commands): void {
 
         const rf = this;
 
@@ -3958,7 +3965,7 @@ export class RecentFilesManager {
         for (const z of aList.reverse()) {
             rf.updateRecentFiles(z);
         }
-        await rf.writeRecentFilesFile(c);
+        rf.writeRecentFilesFile(c);
     }
     //@+node:felix.20251214160339.142: *3* rf.updateRecentFiles
     /**
@@ -4009,7 +4016,7 @@ export class RecentFilesManager {
     /**
      * Write content of "edit_headline" node as recentFiles and recreates menus.
      */
-    async writeEditedRecentFiles(c: Commands): Promise<void> {
+    public async writeEditedRecentFiles(c: Commands): Promise<void> {
         const rf = this;
         let p = g.findNodeAnywhere(c, rf.edit_headline);
 
@@ -4021,7 +4028,7 @@ export class RecentFilesManager {
                 }
             }
             rf.recentFiles = files;
-            await rf.writeRecentFilesFile(c);
+            rf.writeRecentFilesFile(c);
             rf.updateRecentFiles();
             c.selectPosition(p);
             c.deleteOutline();
@@ -4033,19 +4040,18 @@ export class RecentFilesManager {
     /**
      * Write the appropriate .leoRecentFiles.txt file.
      */
-    public async writeRecentFilesFile(c: Commands): Promise<void> {
+    public writeRecentFilesFile(c: Commands): void {
 
         // Leo-Web tries to save the recent files list on open, so skip if starting up.
         if (!g.app.initComplete) {
             return;
         }
 
-        const tag = '.leoRecentFiles.txt';
         const rf = this;
         if (g.unitTesting || g.app.inBridge) {
             return;
         }
-        await rf.writeRecentFilesFileHelper();
+        rf.writeRecentFilesFileHelper();
         rf.recentFileMessageWritten = true;
 
 
@@ -4118,7 +4124,7 @@ export class RecentFilesManager {
     /**
      * Don't update the file if it begins with read-only.
      */
-    public async writeRecentFilesFileHelper(): Promise<boolean> {
+    public writeRecentFilesFileHelper(): boolean {
 
         const s = this.recentFiles.length ? this.recentFiles.join('\n') : '\n';
 
@@ -4184,7 +4190,7 @@ export class TopLevelCommands {
         'Path demangling potentially alters the paths in the recent files list' +
         'according to find/replace patterns in the @data path-demangle setting.'
     )
-    public async demangle_recent_files_command(this: Commands): Promise<void> {
+    public demangle_recent_files_command(this: Commands): void {
         /*
         Path demangling potentially alters the paths in the recent files list
         according to find/replace patterns in the @data path-demangle setting.
@@ -4199,7 +4205,7 @@ export class TopLevelCommands {
         if (c) {
             const data = c.config.getData('path-demangle');
             if (data) {
-                await g.app.recentFilesManager.demangleRecentFiles(c, data);
+                g.app.recentFilesManager.demangleRecentFiles(c, data);
             } else {
                 g.es_print('No patterns in @data path-demangle');
             }

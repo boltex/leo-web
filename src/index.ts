@@ -1,6 +1,7 @@
 //@+leo-ver=5-thin
 //@+node:felix.20260320222223.1: * @file src/index.ts
 import './style.css';
+import './disposeShim';
 import * as g from './core/leoGlobals';
 import { LeoApp, LoadManager } from './core/leoApp';
 

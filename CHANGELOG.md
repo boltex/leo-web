@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.44
+
+- Recent files list updates itself upon opening a file, instead of only on saving or closing a file.
+
 ## 1.0.43
 
 - Implemented fix for rust importer matching Leo's original PR # 4981
