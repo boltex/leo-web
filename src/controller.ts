@@ -680,9 +680,15 @@ export class Controller {
         try {
             const saved = await workspace.loadWorkspaceDirHandle();
             if (saved && await workspace.ensurePermission(saved)) {
-                dirHandle = saved;
+
+                // Check if that folder even exists and is accessible by attempting to read its entries.
+                for await (const _ of saved.entries()) {
+                    break;
+                }
+                dirHandle = saved; // Ok, has passed the accessibility check
             }
         } catch (e) {
+            workspace.dialog.showMessageDialog("Failed to restore workspace!");
             console.warn("Failed to restore workspace:", e);
         }
 
