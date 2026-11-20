@@ -1,8 +1,12 @@
 # Change Log
 
-## 1.0.45
+## 1.0.46
 
 - ...
+
+## 1.0.45
+
+- Added checks at startup and dialog to inform user if workspace folder is missing.
 
 ## 1.0.44
 
