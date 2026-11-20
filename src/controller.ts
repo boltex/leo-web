@@ -680,6 +680,12 @@ export class Controller {
         try {
             const saved = await workspace.loadWorkspaceDirHandle();
             if (saved && await workspace.ensurePermission(saved)) {
+
+                // Force a directory read; an empty directory is valid too.
+                for await (const _ of saved.entries()) {
+                    break;
+                }
+
                 dirHandle = saved;
             }
         } catch (e) {
